@@ -1,0 +1,20 @@
+[package]
+name = "libskia"
+version = "0.1.0"
+authors = ["Aliaksei Syrel <alex.syrel@gmail.com>"]
+
+[dependencies]
+typename = "0.1.1"
+skia-safe = { git = "https://github.com/rust-skia/rust-skia" }
+libc = "0.2.65"
+boxer = { git = "https://github.com/syrel/rust-boxer" }
+
+[lib]
+name = "Skia"
+crate-type = ["cdylib"]
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+opt-level = 3
