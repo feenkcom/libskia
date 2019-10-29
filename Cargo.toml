@@ -7,7 +7,7 @@ authors = ["Aliaksei Syrel <alex.syrel@gmail.com>"]
 typename = "0.1.1"
 skia-safe = { git = "https://github.com/rust-skia/rust-skia" }
 libc = "0.2.65"
-boxer = { git = "https://github.com/syrel/rust-boxer" }
+boxer = { git = "https://github.com/feenkcom/gtoolkit-boxer" }
 
 [lib]
 name = "Skia"
