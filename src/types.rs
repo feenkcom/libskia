@@ -2,12 +2,19 @@ extern crate typename;
 
 use super::*;
 use self::typename::TypeName;
-use skia_safe::ISize;
-use boxer::size::{BoxerSizeI32};
-
-
+use boxer::string::BoxerString;
 
 #[no_mangle]
-pub fn skia_scalar_name() {
-    skia_safe::scalar::type_name();
+pub fn skia_scalar_name(_ptr: *mut BoxerString) {
+    CBox::with_raw(_ptr, |string| {
+        string.set_string(skia_safe::scalar::type_name());
+    })
+}
+
+#[test]
+fn scalar_name() {
+    let _string_ptr = CBox::into_raw(BoxerString::default());
+    skia_scalar_name(_string_ptr);
+    let string = unsafe { CBox::from_raw(_string_ptr) };
+    assert_eq!(string.to_string(), "f32");
 }
