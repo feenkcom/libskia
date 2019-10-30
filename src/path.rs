@@ -80,7 +80,7 @@ pub fn skia_path_close(_path: *mut Path) {
 
 #[no_mangle]
 pub fn skia_path_count_points(_path: *mut Path) -> usize {
-    CBox::with_raw(_path, |path| path.count_points())
+    CBox::with_raw(_path, |path| { path.count_points() })
 }
 
 #[no_mangle]
@@ -92,4 +92,11 @@ pub fn skia_path_get_points(_path: *mut Path, _points_ptr: *mut BoxerArray<Boxer
         let boxer_points = path_points.into_iter().map(|each| BoxerPointF32::new(each.x, each.y)).collect();
         points.set_vector(boxer_points);
     });
+}
+
+#[no_mangle]
+pub fn skia_path_serialize(_path: *mut Path, _data: *mut BoxerArray<u8>) {
+    CBox::with_two_raw(_path, _data, |path, data| {
+        data.set_array(path.serialize().as_bytes());
+    })
 }
