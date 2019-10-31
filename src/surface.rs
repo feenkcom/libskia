@@ -1,6 +1,7 @@
-use skia_safe::{Surface, ImageInfo, ISize};
+use skia_safe::{Surface, ImageInfo, ISize, IPoint, Canvas};
 use boxer::array::BoxerArrayU8;
 use boxer::CBox;
+use boxer::boxes::ReferenceBox;
 
 #[no_mangle]
 pub fn skia_surface_new_raster_direct(
@@ -38,8 +39,13 @@ pub fn skia_surface_new_default() -> *mut Surface {
 }
 
 #[no_mangle]
-pub fn skia_surface_drop(_ptr: *mut Surface) {
-    CBox::drop(_ptr);
+pub fn skia_surface_get_canvas(_surface_ptr: *mut Surface) -> *mut ReferenceBox<Canvas> {
+    CBox::with_optional_raw(_surface_ptr, |surface_option| {
+        match surface_option {
+            None => { std::ptr::null_mut() },
+            Some(surface) => { ReferenceBox::new(surface.canvas()).into_raw() },
+        }
+    })
 }
 
 #[no_mangle]
@@ -70,4 +76,30 @@ pub fn skia_surface_get_image_info(_surface_ptr: *mut Surface) -> *mut ImageInfo
             Some(surface) => { CBox::into_raw(surface.image_info()) },
         }
     })
+}
+
+#[no_mangle]
+pub fn skia_surface_read_all_pixels(_surface_ptr: *mut Surface, _pixels_ptr: *mut BoxerArrayU8) -> bool {
+    CBox::with_optional_raw(_surface_ptr, |surface_option| {
+        match surface_option {
+            None => { false },
+            Some(surface) => {
+                CBox::with_optional_raw(_pixels_ptr, |pixels_option| {
+                   match pixels_option {
+                       None => { false },
+                       Some(pixels) => {
+                           let image_info = surface.image_info();
+                            let row_bytes = image_info.min_row_bytes();
+                            surface.read_pixels(&image_info, pixels.to_slice(), row_bytes, IPoint::new(0,0))
+                       },
+                   }
+                })
+            },
+        }
+    })
+}
+
+#[no_mangle]
+pub fn skia_surface_drop(_ptr: *mut Surface) {
+    CBox::drop(_ptr);
 }

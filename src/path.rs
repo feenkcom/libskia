@@ -1,7 +1,7 @@
-use super::*;
 use skia_safe::{Path, scalar, Point, Vector};
 use boxer::array::BoxerArray;
 use boxer::point::BoxerPointF32;
+use boxer::CBox;
 
 #[no_mangle]
 pub fn skia_path_new() -> *mut Path {

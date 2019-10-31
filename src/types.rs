@@ -3,6 +3,7 @@ extern crate typename;
 use super::*;
 use self::typename::TypeName;
 use boxer::string::BoxerString;
+use boxer::CBox;
 
 #[no_mangle]
 pub fn skia_scalar_name(_ptr: *mut BoxerString) {
