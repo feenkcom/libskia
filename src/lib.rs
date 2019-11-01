@@ -9,3 +9,8 @@ pub mod surface;
 pub mod surface_props;
 pub mod canvas;
 pub mod color_space;
+pub mod rectangle;
+pub mod rounded_rectangle;
+pub mod point;
+pub mod enums;
+pub mod color;

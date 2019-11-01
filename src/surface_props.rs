@@ -1,19 +1,5 @@
 use skia_safe::{PixelGeometry, SurfacePropsFlags, SurfaceProps};
-use boxer::string::BoxerString;
 use boxer::CBox;
-
-#[no_mangle]
-pub fn skia_surface_props_pixel_geometry_to_string(_enum: PixelGeometry, _string_ptr: *mut BoxerString) {
-    CBox::with_optional_raw(_string_ptr, |option| match option {
-        None => {},
-        Some(string) => { string.set_string(format!("{:?}", _enum)) },
-    })
-}
-
-#[no_mangle]
-pub fn skia_surface_props_pixel_geometry_to_int(_enum: PixelGeometry) -> i32 {
-    unsafe { std::mem::transmute(_enum) }
-}
 
 #[no_mangle]
 pub fn skia_surface_props_default() -> *mut SurfaceProps {

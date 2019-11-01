@@ -1,33 +1,5 @@
 use skia_safe::{AlphaType, ColorType, ImageInfo, ISize, ColorSpace};
-use boxer::string::BoxerString;
 use boxer::CBox;
-
-#[no_mangle]
-pub fn skia_image_info_alpha_type_to_string(_enum: AlphaType, _string_ptr: *mut BoxerString) {
-    CBox::with_optional_raw(_string_ptr, |option| match option {
-        None => {},
-        Some(string) => { string.set_string(format!("{:?}", _enum)) },
-    })
-}
-
-#[no_mangle]
-pub fn skia_image_info_alpha_type_to_int(_enum: AlphaType) -> i32 {
-    unsafe { std::mem::transmute(_enum) }
-}
-
-#[no_mangle]
-pub fn skia_image_info_color_type_to_string(_enum: ColorType, _string_ptr: *mut BoxerString) {
-    CBox::with_optional_raw(_string_ptr, |option| match option {
-        None => {},
-        Some(string) => { string.set_string(format!("{:?}", _enum)) },
-    })
-}
-
-#[no_mangle]
-pub fn skia_image_info_color_type_to_int(_enum: ColorType) -> i32 {
-    unsafe { std::mem::transmute(_enum) }
-}
-
 
 #[no_mangle]
 pub fn skia_image_info_new_default() -> *mut ImageInfo {
