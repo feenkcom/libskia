@@ -1,7 +1,7 @@
-use skia_safe::{FilterQuality, BlendMode, ClipOp, AlphaType, ColorType, PixelGeometry};
+use skia_safe::{FilterQuality, BlendMode, ClipOp, AlphaType, ColorType, PixelGeometry, TileMode};
 use boxer::string::BoxerString;
 use boxer::CBox;
-use skia_safe::paint::Style;
+use skia_safe::paint::{Style, Cap, Join};
 use skia_safe::canvas::PointMode;
 
 #[no_mangle]
@@ -62,6 +62,30 @@ pub fn skia_enums_color_type_to_string(_enum: ColorType, _string_ptr: *mut Boxer
 
 #[no_mangle]
 pub fn skia_enums_pixel_geometry_to_string(_enum: PixelGeometry, _string_ptr: *mut BoxerString) {
+    CBox::with_optional_raw(_string_ptr, |option| match option {
+        None => {},
+        Some(string) => { string.set_string(format!("{:?}", _enum)) },
+    })
+}
+
+#[no_mangle]
+pub fn skia_enums_cap_style_to_string(_enum: Cap, _string_ptr: *mut BoxerString) {
+    CBox::with_optional_raw(_string_ptr, |option| match option {
+        None => {},
+        Some(string) => { string.set_string(format!("{:?}", _enum)) },
+    })
+}
+
+#[no_mangle]
+pub fn skia_enums_join_style_to_string(_enum: Join, _string_ptr: *mut BoxerString) {
+    CBox::with_optional_raw(_string_ptr, |option| match option {
+        None => {},
+        Some(string) => { string.set_string(format!("{:?}", _enum)) },
+    })
+}
+
+#[no_mangle]
+pub fn skia_enums_tile_mode_to_string(_enum: TileMode, _string_ptr: *mut BoxerString) {
     CBox::with_optional_raw(_string_ptr, |option| match option {
         None => {},
         Some(string) => { string.set_string(format!("{:?}", _enum)) },

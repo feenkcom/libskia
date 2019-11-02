@@ -1,6 +1,6 @@
 use boxer::boxes::{ValueBox, ValueBoxPointer};
 use skia_safe::{Paint, FilterQuality, scalar, BlendMode, Color};
-use skia_safe::paint::Style;
+use skia_safe::paint::{Style, Cap, Join};
 
 #[no_mangle]
 pub fn skia_paint_default() -> *mut ValueBox<Paint> {
@@ -33,7 +33,7 @@ pub fn skia_paint_set_dither(_paint_ptr: *mut ValueBox<Paint>, dither: bool) {
 }
 
 #[no_mangle]
-pub fn skia_paint_filter_quality(_paint_ptr: *mut ValueBox<Paint>) -> FilterQuality {
+pub fn skia_paint_get_filter_quality(_paint_ptr: *mut ValueBox<Paint>) -> FilterQuality {
     _paint_ptr.with(|paint| paint.filter_quality())
 }
 
@@ -43,7 +43,7 @@ pub fn skia_paint_set_filter_quality(_paint_ptr: *mut ValueBox<Paint>, quality: 
 }
 
 #[no_mangle]
-pub fn skia_paint_style(_paint_ptr: *mut ValueBox<Paint>) -> Style {
+pub fn skia_paint_get_style(_paint_ptr: *mut ValueBox<Paint>) -> Style {
     _paint_ptr.with(|paint| paint.style())
 }
 
@@ -58,12 +58,32 @@ pub fn skia_paint_set_rgba(_paint_ptr: *mut ValueBox<Paint>, r: u8, g: u8, b: u8
 }
 
 #[no_mangle]
+pub fn skia_paint_set_alpha(_paint_ptr: *mut ValueBox<Paint>, alpha: u8) {
+    _paint_ptr.with(|paint| { paint.set_alpha(alpha); });
+}
+
+#[no_mangle]
+pub fn skia_paint_set_alpha_f(_paint_ptr: *mut ValueBox<Paint>, alpha: f32) {
+    _paint_ptr.with(|paint| { paint.set_alpha_f(alpha); });
+}
+
+#[no_mangle]
+pub fn skia_paint_get_alpha(_paint_ptr: *mut ValueBox<Paint>) -> u8 {
+    _paint_ptr.with(|paint| paint.alpha())
+}
+
+#[no_mangle]
+pub fn skia_paint_get_alpha_f(_paint_ptr: *mut ValueBox<Paint>) -> f32 {
+    _paint_ptr.with(|paint| paint.alpha_f())
+}
+
+#[no_mangle]
 pub fn skia_paint_get_color(_paint_ptr: *mut ValueBox<Paint>) -> *mut ValueBox<Color> {
     _paint_ptr.with(|paint| ValueBox::new(paint.color()).into_raw())
 }
 
 #[no_mangle]
-pub fn skia_paint_stroke_width(_paint_ptr: *mut ValueBox<Paint>) -> scalar {
+pub fn skia_paint_get_stroke_width(_paint_ptr: *mut ValueBox<Paint>) -> scalar {
     _paint_ptr.with(|paint| paint.stroke_width())
 }
 
@@ -73,13 +93,43 @@ pub fn skia_paint_set_stroke_width(_paint_ptr: *mut ValueBox<Paint>, width: scal
 }
 
 #[no_mangle]
-pub fn skia_paint_blend_mode(_paint_ptr: *mut ValueBox<Paint>) -> BlendMode {
+pub fn skia_paint_get_blend_mode(_paint_ptr: *mut ValueBox<Paint>) -> BlendMode {
     _paint_ptr.with(|paint| paint.blend_mode())
 }
 
 #[no_mangle]
 pub fn skia_paint_set_blend_mode(_paint_ptr: *mut ValueBox<Paint>, blend_mode: BlendMode) {
     _paint_ptr.with(|paint| { paint.set_blend_mode(blend_mode); });
+}
+
+#[no_mangle]
+pub fn skia_paint_get_stroke_miter(_paint_ptr: *mut ValueBox<Paint>) -> scalar {
+    _paint_ptr.with(|paint| paint.stroke_miter())
+}
+
+#[no_mangle]
+pub fn skia_paint_set_stroke_miter(_paint_ptr: *mut ValueBox<Paint>, stroke_miter: scalar) {
+    _paint_ptr.with(|paint| { paint.set_stroke_miter(stroke_miter); });
+}
+
+#[no_mangle]
+pub fn skia_paint_get_stroke_cap(_paint_ptr: *mut ValueBox<Paint>) -> Cap {
+    _paint_ptr.with(|paint| paint.stroke_cap())
+}
+
+#[no_mangle]
+pub fn skia_paint_set_stroke_cap(_paint_ptr: *mut ValueBox<Paint>, stroke_cap: Cap) {
+    _paint_ptr.with(|paint| { paint.set_stroke_cap(stroke_cap); });
+}
+
+#[no_mangle]
+pub fn skia_paint_get_stroke_join(_paint_ptr: *mut ValueBox<Paint>) -> Join {
+    _paint_ptr.with(|paint| paint.stroke_join())
+}
+
+#[no_mangle]
+pub fn skia_paint_set_stroke_join(_paint_ptr: *mut ValueBox<Paint>, stroke_join: Join) {
+    _paint_ptr.with(|paint| { paint.set_stroke_join(stroke_join); });
 }
 
 #[no_mangle]

@@ -1,5 +1,5 @@
 use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer};
-use skia_safe::{Canvas, BlendMode, Color, Paint, Point, scalar, Rect};
+use skia_safe::{Canvas, BlendMode, Color, Paint, Point, scalar, Rect, Path, ClipOp, IRect, QuickReject};
 use skia_safe::canvas::PointMode;
 use boxer::array::{BoxerArray};
 
@@ -29,12 +29,10 @@ pub fn skia_canvas_draw_points(canvas_ptr: *mut ReferenceBox<Canvas>, point_mode
 }
 
 #[no_mangle]
-pub fn skia_canvas_draw_point(canvas_ptr: *mut ReferenceBox<Canvas>, point_ptr: *mut ValueBox<Point>, paint_ptr: *mut ValueBox<Paint>) {
+pub fn skia_canvas_draw_point(canvas_ptr: *mut ReferenceBox<Canvas>, x: scalar, y: scalar, paint_ptr: *mut ValueBox<Paint>) {
     canvas_ptr.with(|canvas| {
         paint_ptr.with(|paint| {
-            point_ptr.with_value(|point| {
-                canvas.draw_point(point, paint);
-            })
+            canvas.draw_point(Point::new(x, y), paint);
         });
     });
 }
@@ -55,6 +53,95 @@ pub fn skia_canvas_draw_rectangle(canvas_ptr: *mut ReferenceBox<Canvas>, left: s
             canvas.draw_rect(Rect::new(left, top, right, bottom), paint);
         });
     });
+}
+
+#[no_mangle]
+pub fn skia_canvas_draw_oval(canvas_ptr: *mut ReferenceBox<Canvas>, left: scalar, top: scalar, right: scalar, bottom: scalar, paint_ptr: *mut ValueBox<Paint>) {
+    canvas_ptr.with(|canvas| {
+        paint_ptr.with(|paint| {
+            canvas.draw_oval(Rect::new(left, top, right, bottom), paint);
+        });
+    });
+}
+
+#[no_mangle]
+pub fn skia_canvas_draw_circle(canvas_ptr: *mut ReferenceBox<Canvas>, center_x: scalar, center_y: scalar, radius: scalar, paint_ptr: *mut ValueBox<Paint>) {
+    canvas_ptr.with(|canvas| {
+        paint_ptr.with(|paint| {
+            canvas.draw_circle(Point::new(center_x,center_y), radius, paint);
+        });
+    });
+}
+
+#[no_mangle]
+pub fn skia_canvas_draw_rounded_rectangle(canvas_ptr: *mut ReferenceBox<Canvas>, left: scalar, top: scalar, right: scalar, bottom: scalar, rx: scalar, ry: scalar, paint_ptr: *mut ValueBox<Paint>) {
+    canvas_ptr.with(|canvas| {
+        paint_ptr.with(|paint| {
+            canvas.draw_round_rect(Rect::new(left, top, right, bottom), rx, ry, paint);
+        });
+    });
+}
+
+#[no_mangle]
+pub fn skia_canvas_draw_path(canvas_ptr: *mut ReferenceBox<Canvas>, path_ptr: *mut ValueBox<Path>, paint_ptr: *mut ValueBox<Paint>) {
+    canvas_ptr.with(|canvas| {
+        paint_ptr.with(|paint| {
+            path_ptr.with(|path| {
+                canvas.draw_path(path, paint);
+            })
+        });
+    });
+}
+
+#[no_mangle]
+pub fn skia_canvas_clip_rect(canvas_ptr: *mut ReferenceBox<Canvas>, left: scalar, top: scalar, right: scalar, bottom: scalar, clip_op: ClipOp, do_anti_alias: bool) {
+    canvas_ptr.with(|canvas| {
+        canvas.clip_rect(Rect::new(left, top, right, bottom), clip_op, do_anti_alias);
+    });
+}
+
+#[no_mangle]
+pub fn skia_canvas_clip_path(canvas_ptr: *mut ReferenceBox<Canvas>, path_ptr: *mut ValueBox<Path>, clip_op: ClipOp, do_anti_alias: bool) {
+    canvas_ptr.with(|canvas| {
+        path_ptr.with(|path| {
+            canvas.clip_path(path, clip_op, do_anti_alias);
+        })
+    });
+}
+
+#[no_mangle]
+pub fn skia_canvas_local_clip_bounds(canvas_ptr: *mut ReferenceBox<Canvas>, rect_ptr: *mut ValueBox<Rect>) {
+    canvas_ptr.with(|canvas| {
+        rect_ptr.with(|rectangle| {
+            match canvas.local_clip_bounds() {
+                None => {},
+                Some(local_bounds) => { rectangle.set_ltrb(local_bounds.left, local_bounds.top, local_bounds.right, local_bounds.bottom) },
+            }
+        })
+    });
+}
+
+#[no_mangle]
+pub fn skia_canvas_device_clip_bounds(canvas_ptr: *mut ReferenceBox<Canvas>, rect_ptr: *mut ValueBox<IRect>) {
+    canvas_ptr.with(|canvas| {
+        rect_ptr.with(|rectangle| {
+            match canvas.device_clip_bounds() {
+                None => {},
+                Some(device_bounds) => { rectangle.set_ltrb(device_bounds.left, device_bounds.top, device_bounds.right, device_bounds.bottom) },
+            }
+        })
+    });
+}
+
+#[no_mangle]
+pub fn skia_canvas_quick_reject_rectangle(canvas_ptr: *mut ReferenceBox<Canvas>, left: scalar, top: scalar, right: scalar, bottom: scalar) -> bool {
+    canvas_ptr.with(|canvas| canvas.quick_reject(&Rect::new(left, top, right, bottom)))
+}
+
+#[no_mangle]
+pub fn skia_canvas_quick_reject_path(canvas_ptr: *mut ReferenceBox<Canvas>, path_ptr: *mut ValueBox<Path>) -> bool {
+    canvas_ptr.with(|canvas|
+        path_ptr.with(|path| canvas.quick_reject(path.as_ref())))
 }
 
 #[no_mangle]
