@@ -1,5 +1,6 @@
-use skia_safe::{TextBlob, Font};
+use skia_safe::{TextBlob, Font, TextEncoding};
 use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::string::{BoxerString, BoxerStringPointer};
 
 #[no_mangle]
 pub fn skia_text_blob_default() -> *mut ValueBox<TextBlob> {
@@ -7,6 +8,17 @@ pub fn skia_text_blob_default() -> *mut ValueBox<TextBlob> {
         None => { std::ptr::null_mut() },
         Some(text_blob) => {  ValueBox::new(text_blob).into_raw() },
     }
+}
+
+#[no_mangle]
+pub fn skia_text_blob_from_text(_text_ptr: *mut BoxerString, encoding: TextEncoding, _font_ptr: *mut ValueBox<Font>) -> *mut ValueBox<TextBlob> {
+    _text_ptr.with(|text|
+        _font_ptr.with(|font| {
+           match TextBlob::from_text(text.to_slice_u8(), encoding, font) {
+                None => { std::ptr::null_mut() },
+                Some(text_blob) => {  ValueBox::new(text_blob).into_raw() },
+            }
+        }))
 }
 
 #[no_mangle]
