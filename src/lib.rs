@@ -14,5 +14,5 @@ pub mod rectangle;
 pub mod rounded_rectangle;
 pub mod shader;
 pub mod surface;
-pub mod surface_props;
+pub mod text;
 pub mod types;

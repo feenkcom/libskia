@@ -1,5 +1,5 @@
 use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer};
-use skia_safe::{Canvas, BlendMode, Color, Paint, Point, scalar, Rect, Path, ClipOp, IRect, QuickReject};
+use skia_safe::{Canvas, BlendMode, Color, Paint, Point, scalar, Rect, Path, ClipOp, IRect, QuickReject, Matrix, Vector, TextBlob};
 use skia_safe::canvas::PointMode;
 use boxer::array::{BoxerArray};
 
@@ -94,6 +94,17 @@ pub fn skia_canvas_draw_path(canvas_ptr: *mut ReferenceBox<Canvas>, path_ptr: *m
 }
 
 #[no_mangle]
+pub fn skia_canvas_draw_text_blob(canvas_ptr: *mut ReferenceBox<Canvas>, text_blob_ptr: *mut ValueBox<TextBlob>, x: scalar, y: scalar, paint_ptr: *mut ValueBox<Paint>) {
+    canvas_ptr.with(|canvas| {
+        paint_ptr.with(|paint| {
+            text_blob_ptr.with(|text_blob| {
+                canvas.draw_text_blob(text_blob, Point::new(x, y), paint);
+            })
+        });
+    });
+}
+
+#[no_mangle]
 pub fn skia_canvas_clip_rect(canvas_ptr: *mut ReferenceBox<Canvas>, left: scalar, top: scalar, right: scalar, bottom: scalar, clip_op: ClipOp, do_anti_alias: bool) {
     canvas_ptr.with(|canvas| {
         canvas.clip_rect(Rect::new(left, top, right, bottom), clip_op, do_anti_alias);
@@ -142,6 +153,58 @@ pub fn skia_canvas_quick_reject_rectangle(canvas_ptr: *mut ReferenceBox<Canvas>,
 pub fn skia_canvas_quick_reject_path(canvas_ptr: *mut ReferenceBox<Canvas>, path_ptr: *mut ValueBox<Path>) -> bool {
     canvas_ptr.with(|canvas|
         path_ptr.with(|path| canvas.quick_reject(path.as_ref())))
+}
+
+#[no_mangle]
+pub fn skia_canvas_translate(canvas_ptr: *mut ReferenceBox<Canvas>, x: scalar, y: scalar) {
+    canvas_ptr.with(|canvas| { canvas.translate(Vector::new(x, y)); });
+}
+
+#[no_mangle]
+pub fn skia_canvas_scale(canvas_ptr: *mut ReferenceBox<Canvas>, sx: scalar, sy: scalar) {
+    canvas_ptr.with(|canvas| { canvas.scale((sx, sy)); });
+}
+
+#[no_mangle]
+pub fn skia_canvas_rotate(canvas_ptr: *mut ReferenceBox<Canvas>, degrees: scalar, x: scalar, y: scalar) {
+    canvas_ptr.with(|canvas| { canvas.rotate(degrees, Some(Point::new(x, y))); });
+}
+
+#[no_mangle]
+pub fn skia_canvas_skew(canvas_ptr: *mut ReferenceBox<Canvas>, sx: scalar, sy: scalar) {
+    canvas_ptr.with(|canvas| { canvas.skew((sx, sy)); });
+}
+
+#[no_mangle]
+pub fn skia_canvas_concat_matrix(canvas_ptr: *mut ReferenceBox<Canvas>, matrix_ptr: *mut ValueBox<Matrix>) {
+    canvas_ptr.with(|canvas|
+        matrix_ptr.with(|matrix| {
+            canvas.concat(matrix);
+        }));
+}
+
+#[no_mangle]
+pub fn skia_canvas_set_matrix(canvas_ptr: *mut ReferenceBox<Canvas>, matrix_ptr: *mut ValueBox<Matrix>) {
+    canvas_ptr.with(|canvas|
+        matrix_ptr.with(|matrix| {
+            canvas.set_matrix(matrix);
+        }));
+}
+
+#[no_mangle]
+pub fn skia_canvas_get_matrix(canvas_ptr: *mut ReferenceBox<Canvas>, matrix_ptr: *mut ValueBox<Matrix>) {
+    canvas_ptr.with(|canvas|
+        matrix_ptr.with(|matrix| {
+            let m = canvas.total_matrix();
+            let mut buffer: [scalar; 9] = [0.0; 9];
+            m.get_9(&mut buffer);
+            matrix.set_9(&buffer);
+        }));
+}
+
+#[no_mangle]
+pub fn skia_canvas_reset_matrix(canvas_ptr: *mut ReferenceBox<Canvas>) {
+    canvas_ptr.with(|canvas| { canvas.reset_matrix(); })
 }
 
 #[no_mangle]

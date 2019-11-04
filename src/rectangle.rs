@@ -11,7 +11,7 @@ pub fn skia_rectangle_f32_default() -> *mut ValueBox<Rect> {
 }
 
 #[no_mangle]
-pub fn skia_rectangle_set_f32_ltrb(_rectangle_ptr: *mut ValueBox<Rect>, left: scalar, top: scalar, right: scalar, bottom: scalar) {
+pub fn skia_rectangle_f32_set_ltrb(_rectangle_ptr: *mut ValueBox<Rect>, left: scalar, top: scalar, right: scalar, bottom: scalar) {
     _rectangle_ptr.with(|rectangle| { rectangle.set_ltrb(left, top, right, bottom); });
 }
 

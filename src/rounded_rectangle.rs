@@ -66,13 +66,13 @@ pub fn skia_rounded_rectangle_drop(_ptr: *mut ValueBox<RRect>) {
 #[cfg(test)]
 mod test {
     use rounded_rectangle::{skia_rounded_rectangle_default, skia_rounded_rectangle_set_rect, skia_rounded_rectangle_width, skia_rounded_rectangle_height};
-    use rectangle::{skia_rectangle_default, skia_rectangle_set_ltrb};
+    use rectangle::{skia_rectangle_f32_set_ltrb, skia_rectangle_f32_default};
     use boxer::boxes::ValueBoxPointer;
 
     #[test]
     fn set_rect() {
-        let rect = skia_rectangle_default();
-        skia_rectangle_set_ltrb(rect, 0.0,0.0, 50.0, 50.0);
+        let rect = skia_rectangle_f32_default();
+        skia_rectangle_f32_set_ltrb(rect, 0.0,0.0, 50.0, 50.0);
 
         let r_rect = skia_rounded_rectangle_default();
         skia_rounded_rectangle_set_rect(r_rect, rect);
@@ -80,7 +80,7 @@ mod test {
         assert_eq!(skia_rounded_rectangle_width(r_rect), 50.0);
         assert_eq!(skia_rounded_rectangle_height(r_rect), 50.0);
 
-        skia_rectangle_set_ltrb(rect, 0.0,0.0, 100.0, 100.0);
+        skia_rectangle_f32_set_ltrb(rect, 0.0,0.0, 100.0, 100.0);
 
         assert_eq!(skia_rounded_rectangle_width(r_rect), 50.0);
         assert_eq!(skia_rounded_rectangle_height(r_rect), 50.0);

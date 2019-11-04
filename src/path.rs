@@ -1,4 +1,4 @@
-use skia_safe::{Path, scalar, Point, Vector};
+use skia_safe::{Path, scalar, Point, Vector, PathFillType, Rect};
 use boxer::array::BoxerArray;
 use boxer::boxes::{ValueBox, ValueBoxPointer};
 
@@ -10,6 +10,16 @@ pub fn skia_path_new() -> *mut ValueBox<Path> {
 #[no_mangle]
 pub fn skia_path_drop(_ptr: *mut ValueBox<Path>) {
    _ptr.drop();
+}
+
+#[no_mangle]
+pub fn skia_path_get_fill_type(_path: *mut ValueBox<Path>) -> PathFillType {
+    _path.with(|path| path.fill_type())
+}
+
+#[no_mangle]
+pub fn skia_path_set_fill_type(_path: *mut ValueBox<Path>, fill_type: PathFillType) {
+    _path.with(|path| { path.set_fill_type(fill_type); });
 }
 
 #[no_mangle]
@@ -69,6 +79,26 @@ pub fn skia_path_cubic_to(_path: *mut ValueBox<Path>, x1: scalar, y1: scalar, x2
         else {
             path.r_cubic_to(Vector::new(x1,y1), Vector::new(x2,y2), Vector::new(x3,y3));
         }
+    });
+}
+
+#[no_mangle]
+pub fn skia_path_arc_to(_path: *mut ValueBox<Path>,
+                        left: scalar, top: scalar, right: scalar, bottom: scalar,
+                        start_angle: scalar, sweep_angle: scalar,
+                        force_move_to: bool, is_absolute: bool) {
+    _path.with(|path| {
+        let rect = if is_absolute {
+            Rect::new(left, top, right, bottom)
+        }
+        else {
+            let current_point = match path.last_pt() {
+                None => { Point::new(0.0, 0.0) },
+                Some(point) => { point },
+            };
+            Rect::new(current_point.x + left, current_point.y + top, current_point.x + right, current_point.y + bottom)
+        };
+        path.arc_to(rect, start_angle, sweep_angle, force_move_to);
     });
 }
 

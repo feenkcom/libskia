@@ -1,8 +1,10 @@
-use skia_safe::{FilterQuality, BlendMode, ClipOp, AlphaType, ColorType, PixelGeometry, TileMode};
+use skia_safe::{FilterQuality, BlendMode, ClipOp, AlphaType, ColorType, PixelGeometry, TileMode, PathFillType, FontEdging, FontHinting};
 use boxer::string::BoxerString;
 use boxer::CBox;
 use skia_safe::paint::{Style, Cap, Join};
 use skia_safe::canvas::PointMode;
+use skia_safe::font_style::Slant;
+use text::font_style::FontStyleWidth;
 
 #[no_mangle]
 pub fn skia_enums_filter_quality_to_string(_enum: FilterQuality, _string_ptr: *mut BoxerString) {
@@ -86,6 +88,46 @@ pub fn skia_enums_join_style_to_string(_enum: Join, _string_ptr: *mut BoxerStrin
 
 #[no_mangle]
 pub fn skia_enums_tile_mode_to_string(_enum: TileMode, _string_ptr: *mut BoxerString) {
+    CBox::with_optional_raw(_string_ptr, |option| match option {
+        None => {},
+        Some(string) => { string.set_string(format!("{:?}", _enum)) },
+    })
+}
+
+#[no_mangle]
+pub fn skia_enums_path_fill_type_to_string(_enum: PathFillType, _string_ptr: *mut BoxerString) {
+    CBox::with_optional_raw(_string_ptr, |option| match option {
+        None => {},
+        Some(string) => { string.set_string(format!("{:?}", _enum)) },
+    })
+}
+
+#[no_mangle]
+pub fn skia_enums_font_style_slant_to_string(_enum: Slant, _string_ptr: *mut BoxerString) {
+    CBox::with_optional_raw(_string_ptr, |option| match option {
+        None => {},
+        Some(string) => { string.set_string(format!("{:?}", _enum)) },
+    })
+}
+
+#[no_mangle]
+pub fn skia_enums_font_style_width_to_string(_enum: FontStyleWidth, _string_ptr: *mut BoxerString) {
+    CBox::with_optional_raw(_string_ptr, |option| match option {
+        None => {},
+        Some(string) => { string.set_string(format!("{:?}", _enum)) },
+    })
+}
+
+#[no_mangle]
+pub fn skia_enums_font_edging_to_string(_enum: FontEdging, _string_ptr: *mut BoxerString) {
+    CBox::with_optional_raw(_string_ptr, |option| match option {
+        None => {},
+        Some(string) => { string.set_string(format!("{:?}", _enum)) },
+    })
+}
+
+#[no_mangle]
+pub fn skia_enums_font_hinting_to_string(_enum: FontHinting, _string_ptr: *mut BoxerString) {
     CBox::with_optional_raw(_string_ptr, |option| match option {
         None => {},
         Some(string) => { string.set_string(format!("{:?}", _enum)) },
