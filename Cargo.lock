@@ -65,7 +65,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "boxer"
 version = "0.1.0"
-source = "git+https://github.com/feenkcom/gtoolkit-boxer#e7867b6cf87208c3bc3ff1560ed46e10abe9867e"
+source = "git+https://github.com/feenkcom/gtoolkit-boxer#d5764ff8475c76dae5d52b84c1e6da38a71dc0d9"
 
 [[package]]
 name = "byteorder"

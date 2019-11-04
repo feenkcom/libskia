@@ -1,4 +1,4 @@
-use skia_safe::{FilterQuality, BlendMode, ClipOp, AlphaType, ColorType, PixelGeometry, TileMode, PathFillType, FontEdging, FontHinting};
+use skia_safe::{FilterQuality, BlendMode, ClipOp, AlphaType, ColorType, PixelGeometry, TileMode, PathFillType, FontEdging, FontHinting, TextEncoding};
 use boxer::string::BoxerString;
 use boxer::CBox;
 use skia_safe::paint::{Style, Cap, Join};
@@ -128,6 +128,14 @@ pub fn skia_enums_font_edging_to_string(_enum: FontEdging, _string_ptr: *mut Box
 
 #[no_mangle]
 pub fn skia_enums_font_hinting_to_string(_enum: FontHinting, _string_ptr: *mut BoxerString) {
+    CBox::with_optional_raw(_string_ptr, |option| match option {
+        None => {},
+        Some(string) => { string.set_string(format!("{:?}", _enum)) },
+    })
+}
+
+#[no_mangle]
+pub fn skia_enums_text_encoding_to_string(_enum: TextEncoding, _string_ptr: *mut BoxerString) {
     CBox::with_optional_raw(_string_ptr, |option| match option {
         None => {},
         Some(string) => { string.set_string(format!("{:?}", _enum)) },

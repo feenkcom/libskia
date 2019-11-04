@@ -1,10 +1,16 @@
 use skia_safe::{Font, FontEdging, FontHinting, Typeface, scalar, TextEncoding, GlyphId, Rect, Paint, FontMetrics};
 use boxer::boxes::{ValueBox, ValueBoxPointer};
-use boxer::array::{BoxerArrayU8, BoxerArray};
+use boxer::array::{BoxerArray};
+use boxer::string::{BoxerString, BoxerStringPointer};
 
 #[no_mangle]
 pub fn skia_font_default() -> *mut ValueBox<Font> {
     ValueBox::new(Font::default()).into_raw()
+}
+
+#[no_mangle]
+pub fn skia_font_from_typeface(mut _typeface_ptr: *mut ValueBox<Typeface>, size: scalar) -> *mut ValueBox<Font> {
+    _typeface_ptr.with_value_consumed(|typeface | ValueBox::new(Font::from_typeface(typeface, size)).into_raw())
 }
 
 #[no_mangle]
@@ -78,21 +84,21 @@ pub fn skia_font_get_metrics(_ptr: *mut ValueBox<Font>) -> *mut ValueBox<FontMet
 }
 
 #[no_mangle]
-pub fn skia_font_text_to_glyphs(_ptr: *mut ValueBox<Font>, _text_ptr: *mut ValueBox<BoxerArrayU8>, encoding: TextEncoding, _glyphs_ptr: *mut ValueBox<BoxerArray<GlyphId>>) {
+pub fn skia_font_text_to_glyphs(_ptr: *mut ValueBox<Font>, _text_ptr: *mut BoxerString, encoding: TextEncoding, _glyphs_ptr: *mut ValueBox<BoxerArray<GlyphId>>) {
     _ptr.with(|font|
         _text_ptr.with(|text|
             _glyphs_ptr.with(|glyphs| {
-                glyphs.set_vector(font.text_to_glyphs_vec(text.to_slice(), encoding))
+                glyphs.set_vector(font.text_to_glyphs_vec(text.to_slice_u8(), encoding))
             })));
 }
 
 #[no_mangle]
-pub fn skia_font_measure_text(_ptr: *mut ValueBox<Font>, _text_ptr: *mut ValueBox<BoxerArrayU8>, encoding: TextEncoding, _paint_ptr: *mut ValueBox<Paint>, _bounds_ptr: *mut ValueBox<Rect>) -> scalar {
+pub fn skia_font_measure_text(_ptr: *mut ValueBox<Font>, _text_ptr: *mut BoxerString, encoding: TextEncoding, _paint_ptr: *mut ValueBox<Paint>, _bounds_ptr: *mut ValueBox<Rect>) -> scalar {
     _ptr.with(|font|
         _text_ptr.with(|text|
             _paint_ptr.with(|paint|
                 _bounds_ptr.with(|bounds| {
-                    let metrics = font.measure_text(text.to_slice(), encoding, Some(paint));
+                    let metrics = font.measure_text(text.to_slice_u8(), encoding, Some(paint));
                     bounds.set_ltrb(metrics.1.left, metrics.1.top, metrics.1.right, metrics.1.bottom);
                     metrics.0
                 }))))
