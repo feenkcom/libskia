@@ -9,7 +9,7 @@ else
 	mkdir -p ~/.ssh/
 	touch ~/.ssh/config
 	echo -e "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-	openssl aes-256-cbc -K $encrypted_11fc2ba54d64_key -iv $encrypted_11fc2ba54d64_iv -in deploy_key.enc -out deploy_key -d
+	openssl aes-256-cbc -K $encrypted_ff3776e75621_key -iv $encrypted_ff3776e75621_iv -in deploy_key.enc -out deploy_key -d
 	eval "$(ssh-agent -s)"
 	chmod 600 deploy_key
 	ssh-add deploy_key
