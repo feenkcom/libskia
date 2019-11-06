@@ -10,12 +10,17 @@ rust:
 
 cache: cargo
 
+addons:
+  apt:
+    packages:
+      - libgl1-mesa-dev
+
 branches:
   only:
   - master
 
 script:
-- cargo build --release
+- travis_wait 30 cargo build --release
 
 deploy:
   skip_cleanup: true
