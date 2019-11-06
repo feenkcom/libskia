@@ -1,0 +1,23 @@
+language: rust
+
+os:
+- linux
+- osx
+- windows
+
+rust:
+- stable
+
+cache: cargo
+
+branches:
+  only:
+  - master
+
+script:
+- cargo build --release
+
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: bash .travis.deploy.sh
