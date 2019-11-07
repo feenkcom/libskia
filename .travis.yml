@@ -21,7 +21,7 @@ branches:
 
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
-    REG ADD "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t REG_DWORD /d 1 /f
+    ./scripts/enable_long_paths.bat;
   fi
 
 script:
