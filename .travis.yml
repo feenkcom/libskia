@@ -23,6 +23,8 @@ before_install:
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
     ./scripts/enable_long_paths.bat;
     export PYTHONHTTPSVERIFY=0;
+    choco install openssl;
+    certutil -generateSSTFromWU roots.sst && certutil -addstore -f root roots.sst && del roots.sst;
   fi
 
 script:
