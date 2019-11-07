@@ -24,7 +24,7 @@ before_install:
     ./scripts/enable_long_paths.bat;
     export PYTHONHTTPSVERIFY=0;
     choco install openssl;
-    certutil -generateSSTFromWU roots.sst && certutil -addstore -f root roots.sst && del roots.sst;
+    certutil -generateSSTFromWU roots.sst && certutil -addstore -f root roots.sst;
   fi
 
 script:
