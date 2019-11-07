@@ -19,6 +19,11 @@ branches:
   only:
   - master
 
+before_install:
+- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+    REG ADD "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t REG_DWORD /d 1 /f
+  fi
+
 script:
 - travis_wait 30 cargo build --release
 
