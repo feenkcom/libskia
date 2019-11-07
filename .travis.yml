@@ -21,6 +21,12 @@ branches:
 
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+    echo "DisableArchiveScanning...";
+    powershell Start-Process -PassThru -Wait PowerShell -ArgumentList "'-Command Set-MpPreference -DisableArchiveScanning \$true'";
+    echo "DisableBehaviorMonitoring...";
+    powershell Start-Process -PassThru -Wait PowerShell -ArgumentList "'-Command Set-MpPreference -DisableBehaviorMonitoring \$true'";
+    echo "DisableRealtimeMonitoring...";
+    powershell Start-Process -PassThru -Wait PowerShell -ArgumentList "'-Command Set-MpPreference -DisableRealtimeMonitoring \$true'";
     ./scripts/enable_long_paths.bat;
     export PYTHONHTTPSVERIFY=0;
     choco install openssl;
