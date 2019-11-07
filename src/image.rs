@@ -37,6 +37,11 @@ pub fn skia_image_is_opaque(_image_ptr: *mut ValueBox<Image>) -> bool {
 }
 
 #[no_mangle]
+pub fn skia_image_is_texture_backed(_image_ptr: *mut ValueBox<Image>) -> bool {
+    _image_ptr.with(|image| image.is_texture_backed())
+}
+
+#[no_mangle]
 pub fn skia_image_drop(_ptr: *mut ValueBox<Image>) {
     _ptr.drop()
 }

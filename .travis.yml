@@ -22,7 +22,7 @@ branches:
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
     ./scripts/enable_long_paths.bat;
-    export PYTHONHTTPSVERIFY=0
+    export PYTHONHTTPSVERIFY=0;
   fi
 
 script:

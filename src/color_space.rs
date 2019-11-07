@@ -1,24 +1,19 @@
 use skia_safe::ColorSpace;
-use boxer::CBox;
+use boxer::boxes::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
-pub fn skia_color_space_new_srgb() -> *mut ColorSpace {
-    CBox::into_raw(ColorSpace::new_srgb())
+pub fn skia_color_space_new_srgb() -> *mut ValueBox<ColorSpace> {
+    ValueBox::new(ColorSpace::new_srgb()).into_raw()
 }
 
 #[no_mangle]
-pub fn skia_color_space_drop(_ptr: *mut ColorSpace) {
-    CBox::drop(_ptr);
+pub fn skia_color_space_drop(_ptr: *mut ValueBox<ColorSpace>) {
+    _ptr.drop();
 }
 
 #[no_mangle]
-pub fn skia_color_space_is_srgb(_ptr: *mut ColorSpace) -> bool {
-    CBox::with_optional_raw(_ptr, |option| {
-        match option {
-            None => { false },
-            Some(color_space) => { color_space.is_srgb() },
-        }
-    })
+pub fn skia_color_space_is_srgb(_ptr:  *mut ValueBox<ColorSpace>) -> bool {
+    _ptr.with_not_null_return(false, |color_space| color_space.is_srgb())
 }
 
 #[test]
@@ -31,7 +26,7 @@ fn color_space_new_srgb() {
 
 #[test]
 fn color_space_is_srgb_for_null() {
-    let _color_space_ptr: *mut ColorSpace = std::ptr::null_mut();
+    let _color_space_ptr: *mut ValueBox<ColorSpace> = std::ptr::null_mut();
     assert_eq!(_color_space_ptr.is_null(), true);
     assert_eq!(skia_color_space_is_srgb(_color_space_ptr), false);
     skia_color_space_drop(_color_space_ptr);

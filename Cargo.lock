@@ -65,7 +65,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "boxer"
 version = "0.1.0"
-source = "git+https://github.com/feenkcom/gtoolkit-boxer#4beb6a444ee5bdb886b6ffd89c639093c8d1b474"
+source = "git+https://github.com/feenkcom/gtoolkit-boxer#a79c7153508338dc835914cc955adeb480d5cffb"
 
 [[package]]
 name = "byteorder"
@@ -410,7 +410,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "skia-bindings"
 version = "0.19.0"
-source = "git+https://github.com/rust-skia/rust-skia#f6c21f800247d4710a8ac9cb0ee38717fa816fc2"
+source = "git+https://github.com/rust-skia/rust-skia#93b8fed3f5f23ff7afdd8903183880496c9163b7"
 dependencies = [
  "bindgen 0.51.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "cc 1.0.47 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -426,7 +426,7 @@ dependencies = [
 [[package]]
 name = "skia-safe"
 version = "0.19.0"
-source = "git+https://github.com/rust-skia/rust-skia#f6c21f800247d4710a8ac9cb0ee38717fa816fc2"
+source = "git+https://github.com/rust-skia/rust-skia#93b8fed3f5f23ff7afdd8903183880496c9163b7"
 dependencies = [
  "bitflags 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
