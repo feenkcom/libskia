@@ -29,7 +29,7 @@ before_install:
     export PYTHONHTTPSVERIFY=0;
     choco install openssl;
     certutil -generateSSTFromWU roots.sst && certutil -addstore -f root roots.sst;
-	git config --global sync-deps.disable true
+	git config --global sync-deps.disable true;
   fi
 
 script:
