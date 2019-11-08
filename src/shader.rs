@@ -10,12 +10,12 @@ pub fn skia_shader_create_empty() -> *mut ValueBox<Shader> {
 
 #[no_mangle]
 pub fn skia_shader_is_opaque(_shader_ptr: *mut ValueBox<Shader>) -> bool {
-    _shader_ptr.with(|shader| shader.is_opaque() )
+    _shader_ptr.with_not_null_return(false, |shader| shader.is_opaque() )
 }
 
 #[no_mangle]
 pub fn skia_shader_is_a_image(_shader_ptr: *mut ValueBox<Shader>) -> bool {
-    _shader_ptr.with(|shader| shader.is_a_image() )
+    _shader_ptr.with_not_null_return(false, |shader| shader.is_a_image() )
 }
 
 #[no_mangle]
