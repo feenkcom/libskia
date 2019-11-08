@@ -8,8 +8,6 @@ os:
 rust:
 - stable
 
-cache: cargo
-
 addons:
   apt:
     packages:
