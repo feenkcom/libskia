@@ -1,6 +1,7 @@
 use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer};
-use skia_safe::{Canvas, BlendMode, Color, Paint, Point, scalar, Rect, Path, ClipOp, IRect, QuickReject, Matrix, Vector, TextBlob};
+use skia_safe::{Canvas, BlendMode, Color, Paint, Point, scalar, Rect, Path, ClipOp, IRect, QuickReject, Matrix, Vector, TextBlob, Point3};
 use skia_safe::canvas::PointMode;
+use skia_safe::utils::shadow_utils::ShadowFlags;
 use boxer::array::{BoxerArray};
 
 #[no_mangle]
@@ -102,6 +103,31 @@ pub fn skia_canvas_draw_text_blob(canvas_ptr: *mut ReferenceBox<Canvas>, text_bl
             })
         });
     });
+}
+
+#[no_mangle]
+pub fn skia_canvas_draw_shadow(canvas_ptr: *mut ReferenceBox<Canvas>,
+                               _path_ptr: *mut ValueBox<Path>,
+                               _z_plane_ptr: *mut ValueBox<Point3>,
+                               _light_pos_ptr: *mut ValueBox<Point3>,
+                               light_radius: scalar,
+                               _ambient_color_ptr: *mut ValueBox<Color>,
+                               _spot_color_ptr: *mut ValueBox<Color>,
+                               bit_flags: u32
+) {
+    canvas_ptr.with(|canvas| {
+        _path_ptr.with_not_null(|path| {
+            _z_plane_ptr.with_value(|z_plane|{
+                _light_pos_ptr.with_value(|light_pos| {
+                    _ambient_color_ptr.with_value(|ambient_color| {
+                        _spot_color_ptr.with_value(|spot_color| {
+                            canvas.draw_shadow(path, z_plane, light_pos, light_radius, ambient_color, spot_color, ShadowFlags::ALL/*from_bits_truncate(bit_flags)*/);
+                        })
+                    })
+                })
+            })
+        })
+    })
 }
 
 #[no_mangle]

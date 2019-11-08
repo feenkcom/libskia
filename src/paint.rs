@@ -1,5 +1,5 @@
 use boxer::boxes::{ValueBox, ValueBoxPointer};
-use skia_safe::{Paint, FilterQuality, scalar, BlendMode, Color};
+use skia_safe::{Paint, FilterQuality, scalar, BlendMode, Color, Shader};
 use skia_safe::paint::{Style, Cap, Join};
 
 #[no_mangle]
@@ -130,6 +130,22 @@ pub fn skia_paint_get_stroke_join(_paint_ptr: *mut ValueBox<Paint>) -> Join {
 #[no_mangle]
 pub fn skia_paint_set_stroke_join(_paint_ptr: *mut ValueBox<Paint>, stroke_join: Join) {
     _paint_ptr.with(|paint| { paint.set_stroke_join(stroke_join); });
+}
+
+#[no_mangle]
+pub fn skia_paint_get_shader(_paint_ptr: *mut ValueBox<Paint>) -> *mut ValueBox<Shader> {
+    _paint_ptr.with(|paint| match paint.shader() {
+        None => { std::ptr::null_mut() },
+        Some(shader) => { ValueBox::new(shader).into_raw() },
+    })
+}
+
+#[no_mangle]
+pub fn skia_paint_set_shader(_paint_ptr: *mut ValueBox<Paint>, _shader_ptr: *mut ValueBox<Shader>) {
+    _paint_ptr.with(|paint| match _shader_ptr.as_option() {
+        None => { paint.set_shader(None); },
+        Some(mut _ptr) => { _ptr.with_value_consumed(|shader| { paint.set_shader(Some(shader)); } ) },
+    });
 }
 
 #[no_mangle]
