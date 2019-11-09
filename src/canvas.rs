@@ -1,8 +1,9 @@
 use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer};
-use skia_safe::{Canvas, BlendMode, Color, Paint, Point, scalar, Rect, Path, ClipOp, IRect, QuickReject, Matrix, Vector, TextBlob, Point3};
+use skia_safe::{Canvas, BlendMode, Color, Paint, Point, scalar, Rect, Path, ClipOp, IRect, QuickReject, Matrix, Vector, TextBlob, Point3, SaveLayerRec};
 use skia_safe::canvas::PointMode;
 use skia_safe::utils::shadow_utils::ShadowFlags;
 use boxer::array::{BoxerArray};
+use layer::SaveLayerRecWrapper;
 
 #[no_mangle]
 pub fn skia_canvas_draw_color(canvas_ptr: *mut ReferenceBox<Canvas>, r: u8, g: u8, b: u8, a: u8, blend_mode: BlendMode) {
@@ -256,6 +257,18 @@ pub fn skia_canvas_restore(canvas_ptr: *mut ReferenceBox<Canvas>) {
 #[no_mangle]
 pub fn skia_canvas_restore_to_count(canvas_ptr: *mut ReferenceBox<Canvas>, count: usize) {
     canvas_ptr.with(|canvas| { canvas.restore_to_count(count); })
+}
+
+#[no_mangle]
+pub fn skia_canvas_save_layer(canvas_ptr: *mut ReferenceBox<Canvas>, _save_layer_ptr: *mut ValueBox<SaveLayerRecWrapper>) -> usize {
+     canvas_ptr.with(|canvas| {
+         _save_layer_ptr.with(|save_rec| {
+             let mut rec: SaveLayerRec = SaveLayerRec::default();
+             if save_rec.bounds.is_some() { rec = rec.bounds(save_rec.bounds.as_ref().unwrap()) };
+             if save_rec.paint.is_some() { rec = rec.paint(save_rec.paint.as_ref().unwrap()) };
+             canvas.save_layer(&rec)
+         })
+     })
 }
 
 #[no_mangle]

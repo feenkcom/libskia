@@ -10,6 +10,7 @@ pub mod enums;
 pub mod gradient;
 pub mod image;
 pub mod image_info;
+pub mod layer;
 pub mod matrix;
 pub mod paint;
 pub mod path;
