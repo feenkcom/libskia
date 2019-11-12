@@ -125,6 +125,21 @@ pub fn skia_path_get_points(_path: *mut ValueBox<Path>, _points_ptr: *mut ValueB
 }
 
 #[no_mangle]
+pub fn skia_path_get_last_point(_path: *mut ValueBox<Path>, _point_ptr: *mut ValueBox<Point>) -> bool {
+    _path.with(|path| {
+        _point_ptr.with(|point| {
+            match path.last_pt() {
+                None => { false },
+                Some(last_point) => {
+                    point.set(last_point.x, last_point.y);
+                    true
+                },
+            }
+        })
+    })
+}
+
+#[no_mangle]
 pub fn skia_path_serialize(_path: *mut ValueBox<Path>, _data: *mut ValueBox<BoxerArray<u8>>) {
     _path.with(|path| {
         _data.with(|data| {

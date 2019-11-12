@@ -9,6 +9,7 @@ pub mod color_space;
 pub mod enums;
 pub mod gradient;
 pub mod image;
+pub mod image_filters;
 pub mod image_info;
 pub mod layer;
 pub mod matrix;
@@ -21,7 +22,6 @@ pub mod surface;
 pub mod surface_props;
 pub mod text;
 pub mod types;
-
 
 #[no_mangle]
 pub fn skia_test() -> bool {

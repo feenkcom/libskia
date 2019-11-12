@@ -1,5 +1,5 @@
 use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer};
-use skia_safe::{Canvas, BlendMode, Color, Paint, Point, scalar, Rect, Path, ClipOp, IRect, QuickReject, Matrix, Vector, TextBlob, Point3, SaveLayerRec};
+use skia_safe::{Canvas, BlendMode, Color, Paint, Point, scalar, Rect, Path, ClipOp, IRect, QuickReject, Matrix, Vector, TextBlob, Point3, SaveLayerRec, Image};
 use skia_safe::canvas::PointMode;
 use skia_safe::utils::shadow_utils::ShadowFlags;
 use boxer::array::{BoxerArray};
@@ -129,6 +129,22 @@ pub fn skia_canvas_draw_shadow(canvas_ptr: *mut ReferenceBox<Canvas>,
             })
         })
     })
+}
+
+#[no_mangle]
+pub fn skia_canvas_draw_image(canvas_ptr: *mut ReferenceBox<Canvas>, image_ptr: *mut ValueBox<Image>, x: scalar, y: scalar, paint_ptr: *mut ValueBox<Paint>) {
+    canvas_ptr.with(|canvas| {
+        image_ptr.with(|image| {
+            match paint_ptr.as_option() {
+                None => { canvas.draw_image(image, Point::new(x, y), None); },
+                Some(_paint_ptr) => {
+                    _paint_ptr.with(|paint| {
+                        canvas.draw_image(image, Point::new(x, y), Some(paint));
+                    })
+                },
+            }
+        });
+    });
 }
 
 #[no_mangle]
