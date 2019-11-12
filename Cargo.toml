@@ -15,6 +15,9 @@ crate-type = ["cdylib"]
 
 [profile.dev]
 opt-level = 0
+debug = true
+debug-assertions = true
+overflow-checks = true
 
 [profile.release]
 opt-level = 3

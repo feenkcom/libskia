@@ -5,6 +5,17 @@ use skia_safe::utils::shadow_utils::ShadowFlags;
 use boxer::array::{BoxerArray};
 use layer::SaveLayerRecWrapper;
 
+#[inline]
+pub fn assert_canvas(canvas_ptr: *mut ReferenceBox<Canvas>) {
+    if cfg!(debug_assertions) {
+        assert!(!canvas_ptr.is_null(), "ReferenceBox<Canvas> pointer should not be nil");
+        let reference_box =  unsafe { boxer::boxes::from_raw(canvas_ptr) };
+        let pointer = reference_box.boxed();
+        boxer::boxes::into_raw(reference_box);
+        assert!(!pointer.is_null(), "Canvas pointer should not be nil");
+    }
+}
+
 #[no_mangle]
 pub fn skia_canvas_draw_color(canvas_ptr: *mut ReferenceBox<Canvas>, r: u8, g: u8, b: u8, a: u8, blend_mode: BlendMode) {
     canvas_ptr.with(|canvas| { canvas.draw_color(Color::from_argb(a, r, g, b), blend_mode); });
@@ -99,7 +110,8 @@ pub fn skia_canvas_draw_path(canvas_ptr: *mut ReferenceBox<Canvas>, path_ptr: *m
 pub fn skia_canvas_draw_text_blob(canvas_ptr: *mut ReferenceBox<Canvas>, text_blob_ptr: *mut ValueBox<TextBlob>, x: scalar, y: scalar, paint_ptr: *mut ValueBox<Paint>) {
     canvas_ptr.with(|canvas| {
         paint_ptr.with(|paint| {
-            text_blob_ptr.with(|text_blob| {
+            // text blob can be nil if it was created from an empty string
+            text_blob_ptr.with_not_null(|text_blob| {
                 canvas.draw_text_blob(text_blob, Point::new(x, y), paint);
             })
         });
