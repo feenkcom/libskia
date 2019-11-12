@@ -1,5 +1,5 @@
 use boxer::boxes::{ValueBox, ValueBoxPointer};
-use skia_safe::{Paint, FilterQuality, scalar, BlendMode, Color, Shader};
+use skia_safe::{Paint, FilterQuality, scalar, BlendMode, Color, Shader, ImageFilter};
 use skia_safe::paint::{Style, Cap, Join};
 
 #[no_mangle]
@@ -146,6 +146,22 @@ pub fn skia_paint_set_shader(_paint_ptr: *mut ValueBox<Paint>, _shader_ptr: *mut
         None => { paint.set_shader(None); },
         Some(mut _ptr) => { _ptr.with_value_consumed(|shader| { paint.set_shader(Some(shader)); } ) },
     });
+}
+
+#[no_mangle]
+pub fn skia_paint_set_image_filter(_paint_ptr: *mut ValueBox<Paint>, _image_filter_ptr: *mut ValueBox<ImageFilter>) {
+    _paint_ptr.with(|paint| match _image_filter_ptr.as_option() {
+        None => { paint.set_image_filter(None); },
+        Some(mut _ptr) => { _ptr.with_value_consumed(|image_filter| { paint.set_image_filter(Some(image_filter)); } ) },
+    });
+}
+
+#[no_mangle]
+pub fn skia_paint_get_image_filter(_paint_ptr: *mut ValueBox<Paint>) -> *mut ValueBox<ImageFilter> {
+    _paint_ptr.with(|paint| match paint.image_filter() {
+        None => { std::ptr::null_mut() },
+        Some(image_filter) => { ValueBox::new(image_filter).into_raw() },
+    })
 }
 
 #[no_mangle]
