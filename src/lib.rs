@@ -4,6 +4,7 @@ extern crate skia_safe;
 use std::os::raw::c_void;
 
 pub mod canvas;
+pub mod canvas_optimized;
 pub mod color;
 pub mod color_space;
 pub mod enums;
