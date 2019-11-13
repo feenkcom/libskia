@@ -1,6 +1,33 @@
 use boxer::boxes::{ValueBox, ValueBoxPointer};
-use skia_safe::{Image, ImageInfo, AlphaType, ColorType, ColorSpace, ImageCachingHint, IPoint};
+use skia_safe::{Image, ImageInfo, AlphaType, ColorType, ColorSpace, ImageCachingHint, IPoint, Bitmap, ISize};
 use boxer::array::BoxerArrayU8;
+use std::os::raw::c_void;
+
+#[no_mangle]
+pub fn skia_image_from_pixels(mut _pixels_ptr: *mut ValueBox<BoxerArrayU8>, width: i32, height: i32, row_bytes: usize, color_type: ColorType) -> *mut ValueBox<Image> {
+    let mut bitmap = Bitmap::new();
+    let image_info = ImageInfo::new(ISize::new(width, height), color_type, AlphaType::Unpremul, None);
+
+    let pixels_installed = _pixels_ptr.with_value_consumed(|array| {
+        unsafe { bitmap.install_pixels(image_info.as_ref(), array.data as *mut c_void, row_bytes) }
+    });
+
+    if !pixels_installed {
+        if cfg!(debug_assertions) {
+            eprintln!("[skia_image_from_pixels] Could not install pixels for image with width: {:?} height: {:?} bytes per row: {:?} color type: {:?}", width, height, row_bytes, color_type);
+        }
+        return std::ptr::null_mut()
+    }
+
+    match Image::from_bitmap(bitmap.as_ref()) {
+        None => {
+            if cfg!(debug_assertions) {
+                eprintln!("[skia_image_from_pixels] Could not create image from bitmap with width: {:?} height: {:?} bytes per row: {:?} color type: {:?}", width, height, row_bytes, color_type);
+            }
+            std::ptr::null_mut() },
+        Some(image) => { ValueBox::new(image).into_raw() },
+    }
+}
 
 #[no_mangle]
 pub fn skia_image_get_image_info(_image_ptr: *mut ValueBox<Image>) -> *mut ValueBox<ImageInfo> {
