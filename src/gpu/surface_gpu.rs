@@ -13,7 +13,7 @@ pub fn skia_surface_from_render_target(
             let surface_option = Surface::from_backend_render_target(
             context,
             backend_render_target,
-            SurfaceOrigin::TopLeft,
+            SurfaceOrigin::BottomLeft,
             _color_type,
             None,
             None
@@ -51,7 +51,7 @@ pub fn skia_surface_new_render_target(
             Budgeted::NO,
             &image_info,
             8,
-            SurfaceOrigin::TopLeft,
+            SurfaceOrigin::BottomLeft,
             None,
             true,
         );
