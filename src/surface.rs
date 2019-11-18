@@ -75,6 +75,11 @@ pub fn skia_surface_get_image_snapshot(_surface_ptr: *mut ValueBox<Surface>) -> 
 }
 
 #[no_mangle]
+pub fn skia_surface_flush(_ptr: *mut ValueBox<Surface>) {
+    _ptr.with_not_null(|surface| surface.flush());
+}
+
+#[no_mangle]
 pub fn skia_surface_drop(_ptr: *mut ValueBox<Surface>) {
     _ptr.drop()
 }

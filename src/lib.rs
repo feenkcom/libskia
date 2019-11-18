@@ -8,6 +8,7 @@ pub mod canvas_optimized;
 pub mod color;
 pub mod color_space;
 pub mod enums;
+pub mod gpu;
 pub mod gradient;
 pub mod image;
 pub mod image_filters;
