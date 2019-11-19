@@ -1,9 +1,13 @@
 extern crate boxer;
 extern crate skia_safe;
+extern crate float_cmp;
 
 use std::os::raw::c_void;
 
 pub mod canvas;
+pub mod canvas_clip;
+pub mod canvas_draw_fill;
+pub mod canvas_draw_stroke;
 pub mod canvas_optimized;
 pub mod color;
 pub mod color_space;

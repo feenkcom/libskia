@@ -1,24 +1,5 @@
-use skia_safe::rrect::{Type, Corner};
-use boxer::string::BoxerString;
-use boxer::CBox;
 use boxer::boxes::{ValueBox, ValueBoxPointer};
-use skia_safe::{RRect, scalar, Rect};
-
-#[no_mangle]
-pub fn skia_rounded_rectangle_type_to_string(_enum: Type, _string_ptr: *mut BoxerString) {
-    CBox::with_optional_raw(_string_ptr, |option| match option {
-        None => {},
-        Some(string) => { string.set_string(format!("{:?}", _enum)) },
-    })
-}
-
-#[no_mangle]
-pub fn skia_rounded_rectangle_corner_to_string(_enum: Corner, _string_ptr: *mut BoxerString) {
-    CBox::with_optional_raw(_string_ptr, |option| match option {
-        None => {},
-        Some(string) => { string.set_string(format!("{:?}", _enum)) },
-    })
-}
+use skia_safe::{RRect, scalar, Rect, Vector, RRectType};
 
 #[no_mangle]
 pub fn skia_rounded_rectangle_default() -> *mut ValueBox<RRect> {
@@ -26,7 +7,24 @@ pub fn skia_rounded_rectangle_default() -> *mut ValueBox<RRect> {
 }
 
 #[no_mangle]
-pub fn skia_rounded_rectangle_get_type(_ptr: *mut ValueBox<RRect>) -> Type {
+pub fn skia_rounded_rectangle_new_radii(
+        left: scalar, top: scalar, right: scalar, bottom: scalar,
+        r_left_x: scalar, r_left_y: scalar,
+        r_top_x: scalar, r_top_y: scalar,
+        r_right_x: scalar, r_right_y: scalar,
+        r_bottom_x: scalar, r_bottom_y: scalar) -> *mut ValueBox<RRect> {
+    let rect = Rect::new(left, top, right, bottom);
+    let radii = [
+        Vector::new(r_left_x, r_left_y),
+        Vector::new(r_top_x, r_top_y),
+        Vector::new(r_right_x, r_right_y),
+        Vector::new(r_bottom_x, r_bottom_y)];
+
+    ValueBox::new(RRect::new_rect_radii(rect, &radii)).into_raw()
+}
+
+#[no_mangle]
+pub fn skia_rounded_rectangle_get_type(_ptr: *mut ValueBox<RRect>) -> RRectType {
     _ptr.with(|rounded_rectangle| rounded_rectangle.get_type())
 }
 

@@ -39,6 +39,17 @@ pub fn skia_surface_new_default() -> *mut ValueBox<Surface> {
 }
 
 #[no_mangle]
+pub fn skia_surface_new_similar(_surface_ptr: *mut ValueBox<Surface>, width: i32, height: i32) -> *mut ValueBox<Surface> {
+     _surface_ptr.with_not_null_return(std::ptr::null_mut(), |surface| {
+         let surface_option = surface.new_surface_with_dimensions(ISize::new(width, height));
+         match surface_option {
+            None => { std::ptr::null_mut()},
+            Some(surface) => { ValueBox::new(surface).into_raw() }
+        }
+     })
+}
+
+#[no_mangle]
 pub fn skia_surface_get_canvas(_surface_ptr: *mut ValueBox<Surface>) -> *mut ReferenceBox<Canvas> {
     _surface_ptr.with_not_null_return(std::ptr::null_mut(), |surface | ReferenceBox::new(surface.canvas()).into_raw())
 }
