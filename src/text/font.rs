@@ -84,12 +84,37 @@ pub fn skia_font_get_metrics(_ptr: *mut ValueBox<Font>) -> *mut ValueBox<FontMet
 }
 
 #[no_mangle]
-pub fn skia_font_text_to_glyphs(_ptr: *mut ValueBox<Font>, _text_ptr: *mut BoxerString, encoding: TextEncoding, _glyphs_ptr: *mut ValueBox<BoxerArray<GlyphId>>) {
+pub fn skia_font_text_to_glyphs(_ptr: *mut ValueBox<Font>, _text_ptr: *mut BoxerString, encoding: TextEncoding, _glyphs_ptr: *mut ValueBox<BoxerArray<GlyphId>>, _paint_ptr: *mut ValueBox<Paint>, _bounds_ptr: *mut ValueBox<Rect>) -> scalar {
+    let mut advance: scalar = 0.0;
     _ptr.with(|font|
         _text_ptr.with(|text|
             _glyphs_ptr.with(|glyphs| {
-                glyphs.set_vector(font.text_to_glyphs_vec(text.to_slice_u8(), encoding))
+                let glyphs_vec = font.text_to_glyphs_vec(text.to_slice_u8(), encoding);
+                if glyphs_vec.len() > 0 {
+                    _paint_ptr.with_not_null(|paint| {
+                        _bounds_ptr.with_not_null(|bounds| {
+                            let mut glyphs_width: Vec<scalar> = vec![Default::default(); glyphs_vec.len()];
+                            let mut glyphs_bounds: Vec<Rect> = vec![Default::default(); glyphs_vec.len()];
+
+                            font.get_widths_bounds(glyphs_vec.as_slice(), Some(glyphs_width.as_mut_slice()), Some(glyphs_bounds.as_mut_slice()), Some(paint));
+
+                            advance = glyphs_width.iter().sum();
+
+                            let mut width = advance - *glyphs_width.last().unwrap_or(&0.0);
+                            width = width + glyphs_bounds.last().unwrap().right;
+
+                            for rect in glyphs_bounds.iter() {
+                                bounds.join(rect)
+                            }
+
+                            bounds.set_ltrb(glyphs_bounds[0].left, bounds.top, width, bounds.bottom);
+                        });
+                    });
+
+                    glyphs.set_vector(glyphs_vec)
+                }
             })));
+    advance
 }
 
 #[no_mangle]
