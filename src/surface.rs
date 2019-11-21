@@ -1,4 +1,4 @@
-use skia_safe::{Surface, ImageInfo, ISize, IPoint, Canvas, Image};
+use skia_safe::{Surface, ImageInfo, ISize, IPoint, Canvas, Image, ColorType, AlphaType};
 use boxer::array::BoxerArrayU8;
 use boxer::boxes::{ReferenceBox, ValueBox, ValueBoxPointer};
 
@@ -39,13 +39,17 @@ pub fn skia_surface_new_default() -> *mut ValueBox<Surface> {
 }
 
 #[no_mangle]
-pub fn skia_surface_new_similar(_surface_ptr: *mut ValueBox<Surface>, width: i32, height: i32) -> *mut ValueBox<Surface> {
+pub fn skia_surface_new_similar(_surface_ptr: *mut ValueBox<Surface>, _ptr_image_info: *mut ValueBox<ImageInfo>) -> *mut ValueBox<Surface> {
      _surface_ptr.with_not_null_return(std::ptr::null_mut(), |surface| {
-         let surface_option = surface.new_surface_with_dimensions(ISize::new(width, height));
-         match surface_option {
-            None => { std::ptr::null_mut()},
-            Some(surface) => { ValueBox::new(surface).into_raw() }
-        }
+         _ptr_image_info.with_not_null_return(std::ptr::null_mut(), |image_info| {
+             let surface_option = surface.new_surface(image_info);
+             match surface_option {
+                None => { std::ptr::null_mut()},
+                Some(surface) => { ValueBox::new(surface).into_raw() }
+            }
+         })
+
+
      })
 }
 
@@ -57,6 +61,16 @@ pub fn skia_surface_get_canvas(_surface_ptr: *mut ValueBox<Surface>) -> *mut Ref
 #[no_mangle]
 pub fn skia_surface_get_width(_surface_ptr: *mut ValueBox<Surface>) -> i32 {
     _surface_ptr.with_not_null_return(0, |surface | surface.width())
+}
+
+#[no_mangle]
+pub fn skia_surface_get_color_type(_surface_ptr: *mut ValueBox<Surface>) -> ColorType {
+    _surface_ptr.with(|surface | surface.image_info().color_type())
+}
+
+#[no_mangle]
+pub fn skia_surface_get_alpha_type(_surface_ptr: *mut ValueBox<Surface>) -> AlphaType {
+    _surface_ptr.with(|surface | surface.image_info().alpha_type())
 }
 
 #[no_mangle]
