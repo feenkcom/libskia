@@ -291,6 +291,7 @@ pub fn skia_canvas_draw_image(
 
 #[no_mangle]
 pub fn skia_canvas_translate(canvas_ptr: *mut ReferenceBox<Canvas>, x: scalar, y: scalar) {
+    assert_canvas(canvas_ptr);
     canvas_ptr.with(|canvas| {
         canvas.translate(Vector::new(x, y));
     });
@@ -298,6 +299,7 @@ pub fn skia_canvas_translate(canvas_ptr: *mut ReferenceBox<Canvas>, x: scalar, y
 
 #[no_mangle]
 pub fn skia_canvas_scale(canvas_ptr: *mut ReferenceBox<Canvas>, sx: scalar, sy: scalar) {
+    assert_canvas(canvas_ptr);
     canvas_ptr.with(|canvas| {
         canvas.scale((sx, sy));
     });
@@ -310,6 +312,7 @@ pub fn skia_canvas_rotate(
     x: scalar,
     y: scalar,
 ) {
+    assert_canvas(canvas_ptr);
     canvas_ptr.with(|canvas| {
         canvas.rotate(degrees, Some(Point::new(x, y)));
     });
@@ -317,6 +320,7 @@ pub fn skia_canvas_rotate(
 
 #[no_mangle]
 pub fn skia_canvas_skew(canvas_ptr: *mut ReferenceBox<Canvas>, sx: scalar, sy: scalar) {
+    assert_canvas(canvas_ptr);
     canvas_ptr.with(|canvas| {
         canvas.skew((sx, sy));
     });
@@ -327,6 +331,7 @@ pub fn skia_canvas_concat_matrix(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     matrix_ptr: *mut ValueBox<Matrix>,
 ) {
+    assert_canvas(canvas_ptr);
     canvas_ptr.with(|canvas| {
         matrix_ptr.with(|matrix| {
             canvas.concat(matrix);
@@ -339,6 +344,7 @@ pub fn skia_canvas_set_matrix(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     matrix_ptr: *mut ValueBox<Matrix>,
 ) {
+    assert_canvas(canvas_ptr);
     canvas_ptr.with(|canvas| {
         matrix_ptr.with(|matrix| {
             canvas.set_matrix(matrix);
@@ -351,6 +357,7 @@ pub fn skia_canvas_get_matrix(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     matrix_ptr: *mut ValueBox<Matrix>,
 ) {
+    assert_canvas(canvas_ptr);
     canvas_ptr.with(|canvas| {
         matrix_ptr.with(|matrix| {
             let m = canvas.total_matrix();
@@ -363,6 +370,7 @@ pub fn skia_canvas_get_matrix(
 
 #[no_mangle]
 pub fn skia_canvas_reset_matrix(canvas_ptr: *mut ReferenceBox<Canvas>) {
+    assert_canvas(canvas_ptr);
     canvas_ptr.with(|canvas| {
         canvas.reset_matrix();
     })
@@ -370,6 +378,7 @@ pub fn skia_canvas_reset_matrix(canvas_ptr: *mut ReferenceBox<Canvas>) {
 
 #[no_mangle]
 pub fn skia_canvas_flush(canvas_ptr: *mut ReferenceBox<Canvas>) {
+    assert_canvas(canvas_ptr);
     canvas_ptr.with(|canvas| {
         canvas.flush();
     })
