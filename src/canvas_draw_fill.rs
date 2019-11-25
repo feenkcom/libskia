@@ -1,6 +1,6 @@
-use boxer::boxes::{ReferenceBox, ReferenceBoxPointer};
+use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer};
 use canvas::assert_canvas;
-use skia_safe::{scalar, Canvas, Color, Paint, RRect, Rect, Vector};
+use skia_safe::{scalar, Canvas, Color, Paint, RRect, Rect, Vector, Image, Point};
 use float_cmp::ApproxEqUlps;
 
 #[no_mangle]
@@ -76,5 +76,19 @@ pub fn skia_canvas_fill_rounded_rectangle_with_color(
                     .set_anti_alias(antialias),
             );
         };
+    });
+}
+
+#[no_mangle]
+pub fn skia_canvas_fill_image_without_paint(
+    canvas_ptr: *mut ReferenceBox<Canvas>,
+    image_ptr: *mut ValueBox<Image>,
+    x: scalar,
+    y: scalar,
+) {
+    canvas_ptr.with(|canvas| {
+        image_ptr.with(|image| {
+            canvas.draw_image(image, Point::new(x, y), None);
+        });
     });
 }
