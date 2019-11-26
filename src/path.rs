@@ -1,4 +1,4 @@
-use skia_safe::{Path, scalar, Point, Vector, PathFillType, Rect};
+use skia_safe::{Path, scalar, Point, Vector, PathFillType, Rect, Paint};
 use boxer::array::BoxerArray;
 use boxer::boxes::{ValueBox, ValueBoxPointer};
 
@@ -135,6 +135,22 @@ pub fn skia_path_get_last_point(_path: *mut ValueBox<Path>, _point_ptr: *mut Val
                     true
                 },
             }
+        })
+    })
+}
+
+#[no_mangle]
+pub fn skia_path_get_stroke_bounds(_path: *mut ValueBox<Path>, _paint_ptr: *mut ValueBox<Paint>, _rect_ptr: *mut ValueBox<Rect>) {
+    _path.with_not_null(|path| {
+        _paint_ptr.with_not_null(|paint| {
+            _rect_ptr.with_not_null(|rect| {
+                match paint.get_fill_path(path, None, None) {
+                    None => {},
+                    Some(fill_path) => {
+                        let fill_rect = fill_path.compute_tight_bounds();
+                        rect.set_ltrb(fill_rect.left, fill_rect.top, fill_rect.right, fill_rect.bottom) },
+                }
+            })
         })
     })
 }
