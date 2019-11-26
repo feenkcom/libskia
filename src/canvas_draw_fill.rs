@@ -87,7 +87,7 @@ pub fn skia_canvas_fill_image_without_paint(
     y: scalar,
 ) {
     canvas_ptr.with(|canvas| {
-        image_ptr.with(|image| {
+        image_ptr.with_not_null(|image| {
             canvas.draw_image(image, Point::new(x, y), None);
         });
     });

@@ -272,13 +272,13 @@ pub fn skia_canvas_draw_shadow(
 #[no_mangle]
 pub fn skia_canvas_draw_image(
     canvas_ptr: *mut ReferenceBox<Canvas>,
-    image_ptr: *mut ValueBox<Image>,
+    image_ptr: *mut ValueBox<Image>, // may be null
     x: scalar,
     y: scalar,
     paint_ptr: *mut ValueBox<Paint>,
 ) {
     canvas_ptr.with(|canvas| {
-        image_ptr.with(|image| match paint_ptr.as_option() {
+        image_ptr.with_not_null(|image| match paint_ptr.as_option() {
             None => {
                 canvas.draw_image(image, Point::new(x, y), None);
             }
