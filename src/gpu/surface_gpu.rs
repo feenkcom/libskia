@@ -1,6 +1,6 @@
 use boxer::boxes::{ValueBox, ValueBoxPointer};
 use skia_safe::gpu::{Context, SurfaceOrigin, BackendRenderTarget};
-use skia_safe::{Budgeted, ImageInfo, Surface, Paint, Color, ColorType};
+use skia_safe::{Budgeted, ImageInfo, Surface, ColorType};
 
 #[no_mangle]
 pub fn skia_surface_from_render_target(
@@ -24,14 +24,7 @@ pub fn skia_surface_from_render_target(
                         eprintln!("[skia_surface_from_render_target] Unable to create Skia Surface width: {:?} height: {:?} color type: {:?}", backend_render_target.width(), backend_render_target.height(), _color_type);
                 }
                 std::ptr::null_mut() },
-            Some(mut surface) => {
-                let canvas = surface.canvas();
-
-                let mut paint = Paint::default();
-                paint.set_color(Color::BLUE);
-                canvas.draw_paint(paint.as_ref());
-                canvas.flush();
-                context.flush();
+            Some(surface) => {
                 ValueBox::new(surface).into_raw()
             },
         }
@@ -61,14 +54,7 @@ pub fn skia_surface_new_render_target(
                         eprintln!("[skia_surface_new_render_target] Unable to create Skia Surface width: {:?} height: {:?} color type: {:?}", image_info.width(), image_info.height(), image_info.color_type());
                 }
                 std::ptr::null_mut() },
-            Some(mut surface) => {
-                let canvas = surface.canvas();
-
-                let mut paint = Paint::default();
-                paint.set_color(Color::BLUE);
-                canvas.draw_paint(paint.as_ref());
-                canvas.flush();
-                context.flush();
+            Some(surface) => {
                 ValueBox::new(surface).into_raw()
             },
         }
