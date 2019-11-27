@@ -15,8 +15,8 @@ pub fn skia_canvas_draw_text_blob_with_color(
     a: u8,
     antialias: bool,
 ) {
-    assert_canvas(canvas_ptr);
-    canvas_ptr.with(|canvas| {
+    assert_canvas(canvas_ptr, function!());
+    canvas_ptr.with_not_null(|canvas| {
         text_blob_ptr.with_not_null(|text_blob| {
             canvas.draw_text_blob(
                 text_blob,
@@ -38,8 +38,8 @@ pub fn skia_canvas_draw_text_blob_with_black_color(
     y: scalar,
     antialias: bool,
 ) {
-    assert_canvas(canvas_ptr);
-    canvas_ptr.with(|canvas| {
+    assert_canvas(canvas_ptr, function!());
+    canvas_ptr.with_not_null(|canvas| {
         text_blob_ptr.with_not_null(|text_blob| {
             canvas.draw_text_blob(
                 text_blob,

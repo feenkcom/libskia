@@ -18,8 +18,8 @@ pub fn skia_canvas_stroke_rectangle_with_color(
     width: scalar,
     antialias: bool,
 ) {
-    assert_canvas(canvas_ptr);
-    canvas_ptr.with(|canvas| {
+    assert_canvas(canvas_ptr, function!());
+    canvas_ptr.with_not_null(|canvas| {
         canvas.draw_rect(
             Rect::new(left, top, right, bottom),
             Paint::default()
@@ -50,7 +50,8 @@ pub fn skia_canvas_stroke_rounded_rectangle_with_color(
     width: scalar,
     antialias: bool,
 ) {
-    canvas_ptr.with(|canvas| {
+    assert_canvas(canvas_ptr, function!());
+    canvas_ptr.with_not_null(|canvas| {
         // if all radii are same we can use a simpler optimized drawing method
         if r_top_left.approx_eq_ulps(&r_top_right, 2)
             && r_top_right.approx_eq_ulps(&r_bottom_right, 2)
