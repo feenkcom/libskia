@@ -56,6 +56,14 @@ pub fn skia_backend_texture_is_valid(_ptr: *mut ValueBox<BackendTexture>) -> boo
 }
 
 #[no_mangle]
+pub fn skia_backend_texture_get_gl_texture_info(_ptr: *mut ValueBox<BackendTexture>) -> *mut ValueBox<TextureInfo> {
+    _ptr.with_not_null_return(std::ptr::null_mut(), |backend_texture| match backend_texture.gl_texture_info() {
+        None => { std::ptr::null_mut() },
+        Some(texture_info) => { ValueBox::new(texture_info).into_raw()},
+    })
+}
+
+#[no_mangle]
 pub fn skia_backend_texture_drop(_ptr: *mut ValueBox<BackendTexture>) {
     _ptr.drop();
 }
