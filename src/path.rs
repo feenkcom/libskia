@@ -206,6 +206,16 @@ pub fn skia_path_get_stroke_bounds(
 }
 
 #[no_mangle]
+pub fn skia_path_contains_point(
+    _path: *mut ValueBox<Path>,
+    x: f32, y:f32,
+) -> bool {
+    _path.with_not_null_return(false, |path| {
+        path.contains(Point::new(x, y))
+    })
+}
+
+#[no_mangle]
 pub fn skia_path_serialize(_path: *mut ValueBox<Path>, _data: *mut ValueBox<BoxerArray<u8>>) {
     _path.with(|path| {
         _data.with(|data| {
