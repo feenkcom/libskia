@@ -1,5 +1,6 @@
 use boxer::array::BoxerArray;
 use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer};
+use boxer::{assert_reference_box, function};
 use float_cmp::ApproxEqUlps;
 use layer::SaveLayerRecWrapper;
 use skia_safe::canvas::PointMode;
@@ -8,23 +9,6 @@ use skia_safe::{
     scalar, BlendMode, Canvas, Color, Image, Matrix, Paint, Path, Point, Point3, RRect, Rect,
     SaveLayerRec, TextBlob, Vector,
 };
-
-#[inline]
-pub fn assert_canvas(canvas_ptr: *mut ReferenceBox<Canvas>, method_name: &str) {
-    if cfg!(debug_assertions) {
-        if canvas_ptr.is_null() {
-            eprintln!("[{:?}] ReferenceBox<Canvas> pointer is null", method_name);
-            return;
-        }
-        let reference_box = unsafe { boxer::boxes::from_raw(canvas_ptr) };
-        let pointer = reference_box.boxed();
-        boxer::boxes::into_raw(reference_box);
-
-        if pointer.is_null() {
-            eprintln!("[{:?}] Canvas pointer is null", method_name)
-        }
-    }
-}
 
 #[no_mangle]
 pub fn skia_canvas_draw_color(
@@ -35,7 +19,7 @@ pub fn skia_canvas_draw_color(
     a: u8,
     blend_mode: BlendMode,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         canvas.draw_color(Color::from_argb(a, r, g, b), blend_mode);
     });
@@ -46,7 +30,7 @@ pub fn skia_canvas_draw_paint(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     paint_ptr: *mut ValueBox<Paint>,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr.with_not_null(|paint| {
             canvas.draw_paint(paint);
@@ -61,7 +45,7 @@ pub fn skia_canvas_draw_points(
     points_ptr: *mut ValueBox<BoxerArray<Point>>,
     paint_ptr: *mut ValueBox<Paint>,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr.with_not_null(|paint| {
             points_ptr.with_not_null(|points| {
@@ -78,7 +62,7 @@ pub fn skia_canvas_draw_point(
     y: scalar,
     paint_ptr: *mut ValueBox<Paint>,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr.with_not_null(|paint| {
             canvas.draw_point(Point::new(x, y), paint);
@@ -95,7 +79,7 @@ pub fn skia_canvas_draw_line(
     to_y: scalar,
     paint_ptr: *mut ValueBox<Paint>,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr.with_not_null(|paint| {
             canvas.draw_line(Point::new(from_x, from_y), Point::new(to_x, to_y), paint);
@@ -112,7 +96,7 @@ pub fn skia_canvas_draw_rectangle(
     bottom: scalar,
     paint_ptr: *mut ValueBox<Paint>,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr.with_not_null(|paint| {
             canvas.draw_rect(Rect::new(left, top, right, bottom), paint);
@@ -129,7 +113,7 @@ pub fn skia_canvas_draw_oval(
     bottom: scalar,
     paint_ptr: *mut ValueBox<Paint>,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr.with_not_null(|paint| {
             canvas.draw_oval(Rect::new(left, top, right, bottom), paint);
@@ -145,7 +129,7 @@ pub fn skia_canvas_draw_circle(
     radius: scalar,
     paint_ptr: *mut ValueBox<Paint>,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr.with_not_null(|paint| {
             canvas.draw_circle(Point::new(center_x, center_y), radius, paint);
@@ -159,7 +143,7 @@ pub fn skia_canvas_draw_rrect(
     rrect_ptr: *mut ValueBox<RRect>,
     paint_ptr: *mut ValueBox<Paint>,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         rrect_ptr.with_not_null(|rrect| {
             paint_ptr.with_not_null(|paint| {
@@ -182,7 +166,7 @@ pub fn skia_canvas_draw_rounded_rectangle(
     r_bottom_left: scalar,
     paint_ptr: *mut ValueBox<Paint>,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr.with_not_null(|paint| {
             // if all radii are same we can use a simpler optimized drawing method
@@ -221,7 +205,7 @@ pub fn skia_canvas_draw_path(
     path_ptr: *mut ValueBox<Path>,
     paint_ptr: *mut ValueBox<Paint>,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr.with_not_null(|paint| {
             path_ptr.with_not_null(|path| {
@@ -239,7 +223,7 @@ pub fn skia_canvas_draw_text_blob(
     y: scalar,
     paint_ptr: *mut ValueBox<Paint>,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr.with_not_null(|paint| {
             // text blob can be nil if it was created from an empty string
@@ -261,7 +245,7 @@ pub fn skia_canvas_draw_shadow(
     _spot_color_ptr: *mut ValueBox<Color>,
     bit_flags: u32,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         _path_ptr.with_not_null(|path| {
             _z_plane_ptr.with_value(|z_plane| {
@@ -293,7 +277,7 @@ pub fn skia_canvas_draw_image(
     y: scalar,
     paint_ptr: *mut ValueBox<Paint>,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         image_ptr.with_not_null(|image| match paint_ptr.as_option() {
             None => {
@@ -308,7 +292,7 @@ pub fn skia_canvas_draw_image(
 
 #[no_mangle]
 pub fn skia_canvas_translate(canvas_ptr: *mut ReferenceBox<Canvas>, x: scalar, y: scalar) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         canvas.translate(Vector::new(x, y));
     });
@@ -316,7 +300,7 @@ pub fn skia_canvas_translate(canvas_ptr: *mut ReferenceBox<Canvas>, x: scalar, y
 
 #[no_mangle]
 pub fn skia_canvas_scale(canvas_ptr: *mut ReferenceBox<Canvas>, sx: scalar, sy: scalar) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         canvas.scale((sx, sy));
     });
@@ -329,7 +313,7 @@ pub fn skia_canvas_rotate(
     x: scalar,
     y: scalar,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         canvas.rotate(degrees, Some(Point::new(x, y)));
     });
@@ -337,7 +321,7 @@ pub fn skia_canvas_rotate(
 
 #[no_mangle]
 pub fn skia_canvas_skew(canvas_ptr: *mut ReferenceBox<Canvas>, sx: scalar, sy: scalar) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         canvas.skew((sx, sy));
     });
@@ -348,7 +332,7 @@ pub fn skia_canvas_concat_matrix(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     matrix_ptr: *mut ValueBox<Matrix>,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         matrix_ptr.with_not_null(|matrix| {
             canvas.concat(matrix);
@@ -361,7 +345,7 @@ pub fn skia_canvas_set_matrix(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     matrix_ptr: *mut ValueBox<Matrix>,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         matrix_ptr.with_not_null(|matrix| {
             canvas.set_matrix(matrix);
@@ -374,7 +358,7 @@ pub fn skia_canvas_get_matrix(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     matrix_ptr: *mut ValueBox<Matrix>,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         matrix_ptr.with_not_null(|matrix| {
             let m = canvas.total_matrix();
@@ -387,7 +371,7 @@ pub fn skia_canvas_get_matrix(
 
 #[no_mangle]
 pub fn skia_canvas_reset_matrix(canvas_ptr: *mut ReferenceBox<Canvas>) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         canvas.reset_matrix();
     })
@@ -395,7 +379,7 @@ pub fn skia_canvas_reset_matrix(canvas_ptr: *mut ReferenceBox<Canvas>) {
 
 #[no_mangle]
 pub fn skia_canvas_flush(canvas_ptr: *mut ReferenceBox<Canvas>) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         canvas.flush();
     })
@@ -403,19 +387,19 @@ pub fn skia_canvas_flush(canvas_ptr: *mut ReferenceBox<Canvas>) {
 
 #[no_mangle]
 pub fn skia_canvas_save(canvas_ptr: *mut ReferenceBox<Canvas>) -> usize {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null_return(0, |canvas| canvas.save())
 }
 
 #[no_mangle]
 pub fn skia_canvas_save_count(canvas_ptr: *mut ReferenceBox<Canvas>) -> usize {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null_return(0, |canvas| canvas.save_count())
 }
 
 #[no_mangle]
 pub fn skia_canvas_restore(canvas_ptr: *mut ReferenceBox<Canvas>) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         canvas.restore();
     })
@@ -423,7 +407,7 @@ pub fn skia_canvas_restore(canvas_ptr: *mut ReferenceBox<Canvas>) {
 
 #[no_mangle]
 pub fn skia_canvas_restore_to_count(canvas_ptr: *mut ReferenceBox<Canvas>, count: usize) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         canvas.restore_to_count(count);
     })
@@ -434,7 +418,7 @@ pub fn skia_canvas_save_layer(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     _save_layer_ptr: *mut ValueBox<SaveLayerRecWrapper>,
 ) -> usize {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null_return(0, |canvas| {
         _save_layer_ptr.with_not_null_return(0, |save_rec| {
             let mut rec: SaveLayerRec = SaveLayerRec::default();

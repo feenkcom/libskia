@@ -1,6 +1,7 @@
 use boxer::array::BoxerArray;
 use boxer::boxes::{ValueBox, ValueBoxPointer};
 use boxer::string::{BoxerString, BoxerStringPointer};
+use boxer::{assert_box, function};
 use skia_safe::{
     scalar, Font, FontEdging, FontHinting, FontMetrics, GlyphId, Paint, Rect, TextEncoding,
     Typeface,
@@ -16,6 +17,7 @@ pub fn skia_font_from_typeface(
     mut _typeface_ptr: *mut ValueBox<Typeface>,
     size: scalar,
 ) -> *mut ValueBox<Font> {
+    assert_box(_typeface_ptr, function!());
     _typeface_ptr.with_value_consumed(|typeface| {
         ValueBox::new(Font::from_typeface(typeface, size)).into_raw()
     })

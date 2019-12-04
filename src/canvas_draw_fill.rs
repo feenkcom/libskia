@@ -1,7 +1,8 @@
 use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer};
-use canvas::assert_canvas;
 use float_cmp::ApproxEqUlps;
 use skia_safe::{scalar, Canvas, Color, Image, Paint, Point, RRect, Rect, Vector};
+
+use boxer::{assert_reference_box, function};
 
 #[no_mangle]
 pub fn skia_canvas_fill_rectangle_with_color(
@@ -16,7 +17,7 @@ pub fn skia_canvas_fill_rectangle_with_color(
     a: u8,
     antialias: bool,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         canvas.draw_rect(
             Rect::new(left, top, right, bottom),
@@ -45,7 +46,7 @@ pub fn skia_canvas_fill_rounded_rectangle_with_color(
     a: u8,
     antialias: bool,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         // if all radii are same we can use a simpler optimized drawing method
         if r_top_left.approx_eq_ulps(&r_top_right, 2)
@@ -87,7 +88,7 @@ pub fn skia_canvas_fill_image_without_paint(
     x: scalar,
     y: scalar,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         image_ptr.with_not_null(|image| {
             canvas.draw_image(image, Point::new(x, y), None);

@@ -1,7 +1,7 @@
 use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer};
-use canvas::assert_canvas;
 use skia_safe::{scalar, Canvas, Color, Paint, Point, TextBlob};
 
+use boxer::{assert_reference_box, function};
 /// Fill a given text blob with a color and disabled antialias
 #[no_mangle]
 pub fn skia_canvas_draw_text_blob_with_color(
@@ -15,7 +15,7 @@ pub fn skia_canvas_draw_text_blob_with_color(
     a: u8,
     antialias: bool,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         text_blob_ptr.with_not_null(|text_blob| {
             canvas.draw_text_blob(
@@ -38,7 +38,7 @@ pub fn skia_canvas_draw_text_blob_with_black_color(
     y: scalar,
     antialias: bool,
 ) {
-    assert_canvas(canvas_ptr, function!());
+    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         text_blob_ptr.with_not_null(|text_blob| {
             canvas.draw_text_blob(
