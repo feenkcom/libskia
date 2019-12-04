@@ -1,5 +1,6 @@
 use boxer::array::BoxerArray;
 use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer};
+use float_cmp::ApproxEqUlps;
 use layer::SaveLayerRecWrapper;
 use skia_safe::canvas::PointMode;
 use skia_safe::utils::shadow_utils::ShadowFlags;
@@ -7,7 +8,6 @@ use skia_safe::{
     scalar, BlendMode, Canvas, Color, Image, Matrix, Paint, Path, Point, Point3, RRect, Rect,
     SaveLayerRec, TextBlob, Vector,
 };
-use float_cmp::ApproxEqUlps;
 
 #[inline]
 pub fn assert_canvas(canvas_ptr: *mut ReferenceBox<Canvas>, method_name: &str) {
@@ -170,7 +170,7 @@ pub fn skia_canvas_draw_rrect(
 }
 
 #[no_mangle]
-pub fn skia_canvas_draw_rounded_rectangle (
+pub fn skia_canvas_draw_rounded_rectangle(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     left: scalar,
     top: scalar,
@@ -186,31 +186,31 @@ pub fn skia_canvas_draw_rounded_rectangle (
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr.with_not_null(|paint| {
             // if all radii are same we can use a simpler optimized drawing method
-        if r_top_left.approx_eq_ulps(&r_top_right, 2)
-            && r_top_right.approx_eq_ulps(&r_bottom_right, 2)
-            && r_bottom_right.approx_eq_ulps(&r_bottom_left,2)
-            && r_bottom_left.approx_eq_ulps(&r_top_left, 2)
-        {
-            canvas.draw_round_rect(
-                Rect::new(left, top, right, bottom),
-                r_top_right,
-                r_top_right,
-                paint,
-            );
-        } else {
-            canvas.draw_rrect(
-                RRect::new_rect_radii(
+            if r_top_left.approx_eq_ulps(&r_top_right, 2)
+                && r_top_right.approx_eq_ulps(&r_bottom_right, 2)
+                && r_bottom_right.approx_eq_ulps(&r_bottom_left, 2)
+                && r_bottom_left.approx_eq_ulps(&r_top_left, 2)
+            {
+                canvas.draw_round_rect(
                     Rect::new(left, top, right, bottom),
-                    &[
-                        Vector::new(r_top_left, r_top_left),
-                        Vector::new(r_top_right, r_top_right),
-                        Vector::new(r_bottom_right, r_bottom_right),
-                        Vector::new(r_bottom_left, r_bottom_left),
-                    ],
-                ),
-                paint,
-            );
-        };
+                    r_top_right,
+                    r_top_right,
+                    paint,
+                );
+            } else {
+                canvas.draw_rrect(
+                    RRect::new_rect_radii(
+                        Rect::new(left, top, right, bottom),
+                        &[
+                            Vector::new(r_top_left, r_top_left),
+                            Vector::new(r_top_right, r_top_right),
+                            Vector::new(r_bottom_right, r_bottom_right),
+                            Vector::new(r_bottom_left, r_bottom_left),
+                        ],
+                    ),
+                    paint,
+                );
+            };
         });
     });
 }
@@ -404,7 +404,7 @@ pub fn skia_canvas_flush(canvas_ptr: *mut ReferenceBox<Canvas>) {
 #[no_mangle]
 pub fn skia_canvas_save(canvas_ptr: *mut ReferenceBox<Canvas>) -> usize {
     assert_canvas(canvas_ptr, function!());
-    canvas_ptr.with_not_null_return(0,|canvas| canvas.save())
+    canvas_ptr.with_not_null_return(0, |canvas| canvas.save())
 }
 
 #[no_mangle]

@@ -1,5 +1,5 @@
 use boxer::boxes::{ValueBox, ValueBoxPointer};
-use skia_safe::{Rect, scalar, IRect};
+use skia_safe::{scalar, IRect, Rect};
 
 ///
 /// Rect
@@ -11,8 +11,16 @@ pub fn skia_rectangle_f32_default() -> *mut ValueBox<Rect> {
 }
 
 #[no_mangle]
-pub fn skia_rectangle_f32_set_ltrb(_rectangle_ptr: *mut ValueBox<Rect>, left: scalar, top: scalar, right: scalar, bottom: scalar) {
-    _rectangle_ptr.with(|rectangle| { rectangle.set_ltrb(left, top, right, bottom); });
+pub fn skia_rectangle_f32_set_ltrb(
+    _rectangle_ptr: *mut ValueBox<Rect>,
+    left: scalar,
+    top: scalar,
+    right: scalar,
+    bottom: scalar,
+) {
+    _rectangle_ptr.with(|rectangle| {
+        rectangle.set_ltrb(left, top, right, bottom);
+    });
 }
 
 #[no_mangle]
@@ -50,8 +58,16 @@ pub fn skia_rectangle_i32_default() -> *mut ValueBox<IRect> {
 }
 
 #[no_mangle]
-pub fn skia_rectangle_i32_set_ltrb(_rectangle_ptr: *mut ValueBox<IRect>, left: i32, top: i32, right: i32, bottom: i32) {
-    _rectangle_ptr.with(|rectangle| { rectangle.set_ltrb(left, top, right, bottom); });
+pub fn skia_rectangle_i32_set_ltrb(
+    _rectangle_ptr: *mut ValueBox<IRect>,
+    left: i32,
+    top: i32,
+    right: i32,
+    bottom: i32,
+) {
+    _rectangle_ptr.with(|rectangle| {
+        rectangle.set_ltrb(left, top, right, bottom);
+    });
 }
 
 #[no_mangle]

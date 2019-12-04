@@ -1,7 +1,7 @@
 extern crate typename;
 
-use super::*;
 use self::typename::TypeName;
+use super::*;
 use boxer::string::BoxerString;
 use boxer::CBox;
 

@@ -1,5 +1,5 @@
 use boxer::boxes::{ValueBox, ValueBoxPointer};
-use skia_safe::{RRect, scalar, Rect, Vector, RRectType};
+use skia_safe::{scalar, RRect, RRectType, Rect, Vector};
 
 #[no_mangle]
 pub fn skia_rounded_rectangle_default() -> *mut ValueBox<RRect> {
@@ -8,17 +8,26 @@ pub fn skia_rounded_rectangle_default() -> *mut ValueBox<RRect> {
 
 #[no_mangle]
 pub fn skia_rounded_rectangle_new_radii(
-        left: scalar, top: scalar, right: scalar, bottom: scalar,
-        r_left_x: scalar, r_left_y: scalar,
-        r_top_x: scalar, r_top_y: scalar,
-        r_right_x: scalar, r_right_y: scalar,
-        r_bottom_x: scalar, r_bottom_y: scalar) -> *mut ValueBox<RRect> {
+    left: scalar,
+    top: scalar,
+    right: scalar,
+    bottom: scalar,
+    r_left_x: scalar,
+    r_left_y: scalar,
+    r_top_x: scalar,
+    r_top_y: scalar,
+    r_right_x: scalar,
+    r_right_y: scalar,
+    r_bottom_x: scalar,
+    r_bottom_y: scalar,
+) -> *mut ValueBox<RRect> {
     let rect = Rect::new(left, top, right, bottom);
     let radii = [
         Vector::new(r_left_x, r_left_y),
         Vector::new(r_top_x, r_top_y),
         Vector::new(r_right_x, r_right_y),
-        Vector::new(r_bottom_x, r_bottom_y)];
+        Vector::new(r_bottom_x, r_bottom_y),
+    ];
 
     ValueBox::new(RRect::new_rect_radii(rect, &radii)).into_raw()
 }
@@ -39,7 +48,10 @@ pub fn skia_rounded_rectangle_height(_ptr: *mut ValueBox<RRect>) -> scalar {
 }
 
 #[no_mangle]
-pub fn skia_rounded_rectangle_set_rect(_rounded_rectangle_ptr: *mut ValueBox<RRect>, _rectangle_ptr: *mut ValueBox<Rect>) {
+pub fn skia_rounded_rectangle_set_rect(
+    _rounded_rectangle_ptr: *mut ValueBox<RRect>,
+    _rectangle_ptr: *mut ValueBox<Rect>,
+) {
     _rounded_rectangle_ptr.with(|rounded_rectangle| {
         _rectangle_ptr.with(|rectangle| {
             rounded_rectangle.set_rect(rectangle);
@@ -48,7 +60,10 @@ pub fn skia_rounded_rectangle_set_rect(_rounded_rectangle_ptr: *mut ValueBox<RRe
 }
 
 #[no_mangle]
-pub fn skia_rounded_rectangle_set_oval(_rounded_rectangle_ptr: *mut ValueBox<RRect>, _oval_ptr: *mut ValueBox<Rect>) {
+pub fn skia_rounded_rectangle_set_oval(
+    _rounded_rectangle_ptr: *mut ValueBox<RRect>,
+    _oval_ptr: *mut ValueBox<Rect>,
+) {
     _rounded_rectangle_ptr.with(|rounded_rectangle| {
         _oval_ptr.with(|oval| {
             rounded_rectangle.set_oval(oval);
@@ -63,14 +78,17 @@ pub fn skia_rounded_rectangle_drop(_ptr: *mut ValueBox<RRect>) {
 
 #[cfg(test)]
 mod test {
-    use rounded_rectangle::{skia_rounded_rectangle_default, skia_rounded_rectangle_set_rect, skia_rounded_rectangle_width, skia_rounded_rectangle_height};
-    use rectangle::{skia_rectangle_f32_set_ltrb, skia_rectangle_f32_default};
     use boxer::boxes::ValueBoxPointer;
+    use rectangle::{skia_rectangle_f32_default, skia_rectangle_f32_set_ltrb};
+    use rounded_rectangle::{
+        skia_rounded_rectangle_default, skia_rounded_rectangle_height,
+        skia_rounded_rectangle_set_rect, skia_rounded_rectangle_width,
+    };
 
     #[test]
     fn set_rect() {
         let rect = skia_rectangle_f32_default();
-        skia_rectangle_f32_set_ltrb(rect, 0.0,0.0, 50.0, 50.0);
+        skia_rectangle_f32_set_ltrb(rect, 0.0, 0.0, 50.0, 50.0);
 
         let r_rect = skia_rounded_rectangle_default();
         skia_rounded_rectangle_set_rect(r_rect, rect);
@@ -78,7 +96,7 @@ mod test {
         assert_eq!(skia_rounded_rectangle_width(r_rect), 50.0);
         assert_eq!(skia_rounded_rectangle_height(r_rect), 50.0);
 
-        skia_rectangle_f32_set_ltrb(rect, 0.0,0.0, 100.0, 100.0);
+        skia_rectangle_f32_set_ltrb(rect, 0.0, 0.0, 100.0, 100.0);
 
         assert_eq!(skia_rounded_rectangle_width(r_rect), 50.0);
         assert_eq!(skia_rounded_rectangle_height(r_rect), 50.0);

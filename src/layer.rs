@@ -1,11 +1,11 @@
 use boxer::boxes::{ValueBox, ValueBoxPointer};
-use skia_safe::{scalar, Rect, Paint};
+use skia_safe::{scalar, Paint, Rect};
 
 #[derive(Default)]
 #[repr(C)]
 pub struct SaveLayerRecWrapper {
     pub bounds: Option<Rect>,
-    pub paint: Option<Paint>
+    pub paint: Option<Paint>,
 }
 
 #[no_mangle]
@@ -14,14 +14,23 @@ pub fn skia_layer_rec_default() -> *mut ValueBox<SaveLayerRecWrapper> {
 }
 
 #[no_mangle]
-pub fn skia_layer_rec_set_bounds(mut _ptr: *mut ValueBox<SaveLayerRecWrapper>, left: scalar, top: scalar, right: scalar, bottom: scalar) {
+pub fn skia_layer_rec_set_bounds(
+    mut _ptr: *mut ValueBox<SaveLayerRecWrapper>,
+    left: scalar,
+    top: scalar,
+    right: scalar,
+    bottom: scalar,
+) {
     _ptr.with_not_null(|rec| {
         rec.bounds = Some(Rect::new(left, top, right, bottom));
     });
 }
 
 #[no_mangle]
-pub fn skia_layer_rec_set_paint(mut _ptr: *mut ValueBox<SaveLayerRecWrapper>, mut _paint_ptr: *mut ValueBox<Paint>) {
+pub fn skia_layer_rec_set_paint(
+    mut _ptr: *mut ValueBox<SaveLayerRecWrapper>,
+    mut _paint_ptr: *mut ValueBox<Paint>,
+) {
     _ptr.with_not_null(|rec| {
         _paint_ptr.with_value_consumed(|paint| rec.paint = Some(paint));
     });

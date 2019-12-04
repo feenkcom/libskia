@@ -1,5 +1,5 @@
-use skia_safe::{AlphaType, ColorType, ImageInfo, ISize, ColorSpace};
 use boxer::boxes::{ValueBox, ValueBoxPointer};
+use skia_safe::{AlphaType, ColorSpace, ColorType, ISize, ImageInfo};
 
 #[no_mangle]
 pub fn skia_image_info_new_default() -> *mut ValueBox<ImageInfo> {
@@ -7,20 +7,47 @@ pub fn skia_image_info_new_default() -> *mut ValueBox<ImageInfo> {
 }
 
 #[no_mangle]
-pub fn skia_image_info_new(width: i32, height: i32, color_type: ColorType, alpha_type: AlphaType) -> *mut ValueBox<ImageInfo> {
-    ValueBox::new(ImageInfo::new(ISize::new(width, height),color_type, alpha_type, None)).into_raw()
+pub fn skia_image_info_new(
+    width: i32,
+    height: i32,
+    color_type: ColorType,
+    alpha_type: AlphaType,
+) -> *mut ValueBox<ImageInfo> {
+    ValueBox::new(ImageInfo::new(
+        ISize::new(width, height),
+        color_type,
+        alpha_type,
+        None,
+    ))
+    .into_raw()
 }
 
 #[no_mangle]
-pub fn skia_image_info_new_with_color_space(width: i32, height: i32, color_type: ColorType, alpha_type: AlphaType, _color_space_ptr: *mut ValueBox<ColorSpace>) -> *mut ValueBox<ImageInfo> {
+pub fn skia_image_info_new_with_color_space(
+    width: i32,
+    height: i32,
+    color_type: ColorType,
+    alpha_type: AlphaType,
+    _color_space_ptr: *mut ValueBox<ColorSpace>,
+) -> *mut ValueBox<ImageInfo> {
     _color_space_ptr.with(|color_space| {
-        ValueBox::new(ImageInfo::new(ISize::new(width, height),color_type, alpha_type, *(color_space.clone()))).into_raw()
+        ValueBox::new(ImageInfo::new(
+            ISize::new(width, height),
+            color_type,
+            alpha_type,
+            *(color_space.clone()),
+        ))
+        .into_raw()
     })
 }
 
 #[no_mangle]
-pub fn skia_image_info_new_s32(width: i32, height: i32, alpha_type: AlphaType) -> *mut ValueBox<ImageInfo> {
-    ValueBox::new(ImageInfo::new_s32(ISize::new(width, height),alpha_type)).into_raw()
+pub fn skia_image_info_new_s32(
+    width: i32,
+    height: i32,
+    alpha_type: AlphaType,
+) -> *mut ValueBox<ImageInfo> {
+    ValueBox::new(ImageInfo::new_s32(ISize::new(width, height), alpha_type)).into_raw()
 }
 
 #[no_mangle]
@@ -29,7 +56,10 @@ pub fn skia_image_info_min_row_bytes(_image_info_ptr: *mut ValueBox<ImageInfo>) 
 }
 
 #[no_mangle]
-pub fn skia_image_info_compute_byte_size(_image_info_ptr: *mut ValueBox<ImageInfo>, row_bytes: usize) -> usize {
+pub fn skia_image_info_compute_byte_size(
+    _image_info_ptr: *mut ValueBox<ImageInfo>,
+    row_bytes: usize,
+) -> usize {
     _image_info_ptr.with_not_null_return(0, |image_info| image_info.compute_byte_size(row_bytes))
 }
 

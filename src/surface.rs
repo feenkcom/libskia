@@ -96,13 +96,17 @@ pub fn skia_surface_get_width(_surface_ptr: *mut ValueBox<Surface>) -> i32 {
 #[no_mangle]
 pub fn skia_surface_get_color_type(_surface_ptr: *mut ValueBox<Surface>) -> ColorType {
     assert_surface(_surface_ptr, function!());
-    _surface_ptr.with_not_null_return(ColorType::Unknown, |surface| surface.image_info().color_type())
+    _surface_ptr.with_not_null_return(ColorType::Unknown, |surface| {
+        surface.image_info().color_type()
+    })
 }
 
 #[no_mangle]
 pub fn skia_surface_get_alpha_type(_surface_ptr: *mut ValueBox<Surface>) -> AlphaType {
     assert_surface(_surface_ptr, function!());
-    _surface_ptr.with_not_null_return(AlphaType::Unknown, |surface| surface.image_info().alpha_type())
+    _surface_ptr.with_not_null_return(AlphaType::Unknown, |surface| {
+        surface.image_info().alpha_type()
+    })
 }
 
 #[no_mangle]
@@ -116,11 +120,10 @@ pub fn skia_surface_get_image_info(
     _surface_ptr: *mut ValueBox<Surface>,
 ) -> *mut ValueBox<ImageInfo> {
     assert_surface(_surface_ptr, function!());
-    _surface_ptr.with_not_null_return_block(||{
-        ValueBox::new(ImageInfo::default()).into_raw()
-    }, |surface| {
-        ValueBox::new(surface.image_info()).into_raw()
-    })
+    _surface_ptr.with_not_null_return_block(
+        || ValueBox::new(ImageInfo::default()).into_raw(),
+        |surface| ValueBox::new(surface.image_info()).into_raw(),
+    )
 }
 
 #[no_mangle]

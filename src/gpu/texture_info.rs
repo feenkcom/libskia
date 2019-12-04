@@ -7,7 +7,10 @@ pub fn skia_texture_info_default() -> *mut ValueBox<TextureInfo> {
 }
 
 #[no_mangle]
-pub fn skia_texture_info_from_target_and_id(target: std::os::raw::c_uint, id: std::os::raw::c_uint) -> *mut ValueBox<TextureInfo> {
+pub fn skia_texture_info_from_target_and_id(
+    target: std::os::raw::c_uint,
+    id: std::os::raw::c_uint,
+) -> *mut ValueBox<TextureInfo> {
     ValueBox::new(TextureInfo::from_target_and_id(target, id)).into_raw()
 }
 
@@ -22,7 +25,10 @@ pub fn skia_texture_info_get_format(_ptr: *mut ValueBox<TextureInfo>) -> std::os
 }
 
 #[no_mangle]
-pub fn skia_texture_info_set_format(_ptr: *mut ValueBox<TextureInfo>, format: std::os::raw::c_uint) {
+pub fn skia_texture_info_set_format(
+    _ptr: *mut ValueBox<TextureInfo>,
+    format: std::os::raw::c_uint,
+) {
     _ptr.with_not_null(|texture_info| texture_info.format = format);
 }
 

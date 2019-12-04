@@ -1,6 +1,6 @@
 extern crate boxer;
-extern crate skia_safe;
 extern crate float_cmp;
+extern crate skia_safe;
 
 use std::os::raw::c_void;
 
@@ -13,7 +13,7 @@ macro_rules! function {
         }
         let name = type_name_of(f);
         &name[..name.len() - 3]
-    }}
+    }};
 }
 
 pub mod canvas;

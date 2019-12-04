@@ -1,10 +1,9 @@
 use boxer::array::BoxerArrayU8;
 use boxer::boxes::{ValueBox, ValueBoxPointer};
-use skia_safe::{
-    AlphaType, ColorSpace, ColorType, Data, IPoint, ISize, Image, ImageCachingHint,
-    ImageInfo,
-};
 use skia_safe::gpu::{BackendTexture, SurfaceOrigin};
+use skia_safe::{
+    AlphaType, ColorSpace, ColorType, Data, IPoint, ISize, Image, ImageCachingHint, ImageInfo,
+};
 
 #[no_mangle]
 pub fn skia_image_from_pixels(
@@ -35,9 +34,10 @@ pub fn skia_image_from_pixels(
 
 #[no_mangle]
 pub fn skia_image_get_image_info(_image_ptr: *mut ValueBox<Image>) -> *mut ValueBox<ImageInfo> {
-    _image_ptr.with_not_null_return_block(|| {
-        ValueBox::new(ImageInfo::default()).into_raw()
-    }, |image| ValueBox::new(image.image_info().clone()).into_raw())
+    _image_ptr.with_not_null_return_block(
+        || ValueBox::new(ImageInfo::default()).into_raw(),
+        |image| ValueBox::new(image.image_info().clone()).into_raw(),
+    )
 }
 
 #[no_mangle]
@@ -67,9 +67,10 @@ pub fn skia_image_get_color_type(_image_ptr: *mut ValueBox<Image>) -> ColorType 
 
 #[no_mangle]
 pub fn skia_image_get_color_space(_image_ptr: *mut ValueBox<Image>) -> *mut ValueBox<ColorSpace> {
-    _image_ptr.with_not_null_return_block(|| {
-        ValueBox::new(ColorSpace::new_srgb()).into_raw()
-    },|image| ValueBox::new(image.color_space()).into_raw())
+    _image_ptr.with_not_null_return_block(
+        || ValueBox::new(ColorSpace::new_srgb()).into_raw(),
+        |image| ValueBox::new(image.color_space()).into_raw(),
+    )
 }
 
 #[no_mangle]
@@ -88,8 +89,10 @@ pub fn skia_image_is_texture_backend(_image_ptr: *mut ValueBox<Image>) -> bool {
 }
 
 #[no_mangle]
-pub fn skia_image_get_backend_texture(_image_ptr: *mut ValueBox<Image>) -> *mut ValueBox<BackendTexture> {
-    _image_ptr.with_not_null_return(std::ptr::null_mut(), |image|{
+pub fn skia_image_get_backend_texture(
+    _image_ptr: *mut ValueBox<Image>,
+) -> *mut ValueBox<BackendTexture> {
+    _image_ptr.with_not_null_return(std::ptr::null_mut(), |image| {
         let result = image.backend_texture(true);
         ValueBox::new(result.0).into_raw()
     })
@@ -97,7 +100,7 @@ pub fn skia_image_get_backend_texture(_image_ptr: *mut ValueBox<Image>) -> *mut 
 
 #[no_mangle]
 pub fn skia_image_get_backend_texture_origin(_image_ptr: *mut ValueBox<Image>) -> SurfaceOrigin {
-    _image_ptr.with_not_null_return(SurfaceOrigin::BottomLeft, |image|{
+    _image_ptr.with_not_null_return(SurfaceOrigin::BottomLeft, |image| {
         let result = image.backend_texture(true);
         result.1
     })

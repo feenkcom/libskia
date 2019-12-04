@@ -1,6 +1,6 @@
-use skia_safe::{FontStyleSet, FontStyle, Typeface};
 use boxer::boxes::{ValueBox, ValueBoxPointer};
 use boxer::string::{BoxerString, BoxerStringPointer};
+use skia_safe::{FontStyle, FontStyleSet, Typeface};
 
 #[no_mangle]
 pub fn skia_font_style_set_default() -> *mut ValueBox<FontStyleSet> {
@@ -13,29 +13,41 @@ pub fn skia_font_style_set_count(_ptr: *mut ValueBox<FontStyleSet>) -> usize {
 }
 
 #[no_mangle]
-pub fn skia_font_style_set_style_at(_ptr: *mut ValueBox<FontStyleSet>, index: usize) -> *mut ValueBox<FontStyle> {
+pub fn skia_font_style_set_style_at(
+    _ptr: *mut ValueBox<FontStyleSet>,
+    index: usize,
+) -> *mut ValueBox<FontStyle> {
     _ptr.with(|set| ValueBox::new(set.style(index).0).into_raw())
 }
 
 #[no_mangle]
-pub fn skia_font_style_set_name_at(_ptr: *mut ValueBox<FontStyleSet>, index: usize, _name_ptr: *mut BoxerString) {
+pub fn skia_font_style_set_name_at(
+    _ptr: *mut ValueBox<FontStyleSet>,
+    index: usize,
+    _name_ptr: *mut BoxerString,
+) {
     _ptr.with(|set| {
         _name_ptr.with(|name| {
-            name.set_string(match set.style(index).1 {
-                None => { String::from("Hello, world!") },
-                Some(string) => { string },
-            }.parse().unwrap())
+            name.set_string(
+                match set.style(index).1 {
+                    None => String::from("Hello, world!"),
+                    Some(string) => string,
+                }
+                .parse()
+                .unwrap(),
+            )
         })
     });
 }
 
 #[no_mangle]
-pub fn skia_font_style_set_new_typeface(_ptr: *mut ValueBox<FontStyleSet>, index: usize) -> *mut ValueBox<Typeface> {
-    _ptr.with(|set| {
-        match set.new_typeface(index) {
-            None => { std::ptr::null_mut()},
-            Some(typeface) => { ValueBox::new(typeface).into_raw() },
-        }
+pub fn skia_font_style_set_new_typeface(
+    _ptr: *mut ValueBox<FontStyleSet>,
+    index: usize,
+) -> *mut ValueBox<Typeface> {
+    _ptr.with(|set| match set.new_typeface(index) {
+        None => std::ptr::null_mut(),
+        Some(typeface) => ValueBox::new(typeface).into_raw(),
     })
 }
 

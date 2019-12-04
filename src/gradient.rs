@@ -159,7 +159,8 @@ pub mod test {
             TileMode::Repeat,
             Flags::INTERPOLATE_COLORS_IN_PREMUL,
             None,
-        ).unwrap();
+        )
+        .unwrap();
 
         drop(colors);
         drop(positions);

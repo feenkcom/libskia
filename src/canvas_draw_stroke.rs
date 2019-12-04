@@ -1,8 +1,8 @@
 use boxer::boxes::{ReferenceBox, ReferenceBoxPointer};
 use canvas::assert_canvas;
-use skia_safe::{scalar, Canvas, Color, Paint, RRect, Rect, Vector};
-use skia_safe::paint::Style;
 use float_cmp::ApproxEqUlps;
+use skia_safe::paint::Style;
+use skia_safe::{scalar, Canvas, Color, Paint, RRect, Rect, Vector};
 
 #[no_mangle]
 pub fn skia_canvas_stroke_rectangle_with_color(
@@ -55,7 +55,7 @@ pub fn skia_canvas_stroke_rounded_rectangle_with_color(
         // if all radii are same we can use a simpler optimized drawing method
         if r_top_left.approx_eq_ulps(&r_top_right, 2)
             && r_top_right.approx_eq_ulps(&r_bottom_right, 2)
-            && r_bottom_right.approx_eq_ulps(&r_bottom_left,2)
+            && r_bottom_right.approx_eq_ulps(&r_bottom_left, 2)
             && r_bottom_left.approx_eq_ulps(&r_top_left, 2)
         {
             canvas.draw_round_rect(

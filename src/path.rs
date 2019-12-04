@@ -1,6 +1,6 @@
-use skia_safe::{Path, scalar, Point, Vector, PathFillType, Rect, Paint};
 use boxer::array::BoxerArray;
 use boxer::boxes::{ValueBox, ValueBoxPointer};
+use skia_safe::{scalar, Paint, Path, PathFillType, Point, Rect, Vector};
 
 #[no_mangle]
 pub fn skia_path_new() -> *mut ValueBox<Path> {
@@ -9,7 +9,7 @@ pub fn skia_path_new() -> *mut ValueBox<Path> {
 
 #[no_mangle]
 pub fn skia_path_drop(_ptr: *mut ValueBox<Path>) {
-   _ptr.drop();
+    _ptr.drop();
 }
 
 #[no_mangle]
@@ -19,17 +19,18 @@ pub fn skia_path_get_fill_type(_path: *mut ValueBox<Path>) -> PathFillType {
 
 #[no_mangle]
 pub fn skia_path_set_fill_type(_path: *mut ValueBox<Path>, fill_type: PathFillType) {
-    _path.with(|path| { path.set_fill_type(fill_type); });
+    _path.with(|path| {
+        path.set_fill_type(fill_type);
+    });
 }
 
 #[no_mangle]
 pub fn skia_path_move_to(_path: *mut ValueBox<Path>, x: scalar, y: scalar, is_absolute: bool) {
     _path.with(|path| {
         if is_absolute {
-             path.move_to(Point::new(x,y));
-        }
-        else {
-            path.r_move_to(Vector::new(x,y));
+            path.move_to(Point::new(x, y));
+        } else {
+            path.r_move_to(Vector::new(x, y));
         }
     });
 }
@@ -38,65 +39,100 @@ pub fn skia_path_move_to(_path: *mut ValueBox<Path>, x: scalar, y: scalar, is_ab
 pub fn skia_path_line_to(_path: *mut ValueBox<Path>, x: scalar, y: scalar, is_absolute: bool) {
     _path.with(|path| {
         if is_absolute {
-             path.line_to(Point::new(x,y));
-        }
-        else {
-            path.r_line_to(Vector::new(x,y));
+            path.line_to(Point::new(x, y));
+        } else {
+            path.r_line_to(Vector::new(x, y));
         }
     });
 }
 
 #[no_mangle]
-pub fn skia_path_quad_to(_path: *mut ValueBox<Path>, x1: scalar, y1: scalar, x2: scalar, y2: scalar, is_absolute: bool) {
+pub fn skia_path_quad_to(
+    _path: *mut ValueBox<Path>,
+    x1: scalar,
+    y1: scalar,
+    x2: scalar,
+    y2: scalar,
+    is_absolute: bool,
+) {
     _path.with(|path| {
         if is_absolute {
-             path.quad_to(Point::new(x1,y1), Point::new(x2,y2));
-        }
-        else {
-            path.r_quad_to(Vector::new(x1,y1), Vector::new(x2,y2));
+            path.quad_to(Point::new(x1, y1), Point::new(x2, y2));
+        } else {
+            path.r_quad_to(Vector::new(x1, y1), Vector::new(x2, y2));
         }
     });
 }
 
 #[no_mangle]
-pub fn skia_path_conic_to(_path: *mut ValueBox<Path>, x1: scalar, y1: scalar, x2: scalar, y2: scalar, w: scalar, is_absolute: bool) {
+pub fn skia_path_conic_to(
+    _path: *mut ValueBox<Path>,
+    x1: scalar,
+    y1: scalar,
+    x2: scalar,
+    y2: scalar,
+    w: scalar,
+    is_absolute: bool,
+) {
     _path.with(|path| {
         if is_absolute {
-             path.conic_to(Point::new(x1,y1), Point::new(x2,y2), w);
-        }
-        else {
-            path.r_conic_to(Vector::new(x1,y1), Vector::new(x2,y2), w);
+            path.conic_to(Point::new(x1, y1), Point::new(x2, y2), w);
+        } else {
+            path.r_conic_to(Vector::new(x1, y1), Vector::new(x2, y2), w);
         }
     });
 }
 
 #[no_mangle]
-pub fn skia_path_cubic_to(_path: *mut ValueBox<Path>, x1: scalar, y1: scalar, x2: scalar, y2: scalar, x3: scalar, y3: scalar, is_absolute: bool) {
+pub fn skia_path_cubic_to(
+    _path: *mut ValueBox<Path>,
+    x1: scalar,
+    y1: scalar,
+    x2: scalar,
+    y2: scalar,
+    x3: scalar,
+    y3: scalar,
+    is_absolute: bool,
+) {
     _path.with(|path| {
         if is_absolute {
-             path.cubic_to(Point::new(x1,y1), Point::new(x2,y2), Point::new(x3,y3));
-        }
-        else {
-            path.r_cubic_to(Vector::new(x1,y1), Vector::new(x2,y2), Vector::new(x3,y3));
+            path.cubic_to(Point::new(x1, y1), Point::new(x2, y2), Point::new(x3, y3));
+        } else {
+            path.r_cubic_to(
+                Vector::new(x1, y1),
+                Vector::new(x2, y2),
+                Vector::new(x3, y3),
+            );
         }
     });
 }
 
 #[no_mangle]
-pub fn skia_path_arc_to(_path: *mut ValueBox<Path>,
-                        left: scalar, top: scalar, right: scalar, bottom: scalar,
-                        start_angle: scalar, sweep_angle: scalar,
-                        force_move_to: bool, is_absolute: bool) {
+pub fn skia_path_arc_to(
+    _path: *mut ValueBox<Path>,
+    left: scalar,
+    top: scalar,
+    right: scalar,
+    bottom: scalar,
+    start_angle: scalar,
+    sweep_angle: scalar,
+    force_move_to: bool,
+    is_absolute: bool,
+) {
     _path.with(|path| {
         let rect = if is_absolute {
             Rect::new(left, top, right, bottom)
-        }
-        else {
+        } else {
             let current_point = match path.last_pt() {
-                None => { Point::new(0.0, 0.0) },
-                Some(point) => { point },
+                None => Point::new(0.0, 0.0),
+                Some(point) => point,
             };
-            Rect::new(current_point.x + left, current_point.y + top, current_point.x + right, current_point.y + bottom)
+            Rect::new(
+                current_point.x + left,
+                current_point.y + top,
+                current_point.x + right,
+                current_point.y + bottom,
+            )
         };
         path.arc_to(rect, start_angle, sweep_angle, force_move_to);
     });
@@ -104,7 +140,9 @@ pub fn skia_path_arc_to(_path: *mut ValueBox<Path>,
 
 #[no_mangle]
 pub fn skia_path_close(_path: *mut ValueBox<Path>) {
-    _path.with(|path| { path.close(); });
+    _path.with(|path| {
+        path.close();
+    });
 }
 
 #[no_mangle]
@@ -113,7 +151,10 @@ pub fn skia_path_count_points(_path: *mut ValueBox<Path>) -> usize {
 }
 
 #[no_mangle]
-pub fn skia_path_get_points(_path: *mut ValueBox<Path>, _points_ptr: *mut ValueBox<BoxerArray<Point>>) -> usize {
+pub fn skia_path_get_points(
+    _path: *mut ValueBox<Path>,
+    _points_ptr: *mut ValueBox<BoxerArray<Point>>,
+) -> usize {
     _path.with(|path| {
         _points_ptr.with(|points| {
             let mut path_points = vec![Point::default(); path.count_points()];
@@ -125,30 +166,39 @@ pub fn skia_path_get_points(_path: *mut ValueBox<Path>, _points_ptr: *mut ValueB
 }
 
 #[no_mangle]
-pub fn skia_path_get_last_point(_path: *mut ValueBox<Path>, _point_ptr: *mut ValueBox<Point>) -> bool {
+pub fn skia_path_get_last_point(
+    _path: *mut ValueBox<Path>,
+    _point_ptr: *mut ValueBox<Point>,
+) -> bool {
     _path.with(|path| {
-        _point_ptr.with(|point| {
-            match path.last_pt() {
-                None => { false },
-                Some(last_point) => {
-                    point.set(last_point.x, last_point.y);
-                    true
-                },
+        _point_ptr.with(|point| match path.last_pt() {
+            None => false,
+            Some(last_point) => {
+                point.set(last_point.x, last_point.y);
+                true
             }
         })
     })
 }
 
 #[no_mangle]
-pub fn skia_path_get_stroke_bounds(_path: *mut ValueBox<Path>, _paint_ptr: *mut ValueBox<Paint>, _rect_ptr: *mut ValueBox<Rect>) {
+pub fn skia_path_get_stroke_bounds(
+    _path: *mut ValueBox<Path>,
+    _paint_ptr: *mut ValueBox<Paint>,
+    _rect_ptr: *mut ValueBox<Rect>,
+) {
     _path.with_not_null(|path| {
         _paint_ptr.with_not_null(|paint| {
-            _rect_ptr.with_not_null(|rect| {
-                match paint.get_fill_path(path, None, None) {
-                    None => {},
-                    Some(fill_path) => {
-                        let fill_rect = fill_path.compute_tight_bounds();
-                        rect.set_ltrb(fill_rect.left, fill_rect.top, fill_rect.right, fill_rect.bottom) },
+            _rect_ptr.with_not_null(|rect| match paint.get_fill_path(path, None, None) {
+                None => {}
+                Some(fill_path) => {
+                    let fill_rect = fill_path.compute_tight_bounds();
+                    rect.set_ltrb(
+                        fill_rect.left,
+                        fill_rect.top,
+                        fill_rect.right,
+                        fill_rect.bottom,
+                    )
                 }
             })
         })
