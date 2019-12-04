@@ -1,4 +1,4 @@
-use skia_safe::{FontStyleSet, FontStyle};
+use skia_safe::{FontStyleSet, FontStyle, Typeface};
 use boxer::boxes::{ValueBox, ValueBoxPointer};
 use boxer::string::{BoxerString, BoxerStringPointer};
 
@@ -27,6 +27,16 @@ pub fn skia_font_style_set_name_at(_ptr: *mut ValueBox<FontStyleSet>, index: usi
             }.parse().unwrap())
         })
     });
+}
+
+#[no_mangle]
+pub fn skia_font_style_set_new_typeface(_ptr: *mut ValueBox<FontStyleSet>, index: usize) -> *mut ValueBox<Typeface> {
+    _ptr.with(|set| {
+        match set.new_typeface(index) {
+            None => { std::ptr::null_mut()},
+            Some(typeface) => { ValueBox::new(typeface).into_raw() },
+        }
+    })
 }
 
 #[no_mangle]
