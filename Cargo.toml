@@ -9,6 +9,8 @@ float-cmp = "0.6.0"
 skia-safe = { git = "https://github.com/rust-skia/rust-skia" }
 libc = "0.2.65"
 boxer = { git = "https://github.com/feenkcom/gtoolkit-boxer" }
+crossbeam = "0.7.3"
+num_cpus = "1.0"
 
 [lib]
 name = "Skia"

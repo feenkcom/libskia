@@ -1,6 +1,8 @@
 extern crate boxer;
 extern crate float_cmp;
 extern crate skia_safe;
+extern crate crossbeam;
+extern crate num_cpus;
 
 use std::os::raw::c_void;
 
