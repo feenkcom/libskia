@@ -2,8 +2,6 @@ use boxer::boxes::{ValueBox, ValueBoxPointer};
 use skia_safe::{Font, TextEncoding, Paint, GlyphId, scalar};
 use boxer::string::BoxerString;
 use boxer::array::BoxerArray;
-use rectangle::skia_rectangle_f32_default;
-use text::font::skia_font_text_to_glyphs;
 
 pub struct TextToGlyphs {
     pub font: *mut ValueBox<Font>,
@@ -90,40 +88,40 @@ fn number_of_cpus() {
     println!("{}", num_cpus::get());
 }
 
-#[no_mangle]
-pub fn skia_text_to_glyphs_batch_process(_texts_ptr: *mut ValueBox<Vec<TextToGlyphs>>) {
-    _texts_ptr.with_not_null(|texts| {
-        let threads = num_cpus::get() * 4;
-        let chunk_size = texts.len() / threads + if texts.len() % threads != 0 { 1 } else { 0 };
-
-        let _ = crossbeam::scope(|scope| {
-            // Chop `table` into disjoint sub-slices.
-            for each_chunk in texts.as_mut_slice().chunks_mut(chunk_size) {
-                // Spawn a thread operating on that subslice.
-                scope.spawn(move |_| {
-                    for request in each_chunk {
-                        let mut bounds = skia_rectangle_f32_default();
-                        let advance = skia_font_text_to_glyphs(
-                            request.font,
-                            request.text,
-                            request.encoding,
-                            request.glyphs,
-                            request.paint,
-                            bounds,
-                        );
-                        bounds.with_value_consumed(|rect| {
-                            request.top = rect.top;
-                            request.right = rect.right;
-                            request.bottom = rect.bottom;
-                            request.left = rect.left;
-                        });
-                        bounds.drop();
-                        request.advance = advance;
-                    }
-                });
-            }
-            // `crossbeam::scope` ensures that *all* spawned threads join before
-            // returning control back from this closure.
-        });
-    })
-}
+//#[no_mangle]
+//pub fn skia_text_to_glyphs_batch_process(_texts_ptr: *mut ValueBox<Vec<TextToGlyphs>>) {
+//    _texts_ptr.with_not_null(|texts| {
+//        let threads = num_cpus::get() * 4;
+//        let chunk_size = texts.len() / threads + if texts.len() % threads != 0 { 1 } else { 0 };
+//
+//        let _ = crossbeam::scope(|scope| {
+//            // Chop `table` into disjoint sub-slices.
+//            for each_chunk in texts.as_mut_slice().chunks_mut(chunk_size) {
+//                // Spawn a thread operating on that subslice.
+//                scope.spawn(move |_| {
+//                    for request in each_chunk {
+//                        let mut bounds = skia_rectangle_f32_default();
+//                        let advance = skia_font_text_to_glyphs(
+//                            request.font,
+//                            request.text,
+//                            request.encoding,
+//                            request.glyphs,
+//                            request.paint,
+//                            bounds,
+//                        );
+//                        bounds.with_value_consumed(|rect| {
+//                            request.top = rect.top;
+//                            request.right = rect.right;
+//                            request.bottom = rect.bottom;
+//                            request.left = rect.left;
+//                        });
+//                        bounds.drop();
+//                        request.advance = advance;
+//                    }
+//                });
+//            }
+//            // `crossbeam::scope` ensures that *all* spawned threads join before
+//            // returning control back from this closure.
+//        });
+//    })
+//}
