@@ -6,7 +6,7 @@ authors = ["Aliaksei Syrel <alex.syrel@gmail.com>"]
 [dependencies]
 typename = "0.1.1"
 float-cmp = "0.6.0"
-skia-safe = { git = "https://github.com/rust-skia/rust-skia", rev = "b033247501df875328c525714fceafec52de6389" }
+skia-safe = { git = "https://github.com/rust-skia/rust-skia", rev = "047ed7d47b7928883649cec07fd7d98071e9bb5a", features = [ "gl" ] }
 libc = "0.2.65"
 boxer = { git = "https://github.com/feenkcom/gtoolkit-boxer" }
 crossbeam = "0.7.3"
