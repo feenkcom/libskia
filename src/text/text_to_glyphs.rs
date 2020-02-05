@@ -1,7 +1,7 @@
-use boxer::boxes::{ValueBox, ValueBoxPointer};
-use skia_safe::{Font, TextEncoding, Paint, GlyphId, scalar};
-use boxer::string::BoxerString;
 use boxer::array::BoxerArray;
+use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::string::BoxerString;
+use skia_safe::{scalar, Font, GlyphId, Paint, TextEncoding};
 
 pub struct TextToGlyphs {
     pub font: *mut ValueBox<Font>,
@@ -41,46 +41,62 @@ pub fn skia_text_to_glyphs_batch_add(
     _text_ptr: *mut BoxerString,
     _encoding: TextEncoding,
     _glyphs_ptr: *mut ValueBox<BoxerArray<GlyphId>>,
-    _paint_ptr: *mut ValueBox<Paint>) {
-        _vector_ptr.with_not_null(|vector| {
-            vector.push(TextToGlyphs {
-                font: _font_ptr,
-                text: _text_ptr,
-                encoding: _encoding,
-                paint: _paint_ptr,
-                glyphs: _glyphs_ptr,
-                left: 0.0,
-                top: 0.0,
-                right: 0.0,
-                bottom: 0.0,
-                advance: 0.0
-            })
+    _paint_ptr: *mut ValueBox<Paint>,
+) {
+    _vector_ptr.with_not_null(|vector| {
+        vector.push(TextToGlyphs {
+            font: _font_ptr,
+            text: _text_ptr,
+            encoding: _encoding,
+            paint: _paint_ptr,
+            glyphs: _glyphs_ptr,
+            left: 0.0,
+            top: 0.0,
+            right: 0.0,
+            bottom: 0.0,
+            advance: 0.0,
         })
+    })
 }
 
 #[no_mangle]
-pub fn skia_text_to_glyphs_batch_get_advance_at(_vector_ptr: *mut ValueBox<Vec<TextToGlyphs>>, index: usize) -> scalar {
-    _vector_ptr.with_not_null_return(0.0, |vector| { vector[index].advance })
+pub fn skia_text_to_glyphs_batch_get_advance_at(
+    _vector_ptr: *mut ValueBox<Vec<TextToGlyphs>>,
+    index: usize,
+) -> scalar {
+    _vector_ptr.with_not_null_return(0.0, |vector| vector[index].advance)
 }
 
 #[no_mangle]
-pub fn skia_text_to_glyphs_batch_get_left_at(_vector_ptr: *mut ValueBox<Vec<TextToGlyphs>>, index: usize) -> scalar {
-    _vector_ptr.with_not_null_return(0.0, |vector| { vector[index].left })
+pub fn skia_text_to_glyphs_batch_get_left_at(
+    _vector_ptr: *mut ValueBox<Vec<TextToGlyphs>>,
+    index: usize,
+) -> scalar {
+    _vector_ptr.with_not_null_return(0.0, |vector| vector[index].left)
 }
 
 #[no_mangle]
-pub fn skia_text_to_glyphs_batch_get_top_at(_vector_ptr: *mut ValueBox<Vec<TextToGlyphs>>, index: usize) -> scalar {
-    _vector_ptr.with_not_null_return(0.0, |vector| { vector[index].top })
+pub fn skia_text_to_glyphs_batch_get_top_at(
+    _vector_ptr: *mut ValueBox<Vec<TextToGlyphs>>,
+    index: usize,
+) -> scalar {
+    _vector_ptr.with_not_null_return(0.0, |vector| vector[index].top)
 }
 
 #[no_mangle]
-pub fn skia_text_to_glyphs_batch_get_right_at(_vector_ptr: *mut ValueBox<Vec<TextToGlyphs>>, index: usize) -> scalar {
-    _vector_ptr.with_not_null_return(0.0, |vector| { vector[index].right })
+pub fn skia_text_to_glyphs_batch_get_right_at(
+    _vector_ptr: *mut ValueBox<Vec<TextToGlyphs>>,
+    index: usize,
+) -> scalar {
+    _vector_ptr.with_not_null_return(0.0, |vector| vector[index].right)
 }
 
 #[no_mangle]
-pub fn skia_text_to_glyphs_batch_get_bottom_at(_vector_ptr: *mut ValueBox<Vec<TextToGlyphs>>, index: usize) -> scalar {
-    _vector_ptr.with_not_null_return(0.0, |vector| { vector[index].bottom })
+pub fn skia_text_to_glyphs_batch_get_bottom_at(
+    _vector_ptr: *mut ValueBox<Vec<TextToGlyphs>>,
+    index: usize,
+) -> scalar {
+    _vector_ptr.with_not_null_return(0.0, |vector| vector[index].bottom)
 }
 
 #[test]

@@ -120,12 +120,15 @@ pub fn skia_font_text_to_glyphs(
                 _paint_ptr.with_not_null(|paint| {
                     _bounds_ptr.with_not_null(|bounds| {
                         // this is faster than computing ourselves
-                        let (text_advance, text_bounds) = font.measure_text(
-                            text,
-                            encoding,
-                            Some(paint));
+                        let (text_advance, text_bounds) =
+                            font.measure_text(text, encoding, Some(paint));
                         advance = text_advance;
-                        bounds.set_ltrb(text_bounds.left, text_bounds.top, text_bounds.right, text_bounds.bottom);
+                        bounds.set_ltrb(
+                            text_bounds.left,
+                            text_bounds.top,
+                            text_bounds.right,
+                            text_bounds.bottom,
+                        );
                     });
                 });
 

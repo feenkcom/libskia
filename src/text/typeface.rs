@@ -1,9 +1,7 @@
 use boxer::boxes::{ValueBox, ValueBoxPointer};
 use boxer::string::{BoxerString, BoxerStringPointer};
 use boxer::{assert_box, function};
-use skia_safe::{
-    FontStyle, FontStyleSlant, FontStyleWeight, FontStyleWidth, Typeface,
-};
+use skia_safe::{FontStyle, FontStyleSlant, FontStyleWeight, FontStyleWidth, Typeface};
 
 #[no_mangle]
 pub fn skia_typeface_default() -> *mut ValueBox<Typeface> {

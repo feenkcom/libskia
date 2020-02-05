@@ -1,6 +1,6 @@
 use boxer::boxes::{ValueBox, ValueBoxPointer};
-use skia_safe::image_filters::{blur, image};
-use skia_safe::{scalar, FilterQuality, Image, ImageFilter, Rect, TileMode};
+use skia_safe::image_filters::{blur, drop_shadow_only, image, drop_shadow};
+use skia_safe::{scalar, Color, FilterQuality, Image, ImageFilter, Rect, TileMode, Vector};
 
 #[no_mangle]
 pub fn skia_image_filter_blur(
@@ -42,6 +42,78 @@ pub fn skia_image_filter_image(
             filter_quality,
         )
     });
+    match filter_option {
+        None => std::ptr::null_mut(),
+        Some(filter) => ValueBox::new(filter).into_raw(),
+    }
+}
+
+#[no_mangle]
+pub fn skia_image_filter_drop_shadow(
+    delta_x: scalar,
+    delta_y: scalar,
+    sigma_x: scalar,
+    sigma_y: scalar,
+    r: u8,
+    g: u8,
+    b: u8,
+    a: u8,
+    input_ptr: *mut ValueBox<ImageFilter>,
+) -> *mut ValueBox<ImageFilter> {
+    let filter_option = match input_ptr.as_option() {
+        None => drop_shadow(
+            Vector::new(delta_x, delta_y),
+            (sigma_x, sigma_y),
+            Color::from_argb(a, r, g, b),
+            None,
+            None,
+        ),
+        Some(mut _input_ptr) => _input_ptr.with_value_consumed(|input| {
+            drop_shadow(
+                Vector::new(delta_x, delta_y),
+                (sigma_x, sigma_y),
+                Color::from_argb(a, r, g, b),
+                Some(input),
+                None,
+            )
+        }),
+    };
+    match filter_option {
+        None => std::ptr::null_mut(),
+        Some(filter) => ValueBox::new(filter).into_raw(),
+    }
+}
+
+#[no_mangle]
+pub fn skia_image_filter_drop_shadow_only(
+    delta_x: scalar,
+    delta_y: scalar,
+    sigma_x: scalar,
+    sigma_y: scalar,
+    r: u8,
+    g: u8,
+    b: u8,
+    a: u8,
+    input_ptr: *mut ValueBox<ImageFilter>,
+) -> *mut ValueBox<ImageFilter> {
+    let filter_option = match input_ptr.as_option() {
+        None => drop_shadow_only(
+            Vector::new(delta_x, delta_y),
+            (sigma_x, sigma_y),
+            Color::from_argb(a, r, g, b),
+            None,
+            None,
+        ),
+        Some(mut _input_ptr) => _input_ptr.with_value_consumed(|input| {
+            drop_shadow_only(
+                Vector::new(delta_x, delta_y),
+                (sigma_x, sigma_y),
+                Color::from_argb(a, r, g, b),
+                Some(input),
+                None,
+            )
+        }),
+    };
     match filter_option {
         None => std::ptr::null_mut(),
         Some(filter) => ValueBox::new(filter).into_raw(),
