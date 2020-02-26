@@ -95,7 +95,7 @@ jobs:
         if: matrix.variant.os == 'macos-latest'
         run: |
           brew update
-          brew install llvm --with-toolchain 
+          brew install llvm
           brew link llvm --force
 
       - uses: actions/checkout@master
