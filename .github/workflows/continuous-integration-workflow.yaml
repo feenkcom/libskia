@@ -91,6 +91,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install libgl1-mesa-dev
 
+      - name: Install dependencies (MacOS)
+        if: matrix.variant.os == 'macos-latest'
+        run: |
+          brew update
+          brew upgrade
+          brew install --with-toolchain llvm
+          brew link llvm --force
+
       - uses: actions/checkout@master
   
       - name: Install Rust stable
