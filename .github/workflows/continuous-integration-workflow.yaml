@@ -97,6 +97,8 @@ jobs:
           brew update
           brew install llvm
           brew link llvm --force
+          export LDFLAGS="-L/usr/local/opt/llvm/lib"
+          export CPPFLAGS="-I/usr/local/opt/llvm/include"
 
       - uses: actions/checkout@master
   
