@@ -94,9 +94,7 @@ jobs:
       - name: Install dependencies (MacOS)
         if: matrix.variant.os == 'macos-latest'
         run: |
-          brew update
-          brew install llvm
-          brew link llvm --force
+          brew uninstall llvm
 
       - uses: actions/checkout@master
   
@@ -110,9 +108,6 @@ jobs:
         with:
           command: build
           args: --release
-        env:
-          LDFLAGS: "-L/usr/local/opt/llvm/lib"
-          CPPFLAGS: "-I/usr/local/opt/llvm/include"
       
       - name: Deploy
         uses: garygrossgarten/github-action-scp@release
