@@ -40,7 +40,9 @@ pub fn skia_font_is_subpixel(_ptr: *mut ValueBox<Font>) -> bool {
 
 #[no_mangle]
 pub fn skia_font_set_subpixel(_ptr: *mut ValueBox<Font>, is_subpixel: bool) {
-    _ptr.with_not_null(|font| { font.set_subpixel(is_subpixel); });
+    _ptr.with_not_null(|font| {
+        font.set_subpixel(is_subpixel);
+    });
 }
 
 #[no_mangle]
@@ -65,7 +67,9 @@ pub fn skia_font_get_edging(_ptr: *mut ValueBox<Font>) -> FontEdging {
 
 #[no_mangle]
 pub fn skia_font_set_edging(_ptr: *mut ValueBox<Font>, font_edging: FontEdging) {
-    _ptr.with_not_null(|font| { font.set_edging(font_edging); });
+    _ptr.with_not_null(|font| {
+        font.set_edging(font_edging);
+    });
 }
 
 #[no_mangle]
@@ -75,7 +79,9 @@ pub fn skia_font_get_hinting(_ptr: *mut ValueBox<Font>) -> FontHinting {
 
 #[no_mangle]
 pub fn skia_font_set_hinting(_ptr: *mut ValueBox<Font>, font_hinting: FontHinting) {
-    _ptr.with_not_null(|font| { font.set_hinting(font_hinting); });
+    _ptr.with_not_null(|font| {
+        font.set_hinting(font_hinting);
+    });
 }
 
 #[no_mangle]

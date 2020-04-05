@@ -1,5 +1,5 @@
 use boxer::boxes::{ValueBox, ValueBoxPointer};
-use skia_safe::image_filters::{blur, drop_shadow_only, image, drop_shadow};
+use skia_safe::image_filters::{blur, drop_shadow, drop_shadow_only, image};
 use skia_safe::{scalar, Color, FilterQuality, Image, ImageFilter, Rect, TileMode, Vector};
 
 #[no_mangle]

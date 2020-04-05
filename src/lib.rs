@@ -1,11 +1,14 @@
 extern crate boxer;
+extern crate byteorder;
 extern crate crossbeam;
 extern crate float_cmp;
 extern crate num_cpus;
+extern crate num_enum;
 extern crate skia_safe;
 
 use std::os::raw::c_void;
 
+pub mod binary;
 pub mod canvas;
 pub mod canvas_clip;
 pub mod canvas_draw_fill;
