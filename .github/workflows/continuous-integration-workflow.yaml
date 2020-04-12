@@ -109,7 +109,7 @@ jobs:
           command: build
           args: --release
         env:
-          MACOSX_DEPLOYMENT_TARGET: 10.8
+          MACOSX_DEPLOYMENT_TARGET: 10.9
       
       - name: Deploy
         uses: garygrossgarten/github-action-scp@release
