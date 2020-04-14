@@ -101,9 +101,12 @@ jobs:
           sudo apt-get install libgl1-mesa-dev
           sudo apt install clang-9
           sudo apt install llvm-9
-          sudo update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-9 1
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-9 1
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-9 1
+          sudo update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-9 100
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-9 100
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-9 100
+          clang --version
+          clang++ --version
+          llvm-config --prefix
 
       - name: Install dependencies (MacOS)
         if: matrix.variant.os == 'macos-latest'
