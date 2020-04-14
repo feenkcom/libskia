@@ -91,6 +91,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install libgl1-mesa-dev
           sudo apt-get install clang-8 llvm-8
+          sudo update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-8 1
 
       - name: Install dependencies (MacOS)
         if: matrix.variant.os == 'macos-latest'
