@@ -27,7 +27,7 @@ impl Command for Close {
         path.close();
     }
 
-    fn command_type() -> CommandType {
+    fn command_type(&self) -> CommandType {
         CommandType::Close
     }
 }

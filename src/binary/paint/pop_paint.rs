@@ -26,7 +26,7 @@ impl Command for PopPaint {
         context.pop_paint();
     }
 
-    fn command_type() -> CommandType {
+    fn command_type(&self) -> CommandType {
         CommandType::PopPaint
     }
 }

@@ -1,10 +1,52 @@
 use binary::commands::CommandType;
-use skia_safe::{Canvas, Paint, Path, Surface};
+use binary::font::font_face::BinaryFontFace;
+use boxer::boxes::ValueBox;
+use skia_safe::{scalar, Canvas, Font, Paint, Path, Surface, Typeface};
+use std::collections::HashMap;
 use std::io::Cursor;
+use ordered_float::OrderedFloat;
+use binary::command::{Command};
+
+pub struct FontCache {
+    fonts: HashMap<BinaryFontFace, HashMap<OrderedFloat<f32>, Font>>
+}
+
+impl FontCache {
+    fn new() -> Self {
+        Self {
+            fonts: HashMap::new()
+        }
+    }
+
+    fn create_font(font_face: &BinaryFontFace, font_size: scalar) -> Font {
+         let typeface = Typeface::default();
+         Font::from_typeface(typeface, font_size)
+    }
+
+    fn ensure_font(&mut self, font_face: &BinaryFontFace, font_size: scalar) {
+        if !self.fonts.contains_key(&font_face) {
+            let font = Self::create_font(font_face, font_size);
+            let mut map = HashMap::<OrderedFloat<f32>, Font>::new();
+            map.insert(font_size.into(), font);
+            self.fonts.insert(font_face.clone(), map);
+        }
+
+        let map = self.fonts.get_mut(font_face).unwrap();
+        if !map.contains_key(&(font_size.into())) {
+            let font = Self::create_font(font_face, font_size);
+            map.insert(font_size.into(), font);
+        }
+    }
+
+    pub fn get_font(&self, font_face: BinaryFontFace, font_size: scalar) -> &Font {
+        self.fonts.get(&font_face).unwrap().get(&(font_size.into())).unwrap()
+    }
+}
 
 pub struct Context {
     paths: Vec<Path>,
     paints: Vec<Paint>,
+    fonts: FontCache,
 
     current_path: Vec<Path>,
     current_paint: Vec<Paint>,
@@ -21,7 +63,7 @@ impl Context {
         Context {
             paths: vec![],
             paints: vec![],
-
+            fonts: FontCache::new(),
             current_paint: vec![],
             current_path: vec![],
 
@@ -32,6 +74,8 @@ impl Context {
     pub fn execute(&mut self, buffer: &[u8]) {
         let len = buffer.len();
         let mut cursor = Cursor::new(buffer);
+
+        let commands = Vec::<Box<dyn Command>>::new();
 
         while (cursor.position() as usize) < len - 1 {
             let command_type = CommandType::type_from(&mut cursor);
@@ -85,5 +129,17 @@ impl Context {
 
     pub fn peek_canvas_and_paint(&mut self) -> (&mut Canvas, &Paint) {
         (self.surface.canvas(), self.current_paint.last().unwrap())
+    }
+
+    pub fn peek_canvas_and_paint_and_find_font(
+        &mut self,
+        font_face: BinaryFontFace,
+        font_size: scalar,
+    ) -> (&mut Canvas, &Paint, &Font) {
+        (
+            self.surface.canvas(),
+            self.current_paint.last().unwrap(),
+            self.fonts.get_font(font_face, font_size)
+        )
     }
 }

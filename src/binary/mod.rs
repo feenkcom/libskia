@@ -3,5 +3,7 @@ pub mod command;
 pub mod commands;
 pub mod context;
 pub mod fill;
+pub mod font;
 pub mod paint;
 pub mod path;
+pub mod text;

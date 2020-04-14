@@ -374,6 +374,7 @@ dependencies = [
  "libc",
  "num_cpus",
  "num_enum",
+ "ordered-float",
  "skia-safe",
  "typename",
 ]
@@ -497,6 +498,15 @@ dependencies = [
  "libc",
  "pkg-config",
  "vcpkg",
+]
+
+[[package]]
+name = "ordered-float"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "18869315e81473c951eb56ad5558bbc56978562d3ecfb87abb7a1e944cea4518"
+dependencies = [
+ "num-traits",
 ]
 
 [[package]]

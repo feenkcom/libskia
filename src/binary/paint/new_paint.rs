@@ -26,7 +26,7 @@ impl Command for NewPaint {
         context.push_paint(Paint::default());
     }
 
-    fn command_type() -> CommandType {
+    fn command_type(&self) -> CommandType {
         CommandType::NewPaint
     }
 }

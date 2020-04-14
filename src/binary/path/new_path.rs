@@ -26,7 +26,7 @@ impl Command for NewPath {
         context.push_path(Path::new());
     }
 
-    fn command_type() -> CommandType {
+    fn command_type(&self) -> CommandType {
         CommandType::NewPath
     }
 }

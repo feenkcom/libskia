@@ -48,7 +48,7 @@ impl Command for FillRectangle {
         canvas.draw_rect(rect, paint);
     }
 
-    fn command_type() -> CommandType {
+    fn command_type(&self) -> CommandType {
         CommandType::FillRectangle
     }
 }

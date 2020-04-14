@@ -57,7 +57,7 @@ impl Command for MoveTo {
         }
     }
 
-    fn command_type() -> CommandType {
+    fn command_type(&self) -> CommandType {
         CommandType::MoveTo
     }
 }

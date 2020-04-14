@@ -42,7 +42,7 @@ impl Command for PaintSetRgba {
         paint.set_argb(self.a, self.r, self.g, self.b);
     }
 
-    fn command_type() -> CommandType {
+    fn command_type(&self) -> CommandType {
         CommandType::PaintSetRgba
     }
 }

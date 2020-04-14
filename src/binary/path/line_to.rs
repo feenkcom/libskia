@@ -56,7 +56,7 @@ impl Command for LineTo {
             path.r_line_to(Point::new(self.x, self.y));
         }
     }
-    fn command_type() -> CommandType {
+    fn command_type(&self) -> CommandType {
         CommandType::LineTo
     }
 }
