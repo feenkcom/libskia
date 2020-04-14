@@ -76,7 +76,7 @@ jobs:
     strategy:
       matrix:
         variant:
-          - os: ubuntu-latest
+          - os: ubuntu-16.04
             prefix: lib
             extension: .so
             platform: linux
@@ -86,7 +86,7 @@ jobs:
             platform: osx
     steps:
       - name: Install dependencies (Linux)
-        if: matrix.variant.os == 'ubuntu-latest'
+        if: matrix.variant.os == 'ubuntu-16.04'
         run: |
           sudo apt-get update
           sudo apt-get install libgl1-mesa-dev
