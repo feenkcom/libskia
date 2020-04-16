@@ -47,6 +47,11 @@ pub fn skia_interface_new_load_with(
 }
 
 #[no_mangle]
+pub fn skia_interface_drop(_ptr: *mut ValueBox<Interface>) {
+    _ptr.drop()
+}
+
+#[no_mangle]
 pub fn skia_context_new_gl(mut _interface_ptr: *mut ValueBox<Interface>) -> *mut ValueBox<Context> {
     assert_box(_interface_ptr, function!());
 
