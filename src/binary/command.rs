@@ -1,6 +1,6 @@
 use binary::commands::CommandType;
 use binary::context::Context;
-use byteorder::{WriteBytesExt, BigEndian};
+use byteorder::{BigEndian, WriteBytesExt};
 use std::fmt::Debug;
 use std::io::Cursor;
 
@@ -36,9 +36,7 @@ pub trait Command: Debug + PartialEq {
     }
 
     fn store_on(&self, buffer: &mut Vec<u8>) {
-        buffer
-            .write_u8(Self::command_type().into())
-            .unwrap();
+        buffer.write_u8(Self::command_type().into()).unwrap();
         self.write_to(buffer);
     }
 }

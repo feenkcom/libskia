@@ -1,30 +1,70 @@
 use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::string::BoxerString;
+use boxer::CBox;
 use skia_safe::gpu::gl::Interface;
 use skia_safe::gpu::Context;
 use skia_safe::ColorType;
+use boxer::{assert_box, function};
+use std::os::raw::c_void;
 
 #[no_mangle]
-pub fn skia_context_new_gl() -> *mut ValueBox<Context> {
-    let interface = match Interface::new_native() {
+pub fn skia_interface_new_native() -> *mut ValueBox<Interface> {
+    match Interface::new_native() {
         None => {
             if cfg!(debug_assertions) {
                 eprintln!("[skia_context_new_gl] Unable to create native OpenGL interface");
             }
-            return std::ptr::null_mut();
+            std::ptr::null_mut()
         }
-        Some(_interface) => _interface,
-    };
-    let context = match Context::new_gl(Some(interface)) {
+        Some(_interface) => ValueBox::new(_interface).into_raw(),
+    }
+}
+
+#[no_mangle]
+pub fn skia_interface_new_load_with(
+    callback: extern "C" fn(*mut BoxerString) -> *const c_void,
+) -> *mut ValueBox<Interface> {
+    match Interface::new_load_with(|symbol| {
+        let boxer_string = CBox::into_raw(BoxerString::from_slice(symbol));
+        let func_ptr = callback(boxer_string);
+        CBox::drop(boxer_string);
+        if cfg!(debug_assertions) {
+            eprintln!(
+                "[skia_interface_new_load_with] GL func: {:?}; address: {:?}",
+                symbol, func_ptr
+            );
+        }
+        func_ptr
+    }) {
         None => {
             if cfg!(debug_assertions) {
-                eprintln!("[skia_context_new_gl] Unable to create OpenGL context");
+                eprintln!("[skia_interface_new_load_with] Unable to load native OpenGL interface");
             }
-            return std::ptr::null_mut();
+            std::ptr::null_mut()
         }
-        Some(_context) => _context,
-    };
+        Some(_interface) => ValueBox::new(_interface).into_raw(),
+    }
+}
 
-    ValueBox::new(context).into_raw()
+#[no_mangle]
+pub fn skia_context_new_gl(mut _interface_ptr: *mut ValueBox<Interface>) -> *mut ValueBox<Context> {
+    assert_box(_interface_ptr, function!());
+
+    if !_interface_ptr.is_valid() {
+        return std::ptr::null_mut()
+    }
+
+    _interface_ptr.with_value_consumed(|interface| {
+        match Context::new_gl(Some(interface)) {
+            None => {
+                if cfg!(debug_assertions) {
+                    eprintln!("[skia_context_new_gl] Unable to create OpenGL context");
+                }
+                return std::ptr::null_mut()
+            }
+            Some(_context) => ValueBox::new(_context).into_raw()
+        }
+    })
 }
 
 #[no_mangle]
