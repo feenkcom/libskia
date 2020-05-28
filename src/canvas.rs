@@ -3,11 +3,11 @@ use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer}
 use boxer::{assert_reference_box, function};
 use float_cmp::ApproxEqUlps;
 use layer::SaveLayerRecWrapper;
-use skia_safe::canvas::PointMode;
+use skia_safe::canvas::{PointMode, SaveLayerRec};
 use skia_safe::utils::shadow_utils::ShadowFlags;
 use skia_safe::{
     scalar, BlendMode, Canvas, Color, Image, Matrix, Paint, Path, Point, Point3, RRect, Rect,
-    SaveLayerRec, TextBlob, Vector,
+    TextBlob, Vector,
 };
 
 #[no_mangle]

@@ -1,9 +1,8 @@
 use boxer::array::BoxerArrayU8;
 use boxer::boxes::{ValueBox, ValueBoxPointer};
 use skia_safe::gpu::{BackendTexture, SurfaceOrigin};
-use skia_safe::{
-    AlphaType, ColorSpace, ColorType, Data, IPoint, ISize, Image, ImageCachingHint, ImageInfo,
-};
+use skia_safe::image::CachingHint;
+use skia_safe::{AlphaType, ColorSpace, ColorType, Data, IPoint, ISize, Image, ImageInfo};
 
 #[no_mangle]
 pub fn skia_image_from_pixels(
@@ -120,7 +119,7 @@ pub fn skia_image_read_all_pixels(
                 pixels.to_slice(),
                 row_bytes,
                 IPoint::new(0, 0),
-                ImageCachingHint::Disallow,
+                CachingHint::Disallow,
             )
         })
     })

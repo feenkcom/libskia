@@ -6,13 +6,17 @@ authors = ["Aliaksei Syrel <alex.syrel@gmail.com>"]
 [dependencies]
 typename = "0.1.1"
 float-cmp = "0.6.0"
-skia-safe = { git = "https://github.com/rust-skia/rust-skia", rev = "82e58f3cb8b339e2254dad701af5878ccbae462b", features = [ "gl" ] }
+skia-safe = { git = "https://github.com/syrel/rust-skia", rev = "aac05783c9c9f2fd89d94eb32a2681b2d72ade07", features = [ "gl" ] }
 libc = "0.2.68"
 boxer = { git = "https://github.com/feenkcom/gtoolkit-boxer" }
 crossbeam = "0.7.3"
 num_cpus = "1.0"
 byteorder = "1.3.4"
 num_enum = "0.4.3"
+glutin = { git = "https://github.com/syrel/glutin", rev ="0b1971f880f68ee3c2dd83e777b6f20be980c3b4" }
+
+[patch.crates-io]
+winit = { git = "https://github.com/rust-windowing/winit", rev = "6cfddfea21319ef7e28f4a6dc16e119ab033f550" }
 
 [lib]
 name = "Skia"

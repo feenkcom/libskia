@@ -1,5 +1,6 @@
 use boxer::boxes::{ValueBox, ValueBoxPointer};
-use skia_safe::{scalar, RRect, RRectType, Rect, Vector};
+use skia_safe::rrect::Type;
+use skia_safe::{scalar, RRect, Rect, Vector};
 
 #[no_mangle]
 pub fn skia_rounded_rectangle_default() -> *mut ValueBox<RRect> {
@@ -33,7 +34,7 @@ pub fn skia_rounded_rectangle_new_radii(
 }
 
 #[no_mangle]
-pub fn skia_rounded_rectangle_get_type(_ptr: *mut ValueBox<RRect>) -> RRectType {
+pub fn skia_rounded_rectangle_get_type(_ptr: *mut ValueBox<RRect>) -> Type {
     _ptr.with(|rounded_rectangle| rounded_rectangle.get_type())
 }
 

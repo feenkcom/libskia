@@ -41,7 +41,7 @@ pub fn skia_surface_new_render_target(
         _context_ptr.with_not_null_return(std::ptr::null_mut(), |context| {
             let surface_option = Surface::new_render_target(
             context,
-            Budgeted::NO,
+            Budgeted::No,
             &image_info,
             8,
             SurfaceOrigin::BottomLeft,

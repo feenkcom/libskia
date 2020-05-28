@@ -1,10 +1,10 @@
 use boxer::boxes::{ValueBox, ValueBoxPointer};
 use boxer::string::BoxerString;
 use boxer::CBox;
+use boxer::{assert_box, function};
 use skia_safe::gpu::gl::Interface;
 use skia_safe::gpu::Context;
 use skia_safe::ColorType;
-use boxer::{assert_box, function};
 use std::os::raw::c_void;
 
 #[no_mangle]
@@ -56,19 +56,17 @@ pub fn skia_context_new_gl(mut _interface_ptr: *mut ValueBox<Interface>) -> *mut
     assert_box(_interface_ptr, function!());
 
     if !_interface_ptr.is_valid() {
-        return std::ptr::null_mut()
+        return std::ptr::null_mut();
     }
 
-    _interface_ptr.with_value_consumed(|interface| {
-        match Context::new_gl(Some(interface)) {
-            None => {
-                if cfg!(debug_assertions) {
-                    eprintln!("[skia_context_new_gl] Unable to create OpenGL context");
-                }
-                return std::ptr::null_mut()
+    _interface_ptr.with_value_consumed(|interface| match Context::new_gl(Some(interface)) {
+        None => {
+            if cfg!(debug_assertions) {
+                eprintln!("[skia_context_new_gl] Unable to create OpenGL context");
             }
-            Some(_context) => ValueBox::new(_context).into_raw()
+            return std::ptr::null_mut();
         }
+        Some(_context) => ValueBox::new(_context).into_raw(),
     })
 }
 

@@ -2,9 +2,9 @@ use boxer::array::BoxerArray;
 use boxer::boxes::{ValueBox, ValueBoxPointer};
 use boxer::string::{BoxerString, BoxerStringPointer};
 use boxer::{assert_box, function};
+use skia_safe::font::Edging;
 use skia_safe::{
-    scalar, Font, FontEdging, FontHinting, FontMetrics, GlyphId, Paint, Rect, TextEncoding,
-    Typeface,
+    scalar, Font, FontHinting, FontMetrics, GlyphId, Paint, Rect, TextEncoding, Typeface,
 };
 
 #[no_mangle]
@@ -61,12 +61,12 @@ pub fn skia_font_is_baseline_snap(_ptr: *mut ValueBox<Font>) -> bool {
 }
 
 #[no_mangle]
-pub fn skia_font_get_edging(_ptr: *mut ValueBox<Font>) -> FontEdging {
+pub fn skia_font_get_edging(_ptr: *mut ValueBox<Font>) -> Edging {
     _ptr.with(|font| font.edging())
 }
 
 #[no_mangle]
-pub fn skia_font_set_edging(_ptr: *mut ValueBox<Font>, font_edging: FontEdging) {
+pub fn skia_font_set_edging(_ptr: *mut ValueBox<Font>, font_edging: Edging) {
     _ptr.with_not_null(|font| {
         font.set_edging(font_edging);
     });

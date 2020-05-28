@@ -1,11 +1,13 @@
 use boxer::string::BoxerString;
 use boxer::CBox;
 use skia_safe::canvas::PointMode;
+use skia_safe::font::Edging;
 use skia_safe::font_style::Slant;
 use skia_safe::paint::{Cap, Join, Style};
+use skia_safe::rrect::{Corner as RRectCorner, Type as RRectType};
 use skia_safe::{
-    AlphaType, BlendMode, ClipOp, ColorType, FilterQuality, FontEdging, FontHinting, PathFillType,
-    PixelGeometry, RRectCorner, RRectType, TextEncoding, TileMode,
+    AlphaType, BlendMode, ClipOp, ColorType, FilterQuality, FontHinting, PathFillType,
+    PixelGeometry, TextEncoding, TileMode,
 };
 use text::font_style::FontStyleWidth;
 
@@ -122,7 +124,7 @@ pub fn skia_enums_font_style_width_to_string(_enum: FontStyleWidth, _string_ptr:
 }
 
 #[no_mangle]
-pub fn skia_enums_font_edging_to_string(_enum: FontEdging, _string_ptr: *mut BoxerString) {
+pub fn skia_enums_font_edging_to_string(_enum: Edging, _string_ptr: *mut BoxerString) {
     CBox::with_optional_raw(_string_ptr, |option| match option {
         None => {}
         Some(string) => string.set_string(format!("{:?}", _enum)),
