@@ -2,6 +2,7 @@ use skia_safe::gpu::{Context, SurfaceOrigin};
 use skia_safe::{Budgeted, Color, IRect, Image, ImageInfo, Matrix, Picture, Rect, RoundOut, Surface, Vector, ColorSpace};
 use std::time::{Instant, Duration};
 use std::fmt::{Debug, Formatter, Error};
+use boxer::{function};
 
 /// I contain all the necessary data to rasterize a picture
 pub struct PictureToRasterize {
@@ -154,10 +155,13 @@ impl PictureRasterizer {
                         Some(surface)
                     }
                     None => {
-                        println!(
-                            "Could not create GPU surface of size {:?}",
-                            image_info.dimensions()
-                        );
+                        if cfg!(debug_assertions) {
+                            eprintln!(
+                                "[{}] Could not create GPU surface of size {:?}",
+                                function!(),
+                                image_info.dimensions()
+                            );
+                        }
                         None
                     }
                 }
@@ -169,10 +173,13 @@ impl PictureRasterizer {
                 let cpu_surface_time = std::time::Instant::now();
                 match Surface::new_raster(&image_info, None, None) {
                     None => {
-                        println!(
-                            "Could not create CPU surface of size {:?}",
-                            image_info.dimensions()
-                        );
+                        if cfg!(debug_assertions) {
+                            eprintln!(
+                                "[{}] Could not create CPU surface of size {:?}",
+                                function!(),
+                                image_info.dimensions()
+                            );
+                        }
                         None
                     }
                     Some(mut surface) => {

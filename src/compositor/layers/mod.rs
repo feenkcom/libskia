@@ -35,6 +35,16 @@ pub fn skia_picture_layer_new() -> *mut ValueBox<Rc<RefCell<dyn Layer>>> {
 }
 
 #[no_mangle]
+pub fn skia_picture_layer_get_needs_cache(_ptr: *mut ValueBox<Rc<RefCell<PictureLayer>>>) -> bool {
+    _ptr.with_not_null_value_return_block(||{false}, |layer| layer.borrow().needs_cache)
+}
+
+#[no_mangle]
+pub fn skia_picture_layer_set_needs_cache(_ptr: *mut ValueBox<Rc<RefCell<PictureLayer>>>, needs_cache: bool) {
+    _ptr.with_not_null_value(|layer| { layer.borrow_mut().needs_cache = needs_cache});
+}
+
+#[no_mangle]
 pub fn skia_offset_layer_new_point(x: scalar, y: scalar) -> *mut ValueBox<Rc<RefCell<dyn Layer>>> {
     let layer: Rc<RefCell<dyn Layer>> = Rc::new(RefCell::new(OffsetLayer::new(Point::new(x, y))));
     ValueBox::new(layer).into_raw()
@@ -49,6 +59,11 @@ pub fn skia_offset_layer_new() -> *mut ValueBox<Rc<RefCell<dyn Layer>>> {
 #[no_mangle]
 pub fn skia_offset_layer_get_x(_ptr: *mut ValueBox<Rc<RefCell<OffsetLayer>>>) -> scalar {
     _ptr.with_not_null_value_return_block(||{0.0}, |layer| layer.borrow().offset.x)
+}
+
+#[no_mangle]
+pub fn skia_offset_layer_get_y(_ptr: *mut ValueBox<Rc<RefCell<OffsetLayer>>>) -> scalar {
+    _ptr.with_not_null_value_return_block(||{0.0}, |layer| layer.borrow().offset.y)
 }
 
 #[no_mangle]

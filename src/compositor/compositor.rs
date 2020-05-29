@@ -72,8 +72,6 @@ impl Compositor {
     ) {
         let start_time = Instant::now();
 
-        canvas.flush();
-
         layers_tree.borrow_mut().take_image_from_cache(&mut self.image_cache);
 
         let mut to_rasterize = vec![];
@@ -86,8 +84,6 @@ impl Compositor {
            let right_area = b.bounds.size().height * b.bounds.size().width;
             right_area.partial_cmp(&left_area).unwrap()
         });
-
-        println!("to rasterize: {}", to_rasterize.len());
 
         let mut rasterized_pictures = HashMap::new();
         for rasterized_picture in self.rasterizer.rasterize(canvas, to_rasterize) {
@@ -110,10 +106,6 @@ impl Compositor {
         layers_tree.borrow_mut().draw_on(RasterizerContext::new_matrix(canvas.total_matrix()), canvas);
 
         layers_tree.borrow_mut().put_image_in_cache(&mut self.image_cache);
-
-        canvas.flush();
-
-        println!("Render completed! {:?}ms", (Instant::now() - start_time).as_micros() as f64 / 1000.0);
     }
 }
 
