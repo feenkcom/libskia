@@ -1,5 +1,6 @@
 use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer};
 use skia_safe::{scalar, Canvas, ClipOp, IRect, Path, QuickReject, RRect, Rect, Vector};
+use float_cmp::{ApproxEq, F32Margin};
 
 #[no_mangle]
 pub fn skia_canvas_clip_rect(
@@ -8,11 +9,13 @@ pub fn skia_canvas_clip_rect(
     top: scalar,
     right: scalar,
     bottom: scalar,
+    offset_x: scalar,
+    offset_y: scalar,
     clip_op: ClipOp,
     do_anti_alias: bool,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        canvas.clip_rect(Rect::new(left, top, right, bottom), clip_op, do_anti_alias);
+        canvas.clip_rect(Rect::new(left + offset_x, top + offset_y, right + offset_x, bottom + offset_y), clip_op, do_anti_alias);
     });
 }
 
@@ -20,12 +23,19 @@ pub fn skia_canvas_clip_rect(
 pub fn skia_canvas_clip_path(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     path_ptr: *mut ValueBox<Path>,
+    offset_x: scalar,
+    offset_y: scalar,
     clip_op: ClipOp,
     do_anti_alias: bool,
 ) {
     canvas_ptr.with_not_null(|canvas| {
         path_ptr.with_not_null(|path| {
-            canvas.clip_path(path, clip_op, do_anti_alias);
+            if offset_x.approx_eq(0.0, F32Margin::default()) && offset_y.approx_eq(0.0, F32Margin::default()) {
+                canvas.clip_path(path, clip_op, do_anti_alias);
+            }
+            else {
+                canvas.clip_path(&path.with_offset(Vector::new(offset_x, offset_y)), clip_op, do_anti_alias);
+            }
         })
     });
 }
@@ -42,11 +52,13 @@ pub fn skia_canvas_clip_rounded_rectangle(
     r_top_right: scalar,
     r_bottom_right: scalar,
     r_bottom_left: scalar,
+    offset_x: scalar,
+    offset_y: scalar,
 ) {
     canvas_ptr.with_not_null(|canvas| {
         canvas.clip_rrect(
             RRect::new_rect_radii(
-                Rect::new(left, top, right, bottom),
+                Rect::new(left + offset_x, top + offset_y, right + offset_x, bottom + offset_y),
                 &[
                     Vector::new(r_top_left, r_top_left),
                     Vector::new(r_top_right, r_top_right),
@@ -66,14 +78,16 @@ pub fn skia_canvas_clip_circle(
     center_x: scalar,
     center_y: scalar,
     radius: scalar,
+    offset_x: scalar,
+    offset_y: scalar,
 ) {
     canvas_ptr.with_not_null(|canvas| {
         canvas.clip_rrect(
             RRect::new_oval(Rect::new(
-                center_x - radius,
-                center_y - radius,
-                center_x + radius,
-                center_y + radius,
+                center_x + offset_x - radius,
+                center_y + offset_y - radius,
+                center_x + offset_x + radius,
+                center_y + offset_y + radius,
             )),
             ClipOp::Intersect,
             true,
@@ -88,10 +102,12 @@ pub fn skia_canvas_clip_oval(
     top: scalar,
     right: scalar,
     bottom: scalar,
+    offset_x: scalar,
+    offset_y: scalar,
 ) {
     canvas_ptr.with_not_null(|canvas| {
         canvas.clip_rrect(
-            RRect::new_oval(Rect::new(left, top, right, bottom)),
+            RRect::new_oval(Rect::new(left + offset_x, top + offset_y, right + offset_x, bottom + offset_y)),
             ClipOp::Intersect,
             true,
         );
