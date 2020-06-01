@@ -1,11 +1,11 @@
 use compositor::compositor::RasterizerContext;
 use compositor::image_cache::ImageCache;
-use skia_safe::{Canvas, Picture};
-use std::collections::HashMap;
 use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
+use skia_safe::{Canvas, Picture};
+use std::cell::RefCell;
+use std::collections::HashMap;
 use std::fmt::Debug;
 use std::rc::Rc;
-use std::cell::RefCell;
 
 pub trait Layer: Debug {
     fn add_layer(&mut self, layer: Rc<RefCell<dyn Layer>>) {}

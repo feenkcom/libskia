@@ -1,8 +1,11 @@
+use boxer::function;
 use skia_safe::gpu::{Context, SurfaceOrigin};
-use skia_safe::{Budgeted, Color, IRect, Image, ImageInfo, Matrix, Picture, Rect, RoundOut, Surface, Vector, ColorSpace};
-use std::time::{Instant, Duration};
-use std::fmt::{Debug, Formatter, Error};
-use boxer::{function};
+use skia_safe::{
+    Budgeted, Color, ColorSpace, IRect, Image, ImageInfo, Matrix, Picture, Rect, RoundOut, Surface,
+    Vector,
+};
+use std::fmt::{Debug, Error, Formatter};
+use std::time::{Duration, Instant};
 
 /// I contain all the necessary data to rasterize a picture
 pub struct PictureToRasterize {
@@ -25,7 +28,11 @@ impl PictureToRasterize {
         Self::compute_device_bounds(&self.bounds, &self.matrix)
     }
 
-    pub fn into_rasterized(self, image: Option<Image>, stats: PictureRasterizationStats) -> RasterizedPicture {
+    pub fn into_rasterized(
+        self,
+        image: Option<Image>,
+        stats: PictureRasterizationStats,
+    ) -> RasterizedPicture {
         RasterizedPicture::new(self.picture, image, stats)
     }
 
@@ -40,9 +47,9 @@ impl PictureToRasterize {
 impl Debug for PictureToRasterize {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         f.debug_struct("PictureToRasterize")
-         .field("id", &self.picture.unique_id())
-         .field("bounds", &self.bounds)
-         .finish()
+            .field("id", &self.picture.unique_id())
+            .field("bounds", &self.bounds)
+            .finish()
     }
 }
 
@@ -57,7 +64,9 @@ pub struct RasterizedPicture {
 impl RasterizedPicture {
     pub fn new(picture: Picture, image: Option<Image>, stats: PictureRasterizationStats) -> Self {
         Self {
-            picture, image, stats
+            picture,
+            image,
+            stats,
         }
     }
 }
@@ -83,16 +92,19 @@ impl PictureRasterizationStats {
             picture_id,
             surface_type: PictureRasterizerSurfaceType::Unknown,
             step_stats: vec![],
-            total_duration: Duration::default()
+            total_duration: Duration::default(),
         }
     }
 
-    pub fn set_surface_type (&mut self, surface_type: PictureRasterizerSurfaceType) {
+    pub fn set_surface_type(&mut self, surface_type: PictureRasterizerSurfaceType) {
         self.surface_type = surface_type;
     }
 
     pub fn log(&mut self, start_time: Instant, step: String) {
-        self.step_stats.push(PictureRasterizationStepStats::new(std::time::Instant::now() - start_time, step));
+        self.step_stats.push(PictureRasterizationStepStats::new(
+            std::time::Instant::now() - start_time,
+            step,
+        ));
     }
 
     pub fn log_total(&mut self, start_time: Instant) {

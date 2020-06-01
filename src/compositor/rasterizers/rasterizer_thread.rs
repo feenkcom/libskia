@@ -1,3 +1,6 @@
+use compositor::rasterizers::picture_rasterizer::{
+    PictureRasterizer, PictureToRasterize, RasterizedPicture,
+};
 use compositor::thread_pool::{GpuContext, ThreadPool};
 use glutin::{Context, NotCurrent};
 use skia_safe::gpu::SurfaceOrigin;
@@ -10,7 +13,6 @@ use std::collections::HashMap;
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::sync::{Arc, Mutex};
 use std::thread;
-use compositor::rasterizers::picture_rasterizer::{PictureToRasterize, RasterizedPicture, PictureRasterizer};
 
 pub enum RasterizerRequest {
     Rasterize(Vec<PictureToRasterize>),

@@ -15,9 +15,7 @@ pub fn skia_picture_cull_rect(_ptr: *mut ValueBox<Picture>) -> *mut ValueBox<Rec
 
 #[no_mangle]
 pub fn skia_picture_is_empty(_ptr: *mut ValueBox<Picture>) -> bool {
-    _ptr.with_not_null_return(true, |picture| {
-        picture.cull_rect().is_empty()
-    })
+    _ptr.with_not_null_return(true, |picture| picture.cull_rect().is_empty())
 }
 
 #[no_mangle]

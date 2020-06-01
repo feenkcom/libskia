@@ -1,11 +1,11 @@
 use compositor::compositor::RasterizerContext;
 use compositor::image_cache::ImageCache;
 use compositor::layers::layer::Layer;
-use skia_safe::{Canvas, Picture, Point};
-use std::collections::HashMap;
 use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
-use std::rc::Rc;
+use skia_safe::{Canvas, Picture, Point};
 use std::cell::RefCell;
+use std::collections::HashMap;
+use std::rc::Rc;
 
 #[derive(Debug)]
 pub struct OffsetLayer {
@@ -35,7 +35,9 @@ impl Layer for OffsetLayer {
         canvas.save();
         canvas.translate(self.offset);
         for layer in &self.layers {
-            layer.borrow_mut().draw_on(context.translate(self.offset), canvas);
+            layer
+                .borrow_mut()
+                .draw_on(context.translate(self.offset), canvas);
         }
         canvas.restore();
     }
@@ -46,7 +48,9 @@ impl Layer for OffsetLayer {
         mut pictures: &mut Vec<PictureToRasterize>,
     ) {
         for mut layer in &self.layers {
-            layer.borrow_mut().take_picture_to_rasterize(context.translate(self.offset), pictures);
+            layer
+                .borrow_mut()
+                .take_picture_to_rasterize(context.translate(self.offset), pictures);
         }
     }
 

@@ -1,11 +1,15 @@
-use skia_safe::{Canvas, Picture, Image, Rect, Matrix, IRect, RoundOut};
+use compositor::rasterizers::picture_rasterizer::{
+    PictureRasterizer, PictureToRasterize, RasterizedPicture,
+};
+use compositor::rasterizers::rasterizer_thread::{
+    RasterizerRequest, RasterizerResult, RasterizerThread,
+};
+use glutin::event_loop::EventLoop;
+use glutin::{ContextBuilder, PossiblyCurrent, WindowedContext};
+use skia_safe::{Canvas, IRect, Image, Matrix, Picture, Rect, RoundOut};
 use std::collections::HashMap;
-use compositor::rasterizers::picture_rasterizer::{PictureToRasterize, RasterizedPicture, PictureRasterizer};
-use std::sync::mpsc::{Sender, Receiver, channel};
+use std::sync::mpsc::{channel, Receiver, Sender};
 use std::thread::JoinHandle;
-use glutin::{WindowedContext, PossiblyCurrent, ContextBuilder};
-use compositor::rasterizers::rasterizer_thread::{RasterizerThread, RasterizerResult, RasterizerRequest};
-use glutin::event_loop::{EventLoop};
 
 pub trait Rasterizer {
     fn rasterize(
@@ -38,7 +42,11 @@ impl AsyncRasterizer {
         }
     }
 
-    pub fn new_accelerated(workers_num: usize, event_loop: &EventLoop<()>, windowed_context: &WindowedContext<PossiblyCurrent>) -> Self {
+    pub fn new_accelerated(
+        workers_num: usize,
+        event_loop: &EventLoop<()>,
+        windowed_context: &WindowedContext<PossiblyCurrent>,
+    ) -> Self {
         let contexts = (0..workers_num)
             .map(|i| {
                 ContextBuilder::new()

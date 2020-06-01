@@ -1,9 +1,9 @@
 use compositor::compositor::RasterizerContext;
 use compositor::image_cache::ImageCache;
 use compositor::layers::layer::Layer;
+use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
 use skia_safe::{Canvas, Image, Picture, Point, Rect, RoundOut};
 use std::collections::HashMap;
-use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
 use std::fmt::{Debug, Error, Formatter};
 
 pub struct PictureLayer {
@@ -16,10 +16,10 @@ pub struct PictureLayer {
 impl Debug for PictureLayer {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         f.debug_struct("PictureLayer")
-         .field("id", &self.picture_id)
-         .field("has_image", &self.image.is_some())
-         .field("needs_cache", &self.needs_cache)
-         .finish()
+            .field("id", &self.picture_id)
+            .field("has_image", &self.image.is_some())
+            .field("needs_cache", &self.needs_cache)
+            .finish()
     }
 }
 
@@ -66,7 +66,9 @@ impl Layer for PictureLayer {
 
         match self.picture.as_ref() {
             None => {}
-            Some(picture) => { canvas.draw_picture(picture, None, None); },
+            Some(picture) => {
+                canvas.draw_picture(picture, None, None);
+            }
         }
     }
     fn take_picture_to_rasterize(
@@ -76,10 +78,10 @@ impl Layer for PictureLayer {
     ) {
         if self.needs_cache && self.image.is_none() {
             match self.picture.take() {
-                None => {},
+                None => {}
                 Some(picture) => {
                     pictures.push(PictureToRasterize::new(picture, context.matrix));
-                },
+                }
             }
         }
     }
@@ -94,25 +96,20 @@ impl Layer for PictureLayer {
 
     fn take_image_from_cache(&mut self, mut picture_cache: &mut ImageCache) {
         match self.picture.as_ref() {
-            None => {},
-            Some(picture) => {
-                match picture_cache.pop_picture_image(picture) {
-                    None => {}
-                    Some(image) => self.image = Some(image),
-                }
+            None => {}
+            Some(picture) => match picture_cache.pop_picture_image(picture) {
+                None => {}
+                Some(image) => self.image = Some(image),
             },
         }
     }
     fn put_image_in_cache(&mut self, mut picture_cache: &mut ImageCache) {
         match self.picture.as_ref() {
-            None => {},
-            Some(picture) => {
-                match self.image.take() {
-                    None => {}
-                    Some(image) => picture_cache.push_picture_image(picture, image),
-                }
+            None => {}
+            Some(picture) => match self.image.take() {
+                None => {}
+                Some(image) => picture_cache.push_picture_image(picture, image),
             },
         }
-
     }
 }

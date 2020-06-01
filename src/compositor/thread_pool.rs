@@ -1,10 +1,10 @@
 use glutin::{NotCurrent, PossiblyCurrent};
 use skia_safe::gpu::gl::Interface;
+use skia_safe::gpu::Context;
 use std::sync::mpsc;
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::thread;
-use skia_safe::gpu::Context;
 
 enum Message {
     NewJob(Job),
@@ -140,8 +140,8 @@ impl Worker {
                 match message {
                     Message::NewJob(job) => {
                         let context = match gpu_context.as_mut() {
-                            None => { None },
-                            Some(mut gpu_context) => { Some(&mut gpu_context.skia_context) },
+                            None => None,
+                            Some(mut gpu_context) => Some(&mut gpu_context.skia_context),
                         };
                         job.call_box(context);
                     }

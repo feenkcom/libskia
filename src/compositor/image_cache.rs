@@ -1,6 +1,6 @@
 use skia_safe::{Image, Picture};
 use std::collections::HashMap;
-use std::fmt::{Formatter, Error, Debug};
+use std::fmt::{Debug, Error, Formatter};
 
 pub struct ImageCache {
     pub images: HashMap<u32, Image>,
@@ -9,8 +9,8 @@ pub struct ImageCache {
 impl Debug for ImageCache {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         f.debug_struct("ImageCache")
-         .field("images:", &self.images.keys())
-         .finish()
+            .field("images:", &self.images.keys())
+            .finish()
     }
 }
 

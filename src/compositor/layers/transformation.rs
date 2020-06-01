@@ -1,11 +1,11 @@
 use compositor::compositor::RasterizerContext;
 use compositor::image_cache::ImageCache;
 use compositor::layers::layer::Layer;
-use skia_safe::{Canvas, Matrix, Picture, Point};
-use std::collections::HashMap;
 use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
-use std::rc::Rc;
+use skia_safe::{Canvas, Matrix, Picture, Point};
 use std::cell::RefCell;
+use std::collections::HashMap;
+use std::rc::Rc;
 
 #[derive(Debug)]
 pub struct TransformationLayer {
@@ -35,7 +35,9 @@ impl Layer for TransformationLayer {
         canvas.save();
         canvas.concat(&self.matrix);
         for layer in &self.layers {
-            layer.borrow_mut().draw_on(context.concat(&self.matrix), canvas);
+            layer
+                .borrow_mut()
+                .draw_on(context.concat(&self.matrix), canvas);
         }
         canvas.restore();
     }
@@ -46,7 +48,9 @@ impl Layer for TransformationLayer {
         mut pictures: &mut Vec<PictureToRasterize>,
     ) {
         for mut layer in &self.layers {
-            layer.borrow_mut().take_picture_to_rasterize(context.concat(&self.matrix), pictures);
+            layer
+                .borrow_mut()
+                .take_picture_to_rasterize(context.concat(&self.matrix), pictures);
         }
     }
 
