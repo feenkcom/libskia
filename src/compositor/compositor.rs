@@ -44,6 +44,7 @@ impl RasterizerContext {
 pub struct Compositor {
     pub rasterizer: Box<dyn Rasterizer>,
     pub image_cache: ImageCache,
+    pub images_per_frame: usize,
 }
 
 impl Compositor {
@@ -51,6 +52,7 @@ impl Compositor {
         Self {
             image_cache: ImageCache::new(),
             rasterizer: Box::new(SyncRasterizer::new()),
+            images_per_frame: 5
         }
     }
 
@@ -58,6 +60,7 @@ impl Compositor {
         Self {
             image_cache: ImageCache::new(),
             rasterizer: Box::new(AsyncRasterizer::new(workers_num)),
+            images_per_frame: 5
         }
     }
 
@@ -73,7 +76,12 @@ impl Compositor {
                 event_loop,
                 windowed_context,
             )),
+            images_per_frame: 5
         }
+    }
+
+    pub fn set_images_limit(&mut self, images_per_frame: usize) {
+        self.images_per_frame = images_per_frame;
     }
 
     pub fn draw(&mut self, mut layers_tree: &Rc<RefCell<dyn Layer>>, canvas: &mut Canvas) {
@@ -94,8 +102,21 @@ impl Compositor {
             right_area.partial_cmp(&left_area).unwrap()
         });
 
+        let mut to_rasterize_limited = vec![];
+
         let mut rasterized_pictures = HashMap::new();
-        for rasterized_picture in self.rasterizer.rasterize(canvas, to_rasterize) {
+        for picture_to_rasterize in to_rasterize {
+            if to_rasterize_limited.len() < self.images_per_frame {
+                to_rasterize_limited.push(picture_to_rasterize);
+            }
+            else {
+                let picture = picture_to_rasterize.picture;
+                let picture_id = picture.unique_id();
+                rasterized_pictures.insert(picture_id, picture);
+            }
+        }
+
+        for rasterized_picture in self.rasterizer.rasterize(canvas, to_rasterize_limited) {
             let picture = rasterized_picture.picture;
             let picture_id = picture.unique_id();
             let image = rasterized_picture.image;
