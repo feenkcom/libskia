@@ -222,8 +222,6 @@ impl PictureRasterizer {
                 stats.log(draw_picture_time, String::from("Draw picture"));
 
                 let canvas_flush = std::time::Instant::now();
-                canvas.flush();
-                surface.flush();
                 stats.log(canvas_flush, String::from("Flush canvas"));
 
                 let raster_image_snapshot = std::time::Instant::now();
