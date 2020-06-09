@@ -11,13 +11,7 @@ use skia_safe::{
 };
 
 #[no_mangle]
-pub fn skia_canvas_clear(
-    canvas_ptr: *mut ReferenceBox<Canvas>,
-    r: u8,
-    g: u8,
-    b: u8,
-    a: u8,
-) {
+pub fn skia_canvas_clear(canvas_ptr: *mut ReferenceBox<Canvas>, r: u8, g: u8, b: u8, a: u8) {
     assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         canvas.clear(Color::from_argb(a, r, g, b));

@@ -24,10 +24,8 @@ pub fn skia_picture_unique_id(_ptr: *mut ValueBox<Picture>) -> u32 {
 }
 
 #[no_mangle]
-pub fn skia_picture_approximate_op_count( _ptr_picture: *mut ValueBox<Picture>,) -> usize {
-    _ptr_picture.with_not_null_return(0, |picture| {
-            picture.approximate_op_count()
-    })
+pub fn skia_picture_approximate_op_count(_ptr_picture: *mut ValueBox<Picture>) -> usize {
+    _ptr_picture.with_not_null_return(0, |picture| picture.approximate_op_count())
 }
 
 #[no_mangle]

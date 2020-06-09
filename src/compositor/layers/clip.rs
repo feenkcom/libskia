@@ -1,13 +1,13 @@
-use compositor::compositor::RasterizerContext;
+use boxer::boxes::{ValueBox, ValueBoxPointer};
+use compositor::compositor::CompositorContext;
 use compositor::image_cache::ImageCache;
 use compositor::layers::layer::Layer;
 use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
-use skia_safe::{Canvas, ClipOp, Matrix, Path, Picture, Point, RRect, Rect, Vector, scalar};
+use skia_safe::{scalar, Canvas, ClipOp, Matrix, Path, Picture, Point, RRect, Rect, Vector};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt::{Debug, Error, Formatter};
 use std::rc::Rc;
-use boxer::boxes::{ValueBox, ValueBoxPointer};
 
 pub enum Clip {
     None,
@@ -30,9 +30,7 @@ impl Debug for Clip {
                 formatter.field("type", &String::from("RRect"));
                 formatter.field("rrect", rrect.rect())
             }
-            Clip::None => {
-                formatter.field("type", &String::from("None"))
-            }
+            Clip::None => formatter.field("type", &String::from("None")),
         };
         formatted.finish()
     }
@@ -116,45 +114,19 @@ impl Layer for ClipLayer {
         self.layers.len()
     }
 
-    fn draw_on(&mut self, context: RasterizerContext, canvas: &mut Canvas) {
-        let count = canvas.save();
-        self.apply_on_canvas(canvas);
+    fn prepare(&mut self, context: &mut CompositorContext) {
         for layer in &self.layers {
-            layer
-                .borrow_mut()
-                .draw_on(context, canvas);
-        }
-        canvas.restore_to_count(count);
-    }
-
-    fn take_picture_to_rasterize(
-        &mut self,
-        context: RasterizerContext,
-        mut pictures: &mut Vec<PictureToRasterize>,
-    ) {
-        for mut layer in &self.layers {
-            layer
-                .borrow_mut()
-                .take_picture_to_rasterize(context, pictures);
+            layer.borrow_mut().prepare(context);
         }
     }
 
-    fn put_picture_after_rasterization(&mut self, mut pictures: &mut HashMap<u32, Picture>) {
-        for mut layer in &self.layers {
-            layer.borrow_mut().put_picture_after_rasterization(pictures);
+    fn draw(&mut self, context: &mut CompositorContext) {
+        let count = context.canvas().save();
+        self.apply_on_canvas(context.canvas());
+        for layer in &self.layers {
+            layer.borrow_mut().draw(context);
         }
-    }
-
-    fn take_image_from_cache(&mut self, picture_cache: &mut ImageCache) {
-        for mut layer in &self.layers {
-            layer.borrow_mut().take_image_from_cache(picture_cache);
-        }
-    }
-
-    fn put_image_in_cache(&mut self, picture_cache: &mut ImageCache) {
-        for mut layer in &self.layers {
-            layer.borrow_mut().put_image_in_cache(picture_cache);
-        }
+        context.canvas().restore_to_count(count);
     }
 }
 
@@ -173,7 +145,10 @@ pub fn skia_clip_layer_rect(
     offset_x: scalar,
     offset_y: scalar,
 ) -> *mut ValueBox<Rc<RefCell<dyn Layer>>> {
-    let layer: Rc<RefCell<dyn Layer>> = Rc::new(RefCell::new(ClipLayer::rect(Rect::new(left, top, right, bottom), Vector::new(offset_x, offset_y),)));
+    let layer: Rc<RefCell<dyn Layer>> = Rc::new(RefCell::new(ClipLayer::rect(
+        Rect::new(left, top, right, bottom),
+        Vector::new(offset_x, offset_y),
+    )));
     ValueBox::new(layer).into_raw()
 }
 
@@ -190,15 +165,18 @@ pub fn skia_clip_layer_rrect(
     offset_x: scalar,
     offset_y: scalar,
 ) -> *mut ValueBox<Rc<RefCell<dyn Layer>>> {
-    let layer: Rc<RefCell<dyn Layer>> = Rc::new(RefCell::new(ClipLayer::rrect(RRect::new_rect_radii(
-                Rect::new(left, top, right, bottom),
-                &[
-                    Vector::new(r_top_left, r_top_left),
-                    Vector::new(r_top_right, r_top_right),
-                    Vector::new(r_bottom_right, r_bottom_right),
-                    Vector::new(r_bottom_left, r_bottom_left),
-                ],
-            ), Vector::new(offset_x, offset_y),)));
+    let layer: Rc<RefCell<dyn Layer>> = Rc::new(RefCell::new(ClipLayer::rrect(
+        RRect::new_rect_radii(
+            Rect::new(left, top, right, bottom),
+            &[
+                Vector::new(r_top_left, r_top_left),
+                Vector::new(r_top_right, r_top_right),
+                Vector::new(r_bottom_right, r_bottom_right),
+                Vector::new(r_bottom_left, r_bottom_left),
+            ],
+        ),
+        Vector::new(offset_x, offset_y),
+    )));
     ValueBox::new(layer).into_raw()
 }
 
@@ -208,10 +186,14 @@ pub fn skia_clip_layer_path(
     offset_x: scalar,
     offset_y: scalar,
 ) -> *mut ValueBox<Rc<RefCell<dyn Layer>>> {
-    let layer: Rc<RefCell<dyn Layer>> = _ptr_path.with_not_null_value_return_block(||{
-        Rc::new(RefCell::new(ClipLayer::new()))
-    }, |path| {
-        Rc::new(RefCell::new(ClipLayer::path(path, Vector::new(offset_x, offset_y))))
-    });
+    let layer: Rc<RefCell<dyn Layer>> = _ptr_path.with_not_null_value_return_block(
+        || Rc::new(RefCell::new(ClipLayer::new())),
+        |path| {
+            Rc::new(RefCell::new(ClipLayer::path(
+                path,
+                Vector::new(offset_x, offset_y),
+            )))
+        },
+    );
     ValueBox::new(layer).into_raw()
 }

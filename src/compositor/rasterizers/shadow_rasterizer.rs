@@ -1,29 +1,28 @@
 use boxer::function;
-use compositor::compositor_stats::{
-    RasterizationStats, RasterizationStepStats, RasterizerSurfaceType,
-};
+use compositor::compositor_stats::{RasterizationStats, RasterizerSurfaceType};
+use compositor::shadow_cache::Shadow;
 use skia_safe::gpu::{Context, SurfaceOrigin};
+use skia_safe::image_filters::drop_shadow_only;
+use skia_safe::paint::Style;
 use skia_safe::{
-    Budgeted, Color, ColorSpace, IRect, Image, ImageInfo, Matrix, Picture, Rect, RoundOut, Surface,
+    Budgeted, Color, ColorSpace, IRect, Image, ImageInfo, Matrix, Paint, Rect, RoundOut, Surface,
     Vector,
 };
-use std::fmt::{Debug, Error, Formatter};
 use std::sync::Arc;
-use std::time::{Duration, Instant};
+use std::cmp::max;
 
-/// I contain all the necessary data to rasterize a picture
-#[derive(Clone)]
-pub struct PictureToRasterize {
-    pub picture: Arc<Picture>,
-    pub bounds: Rect,
+#[derive(Debug, Clone)]
+pub struct ShadowToRasterize {
+    pub shadow: Shadow,
     pub matrix: Matrix,
+    pub bounds: Rect,
 }
 
-impl PictureToRasterize {
-    pub fn new(picture: Arc<Picture>, matrix: Matrix) -> Self {
-        let logical_bounds = picture.cull_rect();
+impl ShadowToRasterize {
+    pub fn new(shadow: Shadow, matrix: Matrix) -> Self {
+        let logical_bounds = shadow.cull_rect();
         Self {
-            picture,
+            shadow,
             bounds: logical_bounds,
             matrix,
         }
@@ -37,8 +36,8 @@ impl PictureToRasterize {
         self,
         image: Option<Image>,
         stats: RasterizationStats,
-    ) -> RasterizedPicture {
-        RasterizedPicture::new(self.picture, image, stats)
+    ) -> RasterizedShadow {
+        RasterizedShadow::new(self.shadow, image, stats)
     }
 
     pub fn compute_device_bounds(bounds: &Rect, matrix: &Matrix) -> IRect {
@@ -49,54 +48,40 @@ impl PictureToRasterize {
     }
 }
 
-impl Debug for PictureToRasterize {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-        f.debug_struct("PictureToRasterize")
-            .field("id", &self.picture.unique_id())
-            .field("bounds", &self.bounds)
-            .finish()
-    }
-}
-
-/// I hold a result of the picture rasterization. The image is [`Some`] if the process
+/// I hold a result of the shadow rasterization. The image is [`Some`] if the process
 /// was successful
-pub struct RasterizedPicture {
-    pub picture: Arc<Picture>,
+pub struct RasterizedShadow {
+    pub shadow: Shadow,
     pub image: Option<Image>,
     pub stats: RasterizationStats,
 }
 
-impl RasterizedPicture {
-    pub fn new(picture: Arc<Picture>, image: Option<Image>, stats: RasterizationStats) -> Self {
+impl RasterizedShadow {
+    pub fn new(shadow: Shadow, image: Option<Image>, stats: RasterizationStats) -> Self {
         Self {
-            picture,
+            shadow,
             image,
             stats,
         }
     }
-
-    pub fn picture_id(&self) -> u32 {
-        self.picture.unique_id()
-    }
 }
 
-/// I convert a Picture [`PictureToRasterize`] into an Image
-pub struct PictureRasterizer {}
-impl PictureRasterizer {
+/// I convert a Shadow [`ShadowToRasterize`] into an Image
+pub struct ShadowRasterizer {}
+impl ShadowRasterizer {
     pub fn new() -> Self {
         Self {}
     }
 
     pub fn rasterize(
         &self,
-        mut picture_to_rasterize: PictureToRasterize,
+        mut shadow_to_rasterize: ShadowToRasterize,
         gpu_context: Option<&mut Context>,
-    ) -> RasterizedPicture {
-        let device_bounds = picture_to_rasterize.device_bounds();
-        let picture = &picture_to_rasterize.picture;
-        let picture_id = picture.unique_id();
+    ) -> RasterizedShadow {
+        let device_bounds = shadow_to_rasterize.device_bounds();
+        let shadow = &shadow_to_rasterize.shadow;
 
-        let mut stats = RasterizationStats::new(picture_id);
+        let mut stats = RasterizationStats::new(0);
         let start_time = std::time::Instant::now();
 
         let image_info = ImageInfo::new_n32_premul(device_bounds.size(), ColorSpace::new_srgb());
@@ -160,7 +145,7 @@ impl PictureRasterizer {
         let image = match surface {
             None => None,
             Some(mut surface) => {
-                let draw_picture_time = std::time::Instant::now();
+                let draw_shadow_time = std::time::Instant::now();
 
                 let canvas = surface.canvas();
                 canvas.clear(Color::TRANSPARENT);
@@ -168,11 +153,20 @@ impl PictureRasterizer {
                     -device_bounds.left as f32,
                     -device_bounds.top as f32,
                 ));
-                canvas.concat(&picture_to_rasterize.matrix);
+                canvas.concat(&shadow_to_rasterize.matrix);
 
-                canvas.draw_picture(&picture, None, None);
+                let drop_shadow_filter =
+                    drop_shadow_only(shadow.offset, shadow.radius, shadow.color, None, None);
 
-                stats.log(draw_picture_time, String::from("Draw picture"));
+                let mut shadow_paint = Paint::default();
+                shadow_paint.set_style(Style::Stroke);
+                shadow_paint.set_color(Color::WHITE);
+                shadow_paint.set_stroke_width(if shadow.radius.0 > shadow.radius.1 { shadow.radius.0 } else { shadow.radius.1 });
+                shadow_paint.set_image_filter(drop_shadow_filter);
+
+                canvas.draw_path(&shadow.path, &shadow_paint);
+
+                stats.log(draw_shadow_time, String::from("Draw shadow"));
 
                 let canvas_flush = std::time::Instant::now();
                 stats.log(canvas_flush, String::from("Flush canvas"));
@@ -186,6 +180,6 @@ impl PictureRasterizer {
 
         stats.log_total(start_time);
 
-        picture_to_rasterize.into_rasterized(image, stats)
+        shadow_to_rasterize.into_rasterized(image, stats)
     }
 }

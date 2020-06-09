@@ -1,8 +1,9 @@
-use compositor::compositor::RasterizerContext;
+use boxer::boxes::{ValueBox, ValueBoxPointer};
+use compositor::compositor::{CompositorContext, MatrixContext};
 use compositor::image_cache::ImageCache;
 use compositor::layers::layer::Layer;
 use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
-use skia_safe::{Canvas, ClipOp, Matrix, Path, Picture, Point, RRect, Rect, Vector};
+use skia_safe::{scalar, Canvas, ClipOp, Matrix, Path, Picture, Point, RRect, Rect, Vector};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt::{Debug, Error, Formatter};
@@ -104,7 +105,7 @@ impl LeftoverStateLayer {
         self.commands.push(StateCommand::transform(matrix, offset));
     }
 
-    pub fn update_rasterizer_context(&self, context: RasterizerContext) -> RasterizerContext {
+    pub fn update_rasterizer_context(&self, context: MatrixContext) -> MatrixContext {
         let mut current_context = context;
         for command in &self.commands {
             match &command.command_type {
@@ -147,44 +148,125 @@ impl Layer for LeftoverStateLayer {
         self.layers.len()
     }
 
-    fn draw_on(&mut self, context: RasterizerContext, canvas: &mut Canvas) {
-        let count = canvas.save();
-        self.apply_on_canvas(canvas);
+    fn prepare(&mut self, context: &mut CompositorContext) {
+        let matrix_context = self
+            .update_rasterizer_context(MatrixContext::new_matrix(context.current_matrix().clone()));
+        context.push_matrix(matrix_context.matrix);
+
         for layer in &self.layers {
+            layer.borrow_mut().prepare(context);
+        }
+        context.pop_matrix();
+    }
+
+    fn draw(&mut self, context: &mut CompositorContext) {
+        let matrix_context = self
+            .update_rasterizer_context(MatrixContext::new_matrix(context.current_matrix().clone()));
+        context.push_matrix(matrix_context.matrix);
+
+        let count = context.canvas().save();
+        self.apply_on_canvas(context.canvas());
+
+        for layer in &self.layers {
+            layer.borrow_mut().draw(context);
+        }
+        context.canvas().restore_to_count(count);
+
+        context.pop_matrix();
+    }
+}
+
+#[no_mangle]
+pub fn skia_leftover_state_layer_new() -> *mut ValueBox<Rc<RefCell<dyn Layer>>> {
+    let layer: Rc<RefCell<dyn Layer>> = Rc::new(RefCell::new(LeftoverStateLayer::new()));
+    ValueBox::new(layer).into_raw()
+}
+
+#[no_mangle]
+pub fn skia_leftover_state_layer_clip_rect(
+    _ptr: *mut ValueBox<Rc<RefCell<LeftoverStateLayer>>>,
+    left: scalar,
+    top: scalar,
+    right: scalar,
+    bottom: scalar,
+    offset_x: scalar,
+    offset_y: scalar,
+) {
+    _ptr.with_not_null_value(|layer| {
+        layer.borrow_mut().clip_rect(
+            Rect::new(left, top, right, bottom),
+            Vector::new(offset_x, offset_y),
+        );
+    })
+}
+
+#[no_mangle]
+pub fn skia_leftover_state_layer_clip_rrect(
+    _ptr: *mut ValueBox<Rc<RefCell<LeftoverStateLayer>>>,
+    left: scalar,
+    top: scalar,
+    right: scalar,
+    bottom: scalar,
+    r_top_left: scalar,
+    r_top_right: scalar,
+    r_bottom_right: scalar,
+    r_bottom_left: scalar,
+    offset_x: scalar,
+    offset_y: scalar,
+) {
+    _ptr.with_not_null_value(|layer| {
+        layer.borrow_mut().clip_rrect(
+            RRect::new_rect_radii(
+                Rect::new(left, top, right, bottom),
+                &[
+                    Vector::new(r_top_left, r_top_left),
+                    Vector::new(r_top_right, r_top_right),
+                    Vector::new(r_bottom_right, r_bottom_right),
+                    Vector::new(r_bottom_left, r_bottom_left),
+                ],
+            ),
+            Vector::new(offset_x, offset_y),
+        );
+    })
+}
+
+#[no_mangle]
+pub fn skia_leftover_state_layer_clip_path(
+    _ptr: *mut ValueBox<Rc<RefCell<LeftoverStateLayer>>>,
+    _ptr_path: *mut ValueBox<Path>,
+    offset_x: scalar,
+    offset_y: scalar,
+) {
+    _ptr.with_not_null_value(|layer| {
+        _ptr_path.with_not_null_value(|path| {
             layer
                 .borrow_mut()
-                .draw_on(self.update_rasterizer_context(context), canvas);
-        }
-        canvas.restore_to_count(count);
-    }
+                .clip_path(path, Vector::new(offset_x, offset_y));
+        })
+    })
+}
 
-    fn take_picture_to_rasterize(
-        &mut self,
-        context: RasterizerContext,
-        mut pictures: &mut Vec<PictureToRasterize>,
-    ) {
-        for mut layer in &self.layers {
-            layer
-                .borrow_mut()
-                .take_picture_to_rasterize(self.update_rasterizer_context(context), pictures);
-        }
-    }
-
-    fn put_picture_after_rasterization(&mut self, mut pictures: &mut HashMap<u32, Picture>) {
-        for mut layer in &self.layers {
-            layer.borrow_mut().put_picture_after_rasterization(pictures);
-        }
-    }
-
-    fn take_image_from_cache(&mut self, picture_cache: &mut ImageCache) {
-        for mut layer in &self.layers {
-            layer.borrow_mut().take_image_from_cache(picture_cache);
-        }
-    }
-
-    fn put_image_in_cache(&mut self, picture_cache: &mut ImageCache) {
-        for mut layer in &self.layers {
-            layer.borrow_mut().put_image_in_cache(picture_cache);
-        }
-    }
+#[no_mangle]
+pub fn skia_leftover_state_layer_transform(
+    _ptr: *mut ValueBox<Rc<RefCell<LeftoverStateLayer>>>,
+    scale_x: scalar,
+    skew_x: scalar,
+    trans_x: scalar,
+    skew_y: scalar,
+    scale_y: scalar,
+    trans_y: scalar,
+    persp_0: scalar,
+    persp_1: scalar,
+    persp_2: scalar,
+    offset_x: scalar,
+    offset_y: scalar,
+) {
+    _ptr.with_not_null_value(|layer| {
+        layer.borrow_mut().transform(
+            Matrix::new_all(
+                scale_x, skew_x, trans_x, skew_y, scale_y, trans_y, persp_0, persp_1, persp_2,
+            ),
+            Vector::new(offset_x, offset_y),
+        );
+    })
 }

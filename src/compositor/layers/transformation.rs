@@ -1,4 +1,5 @@
-use compositor::compositor::RasterizerContext;
+use boxer::boxes::{ValueBox, ValueBoxPointer};
+use compositor::compositor::CompositorContext;
 use compositor::image_cache::ImageCache;
 use compositor::layers::layer::Layer;
 use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
@@ -31,44 +32,42 @@ impl Layer for TransformationLayer {
         self.layers.len()
     }
 
-    fn draw_on(&mut self, context: RasterizerContext, canvas: &mut Canvas) {
-        canvas.save();
-        canvas.concat(&self.matrix);
+    fn prepare(&mut self, context: &mut CompositorContext) {
+        context.push_concat(&self.matrix);
         for layer in &self.layers {
-            layer
-                .borrow_mut()
-                .draw_on(context.concat(&self.matrix), canvas);
+            layer.borrow_mut().prepare(context);
         }
-        canvas.restore();
+        context.pop_matrix();
     }
 
-    fn take_picture_to_rasterize(
-        &mut self,
-        context: RasterizerContext,
-        mut pictures: &mut Vec<PictureToRasterize>,
-    ) {
-        for mut layer in &self.layers {
-            layer
-                .borrow_mut()
-                .take_picture_to_rasterize(context.concat(&self.matrix), pictures);
-        }
-    }
+    fn draw(&mut self, context: &mut CompositorContext) {
+        context.push_concat(&self.matrix);
 
-    fn put_picture_after_rasterization(&mut self, mut pictures: &mut HashMap<u32, Picture>) {
-        for mut layer in &self.layers {
-            layer.borrow_mut().put_picture_after_rasterization(pictures);
+        context.canvas().save();
+        context.canvas().concat(&self.matrix);
+        for layer in &self.layers {
+            layer.borrow_mut().draw(context);
         }
-    }
+        context.canvas().restore();
 
-    fn take_image_from_cache(&mut self, picture_cache: &mut ImageCache) {
-        for mut layer in &self.layers {
-            layer.borrow_mut().take_image_from_cache(picture_cache);
-        }
+        context.pop_matrix();
     }
+}
 
-    fn put_image_in_cache(&mut self, picture_cache: &mut ImageCache) {
-        for mut layer in &self.layers {
-            layer.borrow_mut().put_image_in_cache(picture_cache);
-        }
-    }
+#[no_mangle]
+pub fn skia_transformation_layer_new() -> *mut ValueBox<Rc<RefCell<dyn Layer>>> {
+    let layer: Rc<RefCell<dyn Layer>> = Rc::new(RefCell::new(TransformationLayer::new(
+        Matrix::new_identity(),
+    )));
+    ValueBox::new(layer).into_raw()
+}
+
+#[no_mangle]
+pub fn skia_transformation_layer_new_matrix(
+    _ptr_matrix: *mut ValueBox<Matrix>,
+) -> *mut ValueBox<Rc<RefCell<dyn Layer>>> {
+    _ptr_matrix.with_value(|matrix| {
+        let layer: Rc<RefCell<dyn Layer>> = Rc::new(RefCell::new(TransformationLayer::new(matrix)));
+        ValueBox::new(layer).into_raw()
+    })
 }

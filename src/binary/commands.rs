@@ -1,4 +1,4 @@
-use binary::command::{Command};
+use binary::command::Command;
 use binary::context::Context;
 use binary::fill::fill_rectangle::FillRectangle;
 use binary::paint::new_paint::NewPaint;

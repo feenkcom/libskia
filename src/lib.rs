@@ -5,6 +5,7 @@ extern crate float_cmp;
 extern crate glutin;
 extern crate num_cpus;
 extern crate num_enum;
+extern crate ordered_float;
 extern crate skia_safe;
 
 use std::os::raw::c_void;

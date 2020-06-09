@@ -1,8 +1,9 @@
-use compositor::compositor::RasterizerContext;
+use boxer::boxes::{ValueBox, ValueBoxPointer};
+use compositor::compositor::CompositorContext;
 use compositor::image_cache::ImageCache;
 use compositor::layers::layer::Layer;
 use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
-use skia_safe::{Canvas, Picture, Point};
+use skia_safe::{scalar, Canvas, Picture, Point};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -31,44 +32,56 @@ impl Layer for OffsetLayer {
         self.layers.len()
     }
 
-    fn draw_on(&mut self, context: RasterizerContext, canvas: &mut Canvas) {
-        canvas.save();
-        canvas.translate(self.offset);
+    fn prepare(&mut self, context: &mut CompositorContext) {
+        context.push_translate(self.offset);
         for layer in &self.layers {
-            layer
-                .borrow_mut()
-                .draw_on(context.translate(self.offset), canvas);
+            layer.borrow_mut().prepare(context);
         }
-        canvas.restore();
+        context.pop_matrix();
     }
 
-    fn take_picture_to_rasterize(
-        &mut self,
-        context: RasterizerContext,
-        mut pictures: &mut Vec<PictureToRasterize>,
-    ) {
-        for mut layer in &self.layers {
-            layer
-                .borrow_mut()
-                .take_picture_to_rasterize(context.translate(self.offset), pictures);
-        }
-    }
+    fn draw(&mut self, context: &mut CompositorContext) {
+        context.push_translate(self.offset);
 
-    fn put_picture_after_rasterization(&mut self, mut pictures: &mut HashMap<u32, Picture>) {
-        for mut layer in &self.layers {
-            layer.borrow_mut().put_picture_after_rasterization(pictures);
-        }
-    }
-
-    fn take_image_from_cache(&mut self, picture_cache: &mut ImageCache) {
+        context.canvas().save();
+        context.canvas().translate(self.offset);
         for layer in &self.layers {
-            layer.borrow_mut().take_image_from_cache(picture_cache);
+            layer.borrow_mut().draw(context);
         }
-    }
+        context.canvas().restore();
 
-    fn put_image_in_cache(&mut self, picture_cache: &mut ImageCache) {
-        for mut layer in &self.layers {
-            layer.borrow_mut().put_image_in_cache(picture_cache);
-        }
+        context.pop_matrix();
     }
+}
+
+#[no_mangle]
+pub fn skia_offset_layer_new_point(x: scalar, y: scalar) -> *mut ValueBox<Rc<RefCell<dyn Layer>>> {
+    let layer: Rc<RefCell<dyn Layer>> = Rc::new(RefCell::new(OffsetLayer::new(Point::new(x, y))));
+    ValueBox::new(layer).into_raw()
+}
+
+#[no_mangle]
+pub fn skia_offset_layer_new() -> *mut ValueBox<Rc<RefCell<dyn Layer>>> {
+    let layer: Rc<RefCell<dyn Layer>> =
+        Rc::new(RefCell::new(OffsetLayer::new(Point::new(0.0, 0.0))));
+    ValueBox::new(layer).into_raw()
+}
+
+#[no_mangle]
+pub fn skia_offset_layer_get_x(_ptr: *mut ValueBox<Rc<RefCell<OffsetLayer>>>) -> scalar {
+    _ptr.with_not_null_value_return_block(|| 0.0, |layer| layer.borrow().offset.x)
+}
+
+#[no_mangle]
+pub fn skia_offset_layer_get_y(_ptr: *mut ValueBox<Rc<RefCell<OffsetLayer>>>) -> scalar {
+    _ptr.with_not_null_value_return_block(|| 0.0, |layer| layer.borrow().offset.y)
+}
+
+#[no_mangle]
+pub fn skia_offset_layer_set_offset(
+    _ptr: *mut ValueBox<Rc<RefCell<OffsetLayer>>>,
+    x: scalar,
+    y: scalar,
+) {
+    _ptr.with_not_null_value(|layer| layer.borrow_mut().offset = Point::new(x, y));
 }
