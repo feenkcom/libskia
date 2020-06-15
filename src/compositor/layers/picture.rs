@@ -86,7 +86,11 @@ pub fn skia_picture_layer_new_picture(
     mut _picture_ptr: *mut ValueBox<Picture>,
 ) -> *mut ValueBox<Rc<RefCell<dyn Layer>>> {
     _picture_ptr.with_not_null_value_return_block(
-        || std::ptr::null_mut(),
+        || {
+            let layer: Rc<RefCell<dyn Layer>> =
+                Rc::new(RefCell::new(PictureLayer::from_picture(Picture::new_placeholder(Rect::new(0.0, 0.0, 50.0, 50.0)))));
+            ValueBox::new(layer).into_raw()
+        },
         |picture| {
             let layer: Rc<RefCell<dyn Layer>> =
                 Rc::new(RefCell::new(PictureLayer::from_picture(picture)));
