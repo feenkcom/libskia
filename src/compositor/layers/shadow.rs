@@ -4,9 +4,7 @@ use compositor::image_cache::ImageCache;
 use compositor::layers::layer::Layer;
 use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
 use compositor::shadow_cache::Shadow;
-use skia_safe::{
-    scalar, Canvas, Color, Image, Path, Picture, Point, RRect, Rect, RoundOut, Vector,
-};
+use skia_safe::{scalar, Canvas, Color, Image, Path, Picture, Point, RRect, Rect, RoundOut, Vector, Matrix};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt::{Debug, Error, Formatter};
@@ -83,19 +81,28 @@ impl Layer for ShadowLayer {
         let (image, canvas) = context.get_rasterized_shadow_image_and_canvas(self.cached_shadow());
         match image {
             None => {}
-            Some(image) => {
+            Some((image, matrix)) => {
                 let current_matrix = canvas.total_matrix();
 
-                let device_bounds = PictureToRasterize::compute_device_bounds(
-                    &(self.cached_shadow().cull_rect()),
+                let device_bounds = PictureToRasterize::compute_device_bounds_rect(
+                    &self.cached_shadow().cull_rect(),
                     &current_matrix,
                 );
+
                 canvas.save();
 
-                canvas.concat(current_matrix.invert().as_ref().unwrap());
+                let relative_matrix = Matrix::concat(&current_matrix, matrix.invert().as_ref().unwrap());
+
+                let relative_bounds = PictureToRasterize::compute_device_bounds(
+                    &device_bounds.into(),
+                    &relative_matrix.invert().unwrap(),
+                );
+
+                canvas.reset_matrix();
+                canvas.set_matrix(&relative_matrix);
                 canvas.draw_image(
                     image,
-                    Point::new(device_bounds.left as f32, device_bounds.top as f32),
+                    Point::new(relative_bounds.left as f32, relative_bounds.top as f32),
                     None,
                 );
                 canvas.restore();

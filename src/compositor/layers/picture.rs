@@ -3,7 +3,7 @@ use compositor::compositor::CompositorContext;
 use compositor::image_cache::ImageCache;
 use compositor::layers::layer::Layer;
 use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
-use skia_safe::{Canvas, Image, Picture, Point, Rect, RoundOut};
+use skia_safe::{Canvas, Image, Picture, Point, Rect, RoundOut, Matrix};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt::{Debug, Error, Formatter};
@@ -51,19 +51,28 @@ impl Layer for PictureLayer {
             None => {
                 context.canvas().draw_picture(&self.picture, None, None);
             }
-            Some(image) => {
+            Some((image, matrix)) => {
                 let current_matrix = canvas.total_matrix();
 
-                let device_bounds = PictureToRasterize::compute_device_bounds(
+                let device_bounds = PictureToRasterize::compute_device_bounds_rect(
                     &self.picture.cull_rect(),
                     &current_matrix,
                 );
+
                 canvas.save();
 
-                canvas.concat(current_matrix.invert().as_ref().unwrap());
+                let relative_matrix = Matrix::concat(&current_matrix, matrix.invert().as_ref().unwrap());
+
+                let relative_bounds = PictureToRasterize::compute_device_bounds(
+                    &device_bounds.into(),
+                    &relative_matrix.invert().unwrap(),
+                );
+
+                canvas.reset_matrix();
+                canvas.set_matrix(&relative_matrix);
                 canvas.draw_image(
                     image,
-                    Point::new(device_bounds.left as f32, device_bounds.top as f32),
+                    Point::new((relative_bounds.left) as f32, (relative_bounds.top) as f32),
                     None,
                 );
                 canvas.restore();

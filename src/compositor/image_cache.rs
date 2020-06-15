@@ -1,17 +1,19 @@
-use skia_safe::{Image, Picture};
+use skia_safe::{Image, Picture, Matrix};
 use std::collections::HashMap;
 use std::fmt::{Debug, Error, Formatter};
 
 pub struct CachedImage {
     image: Image,
     was_used: bool,
+    matrix: Matrix,
 }
 
 impl CachedImage {
-    pub fn new(image: Image) -> Self {
+    pub fn new(image: Image, matrix: Matrix) -> Self {
         Self {
             image,
             was_used: false,
+            matrix
         }
     }
 
@@ -42,24 +44,15 @@ impl ImageCache {
             images: HashMap::new(),
         }
     }
-    pub fn push_picture_image(&mut self, picture: &Picture, image: Image) {
-        self.images
-            .insert(picture.unique_id(), CachedImage::new(image));
-    }
-    pub fn push_id_image(&mut self, picture_id: u32, image: Image) {
-        self.images.insert(picture_id, CachedImage::new(image));
+
+    pub fn push_id_image(&mut self, picture_id: u32, image: Image, matrix: Matrix) {
+        self.images.insert(picture_id, CachedImage::new(image, matrix));
     }
 
-    pub fn pop_picture_image(&mut self, picture: &Picture) -> Option<Image> {
-        self.images
-            .remove(&picture.unique_id())
-            .and_then(|cached_image| Some(cached_image.image))
-    }
-
-    pub fn get_picture_image(&mut self, picture_id: u32) -> Option<&Image> {
+    pub fn get_picture_image(&mut self, picture_id: u32) -> Option<(&Image, Matrix)> {
         self.images.get_mut(&picture_id).and_then(|cached_image| {
             cached_image.mark_used();
-            Some(&cached_image.image)
+            Some((&cached_image.image, cached_image.matrix))
         })
     }
 

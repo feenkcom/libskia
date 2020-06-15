@@ -1,5 +1,5 @@
 use ordered_float::OrderedFloat;
-use skia_safe::{scalar, Color, Image, Path, Rect, Vector};
+use skia_safe::{scalar, Color, Image, Path, Rect, Vector, Matrix};
 use std::collections::hash_map::DefaultHasher;
 use std::collections::HashMap;
 use std::fmt::{Debug, Error, Formatter};
@@ -10,13 +10,15 @@ use std::cmp::{max, min};
 pub struct CachedShadowImage {
     image: Image,
     frames_to_purge: usize,
+    matrix: Matrix
 }
 
 impl CachedShadowImage {
-    pub fn new(image: Image) -> Self {
+    pub fn new(image: Image, matrix: Matrix) -> Self {
         Self {
             image,
             frames_to_purge: 1000,
+            matrix
         }
     }
 
@@ -134,10 +136,10 @@ impl ShadowCache {
         }
     }
 
-    pub fn get_shadow_image(&mut self, shadow: &Shadow) -> Option<&Image> {
+    pub fn get_shadow_image(&mut self, shadow: &Shadow) -> Option<(&Image, Matrix)> {
         self.images.get_mut(shadow).and_then(|cached_image| {
             cached_image.mark_used();
-            Some(&cached_image.image)
+            Some((&cached_image.image, cached_image.matrix))
         })
     }
 
@@ -145,8 +147,8 @@ impl ShadowCache {
         self.images.contains_key(shadow)
     }
 
-    pub fn push_shadow_image(&mut self, shadow: Shadow, image: Image) {
-        self.images.insert(shadow, CachedShadowImage::new(image));
+    pub fn push_shadow_image(&mut self, shadow: Shadow, image: Image, matrix: Matrix) {
+        self.images.insert(shadow, CachedShadowImage::new(image, matrix));
     }
 
     pub fn clear(&mut self) {

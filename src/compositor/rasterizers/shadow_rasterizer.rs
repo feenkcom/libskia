@@ -37,7 +37,7 @@ impl ShadowToRasterize {
         image: Option<Image>,
         stats: RasterizationStats,
     ) -> RasterizedShadow {
-        RasterizedShadow::new(self.shadow, image, stats)
+        RasterizedShadow::new(self.shadow, self.matrix, image, stats)
     }
 
     pub fn compute_device_bounds(bounds: &Rect, matrix: &Matrix) -> IRect {
@@ -53,14 +53,16 @@ impl ShadowToRasterize {
 pub struct RasterizedShadow {
     pub shadow: Shadow,
     pub image: Option<Image>,
+    pub matrix: Matrix,
     pub stats: RasterizationStats,
 }
 
 impl RasterizedShadow {
-    pub fn new(shadow: Shadow, image: Option<Image>, stats: RasterizationStats) -> Self {
+    pub fn new(shadow: Shadow, matrix: Matrix, image: Option<Image>, stats: RasterizationStats) -> Self {
         Self {
             shadow,
             image,
+            matrix,
             stats,
         }
     }

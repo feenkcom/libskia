@@ -148,8 +148,8 @@ impl<'canvas, 'compositor> CompositorContext<'canvas, 'compositor> {
         pictures
     }
 
-    pub fn add_rasterized_picture_image(&mut self, picture_id: u32, image: Image) {
-        self.image_cache.push_id_image(picture_id, image);
+    pub fn add_rasterized_picture_image(&mut self, picture_id: u32, image: Image, matrix: Matrix) {
+        self.image_cache.push_id_image(picture_id, image, matrix);
     }
 
     pub fn is_picture_rasterized(&self, picture_id: u32) -> bool {
@@ -159,7 +159,7 @@ impl<'canvas, 'compositor> CompositorContext<'canvas, 'compositor> {
     pub fn get_rasterized_picture_image_and_canvas(
         &mut self,
         picture_id: u32,
-    ) -> (Option<&Image>, &mut Canvas) {
+    ) -> (Option<(&Image, Matrix)>, &mut Canvas) {
         let image = self.image_cache.get_picture_image(picture_id);
         (image, self.canvas)
     }
@@ -190,14 +190,14 @@ impl<'canvas, 'compositor> CompositorContext<'canvas, 'compositor> {
         shadows
     }
 
-    pub fn add_rasterized_shadow_image(&mut self, shadow: Shadow, image: Image) {
-        self.shadow_cache.push_shadow_image(shadow, image);
+    pub fn add_rasterized_shadow_image(&mut self, shadow: Shadow, image: Image, matrix: Matrix) {
+        self.shadow_cache.push_shadow_image(shadow, image, matrix);
     }
 
     pub fn get_rasterized_shadow_image_and_canvas(
         &mut self,
         shadow: &Shadow,
-    ) -> (Option<&Image>, &mut Canvas) {
+    ) -> (Option<(&Image, Matrix)>, &mut Canvas) {
         let image = self.shadow_cache.get_shadow_image(shadow);
         (image, self.canvas)
     }
@@ -268,10 +268,11 @@ impl Compositor {
         ) {
             let picture_id = rasterized_picture.picture_id();
             let image = rasterized_picture.image;
+            let matrix = rasterized_picture.matrix;
             match image {
                 None => {}
                 Some(image) => {
-                    context.add_rasterized_picture_image(picture_id, image);
+                    context.add_rasterized_picture_image(picture_id, image, matrix);
                 }
             }
         }
@@ -282,9 +283,10 @@ impl Compositor {
         {
             let shadow = rasterized_shadow.shadow;
             let image = rasterized_shadow.image;
+            let matrix = rasterized_shadow.matrix;
             match image {
                 None => {}
-                Some(image) => context.add_rasterized_shadow_image(shadow, image),
+                Some(image) => context.add_rasterized_shadow_image(shadow, image, matrix),
             }
         }
 

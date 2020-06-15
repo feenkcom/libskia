@@ -38,13 +38,20 @@ impl PictureToRasterize {
         image: Option<Image>,
         stats: RasterizationStats,
     ) -> RasterizedPicture {
-        RasterizedPicture::new(self.picture, image, stats)
+        RasterizedPicture::new(self.picture, image, self.matrix, stats)
     }
 
     pub fn compute_device_bounds(bounds: &Rect, matrix: &Matrix) -> IRect {
         match matrix.map_rect_scale_translate(bounds) {
             None => bounds.round_out(),
             Some(bounds) => bounds.round_out(),
+        }
+    }
+
+    pub fn compute_device_bounds_rect(bounds: &Rect, matrix: &Matrix) -> Rect {
+        match matrix.map_rect_scale_translate(bounds) {
+            None => bounds.clone(),
+            Some(bounds) => bounds,
         }
     }
 }
@@ -63,14 +70,16 @@ impl Debug for PictureToRasterize {
 pub struct RasterizedPicture {
     pub picture: Arc<Picture>,
     pub image: Option<Image>,
+    pub matrix: Matrix,
     pub stats: RasterizationStats,
 }
 
 impl RasterizedPicture {
-    pub fn new(picture: Arc<Picture>, image: Option<Image>, stats: RasterizationStats) -> Self {
+    pub fn new(picture: Arc<Picture>, image: Option<Image>, matrix: Matrix, stats: RasterizationStats) -> Self {
         Self {
             picture,
             image,
+            matrix,
             stats,
         }
     }
