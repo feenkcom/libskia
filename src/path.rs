@@ -211,6 +211,20 @@ pub fn skia_path_contains_point(_path: *mut ValueBox<Path>, x: f32, y: f32) -> b
 }
 
 #[no_mangle]
+pub fn skia_path_stroke_contains_point(_path: *mut ValueBox<Path>, x: f32, y: f32, _paint_ptr: *mut ValueBox<Paint>) -> bool {
+    _path.with_not_null_return(false, |path| {
+        _paint_ptr.with_not_null_return(false, |paint| {
+            match paint.get_fill_path(path, None, None) {
+                None => { false },
+                Some(fill_path) => {
+                    fill_path.contains(Point::new(x, y))
+                },
+            }
+        })
+    })
+}
+
+#[no_mangle]
 pub fn skia_path_serialize(_path: *mut ValueBox<Path>, _data: *mut ValueBox<BoxerArray<u8>>) {
     _path.with(|path| {
         _data.with(|data| {
