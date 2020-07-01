@@ -1,8 +1,12 @@
+use std::fs::File;
+use std::io::Read;
+use std::io::Write;
 use boxer::array::BoxerArrayU8;
 use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::string::{BoxerString, BoxerStringPointer};
 use skia_safe::gpu::{BackendTexture, SurfaceOrigin};
 use skia_safe::image::CachingHint;
-use skia_safe::{AlphaType, ColorSpace, ColorType, Data, IPoint, ISize, Image, ImageInfo};
+use skia_safe::{AlphaType, ColorSpace, ColorType, Data, IPoint, ISize, Image, ImageInfo, EncodedImageFormat, Surface, Paint, FilterQuality, Matrix};
 
 #[no_mangle]
 pub fn skia_image_from_pixels(
@@ -30,6 +34,123 @@ pub fn skia_image_from_pixels(
        }
     })
 }
+
+
+#[no_mangle]
+pub fn skia_image_from_file(
+    _ptr_boxer_string: *mut BoxerString
+) -> *mut ValueBox<Image> {
+
+    let file_name = _ptr_boxer_string.with(|string| string.to_string());
+    let file = File::open(file_name);
+    if file.is_err() {
+        return std::ptr::null_mut();
+    }
+    let mut file = file.unwrap();
+    let mut buffer = vec![];
+    if file.read_to_end(&mut buffer).is_err() {
+        return std::ptr::null_mut();
+    }
+
+    let data = Data::new_copy(&buffer);
+    let my_image = Image::from_encoded(data, None);
+    if my_image.is_none() {
+        return std::ptr::null_mut();
+    }
+    let my_image = my_image.unwrap();
+
+    ValueBox::new(my_image).into_raw()
+}
+
+#[no_mangle]
+pub fn skia_image_from_buffer(
+    _buffer_ptr: *mut ValueBox<BoxerArrayU8>,
+    start: usize,
+    end: usize
+) -> *mut ValueBox<Image> {
+    _buffer_ptr.with_not_null_return(std::ptr::null_mut(), |buffer | {
+        match Image::decode_to_raster(&buffer.to_slice()[start..end], None) {
+            None => { std::ptr::null_mut()},
+            Some(image) => { ValueBox::new(image).into_raw() },
+        }
+    })
+}
+
+
+#[no_mangle]
+pub fn skia_image_to_file(
+    _image_ptr: *mut ValueBox<Image>,
+    _name_ptr_boxer_string: *mut BoxerString,
+    _encoding_ptr_boxer_string: *mut BoxerString,
+    quality: i32
+) -> i32 {
+    let file_name = _name_ptr_boxer_string.with(|string| string.to_string());
+    let encoding_name = _encoding_ptr_boxer_string.with(|string| string.to_string());
+    let encoding = match encoding_name.as_str() {
+        "PNG" => EncodedImageFormat::PNG,
+        "BMP" => EncodedImageFormat::BMP,
+        _ => EncodedImageFormat::JPEG
+    };
+
+    _image_ptr.with_not_null_return(-1, |image| {
+        let encoded = image.encode_to_data_with_quality(encoding, quality);
+        if encoded.is_none() {
+            return -2;
+        }
+        let encoded = encoded.unwrap();
+
+        let file = File::create(file_name);
+        if file.is_err() {
+            return -3;
+        }
+        let mut file = file.unwrap();
+        if file.write_all(&encoded).is_err() {
+            return -4;
+        }
+
+        return 0;    
+    })
+}
+
+#[no_mangle]
+pub fn skia_scale_image(
+    _image_ptr: *mut ValueBox<Image>,
+    new_x: i32,
+    new_y: i32,
+    keep_aspect_ratio: u32
+) -> *mut ValueBox<Image> {
+
+    _image_ptr.with_not_null_return(std::ptr::null_mut(), |image| {
+        let mut resize_x = (new_x as f32) / (image.width() as f32);
+        let mut resize_y = (new_y as f32) / (image.height() as f32);
+        let mut actual_x = new_x;
+        let mut actual_y = new_y;
+        if keep_aspect_ratio != 0 {
+            let resize = resize_x.min(resize_y);
+            resize_x = resize;
+            resize_y = resize;
+            actual_x = (resize_x * (image.width() as f32)) as i32;
+            actual_y = (resize_y * (image.height() as f32)) as i32;
+        }
+
+        let dimensions = ISize::new(actual_x, actual_y);
+        let surface = Surface::new_raster_n32_premul(dimensions);
+        if surface.is_none() {
+            return std::ptr::null_mut();
+        }
+        let mut surface = surface.unwrap();
+        let mut paint = Paint::default();
+        paint.set_anti_alias(true);
+        paint.set_filter_quality(FilterQuality::High);
+        surface.canvas().set_matrix(&Matrix::new_scale((resize_x, resize_y)));
+        surface.canvas().draw_image(image, IPoint::new(0, 0), Some(&paint));
+        surface.canvas().flush();
+        let out_image = surface.image_snapshot();
+
+        ValueBox::new(out_image).into_raw()
+    })
+}
+
 
 #[no_mangle]
 pub fn skia_image_get_image_info(_image_ptr: *mut ValueBox<Image>) -> *mut ValueBox<ImageInfo> {
