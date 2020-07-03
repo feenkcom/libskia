@@ -117,7 +117,8 @@ pub fn skia_scale_image(
     _image_ptr: *mut ValueBox<Image>,
     new_x: i32,
     new_y: i32,
-    keep_aspect_ratio: u32
+    keep_aspect_ratio: u32,
+    filter_quality: FilterQuality
 ) -> *mut ValueBox<Image> {
 
     _image_ptr.with_not_null_return(std::ptr::null_mut(), |image| {
@@ -141,7 +142,7 @@ pub fn skia_scale_image(
         let mut surface = surface.unwrap();
         let mut paint = Paint::default();
         paint.set_anti_alias(true);
-        paint.set_filter_quality(FilterQuality::High);
+        paint.set_filter_quality(filter_quality);
         surface.canvas().set_matrix(&Matrix::new_scale((resize_x, resize_y)));
         surface.canvas().draw_image(image, IPoint::new(0, 0), Some(&paint));
         surface.canvas().flush();
