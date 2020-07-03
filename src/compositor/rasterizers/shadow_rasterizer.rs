@@ -41,10 +41,7 @@ impl ShadowToRasterize {
     }
 
     pub fn compute_device_bounds(bounds: &Rect, matrix: &Matrix) -> IRect {
-        match matrix.map_rect_scale_translate(bounds) {
-            None => bounds.round_out(),
-            Some(bounds) => bounds.round_out(),
-        }
+        matrix.map_rect(bounds).0.round_out()
     }
 }
 

@@ -42,17 +42,11 @@ impl PictureToRasterize {
     }
 
     pub fn compute_device_bounds(bounds: &Rect, matrix: &Matrix) -> IRect {
-        match matrix.map_rect_scale_translate(bounds) {
-            None => bounds.round_out(),
-            Some(bounds) => bounds.round_out(),
-        }
+        matrix.map_rect(bounds).0.round_out()
     }
 
     pub fn compute_device_bounds_rect(bounds: &Rect, matrix: &Matrix) -> Rect {
-        match matrix.map_rect_scale_translate(bounds) {
-            None => bounds.clone(),
-            Some(bounds) => bounds,
-        }
+        matrix.map_rect(bounds).0
     }
 }
 
