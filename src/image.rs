@@ -81,16 +81,10 @@ pub fn skia_image_from_buffer(
 pub fn skia_image_to_file(
     _image_ptr: *mut ValueBox<Image>,
     _name_ptr_boxer_string: *mut BoxerString,
-    _encoding_ptr_boxer_string: *mut BoxerString,
+    encoding: EncodedImageFormat,
     quality: i32
 ) -> i32 {
     let file_name = _name_ptr_boxer_string.with(|string| string.to_string());
-    let encoding_name = _encoding_ptr_boxer_string.with(|string| string.to_string());
-    let encoding = match encoding_name.as_str() {
-        "PNG" => EncodedImageFormat::PNG,
-        "BMP" => EncodedImageFormat::BMP,
-        _ => EncodedImageFormat::JPEG
-    };
 
     _image_ptr.with_not_null_return(-1, |image| {
         let encoded = image.encode_to_data_with_quality(encoding, quality);
@@ -108,7 +102,7 @@ pub fn skia_image_to_file(
             return -4;
         }
 
-        return 0;    
+        return 0;
     })
 }
 
