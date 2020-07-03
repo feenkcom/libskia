@@ -117,7 +117,7 @@ pub fn skia_scale_image(
     _image_ptr: *mut ValueBox<Image>,
     new_x: i32,
     new_y: i32,
-    keep_aspect_ratio: u32,
+    keep_aspect_ratio: bool,
     filter_quality: FilterQuality
 ) -> *mut ValueBox<Image> {
 
@@ -126,7 +126,7 @@ pub fn skia_scale_image(
         let mut resize_y = (new_y as f32) / (image.height() as f32);
         let mut actual_x = new_x;
         let mut actual_y = new_y;
-        if keep_aspect_ratio != 0 {
+        if keep_aspect_ratio {
             let resize = resize_x.min(resize_y);
             resize_x = resize;
             resize_y = resize;
