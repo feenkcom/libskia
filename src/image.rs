@@ -1,12 +1,19 @@
-use std::fs::File;
-use std::io::Read;
-use std::io::Write;
 use boxer::array::BoxerArrayU8;
 use boxer::boxes::{ValueBox, ValueBoxPointer};
 use boxer::string::{BoxerString, BoxerStringPointer};
-use skia_safe::gpu::{BackendTexture, SurfaceOrigin};
+use skia_safe::gpu::gl::Enum;
+use skia_safe::gpu::gl::TextureInfo;
+use skia_safe::gpu::{BackendTexture, Context, MipMapped, SurfaceOrigin};
 use skia_safe::image::CachingHint;
-use skia_safe::{AlphaType, ColorSpace, ColorType, Data, IPoint, ISize, Image, ImageInfo, EncodedImageFormat, Surface, Paint, FilterQuality, Matrix};
+use skia_safe::{
+    AlphaType, ColorSpace, ColorType, Data, EncodedImageFormat, FilterQuality, IPoint, ISize,
+    Image, ImageInfo, Matrix, Paint, Surface,
+};
+use skia_safe::prelude::*;
+use std::fs::File;
+use std::io::Read;
+use std::io::Write;
+use std::ffi::c_void;
 
 #[no_mangle]
 pub fn skia_image_from_pixels(
@@ -35,12 +42,8 @@ pub fn skia_image_from_pixels(
     })
 }
 
-
 #[no_mangle]
-pub fn skia_image_from_file(
-    _ptr_boxer_string: *mut BoxerString
-) -> *mut ValueBox<Image> {
-
+pub fn skia_image_from_file(_ptr_boxer_string: *mut BoxerString) -> *mut ValueBox<Image> {
     let file_name = _ptr_boxer_string.with(|string| string.to_string());
     let file = File::open(file_name);
     if file.is_err() {
@@ -66,23 +69,23 @@ pub fn skia_image_from_file(
 pub fn skia_image_from_buffer(
     _buffer_ptr: *mut ValueBox<BoxerArrayU8>,
     start: usize,
-    end: usize
+    end: usize,
 ) -> *mut ValueBox<Image> {
-    _buffer_ptr.with_not_null_return(std::ptr::null_mut(), |buffer | {
-        match Image::decode_to_raster(&buffer.to_slice()[start..end], None) {
-            None => { std::ptr::null_mut()},
-            Some(image) => { ValueBox::new(image).into_raw() },
-        }
-    })
+    _buffer_ptr.with_not_null_return(
+        std::ptr::null_mut(),
+        |buffer| match Image::decode_to_raster(&buffer.to_slice()[start..end], None) {
+            None => std::ptr::null_mut(),
+            Some(image) => ValueBox::new(image).into_raw(),
+        },
+    )
 }
-
 
 #[no_mangle]
 pub fn skia_image_to_file(
     _image_ptr: *mut ValueBox<Image>,
     _name_ptr_boxer_string: *mut BoxerString,
     encoding: EncodedImageFormat,
-    quality: i32
+    quality: i32,
 ) -> i32 {
     let file_name = _name_ptr_boxer_string.with(|string| string.to_string());
 
@@ -112,9 +115,8 @@ pub fn skia_scale_image(
     new_x: i32,
     new_y: i32,
     keep_aspect_ratio: bool,
-    filter_quality: FilterQuality
+    filter_quality: FilterQuality,
 ) -> *mut ValueBox<Image> {
-
     _image_ptr.with_not_null_return(std::ptr::null_mut(), |image| {
         let mut resize_x = (new_x as f32) / (image.width() as f32);
         let mut resize_y = (new_y as f32) / (image.height() as f32);
@@ -137,8 +139,12 @@ pub fn skia_scale_image(
         let mut paint = Paint::default();
         paint.set_anti_alias(true);
         paint.set_filter_quality(filter_quality);
-        surface.canvas().set_matrix(&Matrix::new_scale((resize_x, resize_y)));
-        surface.canvas().draw_image(image, IPoint::new(0, 0), Some(&paint));
+        surface
+            .canvas()
+            .set_matrix(&Matrix::new_scale((resize_x, resize_y)));
+        surface
+            .canvas()
+            .draw_image(image, IPoint::new(0, 0), Some(&paint));
         surface.canvas().flush();
         let out_image = surface.image_snapshot();
 
@@ -146,6 +152,76 @@ pub fn skia_scale_image(
     })
 }
 
+#[no_mangle]
+pub fn skia_image_from_texture(
+    _context_ptr: *mut ValueBox<Context>,
+    target: Enum,
+    id: Enum,
+    width: i32,
+    height: i32,
+    color_type: ColorType,
+    alpha_type: AlphaType,
+    release_proc: Option<unsafe extern "C" fn(*mut c_void)>,
+    release_context: *mut c_void,
+) -> *mut ValueBox<Image> {
+    _context_ptr.with_not_null_return(std::ptr::null_mut(), |context| {
+        let texture_info = TextureInfo::from_target_and_id(target, id);
+        let backend_texture =
+            unsafe { BackendTexture::new_gl((width, height), MipMapped::No, texture_info) };
+
+        let texture = Image::from_texture_with_release_proc(
+            context,
+            &backend_texture,
+            SurfaceOrigin::BottomLeft,
+            color_type,
+            alpha_type,
+            None,
+            release_proc,
+            release_context,
+        );
+
+        match texture {
+            None => { std::ptr::null_mut() },
+            Some(texture) => { ValueBox::new(texture).into_raw() },
+        }
+    })
+}
+
+#[no_mangle]
+pub fn skia_image_from_backend_texture(
+    _context_ptr: *mut ValueBox<Context>,
+    _backend_texture_ptr: *mut ValueBox<BackendTexture>,
+    color_type: ColorType,
+    alpha_type: AlphaType,
+    release_proc: Option<unsafe extern "C" fn(*mut c_void)>,
+    release_context: *mut c_void,
+) -> *mut ValueBox<Image> {
+    _context_ptr.with_not_null_return(std::ptr::null_mut(), |context| {
+        _backend_texture_ptr.with_not_null_return(std::ptr::null_mut(), |backend_texture| {
+            let texture = Image::from_texture_with_release_proc(
+                context,
+                backend_texture,
+                SurfaceOrigin::BottomLeft,
+                color_type,
+                alpha_type,
+                None,
+                release_proc,
+                release_context);
+
+            match texture {
+                None => { std::ptr::null_mut() },
+                Some(texture) => { ValueBox::new(texture).into_raw() },
+            }
+        })
+    })
+}
+
+#[no_mangle]
+pub fn skia_image_get_ref_count(_image_ptr: *mut ValueBox<Image>) -> usize {
+    _image_ptr.with_not_null_return(0, |image| {
+        image.as_ref().native()._ref_cnt()
+    })
+}
 
 #[no_mangle]
 pub fn skia_image_get_image_info(_image_ptr: *mut ValueBox<Image>) -> *mut ValueBox<ImageInfo> {
