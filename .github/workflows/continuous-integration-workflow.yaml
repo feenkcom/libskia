@@ -76,12 +76,12 @@ jobs:
     strategy:
       matrix:
         variant:
-          - os: ubuntu-latest
+          - os: ubuntu-16.04
             prefix: lib
             extension: .so
             platform: linux
-            distro: bionic
-            clang: 11
+            distro: xenial
+            clang: 10
             gcc: 10
           - os: macos-latest
             prefix: lib
