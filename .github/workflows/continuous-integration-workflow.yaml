@@ -82,7 +82,7 @@ jobs:
             platform: linux
             distro: xenial
             clang: 10
-            gcc: 10
+            gcc: 9
           - os: macos-latest
             prefix: lib
             extension: .dylib
