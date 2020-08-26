@@ -7,8 +7,10 @@ extern crate num_cpus;
 extern crate num_enum;
 extern crate ordered_float;
 extern crate skia_safe;
+extern crate widestring;
 
 use std::os::raw::c_void;
+use skia_safe::icu;
 
 pub mod binary;
 pub mod canvas;
@@ -28,6 +30,7 @@ pub mod image_info;
 pub mod layer;
 pub mod matrix;
 pub mod paint;
+pub mod paragraph;
 pub mod path;
 pub mod picture;
 pub mod recorder;
@@ -42,6 +45,11 @@ pub mod types;
 #[no_mangle]
 pub fn skia_test() -> bool {
     true
+}
+
+#[no_mangle]
+pub fn skia_icu_init() {
+    icu::init();
 }
 
 #[no_mangle]

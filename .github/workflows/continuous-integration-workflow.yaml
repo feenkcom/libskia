@@ -48,7 +48,7 @@ jobs:
         shell: powershell
       
       - name: Test certificates
-        if: matrix.variant.os == 'windows-latest'
+        if: startsWith(matrix.variant.os,'windows')
         run: python ./scripts/test_certificate.py
 
       - name: Install Rust stable
@@ -80,19 +80,45 @@ jobs:
             prefix: lib
             extension: .so
             platform: linux
+            distro: bionic
+            clang: 11
+            gcc: 10
           - os: macos-latest
             prefix: lib
             extension: .dylib
             platform: osx
     steps:
       - name: Install dependencies (Linux)
-        if: matrix.variant.os == 'ubuntu-latest'
+        if: startsWith(matrix.variant.os,'ubuntu')
         run: |
           sudo apt-get update
           sudo apt-get install libgl1-mesa-dev
+          sudo apt-get autoremove clang-9 g++ gcc
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo apt-add-repository "deb http://apt.llvm.org/${{matrix.variant.distro}}/ llvm-toolchain-${{matrix.variant.distro}}-${{matrix.variant.clang}} main"
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+          sudo apt --fix-broken install
+          sudo apt update
+          sudo apt install clang-${{matrix.variant.clang}}
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-${{matrix.variant.clang}} 120
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${{matrix.variant.clang}} 120
+          sudo update-alternatives --config clang
+          sudo apt install gcc-snapshot -y
+          sudo apt update
+          sudo apt install gcc-${{matrix.variant.gcc}} g++-${{matrix.variant.gcc}}
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-${{matrix.variant.gcc}} 120
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${{matrix.variant.gcc}} 120
+          sudo update-alternatives --config g++
+          sudo update-alternatives --config gcc
+          whereis clang
+          whereis c++
+          clang --version
+          clang++ --version
+          c++ --version
+          strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX
 
       - name: Install dependencies (MacOS)
-        if: matrix.variant.os == 'macos-latest'
+        if: startsWith(matrix.variant.os,'macos')
         run: |
           brew uninstall llvm
 

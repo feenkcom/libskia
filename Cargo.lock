@@ -115,7 +115,7 @@ checksum = "0d8c1fef690941d3e7788d328517591fecc684c084084702d6ff1641e993699a"
 [[package]]
 name = "boxer"
 version = "0.1.0"
-source = "git+https://github.com/feenkcom/gtoolkit-boxer#0d9d6a18a7fe68e91c5e53dacaa5c5f57bfd8e98"
+source = "git+https://github.com/feenkcom/gtoolkit-boxer?rev=200046a25bc6dcc05740f653713a5af6a0b5355b#200046a25bc6dcc05740f653713a5af6a0b5355b"
 
 [[package]]
 name = "byteorder"
@@ -722,6 +722,7 @@ dependencies = [
  "ordered-float",
  "skia-safe",
  "typename",
+ "widestring",
 ]
 
 [[package]]
@@ -1226,7 +1227,7 @@ checksum = "7fdf1b9db47230893d76faad238fd6097fd6d6a9245cd7a4d90dbd639536bbd2"
 [[package]]
 name = "skia-bindings"
 version = "0.33.0"
-source = "git+https://github.com/syrel/rust-skia?rev=15208b24604fa4689793e78278497372b95f2ae1#15208b24604fa4689793e78278497372b95f2ae1"
+source = "git+https://github.com/syrel/rust-skia?rev=77bf48004e0993babc718f418fa6c98a10ce8b69#77bf48004e0993babc718f418fa6c98a10ce8b69"
 dependencies = [
  "bindgen",
  "cc",
@@ -1242,7 +1243,7 @@ dependencies = [
 [[package]]
 name = "skia-safe"
 version = "0.33.0"
-source = "git+https://github.com/syrel/rust-skia?rev=15208b24604fa4689793e78278497372b95f2ae1#15208b24604fa4689793e78278497372b95f2ae1"
+source = "git+https://github.com/syrel/rust-skia?rev=77bf48004e0993babc718f418fa6c98a10ce8b69#77bf48004e0993babc718f418fa6c98a10ce8b69"
 dependencies = [
  "bitflags",
  "lazy_static",
@@ -1509,6 +1510,12 @@ checksum = "d011071ae14a2f6671d0b74080ae0cd8ebf3a6f8c9589a2cd45f23126fe29724"
 dependencies = [
  "libc",
 ]
+
+[[package]]
+name = "widestring"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a763e303c0e0f23b0da40888724762e802a8ffefbc22de4127ef42493c2ea68c"
 
 [[package]]
 name = "winapi"

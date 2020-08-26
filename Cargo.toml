@@ -7,14 +7,15 @@ authors = ["Aliaksei Syrel <alex.syrel@gmail.com>"]
 typename = "0.1.1"
 float-cmp = "0.6.0"
 ordered-float = "1.0.2"
-skia-safe = { git = "https://github.com/syrel/rust-skia", rev = "15208b24604fa4689793e78278497372b95f2ae1", features = [ "gl" ] }
+skia-safe = { git = "https://github.com/syrel/rust-skia", rev = "77bf48004e0993babc718f418fa6c98a10ce8b69", features = [ "gl", "textlayout" ] }
 libc = "0.2.68"
-boxer = { git = "https://github.com/feenkcom/gtoolkit-boxer" }
+boxer = { git = "https://github.com/feenkcom/gtoolkit-boxer", rev = "200046a25bc6dcc05740f653713a5af6a0b5355b" }
 crossbeam = "0.7.3"
 num_cpus = "1.0"
 byteorder = "1.3.4"
 num_enum = "0.4.3"
 glutin = { git = "https://github.com/syrel/glutin", rev ="0b1971f880f68ee3c2dd83e777b6f20be980c3b4" }
+widestring = "0.4.2"
 
 [patch.crates-io]
 winit = { git = "https://github.com/rust-windowing/winit", rev = "6cfddfea21319ef7e28f4a6dc16e119ab033f550" }

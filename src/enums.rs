@@ -10,6 +10,7 @@ use skia_safe::{
     PixelGeometry, TextEncoding, TileMode,
 };
 use text::font_style::FontStyleWidth;
+use skia_safe::textlayout::PlaceholderAlignment;
 
 #[no_mangle]
 pub fn skia_enums_filter_quality_to_string(_enum: FilterQuality, _string_ptr: *mut BoxerString) {
@@ -157,6 +158,14 @@ pub fn skia_rounded_rectangle_type_to_string(_enum: RRectType, _string_ptr: *mut
 
 #[no_mangle]
 pub fn skia_rounded_rectangle_corner_to_string(_enum: RRectCorner, _string_ptr: *mut BoxerString) {
+    CBox::with_optional_raw(_string_ptr, |option| match option {
+        None => {}
+        Some(string) => string.set_string(format!("{:?}", _enum)),
+    })
+}
+
+#[no_mangle]
+pub fn skia_placeholder_alignment_to_string(_enum: PlaceholderAlignment, _string_ptr: *mut BoxerString) {
     CBox::with_optional_raw(_string_ptr, |option| match option {
         None => {}
         Some(string) => string.set_string(format!("{:?}", _enum)),
