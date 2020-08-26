@@ -81,7 +81,7 @@ jobs:
             extension: .so
             platform: linux
             distro: xenial
-            clang: 10
+            clang: 9
             gcc: 9
           - os: macos-latest
             prefix: lib
