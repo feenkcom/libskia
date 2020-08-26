@@ -1,6 +1,6 @@
 use boxer::array::BoxerArray;
 use boxer::boxes::{ValueBox, ValueBoxPointer};
-use boxer::string::{BoxerString, BoxerStringPointer};
+use boxer::string::BoxerString;
 use boxer::{assert_box, function};
 use skia_safe::font::Edging;
 use skia_safe::{
@@ -163,7 +163,7 @@ pub fn skia_font_text_to_glyphs(
 #[no_mangle]
 pub fn skia_font_measure_text(
     _ptr: *mut ValueBox<Font>,
-    _text_ptr: *mut BoxerString,
+    _text_ptr: *mut ValueBox<BoxerString>,
     encoding: TextEncoding,
     _paint_ptr: *mut ValueBox<Paint>,
     _bounds_ptr: *mut ValueBox<Rect>,
@@ -172,7 +172,7 @@ pub fn skia_font_measure_text(
         _text_ptr.with(|text| {
             _paint_ptr.with(|paint| {
                 _bounds_ptr.with(|bounds| {
-                    let metrics = font.measure_text(text.to_slice_u8(), encoding, Some(paint));
+                    let metrics = font.measure_text(text.as_bytes(), encoding, Some(paint));
                     bounds.set_ltrb(
                         metrics.1.left,
                         metrics.1.top,

@@ -3,34 +3,32 @@ extern crate typename;
 use self::typename::TypeName;
 use super::*;
 use boxer::string::BoxerString;
-use boxer::CBox;
+use boxer::boxes::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
-pub fn skia_scalar_name(_ptr: *mut BoxerString) {
-    CBox::with_raw(_ptr, |string| {
-        string.set_string(skia_safe::scalar::type_name());
-    })
+pub fn skia_scalar_name(_ptr: *mut ValueBox<BoxerString>) {
+    _ptr.with_not_null(|string| string.set_string(skia_safe::scalar::type_name()))
 }
 
 #[no_mangle]
-pub fn skia_glyph_id_name(_ptr: *mut BoxerString) {
-    CBox::with_raw(_ptr, |string| {
-        string.set_string(skia_safe::GlyphId::type_name());
-    })
+pub fn skia_glyph_id_name(_ptr: *mut ValueBox<BoxerString>) {
+    _ptr.with_not_null(|string| string.set_string(skia_safe::GlyphId::type_name()))
 }
 
 #[test]
 fn scalar_name() {
-    let _string_ptr = CBox::into_raw(BoxerString::default());
+    let _string_ptr = ValueBox::new(BoxerString::new()).into_raw();
     skia_scalar_name(_string_ptr);
-    let string = unsafe { CBox::from_raw(_string_ptr) };
-    assert_eq!(string.to_string(), "f32");
+    _string_ptr.with(|string| {
+        assert_eq!(string.to_string(), "f32");
+    });
 }
 
 #[test]
 fn glyph_id_name() {
-    let _string_ptr = CBox::into_raw(BoxerString::default());
+    let _string_ptr = ValueBox::new(BoxerString::new()).into_raw();
     skia_glyph_id_name(_string_ptr);
-    let string = unsafe { CBox::from_raw(_string_ptr) };
-    assert_eq!(string.to_string(), "u16");
+    _string_ptr.with(|string| {
+        assert_eq!(string.to_string(), "u16");
+    });
 }

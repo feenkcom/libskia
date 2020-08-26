@@ -1,6 +1,6 @@
 use boxer::boxes::{ValueBox, ValueBoxPointer, ReferenceBox, ReferenceBoxPointer};
 use skia_safe::textlayout::{ParagraphBuilder, ParagraphStyle, FontCollection, Paragraph, TextStyle, PlaceholderStyle};
-use boxer::string::{BoxerString, BoxerStringPointer};
+use boxer::string::BoxerString;
 use skia_safe::Canvas;
 
 #[no_mangle]
@@ -21,7 +21,7 @@ pub fn skia_paragraph_builder_build(paragraph_builder_ptr: *mut ValueBox<Paragra
 
 /// Add a text to the paragraph by copying it
 #[no_mangle]
-pub fn skia_paragraph_builder_add_text(paragraph_builder_ptr: *mut ValueBox<ParagraphBuilder>, string_ptr: *mut BoxerString) {
+pub fn skia_paragraph_builder_add_text(paragraph_builder_ptr: *mut ValueBox<ParagraphBuilder>, string_ptr: *mut ValueBox<BoxerString>) {
     paragraph_builder_ptr.with_not_null(|paragraph_builder| {
         string_ptr.with_not_null(|string| {
             paragraph_builder.add_text(string.to_string());

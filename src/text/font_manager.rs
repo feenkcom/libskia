@@ -1,6 +1,6 @@
 use boxer::array::BoxerArrayU8;
 use boxer::boxes::{ValueBox, ValueBoxPointer};
-use boxer::string::{BoxerString, BoxerStringPointer};
+use boxer::string::BoxerString;
 use skia_safe::font_style::{Slant, Weight};
 use skia_safe::{FontMgr, FontStyle, FontStyleSet, Typeface};
 use text::font_style::FontStyleWidth;
@@ -18,11 +18,11 @@ pub fn skia_font_manager_count_families(_font_manager_ptr: *mut ValueBox<FontMgr
 #[no_mangle]
 pub fn skia_font_manager_get_family_name_at(
     _font_manager_ptr: *mut ValueBox<FontMgr>,
-    _name_ptr: *mut BoxerString,
+    _name_ptr: *mut ValueBox<BoxerString>,
     index: usize,
 ) {
     _font_manager_ptr.with(|font_manager| {
-        _name_ptr.with(|name| {
+        _name_ptr.with_not_null(|name| {
             name.set_string(font_manager.family_name(index));
         })
     });
@@ -46,7 +46,7 @@ pub fn skia_font_manager_new_typeface_from_data(
 #[no_mangle]
 pub fn skia_font_manager_match_family(
     _font_manager_ptr: *mut ValueBox<FontMgr>,
-    _name_ptr: *mut BoxerString,
+    _name_ptr: *mut ValueBox<BoxerString>,
 ) -> *mut ValueBox<FontStyleSet> {
     _font_manager_ptr.with(|font_manager| {
         _name_ptr.with(|name| ValueBox::new(font_manager.match_family(name.to_string())).into_raw())
@@ -56,7 +56,7 @@ pub fn skia_font_manager_match_family(
 #[no_mangle]
 pub fn skia_font_manager_match_family_style(
     _font_manager_ptr: *mut ValueBox<FontMgr>,
-    _name_ptr: *mut BoxerString,
+    _name_ptr: *mut ValueBox<BoxerString>,
     weight: i32,
     width: FontStyleWidth,
     slant: Slant,

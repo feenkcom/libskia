@@ -1,6 +1,5 @@
 use boxer::boxes::{ValueBox, ValueBoxPointer};
 use boxer::string::BoxerString;
-use boxer::CBox;
 use boxer::{assert_box, function};
 use skia_safe::gpu::gl::Interface;
 use skia_safe::gpu::Context;
@@ -22,12 +21,12 @@ pub fn skia_interface_new_native() -> *mut ValueBox<Interface> {
 
 #[no_mangle]
 pub fn skia_interface_new_load_with(
-    callback: extern "C" fn(*mut BoxerString) -> *const c_void,
+    callback: extern "C" fn(*mut ValueBox<BoxerString>) -> *const c_void,
 ) -> *mut ValueBox<Interface> {
     match Interface::new_load_with(|symbol| {
-        let boxer_string = CBox::into_raw(BoxerString::from_slice(symbol));
+        let boxer_string = ValueBox::new(BoxerString::from_string(symbol.to_string())).into_raw();
         let func_ptr = callback(boxer_string);
-        CBox::drop(boxer_string);
+        boxer_string.drop();
         if cfg!(debug_assertions) {
             eprintln!(
                 "[skia_interface_new_load_with] GL func: {:?}; address: {:?}",

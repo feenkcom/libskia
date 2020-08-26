@@ -1,6 +1,6 @@
 use boxer::array::BoxerArrayU8;
 use boxer::boxes::{ValueBox, ValueBoxPointer};
-use boxer::string::{BoxerString, BoxerStringPointer};
+use boxer::string::BoxerString;
 use skia_safe::gpu::gl::Enum;
 use skia_safe::gpu::gl::TextureInfo;
 use skia_safe::gpu::{BackendTexture, Context, MipMapped, SurfaceOrigin};
@@ -43,7 +43,7 @@ pub fn skia_image_from_pixels(
 }
 
 #[no_mangle]
-pub fn skia_image_from_file(_ptr_boxer_string: *mut BoxerString) -> *mut ValueBox<Image> {
+pub fn skia_image_from_file(_ptr_boxer_string: *mut ValueBox<BoxerString>) -> *mut ValueBox<Image> {
     let file_name = _ptr_boxer_string.with(|string| string.to_string());
     let file = File::open(file_name);
     if file.is_err() {
@@ -83,7 +83,7 @@ pub fn skia_image_from_buffer(
 #[no_mangle]
 pub fn skia_image_to_file(
     _image_ptr: *mut ValueBox<Image>,
-    _name_ptr_boxer_string: *mut BoxerString,
+    _name_ptr_boxer_string: *mut ValueBox<BoxerString>,
     encoding: EncodedImageFormat,
     quality: i32,
 ) -> i32 {

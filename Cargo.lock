@@ -115,7 +115,10 @@ checksum = "0d8c1fef690941d3e7788d328517591fecc684c084084702d6ff1641e993699a"
 [[package]]
 name = "boxer"
 version = "0.1.0"
-source = "git+https://github.com/feenkcom/gtoolkit-boxer?rev=200046a25bc6dcc05740f653713a5af6a0b5355b#200046a25bc6dcc05740f653713a5af6a0b5355b"
+source = "git+https://github.com/feenkcom/gtoolkit-boxer?rev=f004b8cfabe8ab7e2e9d4ab720c248d71759256b#f004b8cfabe8ab7e2e9d4ab720c248d71759256b"
+dependencies = [
+ "widestring",
+]
 
 [[package]]
 name = "byteorder"
