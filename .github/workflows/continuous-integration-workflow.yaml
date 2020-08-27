@@ -76,11 +76,11 @@ jobs:
     strategy:
       matrix:
         variant:
-          - os: ubuntu-16.04
+          - os: ubuntu-latest
             prefix: lib
             extension: .so
             platform: linux
-            distro: xenial
+            distro: bionic
             clang: 9
             gcc: 9
           - os: macos-latest
@@ -92,7 +92,10 @@ jobs:
         if: startsWith(matrix.variant.os,'ubuntu')
         run: |
           sudo apt-get update
-          sudo apt-get install libgl1-mesa-dev
+          sudo apt install git curl clang pkg-config libssl-dev libgl1-mesa-dev libfontconfig1-dev
+      - name: Update compilers (Linux)
+        if: ${{ false }}
+        run: |
           sudo apt-get autoremove clang-9 g++ gcc
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
           sudo apt-add-repository "deb http://apt.llvm.org/${{matrix.variant.distro}}/ llvm-toolchain-${{matrix.variant.distro}}-${{matrix.variant.clang}} main"
