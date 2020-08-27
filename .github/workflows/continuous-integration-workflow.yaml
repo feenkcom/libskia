@@ -96,12 +96,12 @@ jobs:
       - name: Update clang (Linux)
         if: ${{ true && startsWith(matrix.variant.os,'ubuntu') }}
         run: |
-          sudo apt autoremove clang-6 clang-8 clang-9
+          sudo apt autoremove clang-8 clang-9
           sudo apt install clang
       - name: Update compilers (Linux)
         if: ${{ false && startsWith(matrix.variant.os,'ubuntu') }}
         run: |
-          sudo apt-get autoremove clang-6 clang-8 clang-9 g++ gcc
+          sudo apt-get autoremove clang-8 clang-9 g++ gcc
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
           sudo apt-add-repository "deb http://apt.llvm.org/${{matrix.variant.distro}}/ llvm-toolchain-${{matrix.variant.distro}}-${{matrix.variant.clang}} main"
           sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
