@@ -1,6 +1,7 @@
 use boxer::boxes::{ValueBox, ValueBoxPointer};
 use skia_safe::textlayout::TextStyle;
-use skia_safe::{scalar, Color, Paint};
+use skia_safe::{scalar, Color, Paint, FontStyle};
+use boxer::string::BoxerString;
 
 #[no_mangle]
 pub fn skia_paragraph_text_style_new() -> *mut ValueBox<TextStyle> {
@@ -11,6 +12,13 @@ pub fn skia_paragraph_text_style_new() -> *mut ValueBox<TextStyle> {
 pub fn skia_paragraph_text_style_get_font_size(text_style_ptr: *mut ValueBox<TextStyle>) -> scalar {
     text_style_ptr.with_not_null_return(0.0, |style| {
         style.font_size()
+    })
+}
+
+#[no_mangle]
+pub fn skia_paragraph_text_style_set_font_size(text_style_ptr: *mut ValueBox<TextStyle>, font_size: scalar) {
+    text_style_ptr.with_not_null(|style| {
+        style.set_font_size(font_size);
     })
 }
 
@@ -78,6 +86,24 @@ pub fn skia_paragraph_text_style_set_background(text_style_ptr: *mut ValueBox<Te
     text_style_ptr.with_not_null( |style| {
         paint_ptr.with_not_null_value(|paint| {
             style.set_background_color(paint);
+        })
+    })
+}
+
+#[no_mangle]
+pub fn skia_paragraph_text_style_set_font_style(text_style_ptr: *mut ValueBox<TextStyle>, font_style_ptr: *mut ValueBox<FontStyle>) {
+    text_style_ptr.with_not_null(|text_style| {
+        font_style_ptr.with_not_null_value(|font_style| {
+            text_style.set_font_style(font_style);
+        })
+    })
+}
+
+#[no_mangle]
+pub fn skia_paragraph_text_style_set_font_family(text_style_ptr: *mut ValueBox<TextStyle>, font_family_ptr: *mut ValueBox<BoxerString>) {
+    text_style_ptr.with_not_null(|text_style| {
+        font_family_ptr.with_not_null(|font_family| {
+            text_style.set_font_families(&[font_family.as_str()]);
         })
     })
 }
