@@ -81,7 +81,7 @@ jobs:
             extension: .so
             platform: linux
             distro: bionic
-            clang: 6
+            clang: 10
             gcc: 9
           - os: macos-latest
             prefix: lib
@@ -92,25 +92,24 @@ jobs:
         if: startsWith(matrix.variant.os,'ubuntu')
         run: |
           sudo apt-get update
-          sudo apt install git curl clang pkg-config libssl-dev libgl1-mesa-dev libfontconfig1-dev
+          sudo apt install pkg-config libssl-dev libgl1-mesa-dev libfontconfig1-dev
       - name: Update clang (Linux)
         if: ${{ true && startsWith(matrix.variant.os,'ubuntu') }}
         run: |
           sudo apt autoremove clang-8 clang-9
-          sudo apt install clang
-      - name: Update compilers (Linux)
-        if: ${{ false && startsWith(matrix.variant.os,'ubuntu') }}
-        run: |
-          sudo apt-get autoremove clang-8 clang-9 g++ gcc
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
           sudo apt-add-repository "deb http://apt.llvm.org/${{matrix.variant.distro}}/ llvm-toolchain-${{matrix.variant.distro}}-${{matrix.variant.clang}} main"
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-          sudo apt --fix-broken install
           sudo apt update
           sudo apt install clang-${{matrix.variant.clang}}
           sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-${{matrix.variant.clang}} 120
           sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${{matrix.variant.clang}} 120
           sudo update-alternatives --config clang
+      - name: Update gcc (Linux)
+        if: ${{ false && startsWith(matrix.variant.os,'ubuntu') }}
+        run: |
+          sudo apt-get autoremove g++ gcc
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+          sudo apt update
           sudo apt install gcc-snapshot -y
           sudo apt update
           sudo apt install gcc-${{matrix.variant.gcc}} g++-${{matrix.variant.gcc}}
@@ -118,13 +117,14 @@ jobs:
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${{matrix.variant.gcc}} 120
           sudo update-alternatives --config g++
           sudo update-alternatives --config gcc
+      - name: Check versions (Linux)
+        if: ${{ true && startsWith(matrix.variant.os,'ubuntu') }}
+        run: |
           whereis clang
-          whereis c++
+          whereis gcc
           clang --version
-          clang++ --version
-          c++ --version
+          gcc --version
           strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX
-
       - name: Install dependencies (MacOS)
         if: startsWith(matrix.variant.os,'macos')
         run: |
