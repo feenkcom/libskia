@@ -4,7 +4,7 @@ use boxer::point::BoxerPointF32;
 use boxer::string::BoxerString;
 use skia_safe::textlayout::{Paragraph, PlaceholderStyle, RectHeightStyle, RectWidthStyle, TextBoxes, PositionWithAffinity, LineMetricsVector, TextBox};
 use skia_safe::{scalar, Canvas, Point};
-use std::ops::Range;
+use std::ops::{Range, Index};
 
 #[derive(Debug)]
 pub enum ParagraphPiece {
@@ -14,14 +14,22 @@ pub enum ParagraphPiece {
 
 pub struct ParagraphText {
     pieces: Vec<ParagraphPiece>,
+    char_count: usize,
 }
 
 impl ParagraphText {
     pub fn new() -> Self {
-        Self { pieces: vec![] }
+        Self { pieces: vec![], char_count: 0 }
     }
+
+    pub fn char_count(&self) -> usize {
+        self.char_count
+    }
+
     pub fn add_text(&mut self, text: BoxerString) {
+        let char_count = text.char_count();
         self.pieces.push(ParagraphPiece::Text(text));
+        self.char_count = self.char_count + char_count;
     }
 
     pub fn add_placeholder(&mut self, placeholder: PlaceholderStyle) {
@@ -102,6 +110,8 @@ impl ParagraphText {
         }
         current_char_index
     }
+
+
 }
 
 pub struct ParagraphWithText {
@@ -144,6 +154,10 @@ impl ParagraphWithText {
         self.paragraph.get_line_metrics()
     }
 
+    pub fn line_number(&self) -> usize {
+        self.paragraph.line_number()
+    }
+
     pub fn height(&self) -> scalar {
         self.paragraph.height()
     }
@@ -152,9 +166,32 @@ impl ParagraphWithText {
         self.paragraph.longest_line()
     }
 
+    pub fn char_count(&self) -> usize {
+        self.text.char_count()
+    }
+
     pub fn get_rects_for_char_range(&self, range: Range<usize>, rect_height_style: RectHeightStyle, rect_width_style: RectWidthStyle) -> TextBoxes {
         let glyph_range = self.text.get_glyph_range_for_char_range(range);
         self.get_rects_for_range(glyph_range, rect_height_style, rect_width_style)
+    }
+
+    pub fn get_line_index_for_char(&self, index: usize) -> usize {
+        let glyph_range = self.text.get_glyph_range_for_char_index(index);
+
+        for (index, line) in self.get_line_metrics().iter().enumerate() {
+            if glyph_range.start < line.end_index {
+                return index;
+            }
+        }
+        self.line_number()
+    }
+
+    pub fn get_line_height(&self, index: usize) -> scalar {
+        if self.line_number() == 0 && index == 0 {
+            return self.height();
+        }
+
+        self.get_line_metrics().as_slice()[index].height as scalar
     }
 }
 
@@ -187,6 +224,16 @@ pub fn skia_paragraph_get_height(paragraph_ptr: *mut ValueBox<ParagraphWithText>
 #[no_mangle]
 pub fn skia_paragraph_get_longest_line(paragraph_ptr: *mut ValueBox<ParagraphWithText>) -> scalar {
     paragraph_ptr.with_not_null_return(0.0, |paragraph| paragraph.longest_line())
+}
+
+#[no_mangle]
+pub fn skia_paragraph_get_line_number(paragraph_ptr: *mut ValueBox<ParagraphWithText>) -> usize {
+    paragraph_ptr.with_not_null_return(0, |paragraph| paragraph.line_number())
+}
+
+#[no_mangle]
+pub fn skia_paragraph_get_char_count(paragraph_ptr: *mut ValueBox<ParagraphWithText>) -> usize {
+    paragraph_ptr.with_not_null_return(0, |paragraph| paragraph.char_count())
 }
 
 #[no_mangle]
@@ -300,6 +347,20 @@ pub fn skia_paragraph_get_char_position_at_coordinate(
             return 0;
         }
         paragraph.text.get_char_offset_for_glyph_offset(position.position as usize)
+    })
+}
+
+#[no_mangle]
+pub fn skia_paragraph_get_line_index_for_char(paragraph_ptr: *mut ValueBox<ParagraphWithText>, index: usize) -> usize {
+    paragraph_ptr.with_not_null_return(0, |paragraph| {
+        paragraph.get_line_index_for_char(index)
+    })
+}
+
+#[no_mangle]
+pub fn skia_paragraph_get_line_height(paragraph_ptr: *mut ValueBox<ParagraphWithText>, index: usize) -> scalar {
+    paragraph_ptr.with_not_null_return(0.0, |paragraph| {
+        paragraph.get_line_height(index)
     })
 }
 

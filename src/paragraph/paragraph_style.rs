@@ -38,6 +38,20 @@ pub fn skia_paragraph_style_set_height(paragraph_ptr: *mut ValueBox<ParagraphSty
 }
 
 #[no_mangle]
+pub fn skia_paragraph_style_set_max_lines(paragraph_ptr: *mut ValueBox<ParagraphStyle>, max_lines: usize) {
+    paragraph_ptr.with_not_null(|style| {
+        style.set_max_lines(if max_lines == usize::max_value() { None } else { Some(max_lines) });
+    })
+}
+
+#[no_mangle]
+pub fn skia_paragraph_style_get_max_lines(paragraph_ptr: *mut ValueBox<ParagraphStyle>) -> usize {
+    paragraph_ptr.with_not_null_return(0, |style| {
+        style.max_lines().unwrap_or(usize::max_value())
+    })
+}
+
+#[no_mangle]
 pub fn skia_paragraph_style_drop(ptr: *mut ValueBox<ParagraphStyle>) {
     ptr.drop()
 }
