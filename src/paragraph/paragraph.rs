@@ -3,18 +3,19 @@ use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer}
 use boxer::point::BoxerPointF32;
 use boxer::string::BoxerString;
 use skia_safe::textlayout::{
-    LineMetricsVector, Paragraph, PlaceholderStyle, PositionWithAffinity, RectHeightStyle,
-    RectWidthStyle, TextBox, TextBoxes,
+    Affinity, LineMetricsVector, Paragraph, PlaceholderStyle, PositionWithAffinity,
+    RectHeightStyle, RectWidthStyle, TextBox, TextBoxes,
 };
-use skia_safe::{scalar, Canvas, Point};
+use skia_safe::{scalar, Canvas, Point, Rect, Size};
 use std::ops::{Index, Range};
 
 pub type TabSize = usize;
+pub type CharLength = usize;
 
 #[derive(Debug)]
 pub enum ParagraphPiece {
     Text(BoxerString),
-    Placeholder(PlaceholderStyle),
+    Placeholder(PlaceholderStyle, CharLength),
 }
 
 pub struct ParagraphText {
@@ -42,15 +43,17 @@ impl ParagraphText {
         self.char_count = self.char_count + char_count;
     }
 
-    pub fn add_placeholder(&mut self, placeholder: PlaceholderStyle) {
-        self.pieces.push(ParagraphPiece::Placeholder(placeholder));
+    pub fn add_placeholder(&mut self, placeholder: PlaceholderStyle, char_length: CharLength) {
+        self.pieces
+            .push(ParagraphPiece::Placeholder(placeholder, char_length));
+        self.char_count = self.char_count + char_length;
     }
 
     pub fn get_glyph_range_for_char_range(&self, range: Range<usize>) -> Range<usize> {
-        let first_range = self.get_glyph_range_for_char_index(range.start);
-        let last_range = self.get_glyph_range_for_char_index(range.end - 1);
+        let first_range = self.get_glyph_offset_for_char_offset(range.start);
+        let last_range = self.get_glyph_offset_for_char_offset(range.end);
 
-        first_range.start..last_range.end
+        first_range..last_range
     }
 
     fn get_char_len(&self, ch: char, buf: &mut [u16]) -> usize {
@@ -60,36 +63,35 @@ impl ParagraphText {
         }
     }
 
-    pub fn get_glyph_range_for_char_index(&self, index: usize) -> Range<usize> {
+    pub fn get_glyph_offset_for_char_offset(&self, index: usize) -> usize {
         let mut current_char_index: usize = 0;
-        let mut glyph_range_start: usize = 0;
-        let mut glyph_range_end: usize = 0;
+        let mut current_glyph_index: usize = 0;
 
         let mut buf = [0; 2];
 
         for piece in &self.pieces {
+            if current_char_index >= index {
+                return current_glyph_index;
+            }
             match piece {
                 ParagraphPiece::Text(string) => {
                     for ch in string.as_str().chars() {
+                        if current_char_index >= index {
+                            return current_glyph_index;
+                        }
                         let n = self.get_char_len(ch, &mut buf);
 
-                        glyph_range_start = glyph_range_end;
-                        glyph_range_end = glyph_range_start + n;
-
-                        if current_char_index == index {
-                            return glyph_range_start..glyph_range_end;
-                        }
-
+                        current_glyph_index = current_glyph_index + n;
                         current_char_index = current_char_index + 1;
                     }
                 }
-                ParagraphPiece::Placeholder(_) => {
-                    glyph_range_start = glyph_range_start + 1;
-                    glyph_range_end = glyph_range_end + 1;
+                ParagraphPiece::Placeholder(_, char_length) => {
+                    current_glyph_index = current_glyph_index + 1;
+                    current_char_index = current_char_index + *char_length;
                 }
             }
         }
-        glyph_range_start..glyph_range_end
+        current_glyph_index
     }
 
     pub fn get_char_offset_for_glyph_offset(&self, index: usize) -> usize {
@@ -99,7 +101,7 @@ impl ParagraphText {
         let mut buf = [0; 2];
 
         for piece in &self.pieces {
-            if current_glyph_index == index {
+            if current_glyph_index >= index {
                 return current_char_index;
             }
             match piece {
@@ -118,10 +120,9 @@ impl ParagraphText {
 
                             // left part of the char
                             if n > 1 {
-                                 if target_glyph_offset <= (n / 2) {
-                                     return current_char_index;
-                                 }
-                                else {
+                                if target_glyph_offset <= (n / 2) {
+                                    return current_char_index;
+                                } else {
                                     return current_char_index + 1;
                                 }
                             }
@@ -131,8 +132,9 @@ impl ParagraphText {
                         current_char_index = current_char_index + 1;
                     }
                 }
-                ParagraphPiece::Placeholder(_) => {
+                ParagraphPiece::Placeholder(_, char_length) => {
                     current_glyph_index = current_glyph_index + 1;
+                    current_char_index = current_char_index + *char_length;
                 }
             }
         }
@@ -172,8 +174,94 @@ impl ParagraphWithText {
         self.paragraph.get_rects_for_placeholders()
     }
 
+    pub fn get_coordinate_outside_placeholder(
+        &self,
+        p: impl Into<Point>,
+        global_affinity: Option<Affinity>,
+    ) -> Point {
+        let coordinate: Point = p.into();
+
+        match self.get_placeholder_at_coordinate(coordinate) {
+            None => coordinate,
+            Some((placeholder, rect, affinity)) => {
+                let local_affinity = match global_affinity {
+                    None => affinity,
+                    Some(affinity) => affinity,
+                };
+
+                let new_coordinate = match local_affinity {
+                    Affinity::Upstream => Point::new(rect.right + 1.0, coordinate.y),
+                    Affinity::Downstream => Point::new(rect.left - 1.0, coordinate.y),
+                };
+                self.get_coordinate_outside_placeholder(new_coordinate, Some(affinity))
+            }
+        }
+    }
+
     pub fn get_glyph_position_at_coordinate(&self, p: impl Into<Point>) -> PositionWithAffinity {
-        self.paragraph.get_glyph_position_at_coordinate(p)
+        let point: Point = p.into();
+        let mut coordinate = self.get_coordinate_outside_placeholder(point, None);
+        self.paragraph.get_glyph_position_at_coordinate(coordinate)
+    }
+
+    pub fn get_placeholder_at_index(&self, index: usize) -> &PlaceholderStyle {
+        let placeholders: Vec<&PlaceholderStyle> =
+            (self.text.pieces.iter().map(|piece| match piece {
+                ParagraphPiece::Text(_) => None,
+                ParagraphPiece::Placeholder(placeholder, _) => Some(placeholder),
+            }))
+            .filter(|piece| piece.is_some())
+            .map(|placeholder| placeholder.unwrap())
+            .collect();
+
+        placeholders[index]
+    }
+
+    fn rect_contains(rect: &Rect, point: &Point) -> bool {
+        if point.x < rect.left || point.y < rect.top {
+            return false;
+        }
+        if point.x > rect.right || point.y > rect.bottom {
+            return false;
+        }
+        true
+    }
+
+    pub fn get_placeholder_at_coordinate(
+        &self,
+        p: impl Into<Point>,
+    ) -> Option<(&PlaceholderStyle, Rect, Affinity)> {
+        let point: Point = p.into();
+
+        let mut placeholder_index: usize = 0;
+
+        for rect in self.get_rects_for_placeholders().iter() {
+            if Self::rect_contains(&rect.rect, &point) {
+                let affinity = if point.x < rect.rect.center_x() {
+                    Affinity::Downstream
+                } else {
+                    Affinity::Upstream
+                };
+                let result = Some((
+                    self.get_placeholder_at_index(placeholder_index),
+                    rect.rect,
+                    affinity,
+                ));
+                return result;
+            }
+            placeholder_index = placeholder_index + 1;
+        }
+
+        None
+    }
+
+    pub fn get_char_position_at_coordinate(&self, p: impl Into<Point>) -> usize {
+        let position_with_affinity = self.get_glyph_position_at_coordinate(p);
+        if position_with_affinity.position < 0 {
+            return 0;
+        }
+        self.text
+            .get_char_offset_for_glyph_offset(position_with_affinity.position as usize)
     }
 
     pub fn get_line_metrics(&self) -> LineMetricsVector {
@@ -198,19 +286,19 @@ impl ParagraphWithText {
 
     pub fn get_rects_for_char_range(
         &self,
-        range: Range<usize>,
+        char_range: Range<usize>,
         rect_height_style: RectHeightStyle,
         rect_width_style: RectWidthStyle,
     ) -> TextBoxes {
-        let glyph_range = self.text.get_glyph_range_for_char_range(range);
+        let glyph_range = self.text.get_glyph_range_for_char_range(char_range.clone());
         self.get_rects_for_range(glyph_range, rect_height_style, rect_width_style)
     }
 
     pub fn get_line_index_for_char(&self, index: usize) -> usize {
-        let glyph_range = self.text.get_glyph_range_for_char_index(index);
+        let glyph_offset = self.text.get_glyph_offset_for_char_offset(index);
 
         for (index, line) in self.get_line_metrics().iter().enumerate() {
-            if glyph_range.start < line.end_index {
+            if glyph_offset <= line.end_index {
                 return index;
             }
         }
@@ -360,9 +448,8 @@ pub fn skia_paragraph_get_glyph_position_at_coordinate(
     y: scalar,
 ) -> i32 {
     paragraph_ptr.with_not_null_return(0, |paragraph| {
-        paragraph
-            .get_glyph_position_at_coordinate(Point::new(x, y))
-            .position
+        let position_with_affinity = paragraph.get_glyph_position_at_coordinate(Point::new(x, y));
+        position_with_affinity.position
     })
 }
 
@@ -373,13 +460,18 @@ pub fn skia_paragraph_get_char_position_at_coordinate(
     y: scalar,
 ) -> usize {
     paragraph_ptr.with_not_null_return(0, |paragraph| {
-        let position = paragraph.get_glyph_position_at_coordinate(Point::new(x, y));
-        if position.position < 0 {
-            return 0;
-        }
-        paragraph
-            .text
-            .get_char_offset_for_glyph_offset(position.position as usize)
+        paragraph.get_char_position_at_coordinate(Point::new(x, y))
+    })
+}
+
+#[no_mangle]
+pub fn skia_paragraph_get_glyph_range_for_char_range(
+    paragraph_ptr: *mut ValueBox<ParagraphWithText>,
+    start: usize,
+    end: usize,
+) -> *mut ValueBox<Range<usize>> {
+    paragraph_ptr.with_not_null_return(std::ptr::null_mut(), |paragraph| {
+        ValueBox::new(paragraph.text.get_glyph_range_for_char_range(start..end)).into_raw()
     })
 }
 

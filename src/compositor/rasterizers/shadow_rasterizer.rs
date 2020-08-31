@@ -8,8 +8,8 @@ use skia_safe::{
     Budgeted, Color, ColorSpace, IRect, Image, ImageInfo, Matrix, Paint, Rect, RoundOut, Surface,
     Vector,
 };
-use std::sync::Arc;
 use std::cmp::max;
+use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 pub struct ShadowToRasterize {
@@ -55,7 +55,12 @@ pub struct RasterizedShadow {
 }
 
 impl RasterizedShadow {
-    pub fn new(shadow: Shadow, matrix: Matrix, image: Option<Image>, stats: RasterizationStats) -> Self {
+    pub fn new(
+        shadow: Shadow,
+        matrix: Matrix,
+        image: Option<Image>,
+        stats: RasterizationStats,
+    ) -> Self {
         Self {
             shadow,
             image,
@@ -160,7 +165,11 @@ impl ShadowRasterizer {
                 let mut shadow_paint = Paint::default();
                 shadow_paint.set_style(Style::Stroke);
                 shadow_paint.set_color(Color::WHITE);
-                shadow_paint.set_stroke_width(if shadow.radius.0 > shadow.radius.1 { shadow.radius.0 } else { shadow.radius.1 });
+                shadow_paint.set_stroke_width(if shadow.radius.0 > shadow.radius.1 {
+                    shadow.radius.0
+                } else {
+                    shadow.radius.1
+                });
                 shadow_paint.set_image_filter(drop_shadow_filter);
 
                 canvas.draw_path(&shadow.path, &shadow_paint);

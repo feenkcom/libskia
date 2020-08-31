@@ -4,7 +4,9 @@ use compositor::image_cache::ImageCache;
 use compositor::layers::layer::Layer;
 use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
 use compositor::shadow_cache::Shadow;
-use skia_safe::{scalar, Canvas, Color, Image, Path, Picture, Point, RRect, Rect, RoundOut, Vector, Matrix};
+use skia_safe::{
+    scalar, Canvas, Color, Image, Matrix, Path, Picture, Point, RRect, Rect, RoundOut, Vector,
+};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt::{Debug, Error, Formatter};
@@ -91,7 +93,8 @@ impl Layer for ShadowLayer {
 
                 canvas.save();
 
-                let relative_matrix = Matrix::concat(&current_matrix, matrix.invert().as_ref().unwrap());
+                let relative_matrix =
+                    Matrix::concat(&current_matrix, matrix.invert().as_ref().unwrap());
 
                 let relative_bounds = PictureToRasterize::compute_device_bounds(
                     &device_bounds.into(),

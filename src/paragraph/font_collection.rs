@@ -8,7 +8,10 @@ pub fn skia_font_collection_new() -> *mut ValueBox<FontCollection> {
 }
 
 #[no_mangle]
-pub fn skia_font_collection_set_default_font_manager(font_collection_ptr: *mut ValueBox<FontCollection>, font_manager_ptr: *mut ValueBox<FontMgr>) {
+pub fn skia_font_collection_set_default_font_manager(
+    font_collection_ptr: *mut ValueBox<FontCollection>,
+    font_manager_ptr: *mut ValueBox<FontMgr>,
+) {
     font_collection_ptr.with_not_null(|collection| {
         font_manager_ptr.with_not_null_value(|manager| {
             collection.set_default_font_manager(manager, None);

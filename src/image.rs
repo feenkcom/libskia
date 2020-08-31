@@ -5,15 +5,15 @@ use skia_safe::gpu::gl::Enum;
 use skia_safe::gpu::gl::TextureInfo;
 use skia_safe::gpu::{BackendTexture, Context, MipMapped, SurfaceOrigin};
 use skia_safe::image::CachingHint;
+use skia_safe::prelude::*;
 use skia_safe::{
     AlphaType, ColorSpace, ColorType, Data, EncodedImageFormat, FilterQuality, IPoint, ISize,
     Image, ImageInfo, Matrix, Paint, Surface,
 };
-use skia_safe::prelude::*;
+use std::ffi::c_void;
 use std::fs::File;
 use std::io::Read;
 use std::io::Write;
-use std::ffi::c_void;
 
 #[no_mangle]
 pub fn skia_image_from_pixels(
@@ -181,8 +181,8 @@ pub fn skia_image_from_texture(
         );
 
         match texture {
-            None => { std::ptr::null_mut() },
-            Some(texture) => { ValueBox::new(texture).into_raw() },
+            None => std::ptr::null_mut(),
+            Some(texture) => ValueBox::new(texture).into_raw(),
         }
     })
 }
@@ -206,11 +206,12 @@ pub fn skia_image_from_backend_texture(
                 alpha_type,
                 None,
                 release_proc,
-                release_context);
+                release_context,
+            );
 
             match texture {
-                None => { std::ptr::null_mut() },
-                Some(texture) => { ValueBox::new(texture).into_raw() },
+                None => std::ptr::null_mut(),
+                Some(texture) => ValueBox::new(texture).into_raw(),
             }
         })
     })
@@ -218,9 +219,7 @@ pub fn skia_image_from_backend_texture(
 
 #[no_mangle]
 pub fn skia_image_get_ref_count(_image_ptr: *mut ValueBox<Image>) -> usize {
-    _image_ptr.with_not_null_return(0, |image| {
-        image.as_ref().native()._ref_cnt()
-    })
+    _image_ptr.with_not_null_return(0, |image| image.as_ref().native()._ref_cnt())
 }
 
 #[no_mangle]

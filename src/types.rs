@@ -2,8 +2,8 @@ extern crate typename;
 
 use self::typename::TypeName;
 use super::*;
-use boxer::string::BoxerString;
 use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::string::BoxerString;
 
 #[no_mangle]
 pub fn skia_scalar_name(_ptr: *mut ValueBox<BoxerString>) {

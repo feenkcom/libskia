@@ -3,7 +3,7 @@ use compositor::compositor::CompositorContext;
 use compositor::image_cache::ImageCache;
 use compositor::layers::layer::Layer;
 use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
-use skia_safe::{Canvas, Image, Picture, Point, Rect, RoundOut, Matrix};
+use skia_safe::{Canvas, Image, Matrix, Picture, Point, Rect, RoundOut};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt::{Debug, Error, Formatter};
@@ -61,7 +61,8 @@ impl Layer for PictureLayer {
 
                 canvas.save();
 
-                let relative_matrix = Matrix::concat(&current_matrix, matrix.invert().as_ref().unwrap());
+                let relative_matrix =
+                    Matrix::concat(&current_matrix, matrix.invert().as_ref().unwrap());
 
                 let relative_bounds = PictureToRasterize::compute_device_bounds(
                     &device_bounds.into(),
@@ -87,8 +88,9 @@ pub fn skia_picture_layer_new_picture(
 ) -> *mut ValueBox<Rc<RefCell<dyn Layer>>> {
     _picture_ptr.with_not_null_value_return_block(
         || {
-            let layer: Rc<RefCell<dyn Layer>> =
-                Rc::new(RefCell::new(PictureLayer::from_picture(Picture::new_placeholder(Rect::new(0.0, 0.0, 50.0, 50.0)))));
+            let layer: Rc<RefCell<dyn Layer>> = Rc::new(RefCell::new(PictureLayer::from_picture(
+                Picture::new_placeholder(Rect::new(0.0, 0.0, 50.0, 50.0)),
+            )));
             ValueBox::new(layer).into_raw()
         },
         |picture| {

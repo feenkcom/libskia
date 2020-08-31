@@ -1,22 +1,27 @@
-use boxer::boxes::{ValueBox, ValueBoxPointer, ReferenceBox, ReferenceBoxPointer};
-use skia_safe::textlayout::{ParagraphBuilder, ParagraphStyle, FontCollection, Paragraph, TextStyle, PlaceholderStyle};
+use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer};
 use boxer::string::BoxerString;
+use paragraph::paragraph::{CharLength, ParagraphText, ParagraphWithText, TabSize};
+use skia_safe::textlayout::{
+    FontCollection, Paragraph, ParagraphBuilder, ParagraphStyle, PlaceholderStyle, TextStyle,
+};
 use skia_safe::Canvas;
-use paragraph::paragraph::{ParagraphText, ParagraphWithText, TabSize};
-
 
 pub struct ParagraphBuilderWithText {
     builder: ParagraphBuilder,
     text: ParagraphText,
-    tab_size: TabSize
+    tab_size: TabSize,
 }
 
 impl ParagraphBuilderWithText {
-    pub fn new(style: &ParagraphStyle, font_collection: impl Into<FontCollection>, tab_size: TabSize) -> Self {
+    pub fn new(
+        style: &ParagraphStyle,
+        font_collection: impl Into<FontCollection>,
+        tab_size: TabSize,
+    ) -> Self {
         Self {
             builder: ParagraphBuilder::new(style, font_collection),
             text: ParagraphText::new(tab_size),
-            tab_size
+            tab_size,
         }
     }
 
@@ -28,9 +33,13 @@ impl ParagraphBuilderWithText {
         self.text.add_text(string);
     }
 
-    pub fn add_placeholder(&mut self, placeholder_style: PlaceholderStyle) {
+    pub fn add_placeholder(
+        &mut self,
+        placeholder_style: PlaceholderStyle,
+        char_length: CharLength,
+    ) {
         self.builder.add_placeholder(&placeholder_style);
-        self.text.add_placeholder(placeholder_style);
+        self.text.add_placeholder(placeholder_style, char_length);
     }
 
     pub fn set_paragraph_style(&mut self, style: &ParagraphStyle) {
@@ -51,24 +60,39 @@ impl ParagraphBuilderWithText {
 }
 
 #[no_mangle]
-pub fn skia_paragraph_builder_new(paragraph_style_ptr: *mut ValueBox<ParagraphStyle>, mut font_collection_ptr: *mut ValueBox<FontCollection>, tab_size: TabSize) -> *mut ValueBox<ParagraphBuilderWithText> {
+pub fn skia_paragraph_builder_new(
+    paragraph_style_ptr: *mut ValueBox<ParagraphStyle>,
+    mut font_collection_ptr: *mut ValueBox<FontCollection>,
+    tab_size: TabSize,
+) -> *mut ValueBox<ParagraphBuilderWithText> {
     paragraph_style_ptr.with_not_null_return(std::ptr::null_mut(), |style| {
-        font_collection_ptr.with_not_null_value_return_block(||{ std::ptr::null_mut() }, |font_collection| {
-            ValueBox::new(ParagraphBuilderWithText::new(style, font_collection, tab_size)).into_raw()
-        })
+        font_collection_ptr.with_not_null_value_return_block(
+            || std::ptr::null_mut(),
+            |font_collection| {
+                ValueBox::new(ParagraphBuilderWithText::new(
+                    style,
+                    font_collection,
+                    tab_size,
+                ))
+                .into_raw()
+            },
+        )
     })
 }
 
 #[no_mangle]
-pub fn skia_paragraph_builder_build(mut paragraph_builder_ptr: *mut ValueBox<ParagraphBuilderWithText>) -> *mut ValueBox<ParagraphWithText> {
-    paragraph_builder_ptr.with_value_consumed(|builder| {
-        ValueBox::new(builder.build()).into_raw()
-    })
+pub fn skia_paragraph_builder_build(
+    mut paragraph_builder_ptr: *mut ValueBox<ParagraphBuilderWithText>,
+) -> *mut ValueBox<ParagraphWithText> {
+    paragraph_builder_ptr.with_value_consumed(|builder| ValueBox::new(builder.build()).into_raw())
 }
 
 /// Add a text to the paragraph by copying it
 #[no_mangle]
-pub fn skia_paragraph_builder_add_text(paragraph_builder_ptr: *mut ValueBox<ParagraphBuilderWithText>, mut string_ptr: *mut ValueBox<BoxerString>) {
+pub fn skia_paragraph_builder_add_text(
+    paragraph_builder_ptr: *mut ValueBox<ParagraphBuilderWithText>,
+    mut string_ptr: *mut ValueBox<BoxerString>,
+) {
     paragraph_builder_ptr.with_not_null(|paragraph_builder| {
         string_ptr.with_not_null_value_consumed(|string| {
             paragraph_builder.add_text(string);
@@ -77,16 +101,23 @@ pub fn skia_paragraph_builder_add_text(paragraph_builder_ptr: *mut ValueBox<Para
 }
 
 #[no_mangle]
-pub fn skia_paragraph_builder_add_placeholder(paragraph_builder_ptr: *mut ValueBox<ParagraphBuilderWithText>, mut placeholder_ptr: *mut ValueBox<PlaceholderStyle>) {
+pub fn skia_paragraph_builder_add_placeholder(
+    paragraph_builder_ptr: *mut ValueBox<ParagraphBuilderWithText>,
+    mut placeholder_ptr: *mut ValueBox<PlaceholderStyle>,
+    char_length: CharLength,
+) {
     paragraph_builder_ptr.with_not_null(|paragraph_builder| {
         placeholder_ptr.with_not_null_value_consumed(|placeholder| {
-            paragraph_builder.add_placeholder(placeholder);
+            paragraph_builder.add_placeholder(placeholder, char_length);
         })
     })
 }
 
 #[no_mangle]
-pub fn skia_paragraph_builder_push_style(paragraph_builder_ptr: *mut ValueBox<ParagraphBuilderWithText>, style_ptr: *mut ValueBox<TextStyle>) {
+pub fn skia_paragraph_builder_push_style(
+    paragraph_builder_ptr: *mut ValueBox<ParagraphBuilderWithText>,
+    style_ptr: *mut ValueBox<TextStyle>,
+) {
     paragraph_builder_ptr.with_not_null(|paragraph_builder| {
         style_ptr.with_not_null(|style| {
             paragraph_builder.push_style(style);
@@ -95,7 +126,9 @@ pub fn skia_paragraph_builder_push_style(paragraph_builder_ptr: *mut ValueBox<Pa
 }
 
 #[no_mangle]
-pub fn skia_paragraph_builder_pop_style(paragraph_builder_ptr: *mut ValueBox<ParagraphBuilderWithText>) {
+pub fn skia_paragraph_builder_pop_style(
+    paragraph_builder_ptr: *mut ValueBox<ParagraphBuilderWithText>,
+) {
     paragraph_builder_ptr.with_not_null(|paragraph_builder| {
         paragraph_builder.pop_style();
     })

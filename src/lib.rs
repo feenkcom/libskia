@@ -9,8 +9,8 @@ extern crate ordered_float;
 extern crate skia_safe;
 extern crate widestring;
 
-use std::os::raw::c_void;
 use skia_safe::icu;
+use std::os::raw::c_void;
 
 pub mod binary;
 pub mod canvas;

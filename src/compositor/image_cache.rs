@@ -1,4 +1,4 @@
-use skia_safe::{Image, Picture, Matrix};
+use skia_safe::{Image, Matrix, Picture};
 use std::collections::HashMap;
 use std::fmt::{Debug, Error, Formatter};
 
@@ -13,7 +13,7 @@ impl CachedImage {
         Self {
             image,
             was_used: false,
-            matrix
+            matrix,
         }
     }
 
@@ -46,7 +46,8 @@ impl ImageCache {
     }
 
     pub fn push_id_image(&mut self, picture_id: u32, image: Image, matrix: Matrix) {
-        self.images.insert(picture_id, CachedImage::new(image, matrix));
+        self.images
+            .insert(picture_id, CachedImage::new(image, matrix));
     }
 
     pub fn get_picture_image(&mut self, picture_id: u32) -> Option<(&Image, Matrix)> {

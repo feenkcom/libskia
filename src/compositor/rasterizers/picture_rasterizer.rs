@@ -69,7 +69,12 @@ pub struct RasterizedPicture {
 }
 
 impl RasterizedPicture {
-    pub fn new(picture: Arc<Picture>, image: Option<Image>, matrix: Matrix, stats: RasterizationStats) -> Self {
+    pub fn new(
+        picture: Arc<Picture>,
+        image: Option<Image>,
+        matrix: Matrix,
+        stats: RasterizationStats,
+    ) -> Self {
         Self {
             picture,
             image,

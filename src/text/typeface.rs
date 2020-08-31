@@ -44,7 +44,10 @@ pub fn skia_typeface_get_font_style(_ptr: *mut ValueBox<Typeface>) -> *mut Value
 }
 
 #[no_mangle]
-pub fn skia_typeface_get_family_name(_ptr: *mut ValueBox<Typeface>, _ptr_string: *mut ValueBox<BoxerString>) {
+pub fn skia_typeface_get_family_name(
+    _ptr: *mut ValueBox<Typeface>,
+    _ptr_string: *mut ValueBox<BoxerString>,
+) {
     assert_box(_ptr, function!());
     _ptr.with_not_null(|typeface| {
         _ptr_string.with(|string| string.set_string(typeface.family_name()))
