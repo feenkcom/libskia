@@ -2,24 +2,29 @@ use boxer::boxes::{ValueBox, ValueBoxPointer, ReferenceBox, ReferenceBoxPointer}
 use skia_safe::textlayout::{ParagraphBuilder, ParagraphStyle, FontCollection, Paragraph, TextStyle, PlaceholderStyle};
 use boxer::string::BoxerString;
 use skia_safe::Canvas;
-use paragraph::paragraph::{ParagraphText, ParagraphWithText};
+use paragraph::paragraph::{ParagraphText, ParagraphWithText, TabSize};
 
 
 pub struct ParagraphBuilderWithText {
     builder: ParagraphBuilder,
-    text: ParagraphText
+    text: ParagraphText,
+    tab_size: TabSize
 }
 
 impl ParagraphBuilderWithText {
-    pub fn new(style: &ParagraphStyle, font_collection: impl Into<FontCollection>) -> Self {
+    pub fn new(style: &ParagraphStyle, font_collection: impl Into<FontCollection>, tab_size: TabSize) -> Self {
         Self {
             builder: ParagraphBuilder::new(style, font_collection),
-            text: ParagraphText::new()
+            text: ParagraphText::new(tab_size),
+            tab_size
         }
     }
 
     pub fn add_text(&mut self, string: BoxerString) {
-        self.builder.add_text(string.as_str());
+        let spaces: String = (0..self.tab_size).map(|i| ' ').collect();
+
+        let replaced_string = string.as_str().replace('\t', &spaces);
+        self.builder.add_text(replaced_string.as_str());
         self.text.add_text(string);
     }
 
@@ -46,10 +51,10 @@ impl ParagraphBuilderWithText {
 }
 
 #[no_mangle]
-pub fn skia_paragraph_builder_new(paragraph_style_ptr: *mut ValueBox<ParagraphStyle>, mut font_collection_ptr: *mut ValueBox<FontCollection>) -> *mut ValueBox<ParagraphBuilderWithText> {
+pub fn skia_paragraph_builder_new(paragraph_style_ptr: *mut ValueBox<ParagraphStyle>, mut font_collection_ptr: *mut ValueBox<FontCollection>, tab_size: TabSize) -> *mut ValueBox<ParagraphBuilderWithText> {
     paragraph_style_ptr.with_not_null_return(std::ptr::null_mut(), |style| {
         font_collection_ptr.with_not_null_value_return_block(||{ std::ptr::null_mut() }, |font_collection| {
-            ValueBox::new(ParagraphBuilderWithText::new(style, font_collection)).into_raw()
+            ValueBox::new(ParagraphBuilderWithText::new(style, font_collection, tab_size)).into_raw()
         })
     })
 }

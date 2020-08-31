@@ -2,9 +2,14 @@ use boxer::array::BoxerArrayPointF32;
 use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer};
 use boxer::point::BoxerPointF32;
 use boxer::string::BoxerString;
-use skia_safe::textlayout::{Paragraph, PlaceholderStyle, RectHeightStyle, RectWidthStyle, TextBoxes, PositionWithAffinity, LineMetricsVector, TextBox};
+use skia_safe::textlayout::{
+    LineMetricsVector, Paragraph, PlaceholderStyle, PositionWithAffinity, RectHeightStyle,
+    RectWidthStyle, TextBox, TextBoxes,
+};
 use skia_safe::{scalar, Canvas, Point};
-use std::ops::{Range, Index};
+use std::ops::{Index, Range};
+
+pub type TabSize = usize;
 
 #[derive(Debug)]
 pub enum ParagraphPiece {
@@ -15,11 +20,16 @@ pub enum ParagraphPiece {
 pub struct ParagraphText {
     pieces: Vec<ParagraphPiece>,
     char_count: usize,
+    tab_size: TabSize,
 }
 
 impl ParagraphText {
-    pub fn new() -> Self {
-        Self { pieces: vec![], char_count: 0 }
+    pub fn new(tab_size: TabSize) -> Self {
+        Self {
+            pieces: vec![],
+            char_count: 0,
+            tab_size,
+        }
     }
 
     pub fn char_count(&self) -> usize {
@@ -40,7 +50,14 @@ impl ParagraphText {
         let first_range = self.get_glyph_range_for_char_index(range.start);
         let last_range = self.get_glyph_range_for_char_index(range.end - 1);
 
-        first_range.start .. last_range.end
+        first_range.start..last_range.end
+    }
+
+    fn get_char_len(&self, ch: char, buf: &mut [u16]) -> usize {
+        match ch {
+            '\t' => self.tab_size * ch.encode_utf16(buf).len(),
+            _ => ch.encode_utf16(buf).len(),
+        }
     }
 
     pub fn get_glyph_range_for_char_index(&self, index: usize) -> Range<usize> {
@@ -54,25 +71,25 @@ impl ParagraphText {
             match piece {
                 ParagraphPiece::Text(string) => {
                     for ch in string.as_str().chars() {
-                        let n = ch.encode_utf16(&mut buf).len();
+                        let n = self.get_char_len(ch, &mut buf);
 
                         glyph_range_start = glyph_range_end;
                         glyph_range_end = glyph_range_start + n;
 
                         if current_char_index == index {
-                            return glyph_range_start .. glyph_range_end;
+                            return glyph_range_start..glyph_range_end;
                         }
 
                         current_char_index = current_char_index + 1;
                     }
-                },
+                }
                 ParagraphPiece::Placeholder(_) => {
                     glyph_range_start = glyph_range_start + 1;
                     glyph_range_end = glyph_range_end + 1;
-                },
+                }
             }
         }
-        glyph_range_start .. glyph_range_end
+        glyph_range_start..glyph_range_end
     }
 
     pub fn get_char_offset_for_glyph_offset(&self, index: usize) -> usize {
@@ -88,30 +105,39 @@ impl ParagraphText {
             match piece {
                 ParagraphPiece::Text(string) => {
                     for ch in string.as_str().chars() {
-                        if current_glyph_index == index {
+                        if current_glyph_index >= index {
                             return current_char_index;
                         }
 
-                        let n = ch.encode_utf16(&mut buf).len();
+                        let n = self.get_char_len(ch, &mut buf);
+                        let next_glyph_index = current_glyph_index + n;
 
-                        // left part of the char
-                        if n == 2 && (current_glyph_index + 1) == index {
-                            return current_char_index;
+                        // looks like the target glyph index is within this char
+                        if next_glyph_index >= index {
+                            let target_glyph_offset = index - current_glyph_index;
+
+                            // left part of the char
+                            if n > 1 {
+                                 if target_glyph_offset <= (n / 2) {
+                                     return current_char_index;
+                                 }
+                                else {
+                                    return current_char_index + 1;
+                                }
+                            }
                         }
 
-                        current_glyph_index = current_glyph_index + n;
+                        current_glyph_index = next_glyph_index;
                         current_char_index = current_char_index + 1;
                     }
-                },
+                }
                 ParagraphPiece::Placeholder(_) => {
                     current_glyph_index = current_glyph_index + 1;
-                },
+                }
             }
         }
         current_char_index
     }
-
-
 }
 
 pub struct ParagraphWithText {
@@ -170,7 +196,12 @@ impl ParagraphWithText {
         self.text.char_count()
     }
 
-    pub fn get_rects_for_char_range(&self, range: Range<usize>, rect_height_style: RectHeightStyle, rect_width_style: RectWidthStyle) -> TextBoxes {
+    pub fn get_rects_for_char_range(
+        &self,
+        range: Range<usize>,
+        rect_height_style: RectHeightStyle,
+        rect_width_style: RectWidthStyle,
+    ) -> TextBoxes {
         let glyph_range = self.text.get_glyph_range_for_char_range(range);
         self.get_rects_for_range(glyph_range, rect_height_style, rect_width_style)
     }
@@ -346,22 +377,26 @@ pub fn skia_paragraph_get_char_position_at_coordinate(
         if position.position < 0 {
             return 0;
         }
-        paragraph.text.get_char_offset_for_glyph_offset(position.position as usize)
+        paragraph
+            .text
+            .get_char_offset_for_glyph_offset(position.position as usize)
     })
 }
 
 #[no_mangle]
-pub fn skia_paragraph_get_line_index_for_char(paragraph_ptr: *mut ValueBox<ParagraphWithText>, index: usize) -> usize {
-    paragraph_ptr.with_not_null_return(0, |paragraph| {
-        paragraph.get_line_index_for_char(index)
-    })
+pub fn skia_paragraph_get_line_index_for_char(
+    paragraph_ptr: *mut ValueBox<ParagraphWithText>,
+    index: usize,
+) -> usize {
+    paragraph_ptr.with_not_null_return(0, |paragraph| paragraph.get_line_index_for_char(index))
 }
 
 #[no_mangle]
-pub fn skia_paragraph_get_line_height(paragraph_ptr: *mut ValueBox<ParagraphWithText>, index: usize) -> scalar {
-    paragraph_ptr.with_not_null_return(0.0, |paragraph| {
-        paragraph.get_line_height(index)
-    })
+pub fn skia_paragraph_get_line_height(
+    paragraph_ptr: *mut ValueBox<ParagraphWithText>,
+    index: usize,
+) -> scalar {
+    paragraph_ptr.with_not_null_return(0.0, |paragraph| paragraph.get_line_height(index))
 }
 
 #[no_mangle]

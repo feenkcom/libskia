@@ -1,5 +1,5 @@
 use boxer::boxes::{ValueBox, ValueBoxPointer};
-use skia_safe::textlayout::TextStyle;
+use skia_safe::textlayout::{TextStyle, Decoration};
 use skia_safe::{scalar, Color, Paint, FontStyle};
 use boxer::string::BoxerString;
 
@@ -104,6 +104,15 @@ pub fn skia_paragraph_text_style_set_font_family(text_style_ptr: *mut ValueBox<T
     text_style_ptr.with_not_null(|text_style| {
         font_family_ptr.with_not_null(|font_family| {
             text_style.set_font_families(&[font_family.as_str()]);
+        })
+    })
+}
+
+#[no_mangle]
+pub fn skia_paragraph_text_style_set_decoration(text_style_ptr: *mut ValueBox<TextStyle>, decoration_ptr: *mut ValueBox<Decoration>) {
+    text_style_ptr.with_not_null(|text_style| {
+        decoration_ptr.with_not_null(|decoration| {
+            text_style.decoration_mut().clone_from(decoration);
         })
     })
 }
