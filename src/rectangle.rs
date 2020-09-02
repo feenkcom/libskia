@@ -92,5 +92,5 @@ pub fn skia_rectangle_i32_bottom(rectangle_ptr: *mut ValueBox<IRect>) -> i32 {
 
 #[no_mangle]
 pub fn skia_rectangle_i32_drop(mut ptr: *mut ValueBox<IRect>) {
-    ptr.drop();
+    drop!(ptr);
 }

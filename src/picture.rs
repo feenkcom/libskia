@@ -38,5 +38,5 @@ pub fn skia_picture_playback(
 
 #[no_mangle]
 pub fn skia_picture_drop(mut ptr: *mut ValueBox<Picture>) {
-    ptr.drop();
+    drop!(ptr);
 }

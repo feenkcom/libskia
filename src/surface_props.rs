@@ -40,5 +40,5 @@ pub fn skia_surface_props_get_flags(surface_props_ptr: *mut ValueBox<SurfaceProp
 
 #[no_mangle]
 pub fn skia_surface_props_drop(mut ptr: *mut ValueBox<SurfaceProps>) {
-    ptr.drop();
+    drop!(ptr);
 }

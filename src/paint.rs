@@ -1,3 +1,4 @@
+use boxer::function;
 use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::paint::{Cap, Join, Style};
 use skia_safe::{scalar, BlendMode, Color, FilterQuality, ImageFilter, Paint, Shader};
@@ -181,6 +182,7 @@ pub fn skia_paint_set_image_filter(
     paint_ptr: *mut ValueBox<Paint>,
     image_filter_ptr: *mut ValueBox<ImageFilter>,
 ) {
+    trace!("{}", function!());
     paint_ptr.with_not_null(|paint| {
         let image_filter =
             image_filter_ptr.with_not_null_value_return(None, |image_filter| Some(image_filter));
@@ -197,6 +199,14 @@ pub fn skia_paint_get_image_filter(paint_ptr: *mut ValueBox<Paint>) -> *mut Valu
 }
 
 #[no_mangle]
+pub fn skia_paint_has_image_filter(paint_ptr: *mut ValueBox<Paint>) -> bool {
+    paint_ptr.with_not_null_return(false, |paint| match paint.image_filter() {
+        None => false,
+        Some(_) => true,
+    })
+}
+
+#[no_mangle]
 pub fn skia_paint_drop(mut ptr: *mut ValueBox<Paint>) {
-    ptr.drop();
+    drop!(ptr);
 }

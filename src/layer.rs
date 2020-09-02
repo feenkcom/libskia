@@ -34,11 +34,13 @@ pub fn skia_layer_rec_set_paint(
     save_layer_ptr.with_not_null(|rec| {
         paint_ptr.with_not_null_value_consumed(|paint| rec.paint = Some(paint));
     });
+
+    assert_eq!(paint_ptr.is_null(), true);
 }
 
 #[no_mangle]
 pub fn skia_layer_rec_drop(mut ptr: *mut ValueBox<SaveLayerRecWrapper>) {
-    ptr.drop()
+    drop!(ptr);
 }
 
 #[cfg(test)]

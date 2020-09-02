@@ -126,5 +126,5 @@ pub fn skia_image_filter_drop_shadow_only(
 
 #[no_mangle]
 pub fn skia_image_filter_drop(mut ptr: *mut ValueBox<ImageFilter>) {
-    ptr.drop()
+    drop!(ptr);
 }

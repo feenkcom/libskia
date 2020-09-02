@@ -95,5 +95,5 @@ pub fn skia_image_info_get_shift_per_pixel(image_info_ptr: *mut ValueBox<ImageIn
 
 #[no_mangle]
 pub fn skia_image_info_drop(mut ptr: *mut ValueBox<ImageInfo>) {
-    ptr.drop();
+    drop!(ptr);
 }

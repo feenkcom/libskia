@@ -231,5 +231,5 @@ pub fn skia_path_serialize(path_ptr: *mut ValueBox<Path>, data_ptr: *mut ValueBo
 
 #[no_mangle]
 pub fn skia_path_drop(mut ptr: *mut ValueBox<Path>) {
-    ptr.drop();
+    drop!(ptr);
 }

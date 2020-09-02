@@ -322,5 +322,5 @@ pub fn skia_image_read_all_pixels(
 
 #[no_mangle]
 pub fn skia_image_drop(mut ptr: *mut ValueBox<Image>) {
-    ptr.drop()
+    drop!(ptr);
 }

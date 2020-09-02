@@ -76,7 +76,7 @@ pub fn skia_rounded_rectangle_set_oval(
 
 #[no_mangle]
 pub fn skia_rounded_rectangle_drop(mut ptr: *mut ValueBox<RRect>) {
-    ptr.drop();
+    drop!(ptr);
 }
 
 #[cfg(test)]

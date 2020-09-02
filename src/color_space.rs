@@ -8,7 +8,7 @@ pub fn skia_color_space_new_srgb() -> *mut ValueBox<ColorSpace> {
 
 #[no_mangle]
 pub fn skia_color_space_drop(mut ptr: *mut ValueBox<ColorSpace>) {
-    ptr.drop();
+    drop!(ptr);
 }
 
 #[no_mangle]

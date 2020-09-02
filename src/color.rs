@@ -39,7 +39,7 @@ pub fn skia_color_get_alpha(color_ptr: *mut ValueBox<Color>) -> u8 {
 
 #[no_mangle]
 pub fn skia_color_drop(mut ptr: *mut ValueBox<Color>) {
-    ptr.drop();
+    drop!(ptr);
 }
 
 #[no_mangle]
@@ -95,5 +95,5 @@ pub fn skia_color_array_at_put(
 
 #[no_mangle]
 pub fn skia_color_array_drop(mut ptr: *mut ValueBox<BoxerArray<Color>>) {
-    ptr.drop()
+    drop!(ptr);
 }

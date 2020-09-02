@@ -133,5 +133,5 @@ pub fn skia_surface_flush(surface_ptr: *mut ValueBox<Surface>) {
 
 #[no_mangle]
 pub fn skia_surface_drop(mut ptr: *mut ValueBox<Surface>) {
-    ptr.drop()
+    drop!(ptr);
 }

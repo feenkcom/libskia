@@ -43,5 +43,5 @@ pub fn skia_matrix_set_all(
 
 #[no_mangle]
 pub fn skia_matrix_drop(mut ptr: *mut ValueBox<Matrix>) {
-    ptr.drop();
+    drop!(ptr);
 }

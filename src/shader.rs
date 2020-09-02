@@ -19,5 +19,5 @@ pub fn skia_shader_is_a_image(shader_ptr: *mut ValueBox<Shader>) -> bool {
 
 #[no_mangle]
 pub fn skia_shader_drop(mut ptr: *mut ValueBox<Shader>) {
-    ptr.drop()
+    drop!(ptr);
 }

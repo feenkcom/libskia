@@ -115,7 +115,7 @@ checksum = "0d8c1fef690941d3e7788d328517591fecc684c084084702d6ff1641e993699a"
 [[package]]
 name = "boxer"
 version = "0.2.0"
-source = "git+https://github.com/feenkcom/gtoolkit-boxer?rev=97356e99c81546cbf699c5f6f38830f56741ab3a#97356e99c81546cbf699c5f6f38830f56741ab3a"
+source = "git+https://github.com/feenkcom/gtoolkit-boxer?rev=726306af827bbf38bcbc46515417f15e92751360#726306af827bbf38bcbc46515417f15e92751360"
 dependencies = [
  "log",
  "widestring",
@@ -718,6 +718,7 @@ dependencies = [
  "boxer",
  "byteorder",
  "crossbeam",
+ "env_logger",
  "float-cmp",
  "glutin",
  "libc",

@@ -1,3 +1,4 @@
+#[macro_use]
 extern crate boxer;
 extern crate byteorder;
 extern crate crossbeam;
@@ -10,9 +11,18 @@ extern crate skia_safe;
 extern crate widestring;
 #[macro_use]
 extern crate log;
+extern crate env_logger;
 
 use skia_safe::icu;
 use std::os::raw::c_void;
+
+#[macro_export]
+macro_rules! drop {
+    ($ptr:expr) => {
+        trace!("{}", function!());
+        $ptr.drop();
+    };
+}
 
 pub mod canvas;
 pub mod canvas_clip;
@@ -51,6 +61,17 @@ pub fn skia_test() -> bool {
 #[no_mangle]
 pub fn skia_icu_init() {
     icu::init();
+}
+
+#[no_mangle]
+pub fn skia_init_env_logger() {
+    env_logger::init();
+
+    debug!("Debug level logging enabled");
+    info!("Info level logging enabled");
+    error!("Error level logging enabled");
+    warn!("Warning level logging enabled");
+    trace!("Trace level logging enabled");
 }
 
 #[no_mangle]
