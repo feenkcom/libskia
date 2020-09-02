@@ -35,5 +35,5 @@ pub fn skia_picture_recorder_finish_recording(
 
 #[no_mangle]
 pub fn skia_picture_recorder_drop(ptr: &mut *mut ValueBox<PictureRecorder>) {
-    ptr.drop();
+    drop!(ptr);
 }

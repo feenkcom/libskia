@@ -26,7 +26,7 @@ pub fn skia_interface_new_load_with(
         let mut boxer_string =
             ValueBox::new(BoxerString::from_string(symbol.to_string())).into_raw();
         let func_ptr = callback(boxer_string);
-        boxer_string.drop();
+        (&mut boxer_string).drop();
         if cfg!(debug_assertions) {
             eprintln!(
                 "[skia_interface_new_load_with] GL func: {:?}; address: {:?}",
@@ -46,8 +46,8 @@ pub fn skia_interface_new_load_with(
 }
 
 #[no_mangle]
-pub fn skia_interface_drop(mut ptr: *mut ValueBox<Interface>) {
-    ptr.drop()
+pub fn skia_interface_drop(ptr: &mut *mut ValueBox<Interface>) {
+    drop!(ptr);
 }
 
 #[no_mangle]

@@ -44,8 +44,8 @@ pub fn skia_rectangle_f32_bottom(rectangle_ptr: *mut ValueBox<Rect>) -> scalar {
 }
 
 #[no_mangle]
-pub fn skia_rectangle_f32_drop(mut ptr: *mut ValueBox<Rect>) {
-    ptr.drop();
+pub fn skia_rectangle_f32_drop(ptr: &mut *mut ValueBox<Rect>) {
+    drop!(ptr);
 }
 
 ///
