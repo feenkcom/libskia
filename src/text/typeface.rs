@@ -1,6 +1,5 @@
-use boxer::boxes::{ValueBox, ValueBoxPointer};
 use boxer::string::BoxerString;
-use boxer::{assert_box, function};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::font_style::{Slant, Weight, Width};
 use skia_safe::{FontStyle, Typeface};
 
@@ -14,9 +13,8 @@ pub fn skia_typeface_from_name(
     family_name_ptr: *mut ValueBox<BoxerString>,
     font_style_ptr: *mut ValueBox<FontStyle>,
 ) -> *mut ValueBox<Typeface> {
-    assert_box(font_style_ptr, function!());
-    family_name_ptr.with(|family_name| {
-        font_style_ptr.with_value(|font_style| {
+    family_name_ptr.with_not_null_return(std::ptr::null_mut(), |family_name| {
+        font_style_ptr.with_not_null_value_return(std::ptr::null_mut(), |font_style| {
             match Typeface::from_name(family_name.to_string(), font_style) {
                 None => std::ptr::null_mut(),
                 Some(typeface) => ValueBox::new(typeface).into_raw(),
@@ -26,17 +24,17 @@ pub fn skia_typeface_from_name(
 }
 
 #[no_mangle]
-pub fn skia_typeface_clone(_ptr: *mut ValueBox<Typeface>) -> *mut ValueBox<Typeface> {
-    assert_box(_ptr, function!());
-    _ptr.with_not_null_return(std::ptr::null_mut(), |typeface| {
-        ValueBox::from_box(typeface.clone()).into_raw()
+pub fn skia_typeface_clone(typeface_ptr: *mut ValueBox<Typeface>) -> *mut ValueBox<Typeface> {
+    typeface_ptr.with_not_null_value_return(std::ptr::null_mut(), |typeface| {
+        ValueBox::new(typeface).into_raw()
     })
 }
 
 #[no_mangle]
-pub fn skia_typeface_get_font_style(_ptr: *mut ValueBox<Typeface>) -> *mut ValueBox<FontStyle> {
-    assert_box(_ptr, function!());
-    ValueBox::new(_ptr.with_not_null_return_block(
+pub fn skia_typeface_get_font_style(
+    typeface_ptr: *mut ValueBox<Typeface>,
+) -> *mut ValueBox<FontStyle> {
+    ValueBox::new(typeface_ptr.with(
         || FontStyle::new(Weight::NORMAL, Width::NORMAL, Slant::Upright),
         |typeface| typeface.font_style(),
     ))
@@ -45,34 +43,30 @@ pub fn skia_typeface_get_font_style(_ptr: *mut ValueBox<Typeface>) -> *mut Value
 
 #[no_mangle]
 pub fn skia_typeface_get_family_name(
-    _ptr: *mut ValueBox<Typeface>,
+    typeface_ptr: *mut ValueBox<Typeface>,
     _ptr_string: *mut ValueBox<BoxerString>,
 ) {
-    assert_box(_ptr, function!());
-    _ptr.with_not_null(|typeface| {
-        _ptr_string.with(|string| string.set_string(typeface.family_name()))
+    typeface_ptr.with_not_null(|typeface| {
+        _ptr_string.with_not_null(|string| string.set_string(typeface.family_name()))
     });
 }
 
 #[no_mangle]
-pub fn skia_typeface_is_bold(_ptr: *mut ValueBox<Typeface>) -> bool {
-    assert_box(_ptr, function!());
-    _ptr.with_not_null_return(false, |typeface| typeface.is_bold())
+pub fn skia_typeface_is_bold(typeface_ptr: *mut ValueBox<Typeface>) -> bool {
+    typeface_ptr.with_not_null_return(false, |typeface| typeface.is_bold())
 }
 
 #[no_mangle]
-pub fn skia_typeface_is_italic(_ptr: *mut ValueBox<Typeface>) -> bool {
-    assert_box(_ptr, function!());
-    _ptr.with_not_null_return(false, |typeface| typeface.is_italic())
+pub fn skia_typeface_is_italic(typeface_ptr: *mut ValueBox<Typeface>) -> bool {
+    typeface_ptr.with_not_null_return(false, |typeface| typeface.is_italic())
 }
 
 #[no_mangle]
-pub fn skia_typeface_is_fixed_pitch(_ptr: *mut ValueBox<Typeface>) -> bool {
-    assert_box(_ptr, function!());
-    _ptr.with_not_null_return(false, |typeface| typeface.is_fixed_pitch())
+pub fn skia_typeface_is_fixed_pitch(typeface_ptr: *mut ValueBox<Typeface>) -> bool {
+    typeface_ptr.with_not_null_return(false, |typeface| typeface.is_fixed_pitch())
 }
 
 #[no_mangle]
-pub fn skia_typeface_drop(_ptr: *mut ValueBox<Typeface>) {
-    _ptr.drop();
+pub fn skia_typeface_drop(mut ptr: *mut ValueBox<Typeface>) {
+    ptr.drop();
 }

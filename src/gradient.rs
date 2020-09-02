@@ -1,30 +1,30 @@
 use boxer::array::BoxerArray;
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::gradient_shader::{Flags, GradientShaderColors};
 use skia_safe::{scalar, Color, Matrix, Point, Shader, TileMode};
 use std::borrow::Borrow;
 
 #[no_mangle]
 pub fn skia_gradient_linear_create(
-    _from_point_ptr: *mut ValueBox<Point>,
-    _to_point_ptr: *mut ValueBox<Point>,
-    _colors_ptr: *mut ValueBox<BoxerArray<Color>>,
-    _positions_ptr: *mut ValueBox<BoxerArray<scalar>>,
-    _mode: TileMode,
-    _bit_flags: u32,
-    _matrix_ptr: *mut ValueBox<Matrix>,
+    from_point_ptr: *mut ValueBox<Point>,
+    to_point_ptr: *mut ValueBox<Point>,
+    colors_ptr: *mut ValueBox<BoxerArray<Color>>,
+    positions_ptr: *mut ValueBox<BoxerArray<scalar>>,
+    mode: TileMode,
+    bit_flags: u32,
+    matrix_ptr: *mut ValueBox<Matrix>,
 ) -> *mut ValueBox<Shader> {
-    _from_point_ptr.with_value(|from_point| {
-        _to_point_ptr.with_value(|to_point| {
-            _colors_ptr.with(|colors| {
-                _positions_ptr.with(|positions| {
-                    _matrix_ptr.with_reference(|matrix| {
+    from_point_ptr.with_not_null_value_return(std::ptr::null_mut(), |from_point| {
+        to_point_ptr.with_not_null_value_return(std::ptr::null_mut(), |to_point| {
+            colors_ptr.with_not_null_return(std::ptr::null_mut(), |colors| {
+                positions_ptr.with_not_null_return(std::ptr::null_mut(), |positions| {
+                    matrix_ptr.with_not_null_return(std::ptr::null_mut(), |matrix| {
                         match Shader::linear_gradient(
                             (from_point, to_point),
                             GradientShaderColors::Colors(colors.to_slice()),
                             Some(positions.to_slice().borrow()),
-                            _mode,
-                            Flags::from_bits_truncate(_bit_flags),
+                            mode,
+                            Flags::from_bits_truncate(bit_flags),
                             Some(matrix.borrow()),
                         ) {
                             None => std::ptr::null_mut(),
@@ -39,25 +39,25 @@ pub fn skia_gradient_linear_create(
 
 #[no_mangle]
 pub fn skia_gradient_radial_create(
-    _center_ptr: *mut ValueBox<Point>,
-    _radius: scalar,
-    _colors_ptr: *mut ValueBox<BoxerArray<Color>>,
-    _positions_ptr: *mut ValueBox<BoxerArray<scalar>>,
-    _mode: TileMode,
-    _bit_flags: u32,
-    _matrix_ptr: *mut ValueBox<Matrix>,
+    center_ptr: *mut ValueBox<Point>,
+    radius: scalar,
+    colors_ptr: *mut ValueBox<BoxerArray<Color>>,
+    positions_ptr: *mut ValueBox<BoxerArray<scalar>>,
+    mode: TileMode,
+    bit_flags: u32,
+    matrix_ptr: *mut ValueBox<Matrix>,
 ) -> *mut ValueBox<Shader> {
-    _center_ptr.with_value(|center| {
-        _colors_ptr.with(|colors| {
-            _positions_ptr.with(|positions| {
-                _matrix_ptr.with_reference(|matrix| {
+    center_ptr.with_not_null_value_return(std::ptr::null_mut(), |center| {
+        colors_ptr.with_not_null_return(std::ptr::null_mut(), |colors| {
+            positions_ptr.with_not_null_return(std::ptr::null_mut(), |positions| {
+                matrix_ptr.with_not_null_return(std::ptr::null_mut(), |matrix| {
                     match Shader::radial_gradient(
                         center,
-                        _radius,
+                        radius,
                         GradientShaderColors::Colors(colors.to_slice()),
                         Some(positions.to_slice().borrow()),
-                        _mode,
-                        Flags::from_bits_truncate(_bit_flags),
+                        mode,
+                        Flags::from_bits_truncate(bit_flags),
                         Some(matrix.borrow()),
                     ) {
                         None => std::ptr::null_mut(),
@@ -71,30 +71,30 @@ pub fn skia_gradient_radial_create(
 
 #[no_mangle]
 pub fn skia_gradient_two_point_conical_create(
-    _start_ptr: *mut ValueBox<Point>,
-    _start_radius: scalar,
-    _end_ptr: *mut ValueBox<Point>,
-    _end_radius: scalar,
-    _colors_ptr: *mut ValueBox<BoxerArray<Color>>,
-    _positions_ptr: *mut ValueBox<BoxerArray<scalar>>,
-    _mode: TileMode,
-    _bit_flags: u32,
-    _matrix_ptr: *mut ValueBox<Matrix>,
+    start_ptr: *mut ValueBox<Point>,
+    start_radius: scalar,
+    end_ptr: *mut ValueBox<Point>,
+    end_radius: scalar,
+    colors_ptr: *mut ValueBox<BoxerArray<Color>>,
+    positions_ptr: *mut ValueBox<BoxerArray<scalar>>,
+    mode: TileMode,
+    bit_flags: u32,
+    matrix_ptr: *mut ValueBox<Matrix>,
 ) -> *mut ValueBox<Shader> {
-    _start_ptr.with_value(|start| {
-        _end_ptr.with_value(|end| {
-            _colors_ptr.with(|colors| {
-                _positions_ptr.with(|positions| {
-                    _matrix_ptr.with_reference(|matrix| {
+    start_ptr.with_not_null_value_return(std::ptr::null_mut(), |start| {
+        end_ptr.with_not_null_value_return(std::ptr::null_mut(), |end| {
+            colors_ptr.with_not_null_return(std::ptr::null_mut(), |colors| {
+                positions_ptr.with_not_null_return(std::ptr::null_mut(), |positions| {
+                    matrix_ptr.with_not_null_return(std::ptr::null_mut(), |matrix| {
                         match Shader::two_point_conical_gradient(
                             start,
-                            _start_radius,
+                            start_radius,
                             end,
-                            _end_radius,
+                            end_radius,
                             GradientShaderColors::Colors(colors.to_slice()),
                             Some(positions.to_slice().borrow()),
-                            _mode,
-                            Flags::from_bits_truncate(_bit_flags),
+                            mode,
+                            Flags::from_bits_truncate(bit_flags),
                             Some(matrix.borrow()),
                         ) {
                             None => std::ptr::null_mut(),
@@ -109,26 +109,26 @@ pub fn skia_gradient_two_point_conical_create(
 
 #[no_mangle]
 pub fn skia_gradient_sweep_create(
-    _center_ptr: *mut ValueBox<Point>,
-    _start_angle: scalar,
-    _end_angle: scalar,
-    _colors_ptr: *mut ValueBox<BoxerArray<Color>>,
-    _positions_ptr: *mut ValueBox<BoxerArray<scalar>>,
-    _mode: TileMode,
-    _bit_flags: u32,
-    _matrix_ptr: *mut ValueBox<Matrix>,
+    center_ptr: *mut ValueBox<Point>,
+    start_angle: scalar,
+    end_angle: scalar,
+    colors_ptr: *mut ValueBox<BoxerArray<Color>>,
+    positions_ptr: *mut ValueBox<BoxerArray<scalar>>,
+    mode: TileMode,
+    bit_flags: u32,
+    matrix_ptr: *mut ValueBox<Matrix>,
 ) -> *mut ValueBox<Shader> {
-    _center_ptr.with_value(|center| {
-        _colors_ptr.with(|colors| {
-            _positions_ptr.with(|positions| {
-                _matrix_ptr.with_reference(|matrix| {
+    center_ptr.with_not_null_value_return(std::ptr::null_mut(), |center| {
+        colors_ptr.with_not_null_return(std::ptr::null_mut(), |colors| {
+            positions_ptr.with_not_null_return(std::ptr::null_mut(), |positions| {
+                matrix_ptr.with_not_null_return(std::ptr::null_mut(), |matrix| {
                     match Shader::sweep_gradient(
                         center,
                         GradientShaderColors::Colors(colors.to_slice()),
                         Some(positions.to_slice().borrow()),
-                        _mode,
-                        (_start_angle, _end_angle),
-                        Flags::from_bits_truncate(_bit_flags),
+                        mode,
+                        (start_angle, end_angle),
+                        Flags::from_bits_truncate(bit_flags),
                         Some(matrix.borrow()),
                     ) {
                         None => std::ptr::null_mut(),

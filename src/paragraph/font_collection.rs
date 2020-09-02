@@ -1,4 +1,4 @@
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::textlayout::FontCollection;
 use skia_safe::FontMgr;
 
@@ -20,6 +20,6 @@ pub fn skia_font_collection_set_default_font_manager(
 }
 
 #[no_mangle]
-pub fn skia_font_collection_drop(ptr: *mut ValueBox<FontCollection>) {
+pub fn skia_font_collection_drop(mut ptr: *mut ValueBox<FontCollection>) {
     ptr.drop()
 }

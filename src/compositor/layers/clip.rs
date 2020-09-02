@@ -1,11 +1,8 @@
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use compositor::compositor::CompositorContext;
-use compositor::image_cache::ImageCache;
 use compositor::layers::layer::Layer;
-use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
-use skia_safe::{scalar, Canvas, ClipOp, Matrix, Path, Picture, Point, RRect, Rect, Vector};
+use skia_safe::{scalar, Canvas, ClipOp, Path, RRect, Rect, Vector};
 use std::cell::RefCell;
-use std::collections::HashMap;
 use std::fmt::{Debug, Error, Formatter};
 use std::rc::Rc;
 
@@ -25,7 +22,7 @@ impl Debug for Clip {
                 formatter.field("type", &String::from("Rect"));
                 formatter.field("rect", rect)
             }
-            Clip::Path(path) => formatter.field("type", &String::from("Path")),
+            Clip::Path(_) => formatter.field("type", &String::from("Path")),
             Clip::RRect(rrect) => {
                 formatter.field("type", &String::from("RRect"));
                 formatter.field("rrect", rrect.rect())
@@ -182,11 +179,11 @@ pub fn skia_clip_layer_rrect(
 
 #[no_mangle]
 pub fn skia_clip_layer_path(
-    _ptr_path: *mut ValueBox<Path>,
+    path_ptr: *mut ValueBox<Path>,
     offset_x: scalar,
     offset_y: scalar,
 ) -> *mut ValueBox<Rc<RefCell<dyn Layer>>> {
-    let layer: Rc<RefCell<dyn Layer>> = _ptr_path.with_not_null_value_return_block(
+    let layer: Rc<RefCell<dyn Layer>> = path_ptr.with_value(
         || Rc::new(RefCell::new(ClipLayer::new())),
         |path| {
             Rc::new(RefCell::new(ClipLayer::path(

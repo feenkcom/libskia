@@ -1,6 +1,7 @@
 use boxer::array::BoxerArray;
-use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer};
+use boxer::boxes::{ReferenceBox, ReferenceBoxPointer};
 use boxer::{assert_reference_box, function};
+use boxer::{ValueBox, ValueBoxPointer};
 use float_cmp::ApproxEqUlps;
 use layer::SaveLayerRecWrapper;
 use skia_safe::canvas::{PointMode, SaveLayerRec};
@@ -245,21 +246,21 @@ pub fn skia_canvas_draw_text_blob(
 #[no_mangle]
 pub fn skia_canvas_draw_shadow(
     canvas_ptr: *mut ReferenceBox<Canvas>,
-    _path_ptr: *mut ValueBox<Path>,
-    _z_plane_ptr: *mut ValueBox<Point3>,
-    _light_pos_ptr: *mut ValueBox<Point3>,
+    path_ptr: *mut ValueBox<Path>,
+    z_plane_ptr: *mut ValueBox<Point3>,
+    light_pos_ptr: *mut ValueBox<Point3>,
     light_radius: scalar,
-    _ambient_color_ptr: *mut ValueBox<Color>,
-    _spot_color_ptr: *mut ValueBox<Color>,
-    bit_flags: u32,
+    ambient_color_ptr: *mut ValueBox<Color>,
+    spot_color_ptr: *mut ValueBox<Color>,
+    _bit_flags: u32,
 ) {
     assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
-        _path_ptr.with_not_null(|path| {
-            _z_plane_ptr.with_value(|z_plane| {
-                _light_pos_ptr.with_value(|light_pos| {
-                    _ambient_color_ptr.with_value(|ambient_color| {
-                        _spot_color_ptr.with_value(|spot_color| {
+        path_ptr.with_not_null(|path| {
+            z_plane_ptr.with_not_null_value(|z_plane| {
+                light_pos_ptr.with_not_null_value(|light_pos| {
+                    ambient_color_ptr.with_not_null_value(|ambient_color| {
+                        spot_color_ptr.with_not_null_value(|spot_color| {
                             canvas.draw_shadow(
                                 path,
                                 z_plane,
@@ -287,13 +288,14 @@ pub fn skia_canvas_draw_image(
 ) {
     assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
-        image_ptr.with_not_null(|image| match paint_ptr.as_option() {
-            None => {
+        image_ptr.with_not_null(|image| {
+            if paint_ptr.is_valid() {
+                paint_ptr.with_not_null(|paint| {
+                    canvas.draw_image(image, Point::new(x, y), Some(paint));
+                })
+            } else {
                 canvas.draw_image(image, Point::new(x, y), None);
             }
-            Some(_paint_ptr) => _paint_ptr.with(|paint| {
-                canvas.draw_image(image, Point::new(x, y), Some(paint));
-            }),
         });
     });
 }

@@ -8,11 +8,12 @@ extern crate num_enum;
 extern crate ordered_float;
 extern crate skia_safe;
 extern crate widestring;
+#[macro_use]
+extern crate log;
 
 use skia_safe::icu;
 use std::os::raw::c_void;
 
-pub mod binary;
 pub mod canvas;
 pub mod canvas_clip;
 pub mod canvas_draw_fill;

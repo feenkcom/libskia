@@ -1,13 +1,14 @@
 use boxer::array::BoxerArrayPointF32;
-use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer};
+use boxer::boxes::{ReferenceBox, ReferenceBoxPointer};
 use boxer::point::BoxerPointF32;
 use boxer::string::BoxerString;
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::textlayout::{
     Affinity, LineMetricsVector, Paragraph, PlaceholderStyle, PositionWithAffinity,
-    RectHeightStyle, RectWidthStyle, TextBox, TextBoxes,
+    RectHeightStyle, RectWidthStyle, TextBoxes,
 };
-use skia_safe::{scalar, Canvas, Point, Rect, Size};
-use std::ops::{Index, Range};
+use skia_safe::{scalar, Canvas, Point, Rect};
+use std::ops::Range;
 
 pub type TabSize = usize;
 pub type CharLength = usize;
@@ -183,7 +184,7 @@ impl ParagraphWithText {
 
         match self.get_placeholder_at_coordinate(coordinate) {
             None => coordinate,
-            Some((placeholder, rect, affinity)) => {
+            Some((_placeholder, rect, affinity)) => {
                 let local_affinity = match global_affinity {
                     None => affinity,
                     Some(affinity) => affinity,
@@ -200,7 +201,7 @@ impl ParagraphWithText {
 
     pub fn get_glyph_position_at_coordinate(&self, p: impl Into<Point>) -> PositionWithAffinity {
         let point: Point = p.into();
-        let mut coordinate = self.get_coordinate_outside_placeholder(point, None);
+        let coordinate = self.get_coordinate_outside_placeholder(point, None);
         self.paragraph.get_glyph_position_at_coordinate(coordinate)
     }
 
@@ -272,6 +273,10 @@ impl ParagraphWithText {
         self.paragraph.line_number()
     }
 
+    pub fn max_width(&self) -> scalar {
+        self.paragraph.max_width()
+    }
+
     pub fn height(&self) -> scalar {
         self.paragraph.height()
     }
@@ -338,6 +343,11 @@ pub fn skia_paragraph_paint(
 #[no_mangle]
 pub fn skia_paragraph_get_height(paragraph_ptr: *mut ValueBox<ParagraphWithText>) -> scalar {
     paragraph_ptr.with_not_null_return(0.0, |paragraph| paragraph.height())
+}
+
+#[no_mangle]
+pub fn skia_paragraph_get_max_width(paragraph_ptr: *mut ValueBox<ParagraphWithText>) -> scalar {
+    paragraph_ptr.with_not_null_return(0.0, |paragraph| paragraph.max_width())
 }
 
 #[no_mangle]
@@ -492,6 +502,6 @@ pub fn skia_paragraph_get_line_height(
 }
 
 #[no_mangle]
-pub fn skia_paragraph_drop(ptr: *mut ValueBox<ParagraphWithText>) {
+pub fn skia_paragraph_drop(mut ptr: *mut ValueBox<ParagraphWithText>) {
     ptr.drop();
 }

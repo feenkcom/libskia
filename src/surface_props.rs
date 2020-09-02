@@ -1,4 +1,4 @@
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::{PixelGeometry, SurfaceProps, SurfacePropsFlags};
 
 #[no_mangle]
@@ -23,20 +23,22 @@ pub fn skia_surface_props_new(
 }
 
 #[no_mangle]
-pub fn skia_surface_props_get_pixel_geometry(_ptr: *mut ValueBox<SurfaceProps>) -> PixelGeometry {
-    _ptr.with_not_null_return(PixelGeometry::default(), |surface_props| {
+pub fn skia_surface_props_get_pixel_geometry(
+    surface_props_ptr: *mut ValueBox<SurfaceProps>,
+) -> PixelGeometry {
+    surface_props_ptr.with_not_null_return(PixelGeometry::default(), |surface_props| {
         surface_props.pixel_geometry()
     })
 }
 
 #[no_mangle]
-pub fn skia_surface_props_get_flags(_ptr: *mut ValueBox<SurfaceProps>) -> u32 {
-    _ptr.with_not_null_return(SurfacePropsFlags::default().bits(), |surface_props| {
+pub fn skia_surface_props_get_flags(surface_props_ptr: *mut ValueBox<SurfaceProps>) -> u32 {
+    surface_props_ptr.with_not_null_return(SurfacePropsFlags::default().bits(), |surface_props| {
         surface_props.flags().bits()
     })
 }
 
 #[no_mangle]
-pub fn skia_surface_props_drop(_ptr: *mut ValueBox<SurfaceProps>) {
-    _ptr.drop();
+pub fn skia_surface_props_drop(mut ptr: *mut ValueBox<SurfaceProps>) {
+    ptr.drop();
 }

@@ -1,7 +1,6 @@
 use boxer::array::BoxerArray;
-use boxer::boxes::{ValueBox, ValueBoxPointer};
 use boxer::string::BoxerString;
-use boxer::{assert_box, function};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::font::Edging;
 use skia_safe::{
     scalar, Font, FontHinting, FontMetrics, GlyphId, Paint, Rect, TextEncoding, Typeface,
@@ -14,164 +13,158 @@ pub fn skia_font_default() -> *mut ValueBox<Font> {
 
 #[no_mangle]
 pub fn skia_font_from_typeface(
-    mut _typeface_ptr: *mut ValueBox<Typeface>,
+    typeface_ptr: *mut ValueBox<Typeface>,
     size: scalar,
 ) -> *mut ValueBox<Font> {
-    assert_box(_typeface_ptr, function!());
-    _typeface_ptr.with_value_consumed(|typeface| {
+    typeface_ptr.with_not_null_value_return(std::ptr::null_mut(), |typeface| {
         ValueBox::new(Font::from_typeface(typeface, size)).into_raw()
     })
 }
 
 #[no_mangle]
-pub fn skia_font_is_force_auto_hinting(_ptr: *mut ValueBox<Font>) -> bool {
-    _ptr.with(|font| font.is_force_auto_hinting())
+pub fn skia_font_is_force_auto_hinting(font_ptr: *mut ValueBox<Font>) -> bool {
+    font_ptr.with_not_null_return(false, |font| font.is_force_auto_hinting())
 }
 
 #[no_mangle]
-pub fn skia_font_is_embedded_bitmaps(_ptr: *mut ValueBox<Font>) -> bool {
-    _ptr.with(|font| font.is_embedded_bitmaps())
+pub fn skia_font_is_embedded_bitmaps(font_ptr: *mut ValueBox<Font>) -> bool {
+    font_ptr.with_not_null_return(false, |font| font.is_embedded_bitmaps())
 }
 
 #[no_mangle]
-pub fn skia_font_is_subpixel(_ptr: *mut ValueBox<Font>) -> bool {
-    _ptr.with(|font| font.is_subpixel())
+pub fn skia_font_is_subpixel(font_ptr: *mut ValueBox<Font>) -> bool {
+    font_ptr.with_not_null_return(false, |font| font.is_subpixel())
 }
 
 #[no_mangle]
-pub fn skia_font_set_subpixel(_ptr: *mut ValueBox<Font>, is_subpixel: bool) {
-    _ptr.with_not_null(|font| {
+pub fn skia_font_set_subpixel(font_ptr: *mut ValueBox<Font>, is_subpixel: bool) {
+    font_ptr.with_not_null(|font| {
         font.set_subpixel(is_subpixel);
     });
 }
 
 #[no_mangle]
-pub fn skia_font_is_linear_metrics(_ptr: *mut ValueBox<Font>) -> bool {
-    _ptr.with(|font| font.is_linear_metrics())
+pub fn skia_font_is_linear_metrics(font_ptr: *mut ValueBox<Font>) -> bool {
+    font_ptr.with_not_null_return(false, |font| font.is_linear_metrics())
 }
 
 #[no_mangle]
-pub fn skia_font_is_embolden(_ptr: *mut ValueBox<Font>) -> bool {
-    _ptr.with(|font| font.is_embolden())
+pub fn skia_font_is_embolden(font_ptr: *mut ValueBox<Font>) -> bool {
+    font_ptr.with_not_null_return(false, |font| font.is_embolden())
 }
 
 #[no_mangle]
-pub fn skia_font_is_baseline_snap(_ptr: *mut ValueBox<Font>) -> bool {
-    _ptr.with(|font| font.is_baseline_snap())
+pub fn skia_font_is_baseline_snap(font_ptr: *mut ValueBox<Font>) -> bool {
+    font_ptr.with_not_null_return(false, |font| font.is_baseline_snap())
 }
 
 #[no_mangle]
-pub fn skia_font_get_edging(_ptr: *mut ValueBox<Font>) -> Edging {
-    _ptr.with(|font| font.edging())
+pub fn skia_font_get_edging(font_ptr: *mut ValueBox<Font>) -> Edging {
+    font_ptr.with_not_null_return(Edging::Alias, |font| font.edging())
 }
 
 #[no_mangle]
-pub fn skia_font_set_edging(_ptr: *mut ValueBox<Font>, font_edging: Edging) {
-    _ptr.with_not_null(|font| {
+pub fn skia_font_set_edging(font_ptr: *mut ValueBox<Font>, font_edging: Edging) {
+    font_ptr.with_not_null(|font| {
         font.set_edging(font_edging);
     });
 }
 
 #[no_mangle]
-pub fn skia_font_get_hinting(_ptr: *mut ValueBox<Font>) -> FontHinting {
-    _ptr.with(|font| font.hinting())
+pub fn skia_font_get_hinting(font_ptr: *mut ValueBox<Font>) -> FontHinting {
+    font_ptr.with_not_null_return(FontHinting::None, |font| font.hinting())
 }
 
 #[no_mangle]
-pub fn skia_font_set_hinting(_ptr: *mut ValueBox<Font>, font_hinting: FontHinting) {
-    _ptr.with_not_null(|font| {
+pub fn skia_font_set_hinting(font_ptr: *mut ValueBox<Font>, font_hinting: FontHinting) {
+    font_ptr.with_not_null(|font| {
         font.set_hinting(font_hinting);
     });
 }
 
 #[no_mangle]
-pub fn skia_font_get_typeface_or_default(_ptr: *mut ValueBox<Font>) -> *mut ValueBox<Typeface> {
-    _ptr.with(|font| ValueBox::new(font.typeface_or_default()).into_raw())
+pub fn skia_font_get_typeface_or_default(font_ptr: *mut ValueBox<Font>) -> *mut ValueBox<Typeface> {
+    font_ptr.with_not_null_return(std::ptr::null_mut(), |font| {
+        ValueBox::new(font.typeface_or_default()).into_raw()
+    })
 }
 
 #[no_mangle]
-pub fn skia_font_get_size(_ptr: *mut ValueBox<Font>) -> scalar {
-    _ptr.with(|font| font.size())
+pub fn skia_font_get_size(font_ptr: *mut ValueBox<Font>) -> scalar {
+    font_ptr.with_not_null_return(0.0, |font| font.size())
 }
 
 #[no_mangle]
-pub fn skia_font_get_scale_x(_ptr: *mut ValueBox<Font>) -> scalar {
-    _ptr.with(|font| font.scale_x())
+pub fn skia_font_get_scale_x(font_ptr: *mut ValueBox<Font>) -> scalar {
+    font_ptr.with_not_null_return(0.0, |font| font.scale_x())
 }
 
 #[no_mangle]
-pub fn skia_font_get_skew_x(_ptr: *mut ValueBox<Font>) -> scalar {
-    _ptr.with(|font| font.skew_x())
+pub fn skia_font_get_skew_x(font_ptr: *mut ValueBox<Font>) -> scalar {
+    font_ptr.with_not_null_return(0.0, |font| font.skew_x())
 }
 
 #[no_mangle]
-pub fn skia_font_get_spacing(_ptr: *mut ValueBox<Font>) -> scalar {
-    _ptr.with(|font| font.spacing())
+pub fn skia_font_get_spacing(font_ptr: *mut ValueBox<Font>) -> scalar {
+    font_ptr.with_not_null_return(0.0, |font| font.spacing())
 }
 
 #[no_mangle]
-pub fn skia_font_get_metrics(_ptr: *mut ValueBox<Font>) -> *mut ValueBox<FontMetrics> {
-    _ptr.with(|font| ValueBox::new(font.metrics().1).into_raw())
+pub fn skia_font_get_metrics(font_ptr: *mut ValueBox<Font>) -> *mut ValueBox<FontMetrics> {
+    font_ptr.with_not_null_return(std::ptr::null_mut(), |font| {
+        ValueBox::new(font.metrics().1).into_raw()
+    })
 }
 
 #[no_mangle]
 pub fn skia_font_text_to_glyphs(
-    _ptr: *mut ValueBox<Font>,
-    _text_ptr: *mut BoxerString,
-    _text_length: usize,
+    font_ptr: *mut ValueBox<Font>,
+    text_ptr: *mut ValueBox<BoxerString>,
     encoding: TextEncoding,
-    _glyphs_ptr: *mut ValueBox<BoxerArray<GlyphId>>,
-    _paint_ptr: *mut ValueBox<Paint>,
-    _bounds_ptr: *mut ValueBox<Rect>,
+    glyphs_ptr: *mut ValueBox<BoxerArray<GlyphId>>,
+    paint_ptr: *mut ValueBox<Paint>,
+    bounds_ptr: *mut ValueBox<Rect>,
 ) -> scalar {
-    assert_box(_ptr, function!());
-    assert_box(_glyphs_ptr, function!());
-    assert_box(_paint_ptr, function!());
-    assert_box(_bounds_ptr, function!());
-
-    let mut advance: scalar = 0.0;
-
-    // text is zero-terminated
-    let text = unsafe { std::slice::from_raw_parts(_text_ptr as *const u8, _text_length - 1) };
-
-    _ptr.with(|font| {
-        _glyphs_ptr.with(|glyphs| {
-            let glyphs_vec = font.text_to_glyphs_vec(text, encoding);
-            if glyphs_vec.len() > 0 {
-                _paint_ptr.with_not_null(|paint| {
-                    _bounds_ptr.with_not_null(|bounds| {
-                        // this is faster than computing ourselves
-                        let (text_advance, text_bounds) =
-                            font.measure_text(text, encoding, Some(paint));
-                        advance = text_advance;
-                        bounds.set_ltrb(
-                            text_bounds.left,
-                            text_bounds.top,
-                            text_bounds.right,
-                            text_bounds.bottom,
-                        );
+    font_ptr.with_not_null_return(0.0, |font| {
+        glyphs_ptr.with_not_null_return(0.0, |glyphs| {
+            text_ptr.with_not_null_return(0.0, |text| {
+                let mut advance = 0.0;
+                let glyphs_vec = font.text_to_glyphs_vec(text.as_bytes(), encoding);
+                if glyphs_vec.len() > 0 {
+                    paint_ptr.with_not_null(|paint| {
+                        bounds_ptr.with_not_null(|bounds| {
+                            // this is faster than computing ourselves
+                            let (text_advance, text_bounds) =
+                                font.measure_text(text.as_bytes(), encoding, Some(paint));
+                            advance = text_advance;
+                            bounds.set_ltrb(
+                                text_bounds.left,
+                                text_bounds.top,
+                                text_bounds.right,
+                                text_bounds.bottom,
+                            );
+                        });
                     });
-                });
-
-                glyphs.set_vector(glyphs_vec)
-            }
+                    glyphs.set_vector(glyphs_vec)
+                }
+                advance
+            })
         })
-    });
-    advance
+    })
 }
 
 #[no_mangle]
 pub fn skia_font_measure_text(
-    _ptr: *mut ValueBox<Font>,
-    _text_ptr: *mut ValueBox<BoxerString>,
+    font_ptr: *mut ValueBox<Font>,
+    text_ptr: *mut ValueBox<BoxerString>,
     encoding: TextEncoding,
-    _paint_ptr: *mut ValueBox<Paint>,
-    _bounds_ptr: *mut ValueBox<Rect>,
+    paint_ptr: *mut ValueBox<Paint>,
+    bounds_ptr: *mut ValueBox<Rect>,
 ) -> scalar {
-    _ptr.with(|font| {
-        _text_ptr.with(|text| {
-            _paint_ptr.with(|paint| {
-                _bounds_ptr.with(|bounds| {
+    font_ptr.with_not_null_return(0.0, |font| {
+        text_ptr.with_not_null_return(0.0, |text| {
+            paint_ptr.with_not_null_return(0.0, |paint| {
+                bounds_ptr.with_not_null_return(0.0, |bounds| {
                     let metrics = font.measure_text(text.as_bytes(), encoding, Some(paint));
                     bounds.set_ltrb(
                         metrics.1.left,
@@ -187,6 +180,6 @@ pub fn skia_font_measure_text(
 }
 
 #[no_mangle]
-pub fn skia_font_drop(_ptr: *mut ValueBox<Font>) {
-    _ptr.drop();
+pub fn skia_font_drop(mut ptr: *mut ValueBox<Font>) {
+    ptr.drop();
 }

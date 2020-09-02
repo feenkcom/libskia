@@ -1,11 +1,8 @@
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use compositor::compositor::CompositorContext;
-use compositor::image_cache::ImageCache;
 use compositor::layers::layer::Layer;
-use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
-use skia_safe::{Canvas, Matrix, Picture, Point};
+use skia_safe::Matrix;
 use std::cell::RefCell;
-use std::collections::HashMap;
 use std::rc::Rc;
 
 #[derive(Debug)]
@@ -64,9 +61,9 @@ pub fn skia_transformation_layer_new() -> *mut ValueBox<Rc<RefCell<dyn Layer>>> 
 
 #[no_mangle]
 pub fn skia_transformation_layer_new_matrix(
-    _ptr_matrix: *mut ValueBox<Matrix>,
+    matrix_ptr: *mut ValueBox<Matrix>,
 ) -> *mut ValueBox<Rc<RefCell<dyn Layer>>> {
-    _ptr_matrix.with_value(|matrix| {
+    matrix_ptr.with_not_null_value_return(std::ptr::null_mut(), |matrix| {
         let layer: Rc<RefCell<dyn Layer>> = Rc::new(RefCell::new(TransformationLayer::new(matrix)));
         ValueBox::new(layer).into_raw()
     })

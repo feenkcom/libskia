@@ -1,4 +1,4 @@
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::image_filters::{blur, drop_shadow, drop_shadow_only, image};
 use skia_safe::{scalar, Color, FilterQuality, Image, ImageFilter, Rect, TileMode, Vector};
 
@@ -9,12 +9,11 @@ pub fn skia_image_filter_blur(
     tile_mode: TileMode,
     input_ptr: *mut ValueBox<ImageFilter>,
 ) -> *mut ValueBox<ImageFilter> {
-    let filter_option = match input_ptr.as_option() {
-        None => blur((sigma_x, sigma_y), Some(tile_mode), None, None),
-        Some(mut _input_ptr) => _input_ptr.with_value_consumed(|input| {
-            blur((sigma_x, sigma_y), Some(tile_mode), Some(input), None)
-        }),
-    };
+    let filter_option = input_ptr.with_value(
+        || blur((sigma_x, sigma_y), Some(tile_mode), None, None),
+        |input| blur((sigma_x, sigma_y), Some(tile_mode), Some(input), None),
+    );
+
     match filter_option {
         None => std::ptr::null_mut(),
         Some(filter) => ValueBox::new(filter).into_raw(),
@@ -23,7 +22,7 @@ pub fn skia_image_filter_blur(
 
 #[no_mangle]
 pub fn skia_image_filter_image(
-    mut image_ptr: *mut ValueBox<Image>,
+    image_ptr: *mut ValueBox<Image>,
     src_left: scalar,
     src_top: scalar,
     src_right: scalar,
@@ -34,7 +33,7 @@ pub fn skia_image_filter_image(
     dst_bottom: scalar,
     filter_quality: FilterQuality,
 ) -> *mut ValueBox<ImageFilter> {
-    let filter_option = image_ptr.with_value_consumed(|image_source| {
+    let filter_option = image_ptr.with_not_null_value_return(None, |image_source| {
         image(
             image_source,
             Rect::new(src_left, src_top, src_right, src_bottom).as_ref(),
@@ -60,15 +59,17 @@ pub fn skia_image_filter_drop_shadow(
     a: u8,
     input_ptr: *mut ValueBox<ImageFilter>,
 ) -> *mut ValueBox<ImageFilter> {
-    let filter_option = match input_ptr.as_option() {
-        None => drop_shadow(
-            Vector::new(delta_x, delta_y),
-            (sigma_x, sigma_y),
-            Color::from_argb(a, r, g, b),
-            None,
-            None,
-        ),
-        Some(mut _input_ptr) => _input_ptr.with_value_consumed(|input| {
+    let filter_option = input_ptr.with_value(
+        || {
+            drop_shadow(
+                Vector::new(delta_x, delta_y),
+                (sigma_x, sigma_y),
+                Color::from_argb(a, r, g, b),
+                None,
+                None,
+            )
+        },
+        |input| {
             drop_shadow(
                 Vector::new(delta_x, delta_y),
                 (sigma_x, sigma_y),
@@ -76,8 +77,9 @@ pub fn skia_image_filter_drop_shadow(
                 Some(input),
                 None,
             )
-        }),
-    };
+        },
+    );
+
     match filter_option {
         None => std::ptr::null_mut(),
         Some(filter) => ValueBox::new(filter).into_raw(),
@@ -96,15 +98,17 @@ pub fn skia_image_filter_drop_shadow_only(
     a: u8,
     input_ptr: *mut ValueBox<ImageFilter>,
 ) -> *mut ValueBox<ImageFilter> {
-    let filter_option = match input_ptr.as_option() {
-        None => drop_shadow_only(
-            Vector::new(delta_x, delta_y),
-            (sigma_x, sigma_y),
-            Color::from_argb(a, r, g, b),
-            None,
-            None,
-        ),
-        Some(mut _input_ptr) => _input_ptr.with_value_consumed(|input| {
+    let filter_option = input_ptr.with_value(
+        || {
+            drop_shadow_only(
+                Vector::new(delta_x, delta_y),
+                (sigma_x, sigma_y),
+                Color::from_argb(a, r, g, b),
+                None,
+                None,
+            )
+        },
+        |input| {
             drop_shadow_only(
                 Vector::new(delta_x, delta_y),
                 (sigma_x, sigma_y),
@@ -112,8 +116,8 @@ pub fn skia_image_filter_drop_shadow_only(
                 Some(input),
                 None,
             )
-        }),
-    };
+        },
+    );
     match filter_option {
         None => std::ptr::null_mut(),
         Some(filter) => ValueBox::new(filter).into_raw(),
@@ -121,6 +125,6 @@ pub fn skia_image_filter_drop_shadow_only(
 }
 
 #[no_mangle]
-pub fn skia_image_filter_drop(_ptr: *mut ValueBox<ImageFilter>) {
-    _ptr.drop()
+pub fn skia_image_filter_drop(mut ptr: *mut ValueBox<ImageFilter>) {
+    ptr.drop()
 }

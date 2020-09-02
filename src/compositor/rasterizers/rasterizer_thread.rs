@@ -4,18 +4,9 @@ use compositor::rasterizers::picture_rasterizer::{
 use compositor::rasterizers::shadow_rasterizer::{
     RasterizedShadow, ShadowRasterizer, ShadowToRasterize,
 };
-use compositor::thread_pool::{GpuContext, ThreadPool};
+use compositor::thread_pool::ThreadPool;
 use glutin::{Context, NotCurrent};
-use skia_safe::gpu::SurfaceOrigin;
-use skia_safe::image::CachingHint;
-use skia_safe::{
-    Budgeted, Color, Color4f, ColorSpace, IRect, ISize, Image, ImageInfo, Matrix, Paint, Picture,
-    Pixmap, Rect, RoundOut, Surface, Vector,
-};
-use std::collections::HashMap;
 use std::sync::mpsc::{channel, Receiver, Sender};
-use std::sync::{Arc, Mutex};
-use std::thread;
 
 pub enum RasterizerRequest {
     RasterizePicture(Vec<PictureToRasterize>),
@@ -39,28 +30,30 @@ impl RasterizerThread {
     }
 
     pub fn run(&self, workers_num: usize, contexts: Option<Vec<Context<NotCurrent>>>) {
-        let mut pool = ThreadPool::new(workers_num, contexts);
+        let pool = ThreadPool::new(workers_num, contexts);
         loop {
             match self.receiver.recv() {
-                Ok(RasterizerRequest::RasterizePicture(mut pictures)) => {
+                Ok(RasterizerRequest::RasterizePicture(pictures)) => {
                     let n_pics = pictures.len();
                     let (tx, rx) = channel();
-                    for mut picture in pictures {
+                    for picture in pictures {
                         let tx = tx.clone();
                         pool.execute(move |gpu_context| {
-                            tx.send(PictureRasterizer::new().rasterize(picture, gpu_context));
+                            tx.send(PictureRasterizer::new().rasterize(picture, gpu_context))
+                                .unwrap();
                         });
                     }
                     let result = rx.iter().take(n_pics).collect();
                     self.send(RasterizerResult::RasterizedPictures(result))
                 }
-                Ok(RasterizerRequest::RasterizeShadow(mut shadows)) => {
+                Ok(RasterizerRequest::RasterizeShadow(shadows)) => {
                     let n_shadows = shadows.len();
                     let (tx, rx) = channel();
-                    for mut shadow in shadows {
+                    for shadow in shadows {
                         let tx = tx.clone();
                         pool.execute(move |gpu_context| {
-                            tx.send(ShadowRasterizer::new().rasterize(shadow, gpu_context));
+                            tx.send(ShadowRasterizer::new().rasterize(shadow, gpu_context))
+                                .unwrap();
                         });
                     }
                     let result = rx.iter().take(n_shadows).collect();

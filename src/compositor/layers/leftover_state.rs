@@ -1,11 +1,8 @@
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use compositor::compositor::{CompositorContext, MatrixContext};
-use compositor::image_cache::ImageCache;
 use compositor::layers::layer::Layer;
-use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
-use skia_safe::{scalar, Canvas, ClipOp, Matrix, Path, Picture, Point, RRect, Rect, Vector};
+use skia_safe::{scalar, Canvas, ClipOp, Matrix, Path, RRect, Rect, Vector};
 use std::cell::RefCell;
-use std::collections::HashMap;
 use std::fmt::{Debug, Error, Formatter};
 use std::rc::Rc;
 
@@ -31,7 +28,7 @@ impl Debug for StateCommandType {
                 formatter.field("type", &String::from("ClipRect"));
                 formatter.field("rect", rect)
             }
-            StateCommandType::ClipPath(path) => formatter.field("type", &String::from("ClipPath")),
+            StateCommandType::ClipPath(_) => formatter.field("type", &String::from("ClipPath")),
             StateCommandType::ClipRRect(rrect) => {
                 formatter.field("type", &String::from("ClipRRect"));
                 formatter.field("rrect", rrect.rect())

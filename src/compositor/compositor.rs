@@ -1,27 +1,20 @@
-use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer};
+use boxer::boxes::{ReferenceBox, ReferenceBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use compositor::image_cache::ImageCache;
 use compositor::layers::layer::Layer;
-use skia_safe::{
-    scalar, Budgeted, Canvas, Color, Color4f, ColorSpace, Image, ImageInfo, Matrix, Paint, Picture,
-    Rect, Surface, Vector,
-};
-use std::collections::{HashMap, VecDeque};
-use std::sync::mpsc::{channel, Receiver, Sender};
-use std::thread::JoinHandle;
+use skia_safe::{Canvas, Image, Matrix, Picture, Vector};
+use std::collections::VecDeque;
 
-use compositor::rasterizers::picture_rasterizer::{PictureToRasterize, RasterizedPicture};
+use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
 use compositor::rasterizers::rasterizer::{AsyncRasterizer, Rasterizer, SyncRasterizer};
 use compositor::rasterizers::shadow_rasterizer::ShadowToRasterize;
 use compositor::shadow_cache::{Shadow, ShadowCache};
-use glutin::event_loop::{ControlFlow, EventLoop};
-use glutin::{ContextBuilder, PossiblyCurrent, WindowedContext};
-use skia_safe::gpu::SurfaceOrigin;
-use std::borrow::Borrow;
+use glutin::event_loop::EventLoop;
+use glutin::{PossiblyCurrent, WindowedContext};
 use std::cell::RefCell;
 use std::os::raw::c_void;
 use std::rc::Rc;
 use std::sync::Arc;
-use std::time::Instant;
 
 #[derive(Copy, Clone, Debug)]
 pub struct MatrixContext {
@@ -41,7 +34,7 @@ impl MatrixContext {
         Self::new_matrix(Matrix::concat(&self.matrix, &matrix))
     }
     pub fn translate(&self, vector: Vector) -> Self {
-        Self::new_matrix(Matrix::concat(&self.matrix, &Matrix::new_trans(vector)))
+        Self::new_matrix(Matrix::concat(&self.matrix, &Matrix::translate(vector)))
     }
 }
 
@@ -81,7 +74,7 @@ impl<'canvas, 'compositor> CompositorContext<'canvas, 'compositor> {
     pub fn push_translate(&mut self, vector: Vector) -> &mut Self {
         self.push_matrix(Matrix::concat(
             self.current_matrix(),
-            &Matrix::new_trans(vector),
+            &Matrix::translate(vector),
         ));
         self
     }
@@ -250,9 +243,7 @@ impl Compositor {
         self.images_per_frame = images_per_frame;
     }
 
-    pub fn draw(&mut self, mut layers_tree: &Rc<RefCell<dyn Layer>>, canvas: &mut Canvas) {
-        let start_time = Instant::now();
-
+    pub fn draw(&mut self, layers_tree: &Rc<RefCell<dyn Layer>>, canvas: &mut Canvas) {
         let mut context =
             CompositorContext::new(canvas, &mut self.image_cache, &mut self.shadow_cache);
 
@@ -326,24 +317,21 @@ pub fn skia_compositor_new_software(workers_num: usize) -> *mut ValueBox<Composi
 
 #[no_mangle]
 pub fn skia_compositor_draw(
-    _compositor_ptr: *mut ValueBox<Compositor>,
-    _layers_tree_ptr: *mut ValueBox<Rc<RefCell<dyn Layer>>>,
-    _canvas_ptr: *mut ReferenceBox<Canvas>,
+    compositor_ptr: *mut ValueBox<Compositor>,
+    layers_tree_ptr: *mut ValueBox<Rc<RefCell<dyn Layer>>>,
+    canvas_ptr: *mut ReferenceBox<Canvas>,
 ) -> *mut c_void {
-    _canvas_ptr.with_not_null_return(std::ptr::null_mut(), |canvas| {
-        _layers_tree_ptr.with_not_null_value_return_block(
-            || std::ptr::null_mut(),
-            |layers_tree| {
-                _compositor_ptr.with_not_null_return(std::ptr::null_mut(), |compositor| {
-                    compositor.draw(&layers_tree, canvas);
-                    std::ptr::null_mut()
-                })
-            },
-        )
+    canvas_ptr.with_not_null_return(std::ptr::null_mut(), |canvas| {
+        layers_tree_ptr.with_not_null_value_return(std::ptr::null_mut(), |layers_tree| {
+            compositor_ptr.with_not_null_return(std::ptr::null_mut(), |compositor| {
+                compositor.draw(&layers_tree, canvas);
+                std::ptr::null_mut()
+            })
+        })
     })
 }
 
 #[no_mangle]
-pub fn skia_compositor_drop(_ptr: *mut ValueBox<Compositor>) {
-    _ptr.drop();
+pub fn skia_compositor_drop(mut ptr: *mut ValueBox<Compositor>) {
+    ptr.drop();
 }

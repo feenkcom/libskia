@@ -5,7 +5,6 @@ use std::collections::hash_map::DefaultHasher;
 use std::collections::HashMap;
 use std::fmt::{Debug, Error, Formatter};
 use std::hash::{Hash, Hasher};
-use std::sync::Arc;
 
 pub struct CachedShadowImage {
     image: Image,

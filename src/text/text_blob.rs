@@ -1,5 +1,5 @@
-use boxer::boxes::{ValueBox, ValueBoxPointer};
 use boxer::string::BoxerString;
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::{Font, GlyphId, Point, TextBlob, TextBlobBuilder, TextEncoding};
 
 #[no_mangle]
@@ -12,12 +12,12 @@ pub fn skia_text_blob_default() -> *mut ValueBox<TextBlob> {
 
 #[no_mangle]
 pub fn skia_text_blob_from_text(
-    _text_ptr: *mut ValueBox<BoxerString>,
+    text_ptr: *mut ValueBox<BoxerString>,
     encoding: TextEncoding,
-    _font_ptr: *mut ValueBox<Font>,
+    font_ptr: *mut ValueBox<Font>,
 ) -> *mut ValueBox<TextBlob> {
-    _text_ptr.with(|text|
-        _font_ptr.with_not_null_return(std::ptr::null_mut(),|font| {
+    text_ptr.with_not_null_return(std::ptr::null_mut(), |text|
+        font_ptr.with_not_null_return(std::ptr::null_mut(),|font| {
            match TextBlob::from_text(text.as_bytes(), encoding, font) {
                 None => {
                     if cfg!(debug_assertions) {
@@ -31,15 +31,15 @@ pub fn skia_text_blob_from_text(
 
 #[no_mangle]
 pub fn skia_text_blob_from_glyphs(
-    _glyphs_ptr: *mut GlyphId,
-    _glyphs_length: usize,
-    _font_ptr: *mut ValueBox<Font>,
+    glyphs_ptr: *mut GlyphId,
+    glyphs_length: usize,
+    font_ptr: *mut ValueBox<Font>,
 ) -> *mut ValueBox<TextBlob> {
-    let glyphs = unsafe { std::slice::from_raw_parts(_glyphs_ptr, _glyphs_length) };
+    let glyphs = unsafe { std::slice::from_raw_parts(glyphs_ptr, glyphs_length) };
 
-    _font_ptr.with_not_null_return(std::ptr::null_mut(), |font| {
+    font_ptr.with_not_null_return(std::ptr::null_mut(), |font| {
         let mut blob_builder = TextBlobBuilder::new();
-        let allocated_glyphs = blob_builder.alloc_run(font, _glyphs_length,Point::new(0.0,0.0), None);
+        let allocated_glyphs = blob_builder.alloc_run(font, glyphs_length,Point::new(0.0,0.0), None);
         allocated_glyphs.copy_from_slice(glyphs);
 
         match  blob_builder.make() {
@@ -54,6 +54,6 @@ pub fn skia_text_blob_from_glyphs(
 }
 
 #[no_mangle]
-pub fn skia_text_blob_drop(_ptr: *mut ValueBox<TextBlob>) {
-    _ptr.drop();
+pub fn skia_text_blob_drop(mut ptr: *mut ValueBox<TextBlob>) {
+    ptr.drop();
 }

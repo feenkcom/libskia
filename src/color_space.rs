@@ -1,4 +1,4 @@
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::ColorSpace;
 
 #[no_mangle]
@@ -7,8 +7,8 @@ pub fn skia_color_space_new_srgb() -> *mut ValueBox<ColorSpace> {
 }
 
 #[no_mangle]
-pub fn skia_color_space_drop(_ptr: *mut ValueBox<ColorSpace>) {
-    _ptr.drop();
+pub fn skia_color_space_drop(mut ptr: *mut ValueBox<ColorSpace>) {
+    ptr.drop();
 }
 
 #[no_mangle]

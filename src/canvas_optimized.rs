@@ -1,4 +1,5 @@
-use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer};
+use boxer::boxes::{ReferenceBox, ReferenceBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::{scalar, Canvas, Color, Paint, Point, TextBlob};
 
 use boxer::{assert_reference_box, function};

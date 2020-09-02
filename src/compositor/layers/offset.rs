@@ -1,11 +1,8 @@
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use compositor::compositor::CompositorContext;
-use compositor::image_cache::ImageCache;
 use compositor::layers::layer::Layer;
-use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
-use skia_safe::{scalar, Canvas, Picture, Point};
+use skia_safe::{scalar, Point};
 use std::cell::RefCell;
-use std::collections::HashMap;
 use std::rc::Rc;
 
 #[derive(Debug)]
@@ -68,13 +65,13 @@ pub fn skia_offset_layer_new() -> *mut ValueBox<Rc<RefCell<dyn Layer>>> {
 }
 
 #[no_mangle]
-pub fn skia_offset_layer_get_x(_ptr: *mut ValueBox<Rc<RefCell<OffsetLayer>>>) -> scalar {
-    _ptr.with_not_null_value_return_block(|| 0.0, |layer| layer.borrow().offset.x)
+pub fn skia_offset_layer_get_x(layer_ptr: *mut ValueBox<Rc<RefCell<OffsetLayer>>>) -> scalar {
+    layer_ptr.with_not_null_value_return(0.0, |layer| layer.borrow().offset.x)
 }
 
 #[no_mangle]
-pub fn skia_offset_layer_get_y(_ptr: *mut ValueBox<Rc<RefCell<OffsetLayer>>>) -> scalar {
-    _ptr.with_not_null_value_return_block(|| 0.0, |layer| layer.borrow().offset.y)
+pub fn skia_offset_layer_get_y(layer_ptr: *mut ValueBox<Rc<RefCell<OffsetLayer>>>) -> scalar {
+    layer_ptr.with_not_null_value_return(0.0, |layer| layer.borrow().offset.y)
 }
 
 #[no_mangle]

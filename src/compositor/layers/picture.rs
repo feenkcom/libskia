@@ -1,11 +1,9 @@
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use compositor::compositor::CompositorContext;
-use compositor::image_cache::ImageCache;
 use compositor::layers::layer::Layer;
 use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
-use skia_safe::{Canvas, Image, Matrix, Picture, Point, Rect, RoundOut};
+use skia_safe::{Matrix, Picture, Point, Rect};
 use std::cell::RefCell;
-use std::collections::HashMap;
 use std::fmt::{Debug, Error, Formatter};
 use std::rc::Rc;
 use std::sync::Arc;
@@ -84,9 +82,9 @@ impl Layer for PictureLayer {
 
 #[no_mangle]
 pub fn skia_picture_layer_new_picture(
-    mut _picture_ptr: *mut ValueBox<Picture>,
+    picture_ptr: *mut ValueBox<Picture>,
 ) -> *mut ValueBox<Rc<RefCell<dyn Layer>>> {
-    _picture_ptr.with_not_null_value_return_block(
+    picture_ptr.with_value(
         || {
             let layer: Rc<RefCell<dyn Layer>> = Rc::new(RefCell::new(PictureLayer::from_picture(
                 Picture::new_placeholder(Rect::new(0.0, 0.0, 50.0, 50.0)),
@@ -102,14 +100,16 @@ pub fn skia_picture_layer_new_picture(
 }
 
 #[no_mangle]
-pub fn skia_picture_layer_get_needs_cache(_ptr: *mut ValueBox<Rc<RefCell<PictureLayer>>>) -> bool {
-    _ptr.with_not_null_value_return_block(|| false, |layer| layer.borrow().needs_cache)
+pub fn skia_picture_layer_get_needs_cache(
+    layer_ptr: *mut ValueBox<Rc<RefCell<PictureLayer>>>,
+) -> bool {
+    layer_ptr.with_not_null_value_return(false, |layer| layer.borrow().needs_cache)
 }
 
 #[no_mangle]
 pub fn skia_picture_layer_set_needs_cache(
-    _ptr: *mut ValueBox<Rc<RefCell<PictureLayer>>>,
+    layer_ptr: *mut ValueBox<Rc<RefCell<PictureLayer>>>,
     needs_cache: bool,
 ) {
-    _ptr.with_not_null_value(|layer| layer.borrow_mut().needs_cache = needs_cache);
+    layer_ptr.with_not_null_value(|layer| layer.borrow_mut().needs_cache = needs_cache);
 }

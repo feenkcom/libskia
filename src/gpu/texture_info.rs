@@ -1,4 +1,4 @@
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::gpu::gl::TextureInfo;
 
 #[no_mangle]
@@ -15,13 +15,17 @@ pub fn skia_texture_info_from_target_and_id(
 }
 
 #[no_mangle]
-pub fn skia_texture_info_get_target(_ptr: *mut ValueBox<TextureInfo>) -> std::os::raw::c_uint {
-    _ptr.with_not_null_return(0, |texture_info| texture_info.target)
+pub fn skia_texture_info_get_target(
+    texture_info: *mut ValueBox<TextureInfo>,
+) -> std::os::raw::c_uint {
+    texture_info.with_not_null_return(0, |texture_info| texture_info.target)
 }
 
 #[no_mangle]
-pub fn skia_texture_info_get_format(_ptr: *mut ValueBox<TextureInfo>) -> std::os::raw::c_uint {
-    _ptr.with_not_null_return(0, |texture_info| texture_info.format)
+pub fn skia_texture_info_get_format(
+    texture_info: *mut ValueBox<TextureInfo>,
+) -> std::os::raw::c_uint {
+    texture_info.with_not_null_return(0, |texture_info| texture_info.format)
 }
 
 #[no_mangle]
@@ -33,11 +37,13 @@ pub fn skia_texture_info_set_format(
 }
 
 #[no_mangle]
-pub fn skia_texture_info_get_id(_ptr: *mut ValueBox<TextureInfo>) -> std::os::raw::c_uint {
-    _ptr.with_not_null_return(0, |texture_info| texture_info.id)
+pub fn skia_texture_info_get_id(
+    texture_info_ptr: *mut ValueBox<TextureInfo>,
+) -> std::os::raw::c_uint {
+    texture_info_ptr.with_not_null_return(0, |texture_info| texture_info.id)
 }
 
 #[no_mangle]
-pub fn skia_texture_info_drop(_ptr: *mut ValueBox<TextureInfo>) {
-    _ptr.drop();
+pub fn skia_texture_info_drop(mut ptr: *mut ValueBox<TextureInfo>) {
+    ptr.drop();
 }

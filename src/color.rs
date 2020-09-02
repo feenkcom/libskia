@@ -1,5 +1,5 @@
 use boxer::array::BoxerArray;
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::Color;
 
 #[no_mangle]
@@ -18,28 +18,28 @@ pub fn skia_color_create_argb(argb: u32) -> *mut ValueBox<Color> {
 }
 
 #[no_mangle]
-pub fn skia_color_get_red(_ptr: *mut ValueBox<Color>) -> u8 {
-    _ptr.with(|color| color.r())
+pub fn skia_color_get_red(color_ptr: *mut ValueBox<Color>) -> u8 {
+    color_ptr.with_not_null_return(0, |color| color.r())
 }
 
 #[no_mangle]
-pub fn skia_color_get_green(_ptr: *mut ValueBox<Color>) -> u8 {
-    _ptr.with(|color| color.g())
+pub fn skia_color_get_green(color_ptr: *mut ValueBox<Color>) -> u8 {
+    color_ptr.with_not_null_return(0, |color| color.g())
 }
 
 #[no_mangle]
-pub fn skia_color_get_blue(_ptr: *mut ValueBox<Color>) -> u8 {
-    _ptr.with(|color| color.b())
+pub fn skia_color_get_blue(color_ptr: *mut ValueBox<Color>) -> u8 {
+    color_ptr.with_not_null_return(0, |color| color.b())
 }
 
 #[no_mangle]
-pub fn skia_color_get_alpha(_ptr: *mut ValueBox<Color>) -> u8 {
-    _ptr.with(|color| color.a())
+pub fn skia_color_get_alpha(color_ptr: *mut ValueBox<Color>) -> u8 {
+    color_ptr.with_not_null_return(0, |color| color.a())
 }
 
 #[no_mangle]
-pub fn skia_color_drop(_ptr: *mut ValueBox<Color>) {
-    _ptr.drop();
+pub fn skia_color_drop(mut ptr: *mut ValueBox<Color>) {
+    ptr.drop();
 }
 
 #[no_mangle]
@@ -52,7 +52,9 @@ pub fn skia_color_array_create_with(
     element_ptr: *mut ValueBox<Color>,
     amount: usize,
 ) -> *mut ValueBox<BoxerArray<Color>> {
-    element_ptr.with_value(|color| BoxerArray::<Color>::boxer_array_create_with(color, amount))
+    element_ptr.with_not_null_value_return(std::ptr::null_mut(), |color| {
+        BoxerArray::<Color>::boxer_array_create_with(color, amount)
+    })
 }
 
 #[no_mangle]
@@ -72,23 +74,26 @@ pub fn skia_color_array_get_data(_ptr: *mut ValueBox<BoxerArray<Color>>) -> *mut
 
 #[no_mangle]
 pub fn skia_color_array_at(
-    _array_ptr: *mut ValueBox<BoxerArray<Color>>,
+    array_ptr: *mut ValueBox<BoxerArray<Color>>,
     index: usize,
 ) -> *mut ValueBox<Color> {
-    _array_ptr.with(|array| ValueBox::new(array.to_slice()[index]).into_raw())
+    array_ptr.with_not_null_return(std::ptr::null_mut(), |array| {
+        ValueBox::new(array.to_slice()[index]).into_raw()
+    })
 }
 
 #[no_mangle]
 pub fn skia_color_array_at_put(
-    _array_ptr: *mut ValueBox<BoxerArray<Color>>,
+    array_ptr: *mut ValueBox<BoxerArray<Color>>,
     index: usize,
-    _color_ptr: *mut ValueBox<Color>,
+    color_ptr: *mut ValueBox<Color>,
 ) {
-    _color_ptr
-        .with_value(|color| BoxerArray::<Color>::boxer_array_at_put(_array_ptr, index, color));
+    color_ptr.with_not_null_value(|color| {
+        BoxerArray::<Color>::boxer_array_at_put(array_ptr, index, color)
+    });
 }
 
 #[no_mangle]
-pub fn skia_color_array_drop(_ptr: *mut ValueBox<BoxerArray<Color>>) {
-    _ptr.drop()
+pub fn skia_color_array_drop(mut ptr: *mut ValueBox<BoxerArray<Color>>) {
+    ptr.drop()
 }

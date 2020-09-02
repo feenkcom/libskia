@@ -1,4 +1,4 @@
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::font_style::{Slant, Weight, Width};
 use skia_safe::FontStyle;
 
@@ -17,23 +17,25 @@ pub fn skia_font_style_new(
 }
 
 #[no_mangle]
-pub fn skia_font_style_get_weight(_ptr: *mut ValueBox<FontStyle>) -> i32 {
-    _ptr.with(|font_style| *font_style.weight())
+pub fn skia_font_style_get_weight(font_style_ptr: *mut ValueBox<FontStyle>) -> i32 {
+    font_style_ptr.with_not_null_return(0, |font_style| *font_style.weight())
 }
 
 #[no_mangle]
-pub fn skia_font_style_get_width(_ptr: *mut ValueBox<FontStyle>) -> FontStyleWidth {
-    _ptr.with(|font_style| font_style.width().into())
+pub fn skia_font_style_get_width(font_style_ptr: *mut ValueBox<FontStyle>) -> FontStyleWidth {
+    font_style_ptr.with_not_null_return(FontStyleWidth::Normal, |font_style| {
+        font_style.width().into()
+    })
 }
 
 #[no_mangle]
-pub fn skia_font_style_get_slant(_ptr: *mut ValueBox<FontStyle>) -> Slant {
-    _ptr.with(|font_style| font_style.slant())
+pub fn skia_font_style_get_slant(font_style_ptr: *mut ValueBox<FontStyle>) -> Slant {
+    font_style_ptr.with_not_null_return(Slant::Upright, |font_style| font_style.slant())
 }
 
 #[no_mangle]
-pub fn skia_font_style_drop(_ptr: *mut ValueBox<FontStyle>) {
-    _ptr.drop();
+pub fn skia_font_style_drop(mut ptr: *mut ValueBox<FontStyle>) {
+    ptr.drop();
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]

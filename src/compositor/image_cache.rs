@@ -1,4 +1,4 @@
-use skia_safe::{Image, Matrix, Picture};
+use skia_safe::{Image, Matrix};
 use std::collections::HashMap;
 use std::fmt::{Debug, Error, Formatter};
 

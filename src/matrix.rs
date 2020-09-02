@@ -1,5 +1,5 @@
 use boxer::array::BoxerArray;
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::{scalar, Matrix};
 
 #[no_mangle]
@@ -9,11 +9,11 @@ pub fn skia_matrix_new_identity() -> *mut ValueBox<Matrix> {
 
 #[no_mangle]
 pub fn skia_matrix_get_all(
-    _ptr: *mut ValueBox<Matrix>,
-    _buffer_ptr: *mut ValueBox<BoxerArray<scalar>>,
+    matrix_ptr: *mut ValueBox<Matrix>,
+    buffer_ptr: *mut ValueBox<BoxerArray<scalar>>,
 ) {
-    _ptr.with_not_null(|matrix| {
-        _buffer_ptr.with_not_null(|buffer| {
+    matrix_ptr.with_not_null(|matrix| {
+        buffer_ptr.with_not_null(|buffer| {
             let mut members: [scalar; 9] = [0.0; 9];
             matrix.get_9(&mut members);
             buffer.set_array(&members);
@@ -23,7 +23,7 @@ pub fn skia_matrix_get_all(
 
 #[no_mangle]
 pub fn skia_matrix_set_all(
-    _ptr: *mut ValueBox<Matrix>,
+    matrix_ptr: *mut ValueBox<Matrix>,
     scale_x: scalar,
     skew_x: scalar,
     trans_x: scalar,
@@ -34,7 +34,7 @@ pub fn skia_matrix_set_all(
     persp_1: scalar,
     persp_2: scalar,
 ) {
-    _ptr.with_not_null(|matrix| {
+    matrix_ptr.with_not_null(|matrix| {
         matrix.set_all(
             scale_x, skew_x, trans_x, skew_y, scale_y, trans_y, persp_0, persp_1, persp_2,
         );
@@ -42,6 +42,6 @@ pub fn skia_matrix_set_all(
 }
 
 #[no_mangle]
-pub fn skia_matrix_drop(_ptr: *mut ValueBox<Matrix>) {
-    _ptr.drop();
+pub fn skia_matrix_drop(mut ptr: *mut ValueBox<Matrix>) {
+    ptr.drop();
 }

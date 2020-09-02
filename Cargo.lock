@@ -114,9 +114,10 @@ checksum = "0d8c1fef690941d3e7788d328517591fecc684c084084702d6ff1641e993699a"
 
 [[package]]
 name = "boxer"
-version = "0.1.0"
-source = "git+https://github.com/feenkcom/gtoolkit-boxer?rev=4dd3542ffd0c984f0c4fdc85f1015ceef2679a95#4dd3542ffd0c984f0c4fdc85f1015ceef2679a95"
+version = "0.2.0"
+source = "git+https://github.com/feenkcom/gtoolkit-boxer?rev=97356e99c81546cbf699c5f6f38830f56741ab3a#97356e99c81546cbf699c5f6f38830f56741ab3a"
 dependencies = [
+ "log",
  "widestring",
 ]
 
@@ -720,6 +721,7 @@ dependencies = [
  "float-cmp",
  "glutin",
  "libc",
+ "log",
  "num_cpus",
  "num_enum",
  "ordered-float",

@@ -1,17 +1,12 @@
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use compositor::compositor::CompositorContext;
-use compositor::image_cache::ImageCache;
 use compositor::layers::layer::Layer;
 use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
 use compositor::shadow_cache::Shadow;
-use skia_safe::{
-    scalar, Canvas, Color, Image, Matrix, Path, Picture, Point, RRect, Rect, RoundOut, Vector,
-};
+use skia_safe::{scalar, Color, Matrix, Path, Point, RRect, Rect, Vector};
 use std::cell::RefCell;
-use std::collections::HashMap;
 use std::fmt::{Debug, Error, Formatter};
 use std::rc::Rc;
-use std::sync::Arc;
 
 pub struct ShadowLayer {
     pub layers: Vec<Rc<RefCell<dyn Layer>>>,

@@ -26,7 +26,7 @@ impl<F: FnOnce(Option<&mut Context>)> FnBox for F {
     }
 }
 
-type Job = Box<FnBox + Send + 'static>;
+type Job = Box<dyn FnBox + Send + 'static>;
 
 impl ThreadPool {
     /// Create a new ThreadPool.
@@ -85,6 +85,7 @@ impl Drop for ThreadPool {
     }
 }
 
+#[derive(Debug)]
 struct Worker {
     id: usize,
     thread: Option<thread::JoinHandle<()>>,
@@ -141,7 +142,7 @@ impl Worker {
                     Message::NewJob(job) => {
                         let context = match gpu_context.as_mut() {
                             None => None,
-                            Some(mut gpu_context) => Some(&mut gpu_context.skia_context),
+                            Some(gpu_context) => Some(&mut gpu_context.skia_context),
                         };
                         job.call_box(context);
                     }
@@ -156,5 +157,10 @@ impl Worker {
             id,
             thread: Some(thread),
         }
+    }
+
+    #[allow(dead_code)]
+    pub fn id(&self) -> usize {
+        self.id
     }
 }

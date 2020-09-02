@@ -1,4 +1,5 @@
-use boxer::boxes::{ReferenceBox, ReferenceBoxPointer, ValueBox, ValueBoxPointer};
+use boxer::boxes::{ReferenceBox, ReferenceBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use float_cmp::{ApproxEq, F32Margin};
 use skia_safe::{scalar, Canvas, ClipOp, IRect, Path, QuickReject, RRect, Rect, Vector};
 

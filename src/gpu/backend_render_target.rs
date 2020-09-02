@@ -1,4 +1,4 @@
-use boxer::boxes::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::gpu::gl::FramebufferInfo;
 use skia_safe::gpu::BackendRenderTarget;
 
@@ -22,20 +22,24 @@ pub fn skia_backend_render_target_new_gl(
 }
 
 #[no_mangle]
-pub fn skia_backend_render_target_is_valid(_ptr: *mut ValueBox<BackendRenderTarget>) -> bool {
-    _ptr.with_not_null_return(false, |backend_render_target| {
+pub fn skia_backend_render_target_is_valid(
+    backend_render_target_ptr: *mut ValueBox<BackendRenderTarget>,
+) -> bool {
+    backend_render_target_ptr.with_not_null_return(false, |backend_render_target| {
         backend_render_target.is_valid()
     })
 }
 
 #[no_mangle]
-pub fn skia_backend_render_target_is_protected(_ptr: *mut ValueBox<BackendRenderTarget>) -> bool {
-    _ptr.with_not_null_return(false, |backend_render_target| {
+pub fn skia_backend_render_target_is_protected(
+    backend_render_target_ptr: *mut ValueBox<BackendRenderTarget>,
+) -> bool {
+    backend_render_target_ptr.with_not_null_return(false, |backend_render_target| {
         backend_render_target.is_protected()
     })
 }
 
 #[no_mangle]
-pub fn skia_backend_render_target_drop(_ptr: *mut ValueBox<BackendRenderTarget>) {
-    _ptr.drop()
+pub fn skia_backend_render_target_drop(mut ptr: *mut ValueBox<BackendRenderTarget>) {
+    ptr.drop()
 }

@@ -8,8 +8,6 @@ use skia_safe::{
     Budgeted, Color, ColorSpace, IRect, Image, ImageInfo, Matrix, Paint, Rect, RoundOut, Surface,
     Vector,
 };
-use std::cmp::max;
-use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 pub struct ShadowToRasterize {
@@ -79,7 +77,7 @@ impl ShadowRasterizer {
 
     pub fn rasterize(
         &self,
-        mut shadow_to_rasterize: ShadowToRasterize,
+        shadow_to_rasterize: ShadowToRasterize,
         gpu_context: Option<&mut Context>,
     ) -> RasterizedShadow {
         let device_bounds = shadow_to_rasterize.device_bounds();
@@ -92,7 +90,7 @@ impl ShadowRasterizer {
 
         let surface = match gpu_context {
             None => None,
-            Some(mut context) => {
+            Some(context) => {
                 let gpu_surface_time = std::time::Instant::now();
                 match Surface::new_render_target(
                     context,
@@ -136,7 +134,7 @@ impl ShadowRasterizer {
                         }
                         None
                     }
-                    Some(mut surface) => {
+                    Some(surface) => {
                         stats.log(cpu_surface_time, String::from("Create CPU Surface"));
                         stats.set_surface_type(RasterizerSurfaceType::Software);
                         Some(surface)
@@ -180,7 +178,7 @@ impl ShadowRasterizer {
                 stats.log(canvas_flush, String::from("Flush canvas"));
 
                 let raster_image_snapshot = std::time::Instant::now();
-                let mut image = Some(surface.image_snapshot());
+                let image = Some(surface.image_snapshot());
                 stats.log(raster_image_snapshot, String::from("Image snapshot"));
                 image
             }

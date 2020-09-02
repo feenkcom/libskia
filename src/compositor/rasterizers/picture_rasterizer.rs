@@ -1,7 +1,5 @@
 use boxer::function;
-use compositor::compositor_stats::{
-    RasterizationStats, RasterizationStepStats, RasterizerSurfaceType,
-};
+use compositor::compositor_stats::{RasterizationStats, RasterizerSurfaceType};
 use skia_safe::gpu::{Context, SurfaceOrigin};
 use skia_safe::{
     Budgeted, Color, ColorSpace, IRect, Image, ImageInfo, Matrix, Picture, Rect, RoundOut, Surface,
@@ -9,7 +7,6 @@ use skia_safe::{
 };
 use std::fmt::{Debug, Error, Formatter};
 use std::sync::Arc;
-use std::time::{Duration, Instant};
 
 /// I contain all the necessary data to rasterize a picture
 #[derive(Clone)]
@@ -97,7 +94,7 @@ impl PictureRasterizer {
 
     pub fn rasterize(
         &self,
-        mut picture_to_rasterize: PictureToRasterize,
+        picture_to_rasterize: PictureToRasterize,
         gpu_context: Option<&mut Context>,
     ) -> RasterizedPicture {
         let device_bounds = picture_to_rasterize.device_bounds();
@@ -111,7 +108,7 @@ impl PictureRasterizer {
 
         let surface = match gpu_context {
             None => None,
-            Some(mut context) => {
+            Some(context) => {
                 let gpu_surface_time = std::time::Instant::now();
                 match Surface::new_render_target(
                     context,
@@ -155,7 +152,7 @@ impl PictureRasterizer {
                         }
                         None
                     }
-                    Some(mut surface) => {
+                    Some(surface) => {
                         stats.log(cpu_surface_time, String::from("Create CPU Surface"));
                         stats.set_surface_type(RasterizerSurfaceType::Software);
                         Some(surface)
@@ -186,7 +183,7 @@ impl PictureRasterizer {
                 stats.log(canvas_flush, String::from("Flush canvas"));
 
                 let raster_image_snapshot = std::time::Instant::now();
-                let mut image = Some(surface.image_snapshot());
+                let image = Some(surface.image_snapshot());
                 stats.log(raster_image_snapshot, String::from("Image snapshot"));
                 image
             }

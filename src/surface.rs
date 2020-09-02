@@ -1,19 +1,18 @@
 use boxer::array::BoxerArrayU8;
-use boxer::boxes::{ReferenceBox, ValueBox, ValueBoxPointer};
+use boxer::boxes::ReferenceBox;
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::{AlphaType, Canvas, ColorType, IPoint, ISize, Image, ImageInfo, Surface};
-
-use boxer::{assert_box, function};
 
 #[no_mangle]
 pub fn skia_surface_new_raster_direct(
-    _image_info_ptr: *mut ValueBox<ImageInfo>,
-    _pixels_ptr: *mut ValueBox<BoxerArrayU8>,
-    _row_bytes: usize,
+    image_info_ptr: *mut ValueBox<ImageInfo>,
+    pixels_ptr: *mut ValueBox<BoxerArrayU8>,
+    row_bytes: usize,
 ) -> *mut ValueBox<Surface> {
-    _image_info_ptr.with(|image_info| {
-        _pixels_ptr.with(|pixels| {
+    image_info_ptr.with_not_null_return(std::ptr::null_mut(), |image_info| {
+        pixels_ptr.with_not_null_return(std::ptr::null_mut(), |pixels| {
             let surface_option =
-                Surface::new_raster_direct(image_info, pixels.to_slice(), Some(_row_bytes), None);
+                Surface::new_raster_direct(image_info, pixels.to_slice(), Some(row_bytes), None);
             match surface_option {
                 None => std::ptr::null_mut(),
                 Some(borrows_surface) => {
@@ -45,12 +44,11 @@ pub fn skia_surface_new_default() -> *mut ValueBox<Surface> {
 
 #[no_mangle]
 pub fn skia_surface_new_similar(
-    _surface_ptr: *mut ValueBox<Surface>,
-    _ptr_image_info: *mut ValueBox<ImageInfo>,
+    surface_ptr: *mut ValueBox<Surface>,
+    ptr_image_info: *mut ValueBox<ImageInfo>,
 ) -> *mut ValueBox<Surface> {
-    assert_box(_surface_ptr, function!());
-    _surface_ptr.with_not_null_return(std::ptr::null_mut(), |surface| {
-        _ptr_image_info.with_not_null_return(std::ptr::null_mut(), |image_info| {
+    surface_ptr.with_not_null_return(std::ptr::null_mut(), |surface| {
+        ptr_image_info.with_not_null_return(std::ptr::null_mut(), |image_info| {
             let surface_option = surface.new_surface(image_info);
             match surface_option {
                 None => {
@@ -65,47 +63,41 @@ pub fn skia_surface_new_similar(
 }
 
 #[no_mangle]
-pub fn skia_surface_get_canvas(_surface_ptr: *mut ValueBox<Surface>) -> *mut ReferenceBox<Canvas> {
-    assert_box(_surface_ptr, function!());
-    _surface_ptr.with_not_null_return(std::ptr::null_mut(), |surface| {
+pub fn skia_surface_get_canvas(surface_ptr: *mut ValueBox<Surface>) -> *mut ReferenceBox<Canvas> {
+    surface_ptr.with_not_null_return(std::ptr::null_mut(), |surface| {
         ReferenceBox::new(surface.canvas()).into_raw()
     })
 }
 
 #[no_mangle]
-pub fn skia_surface_get_width(_surface_ptr: *mut ValueBox<Surface>) -> i32 {
-    assert_box(_surface_ptr, function!());
-    _surface_ptr.with_not_null_return(0, |surface| surface.width())
+pub fn skia_surface_get_width(surface_ptr: *mut ValueBox<Surface>) -> i32 {
+    surface_ptr.with_not_null_return(0, |surface| surface.width())
 }
 
 #[no_mangle]
-pub fn skia_surface_get_color_type(_surface_ptr: *mut ValueBox<Surface>) -> ColorType {
-    assert_box(_surface_ptr, function!());
-    _surface_ptr.with_not_null_return(ColorType::Unknown, |surface| {
+pub fn skia_surface_get_color_type(surface_ptr: *mut ValueBox<Surface>) -> ColorType {
+    surface_ptr.with_not_null_return(ColorType::Unknown, |surface| {
         surface.image_info().color_type()
     })
 }
 
 #[no_mangle]
-pub fn skia_surface_get_alpha_type(_surface_ptr: *mut ValueBox<Surface>) -> AlphaType {
-    assert_box(_surface_ptr, function!());
-    _surface_ptr.with_not_null_return(AlphaType::Unknown, |surface| {
+pub fn skia_surface_get_alpha_type(surface_ptr: *mut ValueBox<Surface>) -> AlphaType {
+    surface_ptr.with_not_null_return(AlphaType::Unknown, |surface| {
         surface.image_info().alpha_type()
     })
 }
 
 #[no_mangle]
-pub fn skia_surface_get_height(_surface_ptr: *mut ValueBox<Surface>) -> i32 {
-    assert_box(_surface_ptr, function!());
-    _surface_ptr.with_not_null_return(0, |surface| surface.height())
+pub fn skia_surface_get_height(surface_ptr: *mut ValueBox<Surface>) -> i32 {
+    surface_ptr.with_not_null_return(0, |surface| surface.height())
 }
 
 #[no_mangle]
 pub fn skia_surface_get_image_info(
-    _surface_ptr: *mut ValueBox<Surface>,
+    surface_ptr: *mut ValueBox<Surface>,
 ) -> *mut ValueBox<ImageInfo> {
-    assert_box(_surface_ptr, function!());
-    _surface_ptr.with_not_null_return_block(
+    surface_ptr.with(
         || ValueBox::new(ImageInfo::default()).into_raw(),
         |surface| ValueBox::new(surface.image_info()).into_raw(),
     )
@@ -113,12 +105,11 @@ pub fn skia_surface_get_image_info(
 
 #[no_mangle]
 pub fn skia_surface_read_all_pixels(
-    _surface_ptr: *mut ValueBox<Surface>,
-    _pixels_ptr: *mut ValueBox<BoxerArrayU8>,
+    surface_ptr: *mut ValueBox<Surface>,
+    pixels_ptr: *mut ValueBox<BoxerArrayU8>,
 ) -> bool {
-    assert_box(_surface_ptr, function!());
-    _surface_ptr.with_not_null_return(false, |surface| {
-        _pixels_ptr.with(|pixels| {
+    surface_ptr.with_not_null_return(false, |surface| {
+        pixels_ptr.with_not_null_return(false, |pixels| {
             let image_info = surface.image_info();
             let row_bytes = image_info.min_row_bytes();
             surface.read_pixels(&image_info, pixels.to_slice(), row_bytes, IPoint::new(0, 0))
@@ -128,21 +119,19 @@ pub fn skia_surface_read_all_pixels(
 
 #[no_mangle]
 pub fn skia_surface_get_image_snapshot(
-    _surface_ptr: *mut ValueBox<Surface>,
+    surface_ptr: *mut ValueBox<Surface>,
 ) -> *mut ValueBox<Image> {
-    assert_box(_surface_ptr, function!());
-    _surface_ptr.with_not_null_return(std::ptr::null_mut(), |surface| {
+    surface_ptr.with_not_null_return(std::ptr::null_mut(), |surface| {
         ValueBox::new(surface.image_snapshot()).into_raw()
     })
 }
 
 #[no_mangle]
-pub fn skia_surface_flush(_surface_ptr: *mut ValueBox<Surface>) {
-    assert_box(_surface_ptr, function!());
-    _surface_ptr.with_not_null(|surface| surface.flush());
+pub fn skia_surface_flush(surface_ptr: *mut ValueBox<Surface>) {
+    surface_ptr.with_not_null(|surface| surface.flush_and_submit());
 }
 
 #[no_mangle]
-pub fn skia_surface_drop(_ptr: *mut ValueBox<Surface>) {
-    _ptr.drop()
+pub fn skia_surface_drop(mut ptr: *mut ValueBox<Surface>) {
+    ptr.drop()
 }

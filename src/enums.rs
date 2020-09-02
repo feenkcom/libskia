@@ -1,5 +1,5 @@
-use boxer::boxes::{ValueBox, ValueBoxPointer};
 use boxer::string::BoxerString;
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::canvas::PointMode;
 use skia_safe::font::Edging;
 use skia_safe::font_style::Slant;
