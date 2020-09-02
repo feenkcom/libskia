@@ -13,9 +13,9 @@ extern crate widestring;
 extern crate log;
 extern crate env_logger;
 
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::{icu, Paint};
 use std::os::raw::c_void;
-use boxer::{ValueBox, ValueBoxPointer};
 
 #[macro_export]
 macro_rules! drop {

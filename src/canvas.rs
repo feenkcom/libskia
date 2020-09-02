@@ -444,6 +444,7 @@ pub fn skia_canvas_save_layer(
 }
 
 #[no_mangle]
-pub fn skia_canvas_drop(_ptr: *mut ReferenceBox<Canvas>) {
-    _ptr.drop();
+pub fn skia_canvas_drop(_ptr: &mut *mut ReferenceBox<Canvas>) {
+    (*_ptr).drop();
+    *_ptr = std::ptr::null_mut();
 }

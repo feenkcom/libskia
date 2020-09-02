@@ -47,7 +47,7 @@ pub mod test {
 
     #[test]
     fn default_layer() {
-        let layer_ptr = skia_layer_rec_default();
+        let mut layer_ptr = skia_layer_rec_default();
 
         skia_layer_rec_drop(&mut layer_ptr);
     }

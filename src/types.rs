@@ -19,7 +19,7 @@ pub fn skia_glyph_id_name(_ptr: *mut ValueBox<BoxerString>) {
 fn scalar_name() {
     let _string_ptr = ValueBox::new(BoxerString::new()).into_raw();
     skia_scalar_name(_string_ptr);
-    _string_ptr.with(|string| {
+    _string_ptr.with_not_null(|string| {
         assert_eq!(string.to_string(), "f32");
     });
 }
@@ -28,7 +28,7 @@ fn scalar_name() {
 fn glyph_id_name() {
     let _string_ptr = ValueBox::new(BoxerString::new()).into_raw();
     skia_glyph_id_name(_string_ptr);
-    _string_ptr.with(|string| {
+    _string_ptr.with_not_null(|string| {
         assert_eq!(string.to_string(), "u16");
     });
 }
