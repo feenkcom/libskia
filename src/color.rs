@@ -1,5 +1,5 @@
 use boxer::array::BoxerArray;
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::Color;
 
 #[no_mangle]
@@ -94,6 +94,6 @@ pub fn skia_color_array_at_put(
 }
 
 #[no_mangle]
-pub fn skia_color_array_drop(mut ptr: *mut ValueBox<BoxerArray<Color>>) {
+pub fn skia_color_array_drop(ptr: &mut *mut ValueBox<BoxerArray<Color>>) {
     drop!(ptr);
 }

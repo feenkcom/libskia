@@ -13,8 +13,9 @@ extern crate widestring;
 extern crate log;
 extern crate env_logger;
 
-use skia_safe::icu;
+use skia_safe::{icu, Paint};
 use std::os::raw::c_void;
+use boxer::{ValueBox, ValueBoxPointer};
 
 #[macro_export]
 macro_rules! drop {
@@ -77,4 +78,11 @@ pub fn skia_init_env_logger() {
 #[no_mangle]
 pub fn skia_null_ptr() -> *mut c_void {
     std::ptr::null_mut()
+}
+
+#[no_mangle]
+pub fn skia_value_box_is_valid(ptr: *mut ValueBox<Paint>) -> bool {
+    println!("[skia_value_box_is_valid] paint_ptr: {:?}", ptr);
+    println!("{}", ptr.has_value());
+    ptr.has_value()
 }

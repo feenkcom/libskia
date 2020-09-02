@@ -1,5 +1,5 @@
 use boxer::array::BoxerArray;
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::{scalar, Paint, Path, PathFillType, Point, Rect, Vector};
 
 #[no_mangle]
@@ -230,6 +230,6 @@ pub fn skia_path_serialize(path_ptr: *mut ValueBox<Path>, data_ptr: *mut ValueBo
 }
 
 #[no_mangle]
-pub fn skia_path_drop(mut ptr: *mut ValueBox<Path>) {
+pub fn skia_path_drop(ptr: &mut *mut ValueBox<Path>) {
     drop!(ptr);
 }

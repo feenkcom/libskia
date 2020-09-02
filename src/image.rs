@@ -1,6 +1,6 @@
 use boxer::array::BoxerArrayU8;
 use boxer::string::BoxerString;
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::gpu::gl::Enum;
 use skia_safe::gpu::gl::TextureInfo;
 use skia_safe::gpu::{BackendTexture, Context, MipMapped, SurfaceOrigin};
@@ -321,6 +321,6 @@ pub fn skia_image_read_all_pixels(
 }
 
 #[no_mangle]
-pub fn skia_image_drop(mut ptr: *mut ValueBox<Image>) {
+pub fn skia_image_drop(ptr: &mut *mut ValueBox<Image>) {
     drop!(ptr);
 }

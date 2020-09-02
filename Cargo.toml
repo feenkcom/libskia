@@ -9,7 +9,7 @@ float-cmp = "0.6.0"
 ordered-float = "1.0.2"
 skia-safe = { git = "https://github.com/syrel/rust-skia", rev = "77bf48004e0993babc718f418fa6c98a10ce8b69", features = [ "gl", "textlayout" ] }
 libc = "0.2.68"
-boxer = { git = "https://github.com/feenkcom/gtoolkit-boxer", rev = "726306af827bbf38bcbc46515417f15e92751360" }
+boxer = { git = "https://github.com/feenkcom/gtoolkit-boxer", rev = "8ffd345b6aabda55c5ab1b4914f6f3e5f92918d4" }
 crossbeam = "0.7.3"
 num_cpus = "1.0"
 byteorder = "1.3.4"

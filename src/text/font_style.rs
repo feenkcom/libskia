@@ -1,4 +1,4 @@
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::font_style::{Slant, Weight, Width};
 use skia_safe::FontStyle;
 
@@ -34,8 +34,8 @@ pub fn skia_font_style_get_slant(font_style_ptr: *mut ValueBox<FontStyle>) -> Sl
 }
 
 #[no_mangle]
-pub fn skia_font_style_drop(mut ptr: *mut ValueBox<FontStyle>) {
-    ptr.drop();
+pub fn skia_font_style_drop(ptr: &mut *mut ValueBox<FontStyle>) {
+    drop!(ptr);
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]

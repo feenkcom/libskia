@@ -1,5 +1,5 @@
 use boxer::string::BoxerString;
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::font_style::{Slant, Weight, Width};
 use skia_safe::{FontStyle, Typeface};
 
@@ -67,6 +67,6 @@ pub fn skia_typeface_is_fixed_pitch(typeface_ptr: *mut ValueBox<Typeface>) -> bo
 }
 
 #[no_mangle]
-pub fn skia_typeface_drop(mut ptr: *mut ValueBox<Typeface>) {
-    ptr.drop();
+pub fn skia_typeface_drop(ptr: &mut *mut ValueBox<Typeface>) {
+    drop!(ptr);
 }

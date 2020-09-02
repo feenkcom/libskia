@@ -1,5 +1,5 @@
 use boxer::boxes::ReferenceBox;
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::{scalar, Canvas, Picture, PictureRecorder, Rect};
 
 #[no_mangle]
@@ -34,6 +34,6 @@ pub fn skia_picture_recorder_finish_recording(
 }
 
 #[no_mangle]
-pub fn skia_picture_recorder_drop(mut ptr: *mut ValueBox<PictureRecorder>) {
+pub fn skia_picture_recorder_drop(ptr: &mut *mut ValueBox<PictureRecorder>) {
     ptr.drop();
 }

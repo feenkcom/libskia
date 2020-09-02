@@ -115,7 +115,7 @@ checksum = "0d8c1fef690941d3e7788d328517591fecc684c084084702d6ff1641e993699a"
 [[package]]
 name = "boxer"
 version = "0.2.0"
-source = "git+https://github.com/feenkcom/gtoolkit-boxer?rev=726306af827bbf38bcbc46515417f15e92751360#726306af827bbf38bcbc46515417f15e92751360"
+source = "git+https://github.com/feenkcom/gtoolkit-boxer?rev=8ffd345b6aabda55c5ab1b4914f6f3e5f92918d4#8ffd345b6aabda55c5ab1b4914f6f3e5f92918d4"
 dependencies = [
  "log",
  "widestring",

@@ -1,4 +1,4 @@
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::rrect::Type;
 use skia_safe::{scalar, RRect, Rect, Vector};
 
@@ -75,7 +75,7 @@ pub fn skia_rounded_rectangle_set_oval(
 }
 
 #[no_mangle]
-pub fn skia_rounded_rectangle_drop(mut ptr: *mut ValueBox<RRect>) {
+pub fn skia_rounded_rectangle_drop(ptr: &mut *mut ValueBox<RRect>) {
     drop!(ptr);
 }
 

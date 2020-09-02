@@ -1,4 +1,4 @@
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use compositor::compositor::CompositorContext;
 use std::cell::RefCell;
 use std::fmt::Debug;
@@ -41,6 +41,6 @@ pub fn skia_composition_layer_count_refs(
 }
 
 #[no_mangle]
-pub fn skia_composition_layer_drop(mut ptr: *mut ValueBox<Rc<RefCell<dyn Layer>>>) {
-    ptr.drop();
+pub fn skia_composition_layer_drop(ptr: &mut *mut ValueBox<Rc<RefCell<dyn Layer>>>) {
+    drop!(ptr);
 }

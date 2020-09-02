@@ -1,4 +1,4 @@
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::scalar;
 use skia_safe::textlayout::{ParagraphStyle, TextStyle};
 
@@ -63,6 +63,6 @@ pub fn skia_paragraph_style_get_max_lines(paragraph_ptr: *mut ValueBox<Paragraph
 }
 
 #[no_mangle]
-pub fn skia_paragraph_style_drop(mut ptr: *mut ValueBox<ParagraphStyle>) {
-    ptr.drop()
+pub fn skia_paragraph_style_drop(ptr: &mut *mut ValueBox<ParagraphStyle>) {
+    drop!(ptr);
 }

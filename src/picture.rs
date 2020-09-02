@@ -1,5 +1,5 @@
 use boxer::boxes::{ReferenceBox, ReferenceBoxPointer};
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::{Canvas, Picture, Rect};
 
 #[no_mangle]
@@ -37,6 +37,6 @@ pub fn skia_picture_playback(
 }
 
 #[no_mangle]
-pub fn skia_picture_drop(mut ptr: *mut ValueBox<Picture>) {
+pub fn skia_picture_drop(ptr: &mut *mut ValueBox<Picture>) {
     drop!(ptr);
 }

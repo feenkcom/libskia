@@ -1,5 +1,5 @@
 use boxer::string::BoxerString;
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use paragraph::paragraph::{CharLength, ParagraphText, ParagraphWithText, TabSize};
 use skia_safe::textlayout::{
     FontCollection, ParagraphBuilder, ParagraphStyle, PlaceholderStyle, TextStyle,
@@ -133,6 +133,6 @@ pub fn skia_paragraph_builder_pop_style(
 }
 
 #[no_mangle]
-pub fn skia_paragraph_builder_drop(mut ptr: *mut ValueBox<ParagraphBuilderWithText>) {
-    ptr.drop()
+pub fn skia_paragraph_builder_drop(ptr: &mut *mut ValueBox<ParagraphBuilderWithText>) {
+    drop!(ptr);
 }

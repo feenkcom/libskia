@@ -1,5 +1,5 @@
 use boxer::array::BoxerArray;
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::{scalar, Matrix};
 
 #[no_mangle]
@@ -42,6 +42,6 @@ pub fn skia_matrix_set_all(
 }
 
 #[no_mangle]
-pub fn skia_matrix_drop(mut ptr: *mut ValueBox<Matrix>) {
+pub fn skia_matrix_drop(ptr: &mut *mut ValueBox<Matrix>) {
     drop!(ptr);
 }

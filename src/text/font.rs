@@ -1,6 +1,6 @@
 use boxer::array::BoxerArray;
 use boxer::string::BoxerString;
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::font::Edging;
 use skia_safe::{
     scalar, Font, FontHinting, FontMetrics, GlyphId, Paint, Rect, TextEncoding, Typeface,
@@ -180,6 +180,6 @@ pub fn skia_font_measure_text(
 }
 
 #[no_mangle]
-pub fn skia_font_drop(mut ptr: *mut ValueBox<Font>) {
-    ptr.drop();
+pub fn skia_font_drop(ptr: &mut *mut ValueBox<Font>) {
+    drop!(ptr);
 }

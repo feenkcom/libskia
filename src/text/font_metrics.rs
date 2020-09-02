@@ -1,4 +1,4 @@
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::{scalar, FontMetrics};
 
 #[no_mangle]
@@ -98,6 +98,6 @@ pub fn skia_font_metrics_get_strikeout_position(
 }
 
 #[no_mangle]
-pub fn skia_font_metrics_drop(mut ptr: *mut ValueBox<FontMetrics>) {
-    ptr.drop();
+pub fn skia_font_metrics_drop(ptr: &mut *mut ValueBox<FontMetrics>) {
+    drop!(ptr);
 }

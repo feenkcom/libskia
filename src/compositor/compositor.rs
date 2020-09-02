@@ -1,5 +1,5 @@
 use boxer::boxes::{ReferenceBox, ReferenceBoxPointer};
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use compositor::image_cache::ImageCache;
 use compositor::layers::layer::Layer;
 use skia_safe::{Canvas, Image, Matrix, Picture, Vector};
@@ -332,6 +332,6 @@ pub fn skia_compositor_draw(
 }
 
 #[no_mangle]
-pub fn skia_compositor_drop(mut ptr: *mut ValueBox<Compositor>) {
-    ptr.drop();
+pub fn skia_compositor_drop(ptr: &mut *mut ValueBox<Compositor>) {
+    drop!(ptr);
 }

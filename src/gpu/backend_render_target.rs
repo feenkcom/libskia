@@ -1,4 +1,4 @@
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::gpu::gl::FramebufferInfo;
 use skia_safe::gpu::BackendRenderTarget;
 
@@ -40,6 +40,6 @@ pub fn skia_backend_render_target_is_protected(
 }
 
 #[no_mangle]
-pub fn skia_backend_render_target_drop(mut ptr: *mut ValueBox<BackendRenderTarget>) {
-    ptr.drop()
+pub fn skia_backend_render_target_drop(ptr: &mut *mut ValueBox<BackendRenderTarget>) {
+    drop!(ptr);
 }

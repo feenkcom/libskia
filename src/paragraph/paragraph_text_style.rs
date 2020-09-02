@@ -1,5 +1,5 @@
 use boxer::string::BoxerString;
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::textlayout::{Decoration, TextStyle};
 use skia_safe::{scalar, Color, FontStyle, Paint};
 
@@ -139,6 +139,6 @@ pub fn skia_paragraph_text_style_set_decoration(
 }
 
 #[no_mangle]
-pub fn skia_paragraph_text_style_drop(mut ptr: *mut ValueBox<TextStyle>) {
-    ptr.drop()
+pub fn skia_paragraph_text_style_drop(ptr: &mut *mut ValueBox<TextStyle>) {
+    drop!(ptr);
 }

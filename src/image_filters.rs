@@ -1,4 +1,4 @@
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::image_filters::{blur, drop_shadow, drop_shadow_only, image};
 use skia_safe::{scalar, Color, FilterQuality, Image, ImageFilter, Rect, TileMode, Vector};
 
@@ -125,6 +125,6 @@ pub fn skia_image_filter_drop_shadow_only(
 }
 
 #[no_mangle]
-pub fn skia_image_filter_drop(mut ptr: *mut ValueBox<ImageFilter>) {
+pub fn skia_image_filter_drop(ptr: &mut *mut ValueBox<ImageFilter>) {
     drop!(ptr);
 }

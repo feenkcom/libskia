@@ -1,6 +1,6 @@
 use boxer::array::BoxerArrayU8;
 use boxer::boxes::ReferenceBox;
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::{AlphaType, Canvas, ColorType, IPoint, ISize, Image, ImageInfo, Surface};
 
 #[no_mangle]
@@ -132,6 +132,6 @@ pub fn skia_surface_flush(surface_ptr: *mut ValueBox<Surface>) {
 }
 
 #[no_mangle]
-pub fn skia_surface_drop(mut ptr: *mut ValueBox<Surface>) {
+pub fn skia_surface_drop(ptr: &mut *mut ValueBox<Surface>) {
     drop!(ptr);
 }

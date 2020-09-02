@@ -1,5 +1,5 @@
 use boxer::string::BoxerString;
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::gpu::gl::Interface;
 use skia_safe::gpu::Context;
 use skia_safe::ColorType;
@@ -114,6 +114,6 @@ pub fn skia_context_flush(_ptr: *mut ValueBox<Context>) {
 }
 
 #[no_mangle]
-pub fn skia_context_drop(mut ptr: *mut ValueBox<Context>) {
-    ptr.drop()
+pub fn skia_context_drop(ptr: &mut *mut ValueBox<Context>) {
+    drop!(ptr);
 }

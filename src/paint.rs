@@ -1,5 +1,5 @@
 use boxer::function;
-use boxer::{ValueBox, ValueBoxPointer};
+use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::paint::{Cap, Join, Style};
 use skia_safe::{scalar, BlendMode, Color, FilterQuality, ImageFilter, Paint, Shader};
 
@@ -207,6 +207,6 @@ pub fn skia_paint_has_image_filter(paint_ptr: *mut ValueBox<Paint>) -> bool {
 }
 
 #[no_mangle]
-pub fn skia_paint_drop(mut ptr: *mut ValueBox<Paint>) {
+pub fn skia_paint_drop(ptr: &mut *mut ValueBox<Paint>) {
     drop!(ptr);
 }
