@@ -182,11 +182,13 @@ impl ParagraphWithText {
     ) -> Point {
         let coordinate: Point = p.into();
 
+        trace!("[get_coordinate_outside_placeholder] at point {:?} with global affinity {:?}", coordinate, global_affinity);
+
         match self.get_placeholder_at_coordinate(coordinate) {
             None => coordinate,
-            Some((_placeholder, rect, affinity)) => {
+            Some((_placeholder, rect, placeholder_affinity)) => {
                 let local_affinity = match global_affinity {
-                    None => affinity,
+                    None => placeholder_affinity,
                     Some(affinity) => affinity,
                 };
 
@@ -194,7 +196,7 @@ impl ParagraphWithText {
                     Affinity::Upstream => Point::new(rect.right + 1.0, coordinate.y),
                     Affinity::Downstream => Point::new(rect.left - 1.0, coordinate.y),
                 };
-                self.get_coordinate_outside_placeholder(new_coordinate, Some(affinity))
+                self.get_coordinate_outside_placeholder(new_coordinate, Some(local_affinity))
             }
         }
     }
@@ -206,6 +208,7 @@ impl ParagraphWithText {
     }
 
     pub fn get_placeholder_at_index(&self, index: usize) -> &PlaceholderStyle {
+        trace!("[get_placeholder_at_index] {:?}", index);
         let placeholders: Vec<&PlaceholderStyle> =
             (self.text.pieces.iter().map(|piece| match piece {
                 ParagraphPiece::Text(_) => None,
@@ -215,6 +218,7 @@ impl ParagraphWithText {
             .map(|placeholder| placeholder.unwrap())
             .collect();
 
+        assert!(index < placeholders.len(), "placeholder index ({:?}) must be less then placeholder count ({:?})", index, placeholders.len());
         placeholders[index]
     }
 
@@ -234,6 +238,8 @@ impl ParagraphWithText {
     ) -> Option<(&PlaceholderStyle, Rect, Affinity)> {
         let point: Point = p.into();
 
+        trace!("[get_placeholder_at_coordinate] {:?}", point);
+
         let mut placeholder_index: usize = 0;
 
         for rect in self.get_rects_for_placeholders().iter() {
@@ -248,11 +254,13 @@ impl ParagraphWithText {
                     rect.rect,
                     affinity,
                 ));
+                trace!("[get_placeholder_at_coordinate] Found placeholder at {:?} index {:?} with affinity {:?}", point, placeholder_index, affinity);
                 return result;
             }
             placeholder_index = placeholder_index + 1;
         }
 
+        trace!("[get_placeholder_at_coordinate] No placeholder at {:?}", point);
         None
     }
 
