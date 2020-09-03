@@ -67,22 +67,9 @@ pub fn skia_icu_init() {
 #[no_mangle]
 pub fn skia_init_env_logger() {
     env_logger::init();
-
-    debug!("Debug level logging enabled");
-    info!("Info level logging enabled");
-    error!("Error level logging enabled");
-    warn!("Warning level logging enabled");
-    trace!("Trace level logging enabled");
 }
 
 #[no_mangle]
 pub fn skia_null_ptr() -> *mut c_void {
     std::ptr::null_mut()
-}
-
-#[no_mangle]
-pub fn skia_value_box_is_valid(ptr: *mut ValueBox<Paint>) -> bool {
-    println!("[skia_value_box_is_valid] paint_ptr: {:?}", ptr);
-    println!("{}", ptr.has_value());
-    ptr.has_value()
 }
