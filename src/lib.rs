@@ -13,6 +13,7 @@ extern crate widestring;
 extern crate log;
 extern crate env_logger;
 
+use skia_safe::icu;
 use std::os::raw::c_void;
 
 #[macro_export]

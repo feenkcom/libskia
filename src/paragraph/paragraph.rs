@@ -182,7 +182,11 @@ impl ParagraphWithText {
     ) -> Point {
         let coordinate: Point = p.into();
 
-        trace!("[get_coordinate_outside_placeholder] at point {:?} with global affinity {:?}", coordinate, global_affinity);
+        trace!(
+            "[get_coordinate_outside_placeholder] at point {:?} with global affinity {:?}",
+            coordinate,
+            global_affinity
+        );
 
         match self.get_placeholder_at_coordinate(coordinate) {
             None => coordinate,
@@ -218,7 +222,12 @@ impl ParagraphWithText {
             .map(|placeholder| placeholder.unwrap())
             .collect();
 
-        assert!(index < placeholders.len(), "placeholder index ({:?}) must be less then placeholder count ({:?})", index, placeholders.len());
+        assert!(
+            index < placeholders.len(),
+            "placeholder index ({:?}) must be less then placeholder count ({:?})",
+            index,
+            placeholders.len()
+        );
         placeholders[index]
     }
 
@@ -260,7 +269,10 @@ impl ParagraphWithText {
             placeholder_index = placeholder_index + 1;
         }
 
-        trace!("[get_placeholder_at_coordinate] No placeholder at {:?}", point);
+        trace!(
+            "[get_placeholder_at_coordinate] No placeholder at {:?}",
+            point
+        );
         None
     }
 
