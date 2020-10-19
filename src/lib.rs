@@ -43,6 +43,7 @@ pub mod matrix;
 pub mod paint;
 pub mod paragraph;
 pub mod path;
+pub mod path_effect;
 pub mod picture;
 pub mod recorder;
 pub mod rectangle;

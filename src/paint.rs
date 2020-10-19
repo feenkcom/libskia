@@ -1,7 +1,7 @@
 use boxer::function;
 use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::paint::{Cap, Join, Style};
-use skia_safe::{scalar, BlendMode, Color, FilterQuality, ImageFilter, Paint, Shader};
+use skia_safe::{scalar, BlendMode, Color, FilterQuality, ImageFilter, Paint, PathEffect, Shader};
 
 #[no_mangle]
 pub fn skia_paint_default() -> *mut ValueBox<Paint> {
@@ -182,7 +182,6 @@ pub fn skia_paint_set_image_filter(
     paint_ptr: *mut ValueBox<Paint>,
     image_filter_ptr: *mut ValueBox<ImageFilter>,
 ) {
-    trace!("{}", function!());
     paint_ptr.with_not_null(|paint| {
         let image_filter =
             image_filter_ptr.with_not_null_value_return(None, |image_filter| Some(image_filter));
@@ -201,6 +200,34 @@ pub fn skia_paint_get_image_filter(paint_ptr: *mut ValueBox<Paint>) -> *mut Valu
 #[no_mangle]
 pub fn skia_paint_has_image_filter(paint_ptr: *mut ValueBox<Paint>) -> bool {
     paint_ptr.with_not_null_return(false, |paint| match paint.image_filter() {
+        None => false,
+        Some(_) => true,
+    })
+}
+
+#[no_mangle]
+pub fn skia_paint_set_path_effect(
+    paint_ptr: *mut ValueBox<Paint>,
+    path_effect_ptr: *mut ValueBox<PathEffect>,
+) {
+    paint_ptr.with_not_null(|paint| {
+        let path_effect =
+            path_effect_ptr.with_not_null_value_return(None, |path_effect| Some(path_effect));
+        paint.set_path_effect(path_effect);
+    });
+}
+
+#[no_mangle]
+pub fn skia_paint_get_path_effect(paint_ptr: *mut ValueBox<Paint>) -> *mut ValueBox<PathEffect> {
+    paint_ptr.with_not_null_return(std::ptr::null_mut(), |paint| match paint.path_effect() {
+        None => std::ptr::null_mut(),
+        Some(path_effect) => ValueBox::new(path_effect).into_raw(),
+    })
+}
+
+#[no_mangle]
+pub fn skia_paint_has_path_effect(paint_ptr: *mut ValueBox<Paint>) -> bool {
+    paint_ptr.with_not_null_return(false, |paint| match paint.path_effect() {
         None => false,
         Some(_) => true,
     })
