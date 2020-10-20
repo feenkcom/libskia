@@ -31,10 +31,30 @@ pub fn skia_paragraph_text_style_get_word_spacing(
 }
 
 #[no_mangle]
+pub fn skia_paragraph_text_style_set_word_spacing(
+    text_style_ptr: *mut ValueBox<TextStyle>,
+    word_spacing: scalar,
+) {
+    text_style_ptr.with_not_null(|style| {
+        style.set_word_spacing(word_spacing);
+    })
+}
+
+#[no_mangle]
 pub fn skia_paragraph_text_style_get_letter_spacing(
     text_style_ptr: *mut ValueBox<TextStyle>,
 ) -> scalar {
     text_style_ptr.with_not_null_return(0.0, |style| style.letter_spacing())
+}
+
+#[no_mangle]
+pub fn skia_paragraph_text_style_set_letter_spacing(
+    text_style_ptr: *mut ValueBox<TextStyle>,
+    letter_spacing: scalar,
+) {
+    text_style_ptr.with_not_null(|style| {
+        style.set_letter_spacing(letter_spacing);
+    })
 }
 
 #[no_mangle]
