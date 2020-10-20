@@ -34,7 +34,7 @@ impl CachedShadowImage {
     }
 }
 
-#[derive(PartialEq, Clone)]
+#[derive(Clone)]
 pub struct Shadow {
     pub color: Color,
     pub radius: (scalar, scalar),
@@ -72,19 +72,7 @@ impl Shadow {
         OrderedFloat::from(self.radius.0).hash(state);
         OrderedFloat::from(self.radius.1).hash(state);
 
-        let mut points = Vec::with_capacity(self.path.count_points());
-        self.path.get_points(&mut points);
-
-        for point in points {
-            OrderedFloat::from(point.x).hash(state);
-            OrderedFloat::from(point.y).hash(state);
-        }
-
-        let mut verbs = Vec::with_capacity(self.path.count_verbs());
-        self.path.get_verbs(&mut verbs);
-        verbs.hash(state);
-
-        self.path.fill_type().hash(state);
+        self.path.serialize().as_bytes().hash(state);
     }
 
     pub fn cull_rect(&self) -> Rect {
@@ -104,14 +92,30 @@ impl Hash for Shadow {
     }
 }
 
+impl PartialEq for Shadow {
+    fn eq(&self, other: &Self) -> bool {
+        self.color == other.color
+            && self.radius == other.radius
+            && self.offset == other.offset
+            && self.path.eq(&other.path)
+    }
+}
 impl Eq for Shadow {}
 
 impl Debug for Shadow {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+        let mut points = Vec::with_capacity(self.path.count_points());
+        self.path.get_points(&mut points);
+        let mut verbs = Vec::with_capacity(self.path.count_verbs());
+        self.path.get_verbs(&mut verbs);
+
         f.debug_struct("Shadow")
             .field("color:", &self.color)
             .field("radius:", &self.radius)
             .field("offset:", &self.offset)
+            .field("path points:", &points)
+            .field("path verbs:", &verbs)
+            .field("path:", &self.path.serialize().as_bytes())
             .finish()
     }
 }
@@ -165,4 +169,30 @@ impl ShadowCache {
         self.images
             .retain(|_, cached_image| !cached_image.should_purge())
     }
+}
+
+#[test]
+pub fn test_hash_cached_shadow() {
+    let cache = ShadowCache::new();
+
+    let mut path = Path::new();
+    path.add_rect(Rect::new(10.0, 20.0, 30.0, 40.0), None);
+
+    let shadow = Shadow::new(Color::GRAY, (5.0, 5.0), Vector::new(0.0, 1.0), path);
+
+    assert_eq!(cache.has_cached_shadow(&shadow), false);
+}
+
+#[test]
+pub fn test_shadow_equals() {
+    let mut path = Path::new();
+    path.add_rect(Rect::new(10.0, 20.0, 30.0, 40.0), None);
+
+    let mut similar_path = Path::new();
+    similar_path.add_rect(Rect::new(10.0, 20.0, 30.0, 40.0), None);
+
+    let shadow = Shadow::new(Color::GRAY, (5.0, 5.0), Vector::new(0.0, 1.0), path);
+    let similar_shadow = Shadow::new(Color::GRAY, (5.0, 5.0), Vector::new(0.0, 1.0), similar_path);
+
+    assert_eq!(shadow, similar_shadow);
 }

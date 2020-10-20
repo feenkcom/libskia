@@ -57,7 +57,7 @@ pub fn skia_image_from_file(boxer_string_ptr: *mut ValueBox<BoxerString>) -> *mu
         }
 
         let data = Data::new_copy(&buffer);
-        let my_image = Image::from_encoded(data, None);
+        let my_image = Image::from_encoded(data);
         if my_image.is_none() {
             return std::ptr::null_mut();
         }
@@ -287,16 +287,20 @@ pub fn skia_image_get_backend_texture(
     image_ptr: *mut ValueBox<Image>,
 ) -> *mut ValueBox<BackendTexture> {
     image_ptr.with_not_null_return(std::ptr::null_mut(), |image| {
-        let result = image.backend_texture(true);
-        ValueBox::new(result.0).into_raw()
+        match image.backend_texture(true) {
+            None => std::ptr::null_mut(),
+            Some(result) => ValueBox::new(result.0).into_raw(),
+        }
     })
 }
 
 #[no_mangle]
 pub fn skia_image_get_backend_texture_origin(image_ptr: *mut ValueBox<Image>) -> SurfaceOrigin {
     image_ptr.with_not_null_return(SurfaceOrigin::BottomLeft, |image| {
-        let result = image.backend_texture(true);
-        result.1
+        match image.backend_texture(true) {
+            None => SurfaceOrigin::TopLeft,
+            Some(result) => result.1,
+        }
     })
 }
 

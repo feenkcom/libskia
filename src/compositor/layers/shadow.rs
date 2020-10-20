@@ -3,7 +3,11 @@ use compositor::compositor::CompositorContext;
 use compositor::layers::layer::Layer;
 use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
 use compositor::shadow_cache::Shadow;
-use skia_safe::{scalar, Color, Matrix, Path, Point, RRect, Rect, Vector};
+use skia_safe::image_filters::drop_shadow_only;
+use skia_safe::paint::Style;
+use skia_safe::{
+    scalar, BlendMode, Color, Color4f, Matrix, Paint, Path, Point, RRect, Rect, Vector,
+};
 use std::cell::RefCell;
 use std::fmt::{Debug, Error, Formatter};
 use std::rc::Rc;
@@ -77,7 +81,24 @@ impl Layer for ShadowLayer {
     fn draw(&mut self, context: &mut CompositorContext) {
         let (image, canvas) = context.get_rasterized_shadow_image_and_canvas(self.cached_shadow());
         match image {
-            None => {}
+            None => {
+                let drop_shadow_filter =
+                    drop_shadow_only(self.offset, self.radius, self.color, None, None);
+
+                let mut shadow_paint = Paint::default();
+                shadow_paint.set_style(Style::Stroke);
+                shadow_paint.set_color(Color::WHITE);
+                shadow_paint.set_anti_alias(true);
+                shadow_paint.set_blend_mode(BlendMode::SrcOver);
+                shadow_paint.set_stroke_width(if self.radius.0 > self.radius.1 {
+                    self.radius.0
+                } else {
+                    self.radius.1
+                });
+                shadow_paint.set_image_filter(drop_shadow_filter);
+
+                canvas.draw_path(&self.path, &shadow_paint);
+            }
             Some((image, matrix)) => {
                 let current_matrix = canvas.total_matrix();
 
@@ -165,25 +186,20 @@ pub fn skia_shadow_layer_set_rounded_rectangle(
     top: scalar,
     right: scalar,
     bottom: scalar,
-    r_left_x: scalar,
-    r_left_y: scalar,
-    r_top_x: scalar,
-    r_top_y: scalar,
-    r_right_x: scalar,
-    r_right_y: scalar,
-    r_bottom_x: scalar,
-    r_bottom_y: scalar,
+    r_left: scalar,
+    r_top: scalar,
+    r_right: scalar,
+    r_bottom: scalar,
 ) {
     _ptr.with_not_null_value(|layer| {
         let mut path = Path::new();
         let rect = Rect::new(left, top, right, bottom);
         let radii = [
-            Vector::new(r_left_x, r_left_y),
-            Vector::new(r_top_x, r_top_y),
-            Vector::new(r_right_x, r_right_y),
-            Vector::new(r_bottom_x, r_bottom_y),
+            Vector::new(r_left, r_left),
+            Vector::new(r_top, r_top),
+            Vector::new(r_right, r_right),
+            Vector::new(r_bottom, r_bottom),
         ];
-
         path.add_rrect(&RRect::new_rect_radii(rect, &radii), None);
         layer.borrow_mut().set_path(path)
     })
