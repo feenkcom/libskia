@@ -1,17 +1,10 @@
 use compositor::rasterizers::picture_rasterizer::{
     PictureRasterizer, PictureToRasterize, RasterizedPicture,
 };
-use compositor::rasterizers::rasterizer_thread::{
-    RasterizerRequest, RasterizerResult, RasterizerThread,
-};
 use compositor::rasterizers::shadow_rasterizer::{
     RasterizedShadow, ShadowRasterizer, ShadowToRasterize,
 };
-use glutin::event_loop::EventLoop;
-use glutin::{ContextBuilder, PossiblyCurrent, WindowedContext};
 use skia_safe::Canvas;
-use std::sync::mpsc::{channel, Receiver, Sender};
-use std::thread::JoinHandle;
 
 pub trait Rasterizer {
     fn rasterize_picture(
@@ -25,124 +18,6 @@ pub trait Rasterizer {
         canvas: &mut Canvas,
         to_rasterize: Vec<ShadowToRasterize>,
     ) -> Vec<RasterizedShadow>;
-}
-
-pub struct AsyncRasterizer {
-    pub sender: Sender<RasterizerRequest>,
-    pub receiver: Receiver<RasterizerResult>,
-    pub thread: Option<JoinHandle<()>>,
-}
-
-impl AsyncRasterizer {
-    pub fn new(workers_num: usize) -> Self {
-        let (in_tx, in_rx) = channel();
-        let (out_tx, out_rx) = channel();
-
-        let thread = std::thread::spawn(move || {
-            let thread = RasterizerThread::new(out_tx, in_rx);
-            thread.run(workers_num, None);
-        });
-
-        Self {
-            sender: in_tx,
-            receiver: out_rx,
-            thread: Some(thread),
-        }
-    }
-
-    pub fn new_accelerated(
-        workers_num: usize,
-        event_loop: &EventLoop<()>,
-        windowed_context: &WindowedContext<PossiblyCurrent>,
-    ) -> Self {
-        let contexts = (0..workers_num)
-            .map(|_| {
-                ContextBuilder::new()
-                    .with_shared_lists(windowed_context)
-                    .build_headless(event_loop, glutin::dpi::PhysicalSize::new(1, 1))
-            })
-            .filter(|option| option.is_ok())
-            .map(|option| option.unwrap())
-            .collect();
-
-        let (in_tx, in_rx) = channel();
-        let (out_tx, out_rx) = channel();
-
-        let thread = std::thread::spawn(move || {
-            let thread = RasterizerThread::new(out_tx, in_rx);
-            thread.run(workers_num, Some(contexts));
-        });
-
-        Self {
-            sender: in_tx,
-            receiver: out_rx,
-            thread: Some(thread),
-        }
-    }
-}
-
-impl Rasterizer for AsyncRasterizer {
-    fn rasterize_picture(
-        &mut self,
-        _canvas: &mut Canvas,
-        to_rasterize: Vec<PictureToRasterize>,
-    ) -> Vec<RasterizedPicture> {
-        let mut rasterized_pictures: Vec<RasterizedPicture> = vec![];
-
-        if self
-            .sender
-            .send(RasterizerRequest::RasterizePicture(to_rasterize))
-            .is_ok()
-        {
-            match self.receiver.recv() {
-                Ok(RasterizerResult::RasterizedPictures(images)) => {
-                    rasterized_pictures = images;
-                }
-                Ok(RasterizerResult::RasterizedShadows(_)) => {}
-                Err(_) => {}
-            }
-        } else {
-            error!("Could not send RasterizePicture request!");
-        }
-
-        rasterized_pictures
-    }
-
-    fn rasterize_shadow(
-        &mut self,
-        _canvas: &mut Canvas,
-        to_rasterize: Vec<ShadowToRasterize>,
-    ) -> Vec<RasterizedShadow> {
-        let mut rasterized_shadows: Vec<RasterizedShadow> = vec![];
-
-        if self
-            .sender
-            .send(RasterizerRequest::RasterizeShadow(to_rasterize))
-            .is_ok()
-        {
-            match self.receiver.recv() {
-                Ok(RasterizerResult::RasterizedShadows(shadows)) => {
-                    rasterized_shadows = shadows;
-                }
-                Ok(RasterizerResult::RasterizedPictures(_)) => {}
-                Err(_) => {}
-            }
-        } else {
-            error!("Could not send RasterizeShadow request!");
-        }
-
-        rasterized_shadows
-    }
-}
-
-impl Drop for AsyncRasterizer {
-    fn drop(&mut self) {
-        self.sender.send(RasterizerRequest::Terminate).unwrap();
-
-        if let Some(thread) = self.thread.take() {
-            thread.join().unwrap();
-        }
-    }
 }
 
 pub struct SyncRasterizer {}
@@ -159,7 +34,7 @@ impl Rasterizer for SyncRasterizer {
         canvas: &mut Canvas,
         to_rasterize: Vec<PictureToRasterize>,
     ) -> Vec<RasterizedPicture> {
-        let mut gpu_context = canvas.gpu_context();
+        let mut gpu_context = canvas.recording_context();
         let mut rasterized_pictures: Vec<RasterizedPicture> = vec![];
 
         let picture_rasterizer = PictureRasterizer::new();
@@ -175,7 +50,7 @@ impl Rasterizer for SyncRasterizer {
         canvas: &mut Canvas,
         to_rasterize: Vec<ShadowToRasterize>,
     ) -> Vec<RasterizedShadow> {
-        let mut gpu_context = canvas.gpu_context();
+        let mut gpu_context = canvas.recording_context();
         let mut rasterized_shadows: Vec<RasterizedShadow> = vec![];
 
         let shadow_rasterizer = ShadowRasterizer::new();

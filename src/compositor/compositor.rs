@@ -6,11 +6,9 @@ use skia_safe::{Canvas, Image, Matrix, Picture, Vector};
 use std::collections::VecDeque;
 
 use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
-use compositor::rasterizers::rasterizer::{AsyncRasterizer, Rasterizer, SyncRasterizer};
+use compositor::rasterizers::rasterizer::{Rasterizer, SyncRasterizer};
 use compositor::rasterizers::shadow_rasterizer::ShadowToRasterize;
 use compositor::shadow_cache::{Shadow, ShadowCache};
-use glutin::event_loop::EventLoop;
-use glutin::{PossiblyCurrent, WindowedContext};
 use std::cell::RefCell;
 use std::os::raw::c_void;
 use std::rc::Rc;
@@ -213,32 +211,6 @@ impl Compositor {
         }
     }
 
-    pub fn new_software(workers_num: usize) -> Self {
-        Self {
-            image_cache: ImageCache::new(),
-            rasterizer: Box::new(AsyncRasterizer::new(workers_num)),
-            images_per_frame: 5,
-            shadow_cache: ShadowCache::new(),
-        }
-    }
-
-    pub fn new_accelerated(
-        workers_num: usize,
-        event_loop: &EventLoop<()>,
-        windowed_context: &WindowedContext<PossiblyCurrent>,
-    ) -> Self {
-        Self {
-            image_cache: ImageCache::new(),
-            rasterizer: Box::new(AsyncRasterizer::new_accelerated(
-                workers_num,
-                event_loop,
-                windowed_context,
-            )),
-            images_per_frame: 5,
-            shadow_cache: ShadowCache::new(),
-        }
-    }
-
     pub fn set_images_limit(&mut self, images_per_frame: usize) {
         self.images_per_frame = images_per_frame;
     }
@@ -290,29 +262,6 @@ impl Compositor {
 #[no_mangle]
 pub fn skia_compositor_new() -> *mut ValueBox<Compositor> {
     ValueBox::new(Compositor::new()).into_raw()
-}
-
-#[no_mangle]
-pub fn skia_compositor_new_accelerated(
-    workers_num: usize,
-    _event_loop_ptr: *mut ValueBox<EventLoop<()>>,
-    _windowed_context_ptr: *mut ValueBox<WindowedContext<PossiblyCurrent>>,
-) -> *mut ValueBox<Compositor> {
-    _event_loop_ptr.with_not_null_return(std::ptr::null_mut(), |event_loop| {
-        _windowed_context_ptr.with_not_null_return(std::ptr::null_mut(), |context| {
-            ValueBox::new(Compositor::new_accelerated(
-                workers_num,
-                event_loop,
-                context,
-            ))
-            .into_raw()
-        })
-    })
-}
-
-#[no_mangle]
-pub fn skia_compositor_new_software(workers_num: usize) -> *mut ValueBox<Compositor> {
-    ValueBox::new(Compositor::new_software(workers_num)).into_raw()
 }
 
 #[no_mangle]

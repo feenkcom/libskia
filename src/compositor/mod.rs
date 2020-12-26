@@ -4,4 +4,3 @@ pub mod image_cache;
 pub mod layers;
 pub mod rasterizers;
 pub mod shadow_cache;
-pub mod thread_pool;

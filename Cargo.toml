@@ -4,23 +4,25 @@ version = "0.1.0"
 authors = ["Aliaksei Syrel <alex.syrel@gmail.com>"]
 
 [dependencies]
+skia-safe = { git = "https://github.com/syrel/rust-skia", rev = "920fac85fa1d59596ad3bf417bebbffb382db386" }
 typename = "0.1.1"
 float-cmp = "0.6.0"
 ordered-float = "1.0.2"
-skia-safe = { git = "https://github.com/syrel/rust-skia", rev = "4d5ce6982325686cef4f05129bff52a682527831", features = [ "gl", "textlayout" ] }
 libc = "0.2.68"
 boxer = { git = "https://github.com/feenkcom/gtoolkit-boxer", rev = "8ffd345b6aabda55c5ab1b4914f6f3e5f92918d4" }
 crossbeam = "0.7.3"
 num_cpus = "1.0"
 byteorder = "1.3.4"
 num_enum = "0.4.3"
-glutin = { git = "https://github.com/syrel/glutin", rev ="0b1971f880f68ee3c2dd83e777b6f20be980c3b4" }
 widestring = "0.4.2"
 log = "0.4"
-env_logger = "0.7"
+env_logger = "0.8"
 
-[patch.crates-io]
-winit = { git = "https://github.com/rust-windowing/winit", rev = "6cfddfea21319ef7e28f4a6dc16e119ab033f550" }
+[features]
+default = ["skia-safe/gl", "skia-safe/textlayout"]
+skia_windows = ["skia-safe/d3d"]
+skia_mac = ["skia-safe/metal"]
+skia_linux = []
 
 [lib]
 name = "Skia"

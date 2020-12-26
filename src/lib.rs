@@ -3,7 +3,6 @@ extern crate boxer;
 extern crate byteorder;
 extern crate crossbeam;
 extern crate float_cmp;
-extern crate glutin;
 extern crate num_cpus;
 extern crate num_enum;
 extern crate ordered_float;

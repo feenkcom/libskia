@@ -1,6 +1,6 @@
 use boxer::function;
 use compositor::compositor_stats::{RasterizationStats, RasterizerSurfaceType};
-use skia_safe::gpu::{Context, SurfaceOrigin};
+use skia_safe::gpu::{RecordingContext, SurfaceOrigin};
 use skia_safe::{
     Budgeted, Color, ColorSpace, IRect, Image, ImageInfo, Matrix, Picture, Rect, RoundOut, Surface,
     Vector,
@@ -95,7 +95,7 @@ impl PictureRasterizer {
     pub fn rasterize(
         &self,
         picture_to_rasterize: PictureToRasterize,
-        gpu_context: Option<&mut Context>,
+        gpu_context: Option<&mut RecordingContext>,
     ) -> RasterizedPicture {
         let device_bounds = picture_to_rasterize.device_bounds();
         let picture = &picture_to_rasterize.picture;

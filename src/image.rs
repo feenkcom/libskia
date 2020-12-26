@@ -73,13 +73,13 @@ pub fn skia_image_from_buffer(
     start: usize,
     end: usize,
 ) -> *mut ValueBox<Image> {
-    buffer_ptr.with_not_null_return(
-        std::ptr::null_mut(),
-        |buffer| match Image::decode_to_raster(&buffer.to_slice()[start..end], None) {
+    buffer_ptr.with_not_null_return(std::ptr::null_mut(), |buffer| {
+        let data = Data::new_copy(&buffer.to_slice()[start..end]);
+        match Image::from_encoded(data) {
             None => std::ptr::null_mut(),
             Some(image) => ValueBox::new(image).into_raw(),
-        },
-    )
+        }
+    })
 }
 
 #[no_mangle]

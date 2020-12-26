@@ -19,6 +19,7 @@ jobs:
             prefix: ''
             extension: .dll
             platform: windows
+            features: skia_windows
     steps:
       - name: Set CARGO_HOME
         run: |
@@ -55,7 +56,7 @@ jobs:
         run: choco install rustup.install --ignore-checksums
         
       - name: Run cargo build
-        run: cargo build --release
+        run: cargo build --release --features ${{matrix.variant.features}}
         shell: powershell
         
       - name: Deploy
@@ -80,6 +81,7 @@ jobs:
             prefix: lib
             extension: .so
             platform: linux
+            features: skia_linux
             distro: bionic
             clang: 10
             gcc: 9
@@ -87,6 +89,7 @@ jobs:
             prefix: lib
             extension: .dylib
             platform: osx
+            features: skia_mac
     steps:
       - name: Install dependencies (Linux)
         if: startsWith(matrix.variant.os,'ubuntu')
@@ -141,7 +144,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --release
+          args: --release --features ${{matrix.variant.features}}
         env:
           MACOSX_DEPLOYMENT_TARGET: 10.9
       

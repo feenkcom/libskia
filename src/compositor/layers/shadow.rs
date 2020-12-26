@@ -5,9 +5,7 @@ use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
 use compositor::shadow_cache::Shadow;
 use skia_safe::image_filters::drop_shadow_only;
 use skia_safe::paint::Style;
-use skia_safe::{
-    scalar, BlendMode, Color, Color4f, Matrix, Paint, Path, Point, RRect, Rect, Vector,
-};
+use skia_safe::{scalar, BlendMode, Color, Matrix, Paint, Path, Point, RRect, Rect, Vector};
 use std::cell::RefCell;
 use std::fmt::{Debug, Error, Formatter};
 use std::rc::Rc;

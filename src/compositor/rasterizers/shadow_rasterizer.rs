@@ -1,7 +1,7 @@
 use boxer::function;
 use compositor::compositor_stats::{RasterizationStats, RasterizerSurfaceType};
 use compositor::shadow_cache::Shadow;
-use skia_safe::gpu::{Context, SurfaceOrigin};
+use skia_safe::gpu::{RecordingContext, SurfaceOrigin};
 use skia_safe::image_filters::drop_shadow_only;
 use skia_safe::paint::Style;
 use skia_safe::{
@@ -78,7 +78,7 @@ impl ShadowRasterizer {
     pub fn rasterize(
         &self,
         shadow_to_rasterize: ShadowToRasterize,
-        gpu_context: Option<&mut Context>,
+        gpu_context: Option<&mut RecordingContext>,
     ) -> RasterizedShadow {
         let device_bounds = shadow_to_rasterize.device_bounds();
         let shadow = &shadow_to_rasterize.shadow;

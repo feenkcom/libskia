@@ -37,7 +37,7 @@ pub fn skia_backend_texture_get_height(texture_ptr: *mut ValueBox<BackendTexture
 
 #[no_mangle]
 pub fn skia_backend_texture_has_mip_maps(texture_ptr: *mut ValueBox<BackendTexture>) -> bool {
-    texture_ptr.with_not_null_return(false, |backend_texture| backend_texture.has_mip_maps())
+    texture_ptr.with_not_null_return(false, |backend_texture| backend_texture.has_mipmaps())
 }
 
 #[no_mangle]

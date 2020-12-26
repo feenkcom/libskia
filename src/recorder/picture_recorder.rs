@@ -16,7 +16,7 @@ pub fn skia_picture_recorder_begin_recording(
     bottom: scalar,
 ) -> *mut ReferenceBox<Canvas> {
     picture_recorder_ptr.with_not_null_return(std::ptr::null_mut(), |recorder| {
-        ReferenceBox::new(recorder.begin_recording(Rect::new(left, top, right, bottom), None, None))
+        ReferenceBox::new(recorder.begin_recording(Rect::new(left, top, right, bottom), None))
             .into_raw()
     })
 }
