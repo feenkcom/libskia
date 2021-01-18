@@ -61,6 +61,10 @@ impl ImageCache {
         self.images.contains_key(&picture_id)
     }
 
+    pub fn count_cached_images(&self) -> usize {
+        self.images.len()
+    }
+
     pub fn clear(&mut self) {
         self.images.clear();
     }

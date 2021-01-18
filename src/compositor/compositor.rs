@@ -215,6 +215,14 @@ impl Compositor {
         self.images_per_frame = images_per_frame;
     }
 
+    pub fn count_cached_images(&self) -> usize {
+        self.image_cache.count_cached_images()
+    }
+
+    pub fn count_cached_shadows(&self) -> usize {
+        self.shadow_cache.count_cached_shadows()
+    }
+
     pub fn draw(&mut self, layers_tree: &Rc<RefCell<dyn Layer>>, canvas: &mut Canvas) {
         let mut context =
             CompositorContext::new(canvas, &mut self.image_cache, &mut self.shadow_cache);
@@ -278,6 +286,16 @@ pub fn skia_compositor_draw(
             })
         })
     })
+}
+
+#[no_mangle]
+pub fn skia_compositor_count_cached_images(compositor_ptr: *mut ValueBox<Compositor>) -> usize {
+    compositor_ptr.with_not_null_return(0, |compositor| compositor.count_cached_images())
+}
+
+#[no_mangle]
+pub fn skia_compositor_count_cached_shadows(compositor_ptr: *mut ValueBox<Compositor>) -> usize {
+    compositor_ptr.with_not_null_return(0, |compositor| compositor.count_cached_shadows())
 }
 
 #[no_mangle]

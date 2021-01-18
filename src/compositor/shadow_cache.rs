@@ -6,6 +6,9 @@ use std::collections::HashMap;
 use std::fmt::{Debug, Error, Formatter};
 use std::hash::{Hash, Hasher};
 
+/// The amount of frames after which a cached shadow image is purged if not used
+pub const CACHED_SHADOW_UNUSED_FRAMES_LIMIT: usize = 5;
+
 pub struct CachedShadowImage {
     image: Image,
     frames_to_purge: usize,
@@ -16,7 +19,7 @@ impl CachedShadowImage {
     pub fn new(image: Image, matrix: Matrix) -> Self {
         Self {
             image,
-            frames_to_purge: 1000,
+            frames_to_purge: CACHED_SHADOW_UNUSED_FRAMES_LIMIT,
             matrix,
         }
     }
@@ -26,11 +29,20 @@ impl CachedShadowImage {
     }
 
     pub fn mark_used(&mut self) {
-        self.frames_to_purge = min(self.frames_to_purge + 1, 1000);
+        self.frames_to_purge = min(self.frames_to_purge + 1, CACHED_SHADOW_UNUSED_FRAMES_LIMIT);
     }
 
     pub fn should_purge(&self) -> bool {
         self.frames_to_purge <= 0
+    }
+}
+
+impl Debug for CachedShadowImage {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+
+        f.debug_struct("CachedShadowImage")
+            .field("frames_to_purge:", &self.frames_to_purge)
+            .finish()
     }
 }
 
@@ -126,9 +138,7 @@ pub struct ShadowCache {
 
 impl Debug for ShadowCache {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-        f.debug_struct("ShadowCache")
-            .field("images:", &self.images.keys())
-            .finish()
+        f.debug_map().entries(self.images.iter().map(|(k, v)| (k, v))).finish()
     }
 }
 
@@ -148,6 +158,10 @@ impl ShadowCache {
 
     pub fn has_cached_shadow(&self, shadow: &Shadow) -> bool {
         self.images.contains_key(shadow)
+    }
+
+    pub fn count_cached_shadows(&self) -> usize {
+        self.images.len()
     }
 
     pub fn push_shadow_image(&mut self, shadow: Shadow, image: Image, matrix: Matrix) {
