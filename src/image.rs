@@ -1,16 +1,12 @@
 use boxer::array::BoxerArrayU8;
 use boxer::string::BoxerString;
 use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
-use skia_safe::gpu::gl::Enum;
-use skia_safe::gpu::gl::TextureInfo;
-use skia_safe::gpu::{BackendTexture, Context, MipMapped, SurfaceOrigin};
+use skia_safe::gpu::{BackendTexture, SurfaceOrigin};
 use skia_safe::image::CachingHint;
-use skia_safe::prelude::*;
 use skia_safe::{
     AlphaType, ColorSpace, ColorType, Data, EncodedImageFormat, FilterQuality, IPoint, ISize,
     Image, ImageInfo, Matrix, Paint, Surface,
 };
-use std::ffi::c_void;
 use std::fs::File;
 use std::io::Read;
 use std::io::Write;
@@ -154,76 +150,6 @@ pub fn skia_scale_image(
 
         ValueBox::new(out_image).into_raw()
     })
-}
-
-#[no_mangle]
-pub fn skia_image_from_texture(
-    context_ptr: *mut ValueBox<Context>,
-    target: Enum,
-    id: Enum,
-    width: i32,
-    height: i32,
-    color_type: ColorType,
-    alpha_type: AlphaType,
-    release_proc: Option<unsafe extern "C" fn(*mut c_void)>,
-    release_context: *mut c_void,
-) -> *mut ValueBox<Image> {
-    context_ptr.with_not_null_return(std::ptr::null_mut(), |context| {
-        let texture_info = TextureInfo::from_target_and_id(target, id);
-        let backend_texture =
-            unsafe { BackendTexture::new_gl((width, height), MipMapped::No, texture_info) };
-
-        let texture = Image::from_texture_with_release_proc(
-            context,
-            &backend_texture,
-            SurfaceOrigin::BottomLeft,
-            color_type,
-            alpha_type,
-            None,
-            release_proc,
-            release_context,
-        );
-
-        match texture {
-            None => std::ptr::null_mut(),
-            Some(texture) => ValueBox::new(texture).into_raw(),
-        }
-    })
-}
-
-#[no_mangle]
-pub fn skia_image_from_backend_texture(
-    _context_ptr: *mut ValueBox<Context>,
-    _backend_texture_ptr: *mut ValueBox<BackendTexture>,
-    color_type: ColorType,
-    alpha_type: AlphaType,
-    release_proc: Option<unsafe extern "C" fn(*mut c_void)>,
-    release_context: *mut c_void,
-) -> *mut ValueBox<Image> {
-    _context_ptr.with_not_null_return(std::ptr::null_mut(), |context| {
-        _backend_texture_ptr.with_not_null_return(std::ptr::null_mut(), |backend_texture| {
-            let texture = Image::from_texture_with_release_proc(
-                context,
-                backend_texture,
-                SurfaceOrigin::BottomLeft,
-                color_type,
-                alpha_type,
-                None,
-                release_proc,
-                release_context,
-            );
-
-            match texture {
-                None => std::ptr::null_mut(),
-                Some(texture) => ValueBox::new(texture).into_raw(),
-            }
-        })
-    })
-}
-
-#[no_mangle]
-pub fn skia_image_get_ref_count(image_ptr: *mut ValueBox<Image>) -> usize {
-    image_ptr.with_not_null_return(0, |image| image.as_ref().native()._ref_cnt())
 }
 
 #[no_mangle]

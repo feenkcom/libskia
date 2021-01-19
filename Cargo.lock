@@ -786,8 +786,8 @@ checksum = "7fdf1b9db47230893d76faad238fd6097fd6d6a9245cd7a4d90dbd639536bbd2"
 
 [[package]]
 name = "skia-bindings"
-version = "0.36.1"
-source = "git+https://github.com/syrel/rust-skia?rev=920fac85fa1d59596ad3bf417bebbffb382db386#920fac85fa1d59596ad3bf417bebbffb382db386"
+version = "0.37.0"
+source = "git+https://github.com/rust-skia/rust-skia?rev=4a32db33df29d4c98987420dc5b6f74894d8703d#4a32db33df29d4c98987420dc5b6f74894d8703d"
 dependencies = [
  "bindgen",
  "cc",
@@ -797,14 +797,15 @@ dependencies = [
  "regex",
  "serde_json",
  "tar",
+ "thread_local",
  "toml",
  "ureq",
 ]
 
 [[package]]
 name = "skia-safe"
-version = "0.36.1"
-source = "git+https://github.com/syrel/rust-skia?rev=920fac85fa1d59596ad3bf417bebbffb382db386#920fac85fa1d59596ad3bf417bebbffb382db386"
+version = "0.37.0"
+source = "git+https://github.com/rust-skia/rust-skia?rev=4a32db33df29d4c98987420dc5b6f74894d8703d#4a32db33df29d4c98987420dc5b6f74894d8703d"
 dependencies = [
  "bitflags",
  "lazy_static",

@@ -4,5 +4,5 @@ pub mod context;
 pub mod surface_gpu;
 pub mod texture_info;
 
-#[cfg(target_os = "macos")]
+#[cfg(feature = "metal")]
 pub mod metal;

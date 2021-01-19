@@ -1,7 +1,7 @@
 use boxer::string::BoxerString;
 use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::gpu::gl::Interface;
-use skia_safe::gpu::Context;
+use skia_safe::gpu::DirectContext;
 use skia_safe::ColorType;
 use std::os::raw::c_void;
 
@@ -51,10 +51,11 @@ pub fn skia_interface_drop(ptr: &mut *mut ValueBox<Interface>) {
 }
 
 #[no_mangle]
-pub fn skia_context_new_gl(interface_ptr: *mut ValueBox<Interface>) -> *mut ValueBox<Context> {
-    interface_ptr.with_not_null_value_return(
-        std::ptr::null_mut(),
-        |interface| match Context::new_gl(Some(interface)) {
+pub fn skia_context_new_gl(
+    interface_ptr: *mut ValueBox<Interface>,
+) -> *mut ValueBox<DirectContext> {
+    interface_ptr.with_not_null_value_return(std::ptr::null_mut(), |interface| {
+        match DirectContext::new_gl(Some(interface), None) {
             None => {
                 if cfg!(debug_assertions) {
                     eprintln!("[skia_context_new_gl] Unable to create OpenGL context");
@@ -62,23 +63,23 @@ pub fn skia_context_new_gl(interface_ptr: *mut ValueBox<Interface>) -> *mut Valu
                 return std::ptr::null_mut();
             }
             Some(_context) => ValueBox::new(_context).into_raw(),
-        },
-    )
+        }
+    })
 }
 
 #[no_mangle]
-pub fn skia_context_get_max_texture_size(context_ptr: *mut ValueBox<Context>) -> i32 {
+pub fn skia_context_get_max_texture_size(context_ptr: *mut ValueBox<DirectContext>) -> i32 {
     context_ptr.with_not_null_return(0, |context| context.max_texture_size())
 }
 
 #[no_mangle]
-pub fn skia_context_get_max_render_target_size(context_ptr: *mut ValueBox<Context>) -> i32 {
+pub fn skia_context_get_max_render_target_size(context_ptr: *mut ValueBox<DirectContext>) -> i32 {
     context_ptr.with_not_null_return(0, |context| context.max_render_target_size())
 }
 
 #[no_mangle]
 pub fn skia_context_get_max_surface_sample_count_for_color_type(
-    context_ptr: *mut ValueBox<Context>,
+    context_ptr: *mut ValueBox<DirectContext>,
     color_type: ColorType,
 ) -> usize {
     context_ptr.with_not_null_return(0, |context| {
@@ -88,7 +89,7 @@ pub fn skia_context_get_max_surface_sample_count_for_color_type(
 
 #[no_mangle]
 pub fn skia_context_is_color_type_supported_as_image(
-    context_ptr: *mut ValueBox<Context>,
+    context_ptr: *mut ValueBox<DirectContext>,
     color_type: ColorType,
 ) -> bool {
     context_ptr.with_not_null_return(false, |context| {
@@ -98,7 +99,7 @@ pub fn skia_context_is_color_type_supported_as_image(
 
 #[no_mangle]
 pub fn skia_context_is_color_type_supported_as_surface(
-    context_ptr: *mut ValueBox<Context>,
+    context_ptr: *mut ValueBox<DirectContext>,
     color_type: ColorType,
 ) -> bool {
     context_ptr.with_not_null_return(false, |context| {
@@ -107,13 +108,13 @@ pub fn skia_context_is_color_type_supported_as_surface(
 }
 
 #[no_mangle]
-pub fn skia_context_flush(_ptr: *mut ValueBox<Context>) {
+pub fn skia_context_flush(_ptr: *mut ValueBox<DirectContext>) {
     _ptr.with_not_null(|context| {
         context.flush_and_submit();
     });
 }
 
 #[no_mangle]
-pub fn skia_context_drop(ptr: &mut *mut ValueBox<Context>) {
+pub fn skia_context_drop(ptr: &mut *mut ValueBox<DirectContext>) {
     drop!(ptr);
 }

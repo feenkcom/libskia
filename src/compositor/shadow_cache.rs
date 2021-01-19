@@ -39,7 +39,6 @@ impl CachedShadowImage {
 
 impl Debug for CachedShadowImage {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-
         f.debug_struct("CachedShadowImage")
             .field("frames_to_purge:", &self.frames_to_purge)
             .finish()
@@ -138,7 +137,9 @@ pub struct ShadowCache {
 
 impl Debug for ShadowCache {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-        f.debug_map().entries(self.images.iter().map(|(k, v)| (k, v))).finish()
+        f.debug_map()
+            .entries(self.images.iter().map(|(k, v)| (k, v)))
+            .finish()
     }
 }
 

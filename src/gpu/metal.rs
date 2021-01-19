@@ -1,13 +1,13 @@
 use boxer::ValueBox;
-use skia_safe::gpu::Context;
+use skia_safe::gpu::DirectContext;
 
 #[no_mangle]
 pub fn skia_context_new_metal(
     device_ptr: *mut std::ffi::c_void,
     queue: *mut std::ffi::c_void,
-) -> *mut ValueBox<Context> {
+) -> *mut ValueBox<DirectContext> {
     unsafe {
-        match Context::new_metal(device_ptr, queue) {
+        match DirectContext::new_metal(device_ptr, queue, None) {
             None => {
                 if cfg!(debug_assertions) {
                     eprintln!("[skia_context_new_gl] Unable to create OpenGL context");

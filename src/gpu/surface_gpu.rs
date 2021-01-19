@@ -1,11 +1,11 @@
 use boxer::{ValueBox, ValueBoxPointer};
-use skia_safe::gpu::{BackendRenderTarget, BackendTexture, Context, SurfaceOrigin};
+use skia_safe::gpu::{BackendRenderTarget, BackendTexture, DirectContext, SurfaceOrigin};
 use skia_safe::{Budgeted, ColorType, ImageInfo, Surface};
 
 #[no_mangle]
 pub fn skia_surface_from_render_target(
     backend_render_target_ptr: *mut ValueBox<BackendRenderTarget>,
-    context_ptr: *mut ValueBox<Context>,
+    context_ptr: *mut ValueBox<DirectContext>,
     color_type: ColorType,
 ) -> *mut ValueBox<Surface> {
     backend_render_target_ptr.with_not_null_return(std::ptr::null_mut(),|backend_render_target| {
@@ -35,7 +35,7 @@ pub fn skia_surface_from_render_target(
 #[no_mangle]
 pub fn skia_surface_new_render_target(
     _image_info_ptr: *mut ValueBox<ImageInfo>,
-    _context_ptr: *mut ValueBox<Context>,
+    _context_ptr: *mut ValueBox<DirectContext>,
 ) -> *mut ValueBox<Surface> {
     _image_info_ptr.with_not_null_return(std::ptr::null_mut(),|image_info| {
         _context_ptr.with_not_null_return(std::ptr::null_mut(), |context| {
@@ -65,7 +65,7 @@ pub fn skia_surface_new_render_target(
 
 #[no_mangle]
 pub fn skia_surface_from_backend_texture(
-    context_ptr: *mut ValueBox<Context>,
+    context_ptr: *mut ValueBox<DirectContext>,
     backend_texture_ptr: *mut ValueBox<BackendTexture>,
     color_type: ColorType,
 ) -> *mut ValueBox<Surface> {
