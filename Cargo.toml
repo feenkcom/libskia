@@ -22,7 +22,7 @@ env_logger = "0.8"
 default = ["skia-safe/gl", "skia-safe/textlayout"]
 skia_windows = ["skia-safe/d3d"]
 skia_mac = ["skia-safe/metal"]
-skia_linux = []
+skia_linux = ["skia-safe/x11", "skia-safe/shaper"]
 
 [lib]
 name = "Skia"
