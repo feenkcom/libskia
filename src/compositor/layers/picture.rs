@@ -2,7 +2,7 @@ use boxer::{ValueBox, ValueBoxPointer};
 use compositor::compositor::CompositorContext;
 use compositor::layers::layer::Layer;
 use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
-use skia_safe::{Matrix, Picture, Point, Rect};
+use skia_safe::{Matrix, Picture, Point, Rect, M44};
 use std::cell::RefCell;
 use std::fmt::{Debug, Error, Formatter};
 use std::rc::Rc;
@@ -50,7 +50,7 @@ impl Layer for PictureLayer {
                 context.canvas().draw_picture(&self.picture, None, None);
             }
             Some((image, matrix)) => {
-                let current_matrix = canvas.total_matrix();
+                let current_matrix = canvas.local_to_device_as_3x3();
 
                 let device_bounds = PictureToRasterize::compute_device_bounds_rect(
                     &self.picture.cull_rect(),
@@ -68,7 +68,7 @@ impl Layer for PictureLayer {
                 );
 
                 canvas.reset_matrix();
-                canvas.set_matrix(&relative_matrix);
+                canvas.set_matrix(&M44::from(relative_matrix));
                 canvas.draw_image(
                     image,
                     Point::new((relative_bounds.left) as f32, (relative_bounds.top) as f32),

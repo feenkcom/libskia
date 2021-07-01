@@ -8,7 +8,7 @@ use skia_safe::canvas::{PointMode, SaveLayerRec};
 use skia_safe::utils::shadow_utils::ShadowFlags;
 use skia_safe::{
     scalar, BlendMode, Canvas, Color, Image, Matrix, Paint, Path, Point, Point3, RRect, Rect,
-    TextBlob, Vector,
+    TextBlob, Vector, M44,
 };
 
 #[no_mangle]
@@ -358,7 +358,7 @@ pub fn skia_canvas_set_matrix(
     assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         matrix_ptr.with_not_null(|matrix| {
-            canvas.set_matrix(matrix);
+            canvas.set_matrix(&M44::from(matrix as &Matrix));
         })
     });
 }
@@ -371,7 +371,7 @@ pub fn skia_canvas_get_matrix(
     assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         matrix_ptr.with_not_null(|matrix| {
-            let m = canvas.total_matrix();
+            let m = canvas.local_to_device_as_3x3();
             let mut buffer: [scalar; 9] = [0.0; 9];
             m.get_9(&mut buffer);
             matrix.set_9(&buffer);
@@ -388,12 +388,8 @@ pub fn skia_canvas_reset_matrix(canvas_ptr: *mut ReferenceBox<Canvas>) {
 }
 
 #[no_mangle]
-pub fn skia_canvas_flush(canvas_ptr: *mut ReferenceBox<Canvas>) {
-    assert_reference_box(canvas_ptr, function!());
-    canvas_ptr.with_not_null(|canvas| {
-        canvas.flush();
-    })
-}
+#[deprecated(since = "0.38.0", note = "Replace usage with DirectContext::flush()")]
+pub fn skia_canvas_flush(_canvas_ptr: *mut ReferenceBox<Canvas>) {}
 
 #[no_mangle]
 pub fn skia_canvas_save(canvas_ptr: *mut ReferenceBox<Canvas>) -> usize {

@@ -52,7 +52,7 @@ impl<'canvas, 'compositor> CompositorContext<'canvas, 'compositor> {
         shadow_cache: &'compositor mut ShadowCache,
     ) -> Self {
         let mut transformations = VecDeque::new();
-        transformations.push_back(canvas.total_matrix());
+        transformations.push_back(canvas.local_to_device_as_3x3());
 
         Self {
             image_cache,

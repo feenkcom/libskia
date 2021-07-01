@@ -64,7 +64,7 @@ mod tests {
         let height = 1000;
 
         let mut surface = Surface::new_raster_n32_premul(ISize::new(width, height)).unwrap();
-        let mut canvas = surface.canvas();
+        let canvas = surface.canvas();
 
         let font = Font::new(
             Typeface::new("Source Sans Pro", FontStyle::normal()).unwrap(),

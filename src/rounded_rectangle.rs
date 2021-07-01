@@ -81,7 +81,7 @@ pub fn skia_rounded_rectangle_drop(ptr: &mut *mut ValueBox<RRect>) {
 
 #[cfg(test)]
 mod test {
-    use boxer::{ValueBoxPointer, ValueBoxPointerReference};
+    use boxer::ValueBoxPointerReference;
     use rectangle::{skia_rectangle_f32_default, skia_rectangle_f32_set_ltrb};
     use rounded_rectangle::{
         skia_rounded_rectangle_default, skia_rounded_rectangle_height,

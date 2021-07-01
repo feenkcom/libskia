@@ -5,7 +5,7 @@ use skia_safe::gpu::{BackendTexture, SurfaceOrigin};
 use skia_safe::image::CachingHint;
 use skia_safe::{
     AlphaType, ColorSpace, ColorType, Data, EncodedImageFormat, FilterQuality, IPoint, ISize,
-    Image, ImageInfo, Matrix, Paint, Surface,
+    Image, ImageInfo, Paint, Surface, M44,
 };
 use std::fs::File;
 use std::io::Read;
@@ -115,7 +115,7 @@ pub fn skia_scale_image(
     new_x: i32,
     new_y: i32,
     keep_aspect_ratio: bool,
-    filter_quality: FilterQuality,
+    _filter_quality: FilterQuality,
 ) -> *mut ValueBox<Image> {
     image_ptr.with_not_null_return(std::ptr::null_mut(), |image| {
         let mut resize_x = (new_x as f32) / (image.width() as f32);
@@ -138,14 +138,12 @@ pub fn skia_scale_image(
         let mut surface = surface.unwrap();
         let mut paint = Paint::default();
         paint.set_anti_alias(true);
-        paint.set_filter_quality(filter_quality);
         surface
             .canvas()
-            .set_matrix(&Matrix::scale((resize_x, resize_y)));
+            .set_matrix(&M44::scale(resize_x, resize_y, 1.0));
         surface
             .canvas()
             .draw_image(image, IPoint::new(0, 0), Some(&paint));
-        surface.canvas().flush();
         let out_image = surface.image_snapshot();
 
         ValueBox::new(out_image).into_raw()

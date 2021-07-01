@@ -5,7 +5,7 @@ use compositor::rasterizers::picture_rasterizer::PictureToRasterize;
 use compositor::shadow_cache::Shadow;
 use skia_safe::image_filters::drop_shadow_only;
 use skia_safe::paint::Style;
-use skia_safe::{scalar, BlendMode, Color, Matrix, Paint, Path, Point, RRect, Rect, Vector};
+use skia_safe::{scalar, BlendMode, Color, Matrix, Paint, Path, Point, RRect, Rect, Vector, M44};
 use std::cell::RefCell;
 use std::fmt::{Debug, Error, Formatter};
 use std::rc::Rc;
@@ -98,7 +98,7 @@ impl Layer for ShadowLayer {
                 canvas.draw_path(&self.path, &shadow_paint);
             }
             Some((image, matrix)) => {
-                let current_matrix = canvas.total_matrix();
+                let current_matrix = canvas.local_to_device_as_3x3();
 
                 let device_bounds = PictureToRasterize::compute_device_bounds_rect(
                     &self.cached_shadow().cull_rect(),
@@ -116,7 +116,7 @@ impl Layer for ShadowLayer {
                 );
 
                 canvas.reset_matrix();
-                canvas.set_matrix(&relative_matrix);
+                canvas.set_matrix(&M44::from(relative_matrix));
                 canvas.draw_image(
                     image,
                     Point::new(relative_bounds.left as f32, relative_bounds.top as f32),

@@ -40,16 +40,12 @@ pub fn skia_paint_set_dither(paint_ptr: *mut ValueBox<Paint>, dither: bool) {
 }
 
 #[no_mangle]
-pub fn skia_paint_get_filter_quality(paint_ptr: *mut ValueBox<Paint>) -> FilterQuality {
-    paint_ptr.with_not_null_return(FilterQuality::None, |paint| paint.filter_quality())
+pub fn skia_paint_get_filter_quality(_paint_ptr: *mut ValueBox<Paint>) -> FilterQuality {
+    FilterQuality::None
 }
 
 #[no_mangle]
-pub fn skia_paint_set_filter_quality(paint_ptr: *mut ValueBox<Paint>, quality: FilterQuality) {
-    paint_ptr.with_not_null(|paint| {
-        paint.set_filter_quality(quality);
-    });
-}
+pub fn skia_paint_set_filter_quality(_paint_ptr: *mut ValueBox<Paint>, _quality: FilterQuality) {}
 
 #[no_mangle]
 pub fn skia_paint_get_style(paint_ptr: *mut ValueBox<Paint>) -> Style {
