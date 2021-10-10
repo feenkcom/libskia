@@ -125,6 +125,7 @@ pipeline {
                     }
 
                     steps {
+                        powershell 'Remove-Item -Force -Recurse -Path target -ErrorAction Ignore'
                         powershell 'git clean -fdx'
 
                         powershell "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release"
