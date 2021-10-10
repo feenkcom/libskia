@@ -1,38 +1,18 @@
-[package]
-name = "libskia"
-version = "0.1.0"
-authors = ["Aliaksei Syrel <alex.syrel@gmail.com>"]
+[workspace]
 
-[dependencies]
-skia-safe = { git = "https://github.com/rust-skia/rust-skia", rev = "5c96670703e06e64f6fd20a86cfb70681e1914c1" }
-typename = "0.1.1"
-float-cmp = "0.6.0"
-ordered-float = "1.0.2"
-libc = "0.2.68"
-boxer = { git = "https://github.com/feenkcom/gtoolkit-boxer", rev = "8ffd345b6aabda55c5ab1b4914f6f3e5f92918d4" }
-crossbeam = "0.7.3"
-num_cpus = "1.0"
-byteorder = "1.3.4"
-num_enum = "0.4.3"
-widestring = "0.4.2"
-log = "0.4"
-env_logger = "0.8"
+members = [
+    "library",
+    "shared-library-builder/library",
+    "shared-library-builder/builder",
+]
 
-[features]
-default = ["skia-safe/gl", "skia-safe/textlayout"]
-skia_windows = ["skia-safe/d3d"]
-skia_mac = ["skia-safe/metal"]
-skia_linux = ["skia-safe/x11", "skia-safe/shaper"]
-
-[lib]
-name = "Skia"
-crate-type = ["cdylib"]
+exclude = [ "target" ]
 
 [profile.dev]
 opt-level = 0
 debug = true
 debug-assertions = true
-overflow-checks = false
+overflow-checks = true
 
 [profile.release]
 opt-level = 3

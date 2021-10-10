@@ -1,0 +1,10 @@
+[package]
+name = "libskia-library"
+version = "0.1.0"
+edition = "2018"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+shared-library-builder = { git = "https://github.com/feenkcom/shared-library-builder-rs", features = ["git-location"] }
