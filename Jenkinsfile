@@ -106,8 +106,10 @@ pipeline {
 
                 stage ('Windows x86_64') {
                     agent {
-                        label "${WINDOWS_AMD64_TARGET}-${WINDOWS_SERVER_NAME}"
-                        customWorkspace 'C:\\j\\skia'
+                        node {
+                          label "${WINDOWS_AMD64_TARGET}-${WINDOWS_SERVER_NAME}"
+                          customWorkspace 'C:\\j\\skia'
+                        }
                     }
 
                     environment {
