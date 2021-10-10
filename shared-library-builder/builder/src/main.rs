@@ -8,7 +8,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         "Skia",
         LibraryLocation::Path(PathLocation::new(std::env::current_dir().unwrap())),
     )
-    .package("libskia");
+    .package("libskia")
+    .requires("python");
 
     let context = LibraryCompilationContext::new(
         "target",

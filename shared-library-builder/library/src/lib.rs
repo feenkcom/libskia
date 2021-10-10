@@ -6,4 +6,5 @@ pub fn libskia(version: impl Into<String>) -> RustLibrary {
         LibraryLocation::Git(GitLocation::github("feenkcom", "libskia").tag(version)),
     )
     .package("libskia")
+    .requires("python")
 }
