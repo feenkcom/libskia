@@ -4,8 +4,8 @@ use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::gpu::{BackendTexture, SurfaceOrigin};
 use skia_safe::image::CachingHint;
 use skia_safe::{
-    AlphaType, ColorSpace, ColorType, Data, EncodedImageFormat, FilterQuality, IPoint, ISize,
-    Image, ImageInfo, Paint, Surface, M44,
+    AlphaType, ColorSpace, ColorType, Data, EncodedImageFormat, IPoint, ISize, Image, ImageInfo,
+    Paint, Surface, M44,
 };
 use std::fs::File;
 use std::io::Read;
@@ -115,7 +115,6 @@ pub fn skia_scale_image(
     new_x: i32,
     new_y: i32,
     keep_aspect_ratio: bool,
-    _filter_quality: FilterQuality,
 ) -> *mut ValueBox<Image> {
     image_ptr.with_not_null_return(std::ptr::null_mut(), |image| {
         let mut resize_x = (new_x as f32) / (image.width() as f32);

@@ -1,8 +1,6 @@
 use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::image_filters::{blur, drop_shadow, drop_shadow_only, image};
-use skia_safe::{
-    scalar, Color, FilterQuality, Image, ImageFilter, Rect, SamplingOptions, TileMode, Vector,
-};
+use skia_safe::{scalar, Color, Image, ImageFilter, Rect, SamplingOptions, TileMode, Vector};
 
 #[no_mangle]
 pub fn skia_image_filter_blur(
@@ -33,14 +31,13 @@ pub fn skia_image_filter_image(
     dst_top: scalar,
     dst_right: scalar,
     dst_bottom: scalar,
-    filter_quality: FilterQuality,
 ) -> *mut ValueBox<ImageFilter> {
     let filter_option = image_ptr.with_not_null_value_return(None, |image_source| {
         image(
             image_source,
             Rect::new(src_left, src_top, src_right, src_bottom).as_ref(),
             Rect::new(dst_left, dst_top, dst_right, dst_bottom).as_ref(),
-            SamplingOptions::from(filter_quality),
+            SamplingOptions::default(),
         )
     });
     match filter_option {

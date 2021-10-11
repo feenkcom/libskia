@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["Aliaksei Syrel <alex.syrel@gmail.com>"]
 
 [dependencies]
-skia-safe = { git = "https://github.com/rust-skia/rust-skia", rev = "5c96670703e06e64f6fd20a86cfb70681e1914c1" }
+skia-safe = { git = "https://github.com/rust-skia/rust-skia", rev = "f3a468e7fc5f74ef42a5512b506a67c910325c15" }
 typename = "0.1.1"
 float-cmp = "0.6.0"
 ordered-float = "1.0.2"

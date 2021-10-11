@@ -4,8 +4,8 @@ use boxer::point::BoxerPointF32;
 use boxer::string::BoxerString;
 use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::textlayout::{
-    Affinity, LineMetricsVector, Paragraph, PlaceholderStyle, PositionWithAffinity,
-    RectHeightStyle, RectWidthStyle, TextBoxes,
+    Affinity, LineMetrics, Paragraph, PlaceholderStyle, PositionWithAffinity,
+    RectHeightStyle, RectWidthStyle, TextBox,
 };
 use skia_safe::{scalar, Canvas, Point, Rect};
 use std::ops::Range;
@@ -121,10 +121,10 @@ impl ParagraphText {
 
                             // left part of the char
                             if n > 1 {
-                                if target_glyph_offset <= (n / 2) {
-                                    return current_char_index;
+                                return if target_glyph_offset <= (n / 2) {
+                                    current_char_index
                                 } else {
-                                    return current_char_index + 1;
+                                    current_char_index + 1
                                 }
                             }
                         }
@@ -166,12 +166,12 @@ impl ParagraphWithText {
         range: Range<usize>,
         rect_height_style: RectHeightStyle,
         rect_width_style: RectWidthStyle,
-    ) -> TextBoxes {
+    ) -> Vec<TextBox> {
         self.paragraph
             .get_rects_for_range(range, rect_height_style, rect_width_style)
     }
 
-    pub fn get_rects_for_placeholders(&self) -> TextBoxes {
+    pub fn get_rects_for_placeholders(&self) -> Vec<TextBox> {
         self.paragraph.get_rects_for_placeholders()
     }
 
@@ -285,7 +285,7 @@ impl ParagraphWithText {
             .get_char_offset_for_glyph_offset(position_with_affinity.position as usize)
     }
 
-    pub fn get_line_metrics(&self) -> LineMetricsVector {
+    pub fn get_line_metrics(&self) -> Vec<LineMetrics> {
         self.paragraph.get_line_metrics()
     }
 
@@ -314,7 +314,7 @@ impl ParagraphWithText {
         char_range: Range<usize>,
         rect_height_style: RectHeightStyle,
         rect_width_style: RectWidthStyle,
-    ) -> TextBoxes {
+    ) -> Vec<TextBox> {
         let glyph_range = self.text.get_glyph_range_for_char_range(char_range.clone());
         self.get_rects_for_range(glyph_range, rect_height_style, rect_width_style)
     }

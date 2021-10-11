@@ -1,7 +1,7 @@
 use boxer::function;
 use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::paint::{Cap, Join, Style};
-use skia_safe::{scalar, BlendMode, Color, FilterQuality, ImageFilter, Paint, PathEffect, Shader};
+use skia_safe::{scalar, BlendMode, Color, ImageFilter, Paint, PathEffect, Shader};
 
 #[no_mangle]
 pub fn skia_paint_default() -> *mut ValueBox<Paint> {
@@ -38,14 +38,6 @@ pub fn skia_paint_set_dither(paint_ptr: *mut ValueBox<Paint>, dither: bool) {
         paint.set_dither(dither);
     });
 }
-
-#[no_mangle]
-pub fn skia_paint_get_filter_quality(_paint_ptr: *mut ValueBox<Paint>) -> FilterQuality {
-    FilterQuality::None
-}
-
-#[no_mangle]
-pub fn skia_paint_set_filter_quality(_paint_ptr: *mut ValueBox<Paint>, _quality: FilterQuality) {}
 
 #[no_mangle]
 pub fn skia_paint_get_style(paint_ptr: *mut ValueBox<Paint>) -> Style {

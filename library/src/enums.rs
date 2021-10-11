@@ -7,18 +7,10 @@ use skia_safe::paint::{Cap, Join, Style};
 use skia_safe::rrect::{Corner as RRectCorner, Type as RRectType};
 use skia_safe::textlayout::PlaceholderAlignment;
 use skia_safe::{
-    AlphaType, BlendMode, ClipOp, ColorType, FilterQuality, FontHinting, PathFillType,
-    PixelGeometry, TextEncoding, TileMode,
+    AlphaType, BlendMode, ClipOp, ColorType, FontHinting, PathFillType, PixelGeometry,
+    TextEncoding, TileMode,
 };
 use text::font_style::FontStyleWidth;
-
-#[no_mangle]
-pub fn skia_enums_filter_quality_to_string(
-    _enum: FilterQuality,
-    _string_ptr: *mut ValueBox<BoxerString>,
-) {
-    _string_ptr.with_not_null(|string| string.set_string(format!("{:?}", _enum)));
-}
 
 #[no_mangle]
 pub fn skia_enums_paint_style_to_string(_enum: Style, _string_ptr: *mut ValueBox<BoxerString>) {
