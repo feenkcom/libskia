@@ -5,6 +5,7 @@ import hudson.tasks.junit.CaseResult
 pipeline {
     agent none
     parameters {
+        booleanParam(name: 'BUILD', defaultValue: false, description: 'Set to true to build a ne version')
         choice(name: 'BUMP', choices: ['minor', 'patch', 'major'], description: 'What to bump when releasing') }
     options {
         buildDiscarder(logRotator(numToKeepStr: '50'))
@@ -43,6 +44,11 @@ pipeline {
             }
         }
         stage ('Parallel build') {
+            when {
+                expression {
+                    (currentBuild.result == null || currentBuild.result == 'SUCCESS') && env.BRANCH_NAME.toString().equals('main') && params.BUILD
+                }
+            }
             parallel {
                 stage ('MacOS x86_64') {
                     agent {
@@ -144,7 +150,7 @@ pipeline {
             }
             when {
                 expression {
-                    (currentBuild.result == null || currentBuild.result == 'SUCCESS') && env.BRANCH_NAME.toString().equals('main')
+                    (currentBuild.result == null || currentBuild.result == 'SUCCESS') && env.BRANCH_NAME.toString().equals('main') && params.BUILD
                 }
             }
             steps {
