@@ -6,13 +6,11 @@ extern crate float_cmp;
 extern crate num_cpus;
 extern crate num_enum;
 extern crate ordered_float;
-extern crate skia_safe;
 extern crate widestring;
 #[macro_use]
 extern crate log;
 extern crate env_logger;
 
-use skia_safe::icu;
 use std::os::raw::c_void;
 
 #[macro_export]
@@ -30,7 +28,6 @@ pub mod canvas_draw_stroke;
 pub mod canvas_optimized;
 pub mod color;
 pub mod color_space;
-pub mod compositor;
 pub mod enums;
 pub mod gpu;
 pub mod gradient;
@@ -53,6 +50,10 @@ pub mod surface_props;
 pub mod text;
 pub mod types;
 
+// re-export the ffi methods
+pub use compositor_ffi::*;
+pub use compositor_skia_ffi::*;
+
 #[no_mangle]
 pub fn skia_test() -> bool {
     true
@@ -60,7 +61,7 @@ pub fn skia_test() -> bool {
 
 #[no_mangle]
 pub fn skia_icu_init() {
-    icu::init();
+    warn!("no need to setup icu")
 }
 
 #[no_mangle]

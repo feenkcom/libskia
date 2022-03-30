@@ -1,6 +1,6 @@
+use crate::paragraph::paragraph::{CharLength, ParagraphText, ParagraphWithText, TabSize};
 use boxer::string::BoxerString;
 use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
-use paragraph::paragraph::{CharLength, ParagraphText, ParagraphWithText, TabSize};
 use skia_safe::textlayout::{
     FontCollection, ParagraphBuilder, ParagraphStyle, PlaceholderStyle, TextStyle,
 };

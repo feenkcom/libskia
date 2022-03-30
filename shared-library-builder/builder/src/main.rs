@@ -25,12 +25,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         library = library.feature("skia_linux");
     }
 
-    let context = LibraryCompilationContext::new(
-        "target",
-        "target",
-        target,
-        false,
-    );
+    let context = LibraryCompilationContext::new("target", "target", target, false);
     let compiled_library = library.compile(&context)?;
     println!("Compiled {}", compiled_library.display());
     Ok(())

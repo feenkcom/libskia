@@ -1,7 +1,7 @@
 use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
-use skia_safe::gpu::gl::FramebufferInfo;
 use skia_safe::gpu::BackendRenderTarget;
 
+#[cfg(feature = "gl")]
 #[no_mangle]
 pub fn skia_backend_render_target_new_gl(
     width: i32,
@@ -15,8 +15,23 @@ pub fn skia_backend_render_target_new_gl(
         (width, height),
         Some(sample_count),
         stencil_bits,
-        FramebufferInfo { fboid, format },
+        skia_safe::gpu::gl::FramebufferInfo { fboid, format },
     );
+
+    ValueBox::new(render_target).into_raw()
+}
+
+#[cfg(feature = "metal")]
+#[no_mangle]
+pub fn skia_backend_render_target_new_metal(
+    width: i32,
+    height: i32,
+    sample_count: usize,
+) -> *mut ValueBox<BackendRenderTarget> {
+    let texture_info = unsafe { skia_safe::gpu::mtl::TextureInfo::new(std::ptr::null_mut()) };
+
+    let render_target =
+        BackendRenderTarget::new_metal((width, height), sample_count as i32, &texture_info);
 
     ValueBox::new(render_target).into_raw()
 }

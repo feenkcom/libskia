@@ -1,3 +1,4 @@
+use crate::text::font_style::FontStyleWidth;
 use boxer::string::BoxerString;
 use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::canvas::PointMode;
@@ -10,7 +11,6 @@ use skia_safe::{
     AlphaType, BlendMode, ClipOp, ColorType, FontHinting, PathFillType, PixelGeometry,
     TextEncoding, TileMode,
 };
-use text::font_style::FontStyleWidth;
 
 #[no_mangle]
 pub fn skia_enums_paint_style_to_string(_enum: Style, _string_ptr: *mut ValueBox<BoxerString>) {

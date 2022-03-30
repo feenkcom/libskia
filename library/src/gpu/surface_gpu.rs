@@ -20,9 +20,10 @@ pub fn skia_surface_from_render_target(
         );
         match surface_option {
             None => {
-                if cfg!(debug_assertions) {
-                        eprintln!("[skia_surface_from_render_target] Unable to create Skia Surface width: {:?} height: {:?} color type: {:?}", backend_render_target.width(), backend_render_target.height(), color_type);
-                }
+                error!("[skia_surface_from_render_target] Unable to create Skia Surface width: {:?} height: {:?} color type: {:?}",
+                    backend_render_target.width(),
+                    backend_render_target.height(),
+                    color_type);
                 std::ptr::null_mut() },
             Some(surface) => {
                 ValueBox::new(surface).into_raw()
@@ -34,25 +35,26 @@ pub fn skia_surface_from_render_target(
 
 #[no_mangle]
 pub fn skia_surface_new_render_target(
-    _image_info_ptr: *mut ValueBox<ImageInfo>,
-    _context_ptr: *mut ValueBox<DirectContext>,
+    image_info: *mut ValueBox<ImageInfo>,
+    direct_context: *mut ValueBox<DirectContext>,
 ) -> *mut ValueBox<Surface> {
-    _image_info_ptr.with_not_null_return(std::ptr::null_mut(),|image_info| {
-        _context_ptr.with_not_null_return(std::ptr::null_mut(), |context| {
+    image_info.with_not_null_return(std::ptr::null_mut(), |image_info| {
+        direct_context.with_not_null_return(std::ptr::null_mut(), |direct_context| {
             let surface_option = Surface::new_render_target(
-            context,
-            Budgeted::No,
-            &image_info,
-            8,
-            SurfaceOrigin::BottomLeft,
-            None,
-            true,
+                direct_context,
+                Budgeted::No,
+                &image_info,
+                0,
+                SurfaceOrigin::BottomLeft,
+                None,
+                true,
         );
         match surface_option {
             None => {
-                if cfg!(debug_assertions) {
-                        eprintln!("[skia_surface_new_render_target] Unable to create Skia Surface width: {:?} height: {:?} color type: {:?}", image_info.width(), image_info.height(), image_info.color_type());
-                }
+                error!("[skia_surface_new_render_target] Unable to create Skia Surface width: {:?} height: {:?} color type: {:?}",
+                    image_info.width(),
+                    image_info.height(),
+                    image_info.color_type());
                 std::ptr::null_mut() },
             Some(surface) => {
                 ValueBox::new(surface).into_raw()
@@ -82,9 +84,10 @@ pub fn skia_surface_from_backend_texture(
         );
         match surface_option {
             None => {
-                if cfg!(debug_assertions) {
-                        eprintln!("[skia_surface_from_backend_texture] Unable to create Skia Surface from backend texture width: {:?} height: {:?} color type: {:?}", backend_texture.width(), backend_texture.height(), color_type);
-                }
+                error!("[skia_surface_from_backend_texture] Unable to create Skia Surface from backend texture width: {:?} height: {:?} color type: {:?}",
+                    backend_texture.width(),
+                    backend_texture.height(),
+                    color_type);
                 std::ptr::null_mut() },
             Some(surface) => {
                 ValueBox::new(surface).into_raw()

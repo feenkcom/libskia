@@ -1,9 +1,9 @@
+use crate::text::font_style::FontStyleWidth;
 use boxer::array::BoxerArrayU8;
 use boxer::string::BoxerString;
 use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::font_style::{Slant, Weight};
 use skia_safe::{FontMgr, FontStyle, FontStyleSet, Typeface};
-use text::font_style::FontStyleWidth;
 
 #[no_mangle]
 pub fn skia_font_manager_default() -> *mut ValueBox<FontMgr> {

@@ -4,8 +4,8 @@ use boxer::point::BoxerPointF32;
 use boxer::string::BoxerString;
 use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use skia_safe::textlayout::{
-    Affinity, LineMetrics, Paragraph, PlaceholderStyle, PositionWithAffinity,
-    RectHeightStyle, RectWidthStyle, TextBox,
+    Affinity, LineMetrics, Paragraph, PlaceholderStyle, PositionWithAffinity, RectHeightStyle,
+    RectWidthStyle, TextBox,
 };
 use skia_safe::{scalar, Canvas, Point, Rect};
 use std::ops::Range;
@@ -125,7 +125,7 @@ impl ParagraphText {
                                     current_char_index
                                 } else {
                                     current_char_index + 1
-                                }
+                                };
                             }
                         }
 
