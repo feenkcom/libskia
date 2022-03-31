@@ -212,8 +212,8 @@ dependencies = [
 
 [[package]]
 name = "compositor"
-version = "1.4.0"
-source = "git+https://github.com/feenkcom/compositor-rs#b447fa7f127f0ac4626146dae97373e6b3a172c5"
+version = "1.4.1"
+source = "git+https://github.com/feenkcom/compositor-rs#a59b50cdd0e2e1fe2792837ee95db7ebae6bada7"
 dependencies = [
  "euclid",
  "ordered-float",
@@ -221,8 +221,8 @@ dependencies = [
 
 [[package]]
 name = "compositor-ffi"
-version = "1.4.0"
-source = "git+https://github.com/feenkcom/compositor-rs#b447fa7f127f0ac4626146dae97373e6b3a172c5"
+version = "1.4.1"
+source = "git+https://github.com/feenkcom/compositor-rs#a59b50cdd0e2e1fe2792837ee95db7ebae6bada7"
 dependencies = [
  "boxer 0.2.0",
  "compositor",
@@ -231,8 +231,8 @@ dependencies = [
 
 [[package]]
 name = "compositor-skia"
-version = "1.4.0"
-source = "git+https://github.com/feenkcom/compositor-rs#b447fa7f127f0ac4626146dae97373e6b3a172c5"
+version = "1.4.1"
+source = "git+https://github.com/feenkcom/compositor-rs#a59b50cdd0e2e1fe2792837ee95db7ebae6bada7"
 dependencies = [
  "compositor",
  "log",
@@ -241,8 +241,8 @@ dependencies = [
 
 [[package]]
 name = "compositor-skia-ffi"
-version = "1.4.0"
-source = "git+https://github.com/feenkcom/compositor-rs#b447fa7f127f0ac4626146dae97373e6b3a172c5"
+version = "1.4.1"
+source = "git+https://github.com/feenkcom/compositor-rs#a59b50cdd0e2e1fe2792837ee95db7ebae6bada7"
 dependencies = [
  "boxer 0.2.0",
  "compositor",
@@ -1194,9 +1194,9 @@ checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 
 [[package]]
 name = "pkg-config"
-version = "0.3.24"
+version = "0.3.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "58893f751c9b0412871a09abd62ecd2a00298c6c83befa223ef98c52aef40cbe"
+checksum = "1df8c4ec4b0627e53bdf214615ad287367e482558cf84b109250b37464dc03ae"
 
 [[package]]
 name = "ppv-lite86"
