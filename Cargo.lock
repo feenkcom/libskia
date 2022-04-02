@@ -212,8 +212,8 @@ dependencies = [
 
 [[package]]
 name = "compositor"
-version = "1.4.1"
-source = "git+https://github.com/feenkcom/compositor-rs#a59b50cdd0e2e1fe2792837ee95db7ebae6bada7"
+version = "1.5.0"
+source = "git+https://github.com/feenkcom/compositor-rs#2ca2f17efc0dc9a8201c363bf3c91c760bca6380"
 dependencies = [
  "euclid",
  "ordered-float",
@@ -221,8 +221,8 @@ dependencies = [
 
 [[package]]
 name = "compositor-ffi"
-version = "1.4.1"
-source = "git+https://github.com/feenkcom/compositor-rs#a59b50cdd0e2e1fe2792837ee95db7ebae6bada7"
+version = "1.5.0"
+source = "git+https://github.com/feenkcom/compositor-rs#2ca2f17efc0dc9a8201c363bf3c91c760bca6380"
 dependencies = [
  "boxer 0.2.0",
  "compositor",
@@ -231,8 +231,8 @@ dependencies = [
 
 [[package]]
 name = "compositor-skia"
-version = "1.4.1"
-source = "git+https://github.com/feenkcom/compositor-rs#a59b50cdd0e2e1fe2792837ee95db7ebae6bada7"
+version = "1.5.0"
+source = "git+https://github.com/feenkcom/compositor-rs#2ca2f17efc0dc9a8201c363bf3c91c760bca6380"
 dependencies = [
  "compositor",
  "log",
@@ -241,8 +241,8 @@ dependencies = [
 
 [[package]]
 name = "compositor-skia-ffi"
-version = "1.4.1"
-source = "git+https://github.com/feenkcom/compositor-rs#a59b50cdd0e2e1fe2792837ee95db7ebae6bada7"
+version = "1.5.0"
+source = "git+https://github.com/feenkcom/compositor-rs#2ca2f17efc0dc9a8201c363bf3c91c760bca6380"
 dependencies = [
  "boxer 0.2.0",
  "compositor",

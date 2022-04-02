@@ -4,7 +4,7 @@ use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use cocoa::base::YES;
 use cocoa::{appkit::NSView, base::id as cocoa_id};
 use compositor::{Compositor, Layer};
-use compositor_skia::{ImageCache, ShadowCache, SkiaCompositor};
+use compositor_skia::{Cache, SkiaCompositor};
 use core_graphics_types::geometry::CGSize;
 use foreign_types_shared::{ForeignType, ForeignTypeRef};
 use metal::{CommandQueue, Device, MTLPixelFormat, MetalDrawableRef, MetalLayer};
@@ -142,30 +142,26 @@ pub fn skia_metal_context_new_metal_surface(
 pub fn skia_metal_context_draw_composition_layer(
     context: *mut ValueBox<MetalContext>,
     layer: *mut ValueBox<Arc<dyn Layer>>,
-    image_cache: *mut ValueBox<ImageCache>,
-    shadow_cache: *mut ValueBox<ShadowCache>,
+    cache: *mut ValueBox<Cache>,
 ) {
     context.with_not_null(|metal_context| {
         layer.with_not_null(|layer| {
-            image_cache.with_not_null(|image_cache| {
-                shadow_cache.with_not_null(|shadow_cache| {
-                    if let Some(MetalSurface {
-                        mut surface,
-                        drawable,
-                        ..
-                    }) = metal_context.new_surface()
-                    {
-                        SkiaCompositor::new(surface.canvas(), image_cache, shadow_cache)
-                            .compose(layer.clone());
+            cache.with_not_null(|cache| {
+                if let Some(MetalSurface {
+                    mut surface,
+                    drawable,
+                    ..
+                }) = metal_context.new_surface()
+                {
+                    SkiaCompositor::new(surface.canvas(), cache).compose(layer.clone());
 
-                        surface.flush_and_submit();
-                        drop(surface);
+                    surface.flush_and_submit();
+                    drop(surface);
 
-                        let command_buffer = metal_context.queue.new_command_buffer();
-                        command_buffer.present_drawable(drawable.as_ref());
-                        command_buffer.commit();
-                    }
-                })
+                    let command_buffer = metal_context.queue.new_command_buffer();
+                    command_buffer.present_drawable(drawable.as_ref());
+                    command_buffer.commit();
+                }
             })
         })
     })
