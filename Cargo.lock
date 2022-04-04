@@ -27,6 +27,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.56"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4361135be9122e0870de935d7c439aef945b9f9ddd4199a553b5270b49c82a27"
+
+[[package]]
 name = "atty"
 version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -95,10 +101,13 @@ dependencies = [
 
 [[package]]
 name = "boxer"
-version = "0.2.1"
-source = "git+https://github.com/feenkcom/gtoolkit-boxer?rev=f8f3d5ff3973ccef511ee21e78c9e2cd5f63edda#f8f3d5ff3973ccef511ee21e78c9e2cd5f63edda"
+version = "0.2.2"
+source = "git+https://github.com/feenkcom/gtoolkit-boxer?rev=4cc03d989c46aeb78d1a4f142360239cf8df7de3#4cc03d989c46aeb78d1a4f142360239cf8df7de3"
 dependencies = [
+ "anyhow",
  "log",
+ "thiserror",
+ "user-error",
  "widestring",
 ]
 
@@ -550,6 +559,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "fps_counter"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3aaba7ff514ee9d802b562927f80b1e94e93d8e74c31b134c9c3762dabf1a36b"
+
+[[package]]
 name = "fs_extra"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -882,7 +897,7 @@ dependencies = [
 name = "libskia"
 version = "0.1.0"
 dependencies = [
- "boxer 0.2.1",
+ "boxer 0.2.2",
  "byteorder",
  "cocoa",
  "compositor",
@@ -894,6 +909,8 @@ dependencies = [
  "env_logger 0.8.4",
  "float-cmp",
  "foreign-types-shared",
+ "fps_counter",
+ "lazy_static",
  "libc",
  "log",
  "metal",

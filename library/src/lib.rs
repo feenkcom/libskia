@@ -10,6 +10,8 @@ extern crate widestring;
 #[macro_use]
 extern crate log;
 extern crate env_logger;
+#[macro_use]
+extern crate lazy_static;
 
 use std::os::raw::c_void;
 

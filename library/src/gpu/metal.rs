@@ -1,19 +1,94 @@
 use boxer::boxes::ReferenceBox;
-use boxer::boxes::ReferenceBoxPointer;
-use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ReturnBoxerResult, ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use cocoa::base::YES;
 use cocoa::{appkit::NSView, base::id as cocoa_id};
 use compositor::{Compositor, Layer};
 use compositor_skia::{Cache, SkiaCompositor};
 use core_graphics_types::geometry::CGSize;
 use foreign_types_shared::{ForeignType, ForeignTypeRef};
+use fps_counter::FPSCounter;
 use metal::{CommandQueue, Device, MTLPixelFormat, MetalDrawableRef, MetalLayer};
 use skia_safe::gpu::mtl::BackendContext;
-use skia_safe::gpu::{mtl, BackendRenderTarget, ContextOptions, DirectContext, SurfaceOrigin};
-use skia_safe::{scalar, ColorType, Size, Surface};
+use skia_safe::gpu::{mtl, BackendRenderTarget, DirectContext, SurfaceOrigin};
+use skia_safe::{scalar, Color, Color4f, ColorType, Font, Paint, Point, Size, Surface, Typeface};
 use std::mem;
-use std::sync::Arc;
+use std::ops::Deref;
+use std::sync::{Arc, Mutex};
 
+#[derive(Debug)]
+pub struct MetalCompositor {
+    context: MetalContext,
+    latest_frame: Mutex<Option<Arc<dyn Layer>>>,
+    cache: Cache,
+    render_fps: Option<FPSCounter>,
+}
+
+lazy_static! {
+    static ref FPS_FONT: Font = Font::new(Typeface::default(), 60.0);
+    static ref FPS_PAINT: Paint = Paint::new(Color4f::from(Color::BLUE), None);
+}
+
+impl MetalCompositor {
+    pub fn new(ns_view: cocoa_id, size: Option<CGSize>) -> Self {
+        Self {
+            context: MetalContext::new(ns_view, size),
+            latest_frame: Mutex::new(None),
+            cache: Cache::new(),
+            render_fps: None,
+        }
+    }
+
+    /// Resize the surface we render on. Must only be called from the main thread
+    pub fn resize_surface(&mut self, size: CGSize) {
+        self.context.resize_surface(size);
+    }
+
+    /// Submit the new layer to be rendered next. Can be called from any thread
+    pub fn submit_layer(&mut self, layer: Arc<dyn Layer>) {
+        self.latest_frame.lock().unwrap().replace(layer);
+    }
+
+    pub fn enable_fps(&mut self) {
+        self.render_fps.replace(FPSCounter::default());
+    }
+
+    pub fn disable_fps(&mut self) {
+        self.render_fps.take();
+    }
+
+    pub fn draw(&mut self) {
+        let current_layer = self.latest_frame.lock().unwrap().clone();
+
+        if let Some(layer) = current_layer {
+            if let Some(MetalSurface {
+                mut surface,
+                drawable,
+            }) = self.context.new_surface()
+            {
+                let canvas = surface.canvas();
+                canvas.clear(Color::WHITE);
+
+                SkiaCompositor::new(canvas, &mut self.cache).compose(layer);
+
+                self.render_fps.as_mut().map(|counter| {
+                    canvas.draw_str(
+                        &format!("{}", counter.tick()),
+                        Point::new(20.0, 70.0),
+                        &FPS_FONT,
+                        &FPS_PAINT,
+                    );
+                });
+
+                surface.flush_and_submit();
+                drop(surface);
+
+                self.context.commit(drawable.as_ref());
+            }
+        }
+    }
+}
+
+#[allow(dead_code)]
 #[derive(Debug)]
 pub struct MetalContext {
     device: Device,
@@ -70,6 +145,10 @@ impl MetalContext {
         }
     }
 
+    pub fn resize_surface(&mut self, size: CGSize) {
+        self.layer.set_drawable_size(size);
+    }
+
     pub fn new_surface(&mut self) -> Option<MetalSurface> {
         self.layer.next_drawable().and_then(|drawable| {
             let drawable_size = {
@@ -109,17 +188,17 @@ impl MetalContext {
 }
 
 #[no_mangle]
-pub fn skia_context_new_metal(ns_view: cocoa_id) -> *mut ValueBox<MetalContext> {
-    ValueBox::new(MetalContext::new(ns_view, None)).into_raw()
+pub fn skia_metal_compositor_new(ns_view: cocoa_id) -> *mut ValueBox<MetalCompositor> {
+    ValueBox::new(MetalCompositor::new(ns_view, None)).into_raw()
 }
 
 #[no_mangle]
-pub fn skia_context_new_metal_size(
+pub fn skia_metal_compositor_new_size(
     ns_view: cocoa_id,
-    width: f32,
-    height: f32,
-) -> *mut ValueBox<MetalContext> {
-    ValueBox::new(MetalContext::new(
+    width: u32,
+    height: u32,
+) -> *mut ValueBox<MetalCompositor> {
+    ValueBox::new(MetalCompositor::new(
         ns_view,
         Some(CGSize::new(width.into(), height.into())),
     ))
@@ -127,69 +206,57 @@ pub fn skia_context_new_metal_size(
 }
 
 #[no_mangle]
-pub fn skia_metal_context_new_metal_surface(
-    metal_context: *mut ValueBox<MetalContext>,
-) -> *mut ValueBox<MetalSurface> {
-    metal_context.with_not_null_return(std::ptr::null_mut(), |metal_context| {
-        match metal_context.new_surface() {
-            None => std::ptr::null_mut(),
-            Some(surface) => ValueBox::new(surface).into_raw(),
-        }
-    })
-}
-
-#[no_mangle]
-pub fn skia_metal_context_draw_composition_layer(
-    context: *mut ValueBox<MetalContext>,
+pub fn skia_metal_compositor_submit_layer(
+    compositor: *mut ValueBox<MetalCompositor>,
     layer: *mut ValueBox<Arc<dyn Layer>>,
-    cache: *mut ValueBox<Cache>,
 ) {
-    context.with_not_null(|metal_context| {
-        layer.with_not_null(|layer| {
-            cache.with_not_null(|cache| {
-                if let Some(MetalSurface {
-                    mut surface,
-                    drawable,
-                    ..
-                }) = metal_context.new_surface()
-                {
-                    SkiaCompositor::new(surface.canvas(), cache).compose(layer.clone());
-
-                    surface.flush_and_submit();
-                    drop(surface);
-
-                    let command_buffer = metal_context.queue.new_command_buffer();
-                    command_buffer.present_drawable(drawable.as_ref());
-                    command_buffer.commit();
-                }
-            })
+    compositor
+        .to_ref()
+        .and_then(|mut compositor| {
+            layer
+                .to_ref()
+                .map(|layer| compositor.submit_layer(layer.deref().clone()))
         })
-    })
+        .log();
 }
 
 #[no_mangle]
-pub fn skia_metal_context_get_direct_context(
-    metal_context: *mut ValueBox<MetalContext>,
-) -> *mut ValueBox<DirectContext> {
-    metal_context.with_not_null_return(std::ptr::null_mut(), |metal_context| {
-        ValueBox::new(metal_context.direct_context.clone()).into_raw()
-    })
+pub fn skia_metal_compositor_draw(compositor: *mut ValueBox<MetalCompositor>) {
+    compositor
+        .to_ref()
+        .map(|mut compositor| compositor.draw())
+        .log();
 }
 
 #[no_mangle]
-pub fn skia_metal_context_set_drawable_size(
-    metal_context: *mut ValueBox<MetalContext>,
-    width: f32,
-    height: f32,
+pub fn skia_metal_compositor_resize(
+    compositor: *mut ValueBox<MetalCompositor>,
+    width: u32,
+    height: u32,
 ) {
-    metal_context.with_not_null(|metal_context| {
-        metal_context
-            .layer
-            .set_drawable_size(CGSize::new(width.into(), height.into()));
-    })
+    compositor
+        .to_ref()
+        .map(|mut compositor| compositor.resize_surface(CGSize::new(width.into(), height.into())))
+        .log();
 }
 
 #[no_mangle]
-pub fn skia_metal_context_drop(ptr: &mut *mut ValueBox<MetalContext>) {
-    ptr.drop();
+pub fn skia_metal_compositor_enable_fps(compositor: *mut ValueBox<MetalCompositor>) {
+    compositor
+        .to_ref()
+        .map(|mut compositor| compositor.enable_fps())
+        .log();
+}
+
+#[no_mangle]
+pub fn skia_metal_compositor_disable_fps(compositor: *mut ValueBox<MetalCompositor>) {
+    compositor
+        .to_ref()
+        .map(|mut compositor| compositor.disable_fps())
+        .log();
+}
+
+#[no_mangle]
+pub fn skia_metal_compositor_drop(compositor: &mut *mut ValueBox<MetalCompositor>) {
+    compositor.drop();
 }
