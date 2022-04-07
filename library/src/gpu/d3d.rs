@@ -44,8 +44,7 @@ pub struct D3D12Context {
 
 impl D3D12Context {
     pub fn new(window: HWND, width: u32, height: u32) -> Self {
-        let factory: IDXGIFactory4 = unsafe { CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG) }
-            .expect("Creating DXGI factory");
+        let factory: IDXGIFactory4 = create_factory().expect("Creating DXGI factory");
         let adapter: IDXGIAdapter1 = Self::create_hardware_adapter(&factory);
 
         let device: ID3D12Device = resolve_interface(|ptr| unsafe {
@@ -84,8 +83,7 @@ impl D3D12Context {
         let direct_context = unsafe { DirectContext::new_d3d(&backend_context, None) }.unwrap();
 
         let swap_chain: IDXGISwapChain3 = {
-            let factory: IDXGIFactory3 = unsafe { CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG) }
-                .expect("Creating DXGI factory");
+            let factory: IDXGIFactory3 = create_factory().expect("Creating DXGI factory");
 
             let mut swap_chain_desc = DXGI_SWAP_CHAIN_DESC1::default();
             swap_chain_desc.BufferCount = NUM_FRAMES as u32;
@@ -335,6 +333,14 @@ fn resolve_interface<T: Interface>(f: impl FnOnce(&mut Option<T>) -> Result<()>)
     let mut res: Option<T> = None;
     f(&mut res)?;
     Ok(res.unwrap())
+}
+
+fn create_factory<T: Interface>() -> Result<T> {
+    let factory: Result<T> = unsafe { CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG) };
+    factory.or_else(|error| {
+        warn!("Could not create Debug factory: {:?}. We will try a default one.", error);
+        unsafe { CreateDXGIFactory2(0) }
+    })
 }
 
 #[no_mangle]
