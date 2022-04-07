@@ -3,6 +3,12 @@ C api wrapper around [rust-skia](https://github.com/rust-skia/rust-skia)
 
 # Building
 
+## Windows
+
+```
+choco install llvm python2 -y
+```
+
 ## Ubuntu 20.04
 Starting from a minimal installation of `Ubuntu 20.04` we should install a couple of packages:
 ```
