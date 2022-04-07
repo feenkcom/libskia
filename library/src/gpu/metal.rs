@@ -1,22 +1,14 @@
 use crate::gpu::platform_compositor::{PlatformCompositor, PlatformContext};
-use boxer::boxes::ReferenceBox;
-use boxer::{ReturnBoxerResult, ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::ValueBox;
 use cocoa::base::YES;
 use cocoa::{appkit::NSView, base::id as cocoa_id};
-use compositor::{Compositor, Layer};
-use compositor_skia::{Cache, SkiaCompositor};
 use core_graphics_types::geometry::CGSize;
 use foreign_types_shared::{ForeignType, ForeignTypeRef};
-use fps_counter::FPSCounter;
 use metal::{CommandQueue, Device, MTLPixelFormat, MetalDrawableRef, MetalLayer};
 use skia_safe::gpu::mtl::BackendContext;
 use skia_safe::gpu::{mtl, BackendRenderTarget, DirectContext, SurfaceOrigin};
-use skia_safe::{
-    scalar, Color, Color4f, ColorType, Font, ISize, Paint, Point, Size, Surface, Typeface,
-};
+use skia_safe::{scalar, ColorType, ISize, Size, Surface};
 use std::mem;
-use std::ops::Deref;
-use std::sync::{Arc, Mutex};
 
 #[allow(dead_code)]
 #[derive(Debug)]
@@ -103,7 +95,7 @@ impl MetalContext {
                 surface.flush_and_submit();
                 drop(surface);
 
-                self.commit(drawable.as_ref());
+                self.commit(drawable);
             };
         }
     }

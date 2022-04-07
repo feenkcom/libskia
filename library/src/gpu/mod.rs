@@ -11,10 +11,10 @@ pub mod metal;
 pub mod d3d;
 
 #[cfg(feature = "metal")]
-pub use metal::*;
+pub use self::metal::*;
 
 #[cfg(feature = "d3d")]
-pub use d3d::*;
+pub use self::d3d::*;
 
 mod platform_compositor;
 pub use platform_compositor::*;
