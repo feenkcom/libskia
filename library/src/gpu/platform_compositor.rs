@@ -1,6 +1,6 @@
 use boxer::{ReturnBoxerResult, ValueBox, ValueBoxPointer, ValueBoxPointerReference};
 use compositor::{Compositor, Layer};
-use compositor_skia::{Cache, SkiaCompositor};
+use compositor_skia::{Cache, SkiaCachelessCompositor, SkiaCompositor};
 use fps_counter::FPSCounter;
 use skia_safe::{Color, Color4f, Font, ISize, Paint, Point, Surface, Typeface};
 use std::ops::Deref;
@@ -67,6 +67,28 @@ impl PlatformCompositor {
             })
         }
     }
+
+    pub fn draw_cacheless(&mut self) {
+        let current_layer = self.latest_frame.lock().unwrap().clone();
+
+        if let Some(layer) = current_layer {
+            self.context.with_surface(|surface| {
+                let canvas = surface.canvas();
+                canvas.clear(Color::WHITE);
+
+                SkiaCachelessCompositor::new(canvas).compose(layer);
+
+                self.render_fps.as_mut().map(|counter| {
+                    canvas.draw_str(
+                        &format!("{}", counter.tick()),
+                        Point::new(20.0, 70.0),
+                        &FPS_FONT,
+                        &FPS_PAINT,
+                    );
+                });
+            })
+        }
+    }
 }
 
 pub enum PlatformContext {
@@ -74,7 +96,7 @@ pub enum PlatformContext {
     Metal(crate::gpu::MetalContext),
     #[cfg(feature = "d3d")]
     D3D(crate::gpu::D3D12Context),
-    Unsupported
+    Unsupported,
 }
 
 impl PlatformContext {
@@ -119,6 +141,14 @@ pub fn skia_platform_compositor_draw(compositor: *mut ValueBox<PlatformComposito
     compositor
         .to_ref()
         .map(|mut compositor| compositor.draw())
+        .log();
+}
+
+#[no_mangle]
+pub fn skia_platform_compositor_draw_cacheless(compositor: *mut ValueBox<PlatformCompositor>) {
+    compositor
+        .to_ref()
+        .map(|mut compositor| compositor.draw_cacheless())
         .log();
 }
 
