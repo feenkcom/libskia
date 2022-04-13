@@ -96,6 +96,8 @@ pub enum PlatformContext {
     Metal(crate::gpu::MetalContext),
     #[cfg(feature = "d3d")]
     D3D(crate::gpu::D3D12Context),
+    #[cfg(feature = "angle")]
+    Angle(crate::gpu::AngleContext),
     Unsupported,
 }
 
@@ -106,6 +108,8 @@ impl PlatformContext {
             PlatformContext::Metal(context) => context.with_surface(callback),
             #[cfg(feature = "d3d")]
             PlatformContext::D3D(context) => context.with_surface(callback),
+            #[cfg(feature = "angle")]
+            PlatformContext::Angle(context) => context.with_surface(callback),
             PlatformContext::Unsupported => {}
         }
     }
@@ -116,6 +120,8 @@ impl PlatformContext {
             PlatformContext::Metal(context) => context.resize_surface(size),
             #[cfg(feature = "d3d")]
             PlatformContext::D3D(context) => context.resize(size),
+            #[cfg(feature = "angle")]
+            PlatformContext::Angle(context) => context.resize(size.width, size.height).unwrap_or_else(|error| error!("{}", error)),
             PlatformContext::Unsupported => {}
         }
     }
