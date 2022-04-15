@@ -1074,8 +1074,7 @@ dependencies = [
 [[package]]
 name = "mozangle"
 version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ef98797da14500fb5eaabc90dc91cf7c42710c11330351521d72f4aa268d689c"
+source = "git+https://github.com/syrel/mozangle?rev=8ad3227cbfe59b9ddbaa95379b5d45804427630d#8ad3227cbfe59b9ddbaa95379b5d45804427630d"
 dependencies = [
  "cc",
  "gl_generator",

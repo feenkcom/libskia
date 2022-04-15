@@ -42,11 +42,11 @@ impl AngleContext {
         let (major_version, minor_version) = initialize_display(display)?;
         let egl_config = choose_config(display)?;
         let context = create_context(display, egl_config)?;
-        let egl_surface = create_window_surface(display, egl_config, window)?;
+        let egl_surface = create_window_surface(display, egl_config, window, width, height)?;
         make_current(display, egl_surface, egl_surface, context)?;
         let interface = assemble_interface()?;
 
-        Ok(Self {
+        let angle_context = Self {
             window,
             display,
             egl_config,
@@ -58,7 +58,11 @@ impl AngleContext {
             width,
             height,
             skia_context: None,
-        })
+        };
+
+        info!("Initialized Angle context {:?}", &angle_context);
+
+        Ok(angle_context)
     }
 
     pub fn major_version(&self) -> u32 {
@@ -103,6 +107,7 @@ impl AngleContext {
     }
 
     pub fn resize(&mut self, width: i32, height: i32) -> Result<()> {
+        trace!("About to resize angle context to {}x{}", width, height);
         drop(self.skia_context.take());
 
         self.width = width;
@@ -126,7 +131,13 @@ impl AngleContext {
     }
 
     fn initialize_egl_surface(&mut self) -> Result<()> {
-        self.egl_surface = create_window_surface(self.display, self.egl_config, self.window)?;
+        self.egl_surface = create_window_surface(
+            self.display,
+            self.egl_config,
+            self.window,
+            self.width,
+            self.height,
+        )?;
         Ok(())
     }
 

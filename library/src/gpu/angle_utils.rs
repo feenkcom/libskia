@@ -1,5 +1,7 @@
 use crate::gpu::angle::SAMPLE_COUNT;
+
 use anyhow::{bail, Result};
+use mozangle::egl::ffi::types;
 use mozangle::egl::ffi::types::EGLenum;
 use mozangle::egl::ffi::*;
 use mozangle::egl::get_proc_address;
@@ -8,28 +10,67 @@ use windows::Win32::Foundation::HWND;
 use windows::Win32::Graphics::Gdi::HDC;
 
 pub const PLATFORM_ANGLE_TYPE_D3D11_ANGLE: EGLint = 0x3208;
+pub const PLATFORM_ANGLE_ENABLE_AUTOMATIC_TRIM_ANGLE: EGLint = 0x320F;
+pub const FIXED_SIZE_ANGLE: EGLint = 0x3201;
 pub const FRAMEBUFFER_BINDING: EGLenum = 0x8CA6;
 
-pub(crate) fn get_display(hdc: HDC) -> Result<types::EGLDisplay> {
-    // only D3D11 ANGLE is supported.
-    let k_type: EGLint = PLATFORM_ANGLE_TYPE_D3D11_ANGLE;
-    let attribs: [EGLint; 3] = [
-        PLATFORM_ANGLE_TYPE_ANGLE.try_into().unwrap(),
-        k_type,
-        NONE.try_into().unwrap(),
-    ];
-    let display =
-        unsafe { GetPlatformDisplayEXT(PLATFORM_ANGLE_ANGLE, transmute(hdc), attribs.as_ptr()) };
-    if display == NO_DISPLAY {
-        bail!("Failed to get platform display");
-    } else {
-        Ok(display)
-    }
+const fn int(value: EGLenum) -> EGLint {
+    value as EGLint
 }
 
-pub(crate) fn terminate_display(
-    display: types::EGLDisplay,
-) -> Result<()> {
+const DISPLAY_CONFIGS: [&'static [EGLint]; 3] = [
+    &[
+        int(PLATFORM_ANGLE_TYPE_ANGLE),
+        PLATFORM_ANGLE_TYPE_D3D11_ANGLE,
+        // EGL_PLATFORM_ANGLE_ENABLE_AUTOMATIC_TRIM_ANGLE is an option that will
+        // enable ANGLE to automatically call the IDXGIDevice3::Trim method on
+        // behalf of the application when it gets suspended.
+        PLATFORM_ANGLE_ENABLE_AUTOMATIC_TRIM_ANGLE,
+        int(TRUE),
+        // This extension allows angle to render directly on a D3D swapchain
+        // in the correct orientation on D3D11.
+        int(EXPERIMENTAL_PRESENT_PATH_ANGLE),
+        int(EXPERIMENTAL_PRESENT_PATH_FAST_ANGLE),
+        int(NONE),
+    ],
+    &[
+        int(PLATFORM_ANGLE_TYPE_ANGLE),
+        PLATFORM_ANGLE_TYPE_D3D11_ANGLE,
+        int(PLATFORM_ANGLE_MAX_VERSION_MAJOR_ANGLE),
+        9,
+        int(PLATFORM_ANGLE_MAX_VERSION_MINOR_ANGLE),
+        3,
+        PLATFORM_ANGLE_ENABLE_AUTOMATIC_TRIM_ANGLE,
+        int(TRUE),
+        int(NONE),
+    ],
+    &[
+        int(PLATFORM_ANGLE_TYPE_ANGLE),
+        PLATFORM_ANGLE_TYPE_D3D11_ANGLE,
+        PLATFORM_ANGLE_ENABLE_AUTOMATIC_TRIM_ANGLE,
+        int(TRUE),
+        int(NONE),
+    ],
+];
+
+pub(crate) fn get_display(hdc: HDC) -> Result<types::EGLDisplay> {
+    for config in &DISPLAY_CONFIGS {
+        let display =
+            unsafe { GetPlatformDisplayEXT(PLATFORM_ANGLE_ANGLE, transmute(hdc), config.as_ptr()) };
+        if display != NO_DISPLAY {
+            return Ok(display);
+        } else {
+            warn!(
+                "Could not get platform display with Angle for the config: {:?}",
+                config
+            );
+        }
+    }
+
+    bail!("Failed to get platform display");
+}
+
+pub(crate) fn terminate_display(display: types::EGLDisplay) -> Result<()> {
     if display == NO_DISPLAY {
         bail!("Display is already terminated")
     }
@@ -59,10 +100,7 @@ pub(crate) fn choose_config(display: types::EGLDisplay) -> Result<types::EGLConf
     let sample_buffers = if SAMPLE_COUNT > 1 { 1 } else { 0 };
     let egl_sample_count = if SAMPLE_COUNT > 1 { SAMPLE_COUNT } else { 0 };
 
-    let config_attributes: [EGLint; 15] = [
-        RENDERABLE_TYPE,
-        // We currently only support ES3.
-        OPENGL_ES3_BIT,
+    let config_attributes: [EGLint; 17] = [
         RED_SIZE,
         8,
         GREEN_SIZE,
@@ -70,6 +108,10 @@ pub(crate) fn choose_config(display: types::EGLDisplay) -> Result<types::EGLConf
         BLUE_SIZE,
         8,
         ALPHA_SIZE,
+        8,
+        DEPTH_SIZE,
+        8,
+        STENCIL_SIZE,
         8,
         SAMPLE_BUFFERS,
         sample_buffers,
@@ -106,10 +148,9 @@ pub(crate) fn create_context(
     display: types::EGLDisplay,
     surface_config: types::EGLConfig,
 ) -> Result<types::EGLContext> {
-    // We currently only support ES3.
     let context_attributes: [EGLint; 3] = [
         CONTEXT_CLIENT_VERSION.try_into().unwrap(),
-        3,
+        2,
         NONE.try_into().unwrap(),
     ];
     let egl_context: types::EGLContext = unsafe {
@@ -148,13 +189,25 @@ pub(crate) fn create_window_surface(
     display: types::EGLDisplay,
     surface_config: types::EGLConfig,
     window: HWND,
+    width: i32,
+    height: i32,
 ) -> Result<types::EGLSurface> {
+    let surface_attributes: &[EGLint] = &[
+        FIXED_SIZE_ANGLE,
+        int(TRUE),
+        int(WIDTH),
+        width,
+        int(HEIGHT),
+        height,
+        int(NONE),
+    ];
+
     let surface: types::EGLSurface = unsafe {
         CreateWindowSurface(
             display,
             surface_config,
             transmute(window),
-            std::ptr::null_mut(),
+            surface_attributes.as_ptr(),
         )
     };
     if surface == NO_SURFACE {
