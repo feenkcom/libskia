@@ -53,12 +53,23 @@ const DISPLAY_CONFIGS: [&'static [EGLint]; 3] = [
     ],
 ];
 
-pub(crate) fn get_display(hdc: HDC) -> Result<types::EGLDisplay> {
+pub(crate) fn get_display(hdc: HDC) -> Result<(types::EGLDisplay, EGLint, EGLint)> {
     for config in &DISPLAY_CONFIGS {
         let display =
             unsafe { GetPlatformDisplayEXT(PLATFORM_ANGLE_ANGLE, transmute(hdc), config.as_ptr()) };
         if display != NO_DISPLAY {
-            return Ok(display);
+            let mut major_version: EGLint = 0;
+            let mut minor_version: EGLint = 0;
+            let result: types::EGLBoolean =
+                unsafe { Initialize(display, &mut major_version, &mut minor_version) };
+            if result == TRUE {
+                return Ok((display, major_version, minor_version));
+            } else {
+                warn!(
+                    "Failed to initialize egl for the display with Angle for the config: {:?}",
+                    config
+                );
+            }
         } else {
             warn!(
                 "Could not get platform display with Angle for the config: {:?}",
@@ -81,18 +92,6 @@ pub(crate) fn terminate_display(display: types::EGLDisplay) -> Result<()> {
         Ok(())
     } else {
         bail!("Failed to terminate egl display")
-    }
-}
-
-pub(crate) fn initialize_display(display: types::EGLDisplay) -> Result<(EGLint, EGLint)> {
-    let mut major_version: EGLint = 0;
-    let mut minor_version: EGLint = 0;
-    let result: types::EGLBoolean =
-        unsafe { Initialize(display, &mut major_version, &mut minor_version) };
-    if result == TRUE {
-        Ok((major_version, minor_version))
-    } else {
-        bail!("Failed to initialize egl")
     }
 }
 

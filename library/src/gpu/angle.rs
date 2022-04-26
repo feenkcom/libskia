@@ -38,8 +38,7 @@ impl AngleContext {
 
         let hdc = unsafe { GetDC(window) };
 
-        let display = get_display(hdc)?;
-        let (major_version, minor_version) = initialize_display(display)?;
+        let (display, major_version, minor_version) = get_display(hdc)?;
         let egl_config = choose_config(display)?;
         let context = create_context(display, egl_config)?;
         let egl_surface = create_window_surface(display, egl_config, window, width, height)?;
