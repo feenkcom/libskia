@@ -11,6 +11,7 @@ use windows::Win32::Graphics::Gdi::HDC;
 
 pub const PLATFORM_ANGLE_TYPE_D3D11_ANGLE: EGLint = 0x3208;
 pub const PLATFORM_ANGLE_ENABLE_AUTOMATIC_TRIM_ANGLE: EGLint = 0x320F;
+pub const PLATFORM_ANGLE_DEVICE_TYPE_D3D_WARP_ANGLE: EGLint = 0x320B;
 pub const FIXED_SIZE_ANGLE: EGLint = 0x3201;
 pub const FRAMEBUFFER_BINDING: EGLenum = 0x8CA6;
 
@@ -18,7 +19,7 @@ const fn int(value: EGLenum) -> EGLint {
     value as EGLint
 }
 
-const DISPLAY_CONFIGS: [&'static [EGLint]; 3] = [
+const DISPLAY_CONFIGS: [&'static [EGLint]; 2] = [
     &[
         int(PLATFORM_ANGLE_TYPE_ANGLE),
         PLATFORM_ANGLE_TYPE_D3D11_ANGLE,
@@ -33,20 +34,12 @@ const DISPLAY_CONFIGS: [&'static [EGLint]; 3] = [
         int(EXPERIMENTAL_PRESENT_PATH_FAST_ANGLE),
         int(NONE),
     ],
+    // if D3D11 doesn't work we fallback to a Warp Device (https://docs.microsoft.com/en-us/windows/win32/direct3d11/overviews-direct3d-11-devices-create-warp)
     &[
         int(PLATFORM_ANGLE_TYPE_ANGLE),
         PLATFORM_ANGLE_TYPE_D3D11_ANGLE,
-        int(PLATFORM_ANGLE_MAX_VERSION_MAJOR_ANGLE),
-        9,
-        int(PLATFORM_ANGLE_MAX_VERSION_MINOR_ANGLE),
-        3,
-        PLATFORM_ANGLE_ENABLE_AUTOMATIC_TRIM_ANGLE,
-        int(TRUE),
-        int(NONE),
-    ],
-    &[
-        int(PLATFORM_ANGLE_TYPE_ANGLE),
-        PLATFORM_ANGLE_TYPE_D3D11_ANGLE,
+        int(PLATFORM_ANGLE_DEVICE_TYPE_ANGLE),
+        PLATFORM_ANGLE_DEVICE_TYPE_D3D_WARP_ANGLE,
         PLATFORM_ANGLE_ENABLE_AUTOMATIC_TRIM_ANGLE,
         int(TRUE),
         int(NONE),
