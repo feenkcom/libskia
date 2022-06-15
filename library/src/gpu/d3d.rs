@@ -338,7 +338,10 @@ fn resolve_interface<T: Interface>(f: impl FnOnce(&mut Option<T>) -> Result<()>)
 fn create_factory<T: Interface>() -> Result<T> {
     let factory: Result<T> = unsafe { CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG) };
     factory.or_else(|error| {
-        warn!("Could not create Debug factory: {:?}. We will try a default one.", error);
+        warn!(
+            "Could not create Debug factory: {:?}. We will try a default one.",
+            error
+        );
         unsafe { CreateDXGIFactory2(0) }
     })
 }

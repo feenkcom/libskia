@@ -121,7 +121,9 @@ impl PlatformContext {
             #[cfg(feature = "d3d")]
             PlatformContext::D3D(context) => context.resize(size),
             #[cfg(feature = "angle")]
-            PlatformContext::Angle(context) => context.resize(size.width, size.height).unwrap_or_else(|error| error!("{}", error)),
+            PlatformContext::Angle(context) => context
+                .resize(size.width, size.height)
+                .unwrap_or_else(|error| error!("{}", error)),
             PlatformContext::Unsupported => {}
         }
     }
