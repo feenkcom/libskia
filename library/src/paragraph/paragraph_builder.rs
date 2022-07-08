@@ -41,10 +41,6 @@ impl ParagraphBuilderWithText {
         self.text.add_placeholder(placeholder_style, char_length);
     }
 
-    pub fn set_paragraph_style(&mut self, style: &ParagraphStyle) {
-        self.builder.set_paragraph_style(style);
-    }
-
     pub fn push_style(&mut self, style: &TextStyle) {
         self.builder.push_style(style);
     }

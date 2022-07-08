@@ -9,6 +9,9 @@ members = [
 
 exclude = [ "target" ]
 
+[patch.crates-io]
+skia-safe = { git = "https://github.com/syrel/rust-skia.git", rev = "901028139c42d1198bb29da97a978cd5333d86a7" }
+
 [profile.dev]
 opt-level = 0
 debug = true
