@@ -1,14 +1,14 @@
 use shared_library_builder::{GitLocation, LibraryLocation, LibraryTarget, RustLibrary};
 
-pub fn libskia(version: impl Into<String>) -> RustLibrary {
-    let target = LibraryTarget::for_current_platform();
+pub fn libskia(target: LibraryTarget, version: Option<impl Into<String>>) -> RustLibrary {
+    let mut location = GitLocation::github("feenkcom", "libskia");
+    if let Some(version) = version {
+        location = location.tag(version);
+    }
 
-    let mut library = RustLibrary::new(
-        "Skia",
-        LibraryLocation::Git(GitLocation::github("feenkcom", "libskia").tag(version)),
-    )
-    .package("libskia")
-    .requires("python");
+    let mut library = RustLibrary::new("Skia", LibraryLocation::Git(location))
+        .package("libskia")
+        .requires("python");
 
     if target.is_windows() {
         library = library.feature("skia_windows");
@@ -23,4 +23,9 @@ pub fn libskia(version: impl Into<String>) -> RustLibrary {
     };
 
     library
+}
+
+pub fn latest_libskia(target: LibraryTarget) -> RustLibrary {
+    let version: Option<String> = None;
+    libskia(target, version)
 }
