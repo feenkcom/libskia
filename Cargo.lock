@@ -1625,7 +1625,7 @@ dependencies = [
 [[package]]
 name = "shared-library-builder"
 version = "0.3.8"
-source = "git+https://github.com/feenkcom/shared-library-builder-rs#a78adc578ff8f5e64e5c490f602d5d50c3932255"
+source = "git+https://github.com/feenkcom/shared-library-builder-rs#a8b61212718f4d0bce5167f4196bd40c0abc5059"
 dependencies = [
  "clap 3.2.8",
  "downloader",
