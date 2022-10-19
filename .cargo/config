@@ -6,3 +6,6 @@ rustflags = ["-Ctarget-feature=+crt-static"]
 rustflags = ["-Ctarget-feature=+crt-static"]
 [target.x86_64-apple-darwin]
 rustflags=["-C", "link-arg=-mmacosx-version-min=10.10"]
+
+[env]
+MACOSX_DEPLOYMENT_TARGET = "10.10"
