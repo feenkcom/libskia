@@ -1,4 +1,4 @@
-use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::textlayout::{Decoration, TextDecoration, TextDecorationMode, TextDecorationStyle};
 use skia_safe::{scalar, Color};
 
@@ -78,6 +78,6 @@ pub fn skia_paragraph_decoration_get_mode(ptr: *mut ValueBox<Decoration>) -> Tex
 }
 
 #[no_mangle]
-pub fn skia_paragraph_decoration_drop(ptr: &mut *mut ValueBox<Decoration>) {
-    drop!(ptr);
+pub fn skia_paragraph_decoration_drop(ptr: *mut ValueBox<Decoration>) {
+    ptr.release();
 }

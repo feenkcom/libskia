@@ -1,4 +1,4 @@
-use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::shaders::empty;
 use skia_safe::Shader;
 
@@ -18,6 +18,6 @@ pub fn skia_shader_is_a_image(shader_ptr: *mut ValueBox<Shader>) -> bool {
 }
 
 #[no_mangle]
-pub fn skia_shader_drop(ptr: &mut *mut ValueBox<Shader>) {
-    drop!(ptr);
+pub fn skia_shader_drop(ptr: *mut ValueBox<Shader>) {
+    ptr.release();
 }

@@ -1,5 +1,5 @@
 use boxer::array::BoxerArrayF32;
-use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::{scalar, PathEffect};
 
 #[no_mangle]
@@ -24,6 +24,6 @@ pub fn skia_path_effect_corner(radius: scalar) -> *mut ValueBox<PathEffect> {
 }
 
 #[no_mangle]
-pub fn skia_path_effect_drop(ptr: &mut *mut ValueBox<PathEffect>) {
-    drop!(ptr);
+pub fn skia_path_effect_drop(ptr: *mut ValueBox<PathEffect>) {
+    ptr.release();
 }

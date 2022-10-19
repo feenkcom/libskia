@@ -1,5 +1,4 @@
-use boxer::function;
-use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::paint::{Cap, Join, Style};
 use skia_safe::{scalar, BlendMode, Color, ImageFilter, Paint, PathEffect, Shader};
 
@@ -222,6 +221,6 @@ pub fn skia_paint_has_path_effect(paint_ptr: *mut ValueBox<Paint>) -> bool {
 }
 
 #[no_mangle]
-pub fn skia_paint_drop(ptr: &mut *mut ValueBox<Paint>) {
-    drop!(ptr);
+pub fn skia_paint_drop(ptr: *mut ValueBox<Paint>) {
+    ptr.release();
 }

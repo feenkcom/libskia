@@ -1,4 +1,4 @@
-use boxer::{ReturnBoxerResult, ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 use skia_safe::textlayout::TypefaceFontProvider;
 use skia_safe::Typeface;
 
@@ -24,6 +24,6 @@ pub fn skia_typeface_font_provider_register_typeface(
 }
 
 #[no_mangle]
-pub fn skia_typeface_font_provider_drop(ptr: &mut *mut ValueBox<TypefaceFontProvider>) {
-    drop!(ptr);
+pub fn skia_typeface_font_provider_drop(ptr: *mut ValueBox<TypefaceFontProvider>) {
+    ptr.release();
 }

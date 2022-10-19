@@ -2,7 +2,7 @@ use boxer::array::BoxerArrayPointF32;
 use boxer::boxes::{ReferenceBox, ReferenceBoxPointer};
 use boxer::point::BoxerPointF32;
 use boxer::string::BoxerString;
-use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::textlayout::{
     Affinity, LineMetrics, Paragraph, PlaceholderStyle, PositionWithAffinity, RectHeightStyle,
     RectWidthStyle, TextBox,
@@ -522,6 +522,6 @@ pub fn skia_paragraph_get_line_height(
 }
 
 #[no_mangle]
-pub fn skia_paragraph_drop(ptr: &mut *mut ValueBox<ParagraphWithText>) {
-    drop!(ptr);
+pub fn skia_paragraph_drop(ptr: *mut ValueBox<ParagraphWithText>) {
+    ptr.release();
 }

@@ -1,5 +1,5 @@
 use boxer::string::BoxerString;
-use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::{Font, GlyphId, Point, TextBlob, TextBlobBuilder, TextEncoding};
 
 #[no_mangle]
@@ -54,6 +54,6 @@ pub fn skia_text_blob_from_glyphs(
 }
 
 #[no_mangle]
-pub fn skia_text_blob_drop(ptr: &mut *mut ValueBox<TextBlob>) {
-    drop!(ptr);
+pub fn skia_text_blob_drop(ptr: *mut ValueBox<TextBlob>) {
+    ptr.release();
 }

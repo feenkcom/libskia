@@ -1,5 +1,5 @@
 use boxer::string::BoxerString;
-use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::{FontStyle, FontStyleSet, Typeface};
 
 #[no_mangle]
@@ -56,6 +56,6 @@ pub fn skia_font_style_set_new_typeface(
 }
 
 #[no_mangle]
-pub fn skia_font_style_set_drop(ptr: &mut *mut ValueBox<FontStyleSet>) {
-    drop!(ptr);
+pub fn skia_font_style_set_drop(ptr: *mut ValueBox<FontStyleSet>) {
+    ptr.release();
 }

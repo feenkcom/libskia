@@ -1,4 +1,4 @@
-use boxer::{ReturnBoxerResult, ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 use compositor::{Compositor, Layer};
 use compositor_skia::{Cache, SkiaCachelessCompositor, SkiaCompositor};
 use fps_counter::FPSCounter;
@@ -189,6 +189,6 @@ pub fn skia_platform_compositor_disable_fps(compositor: *mut ValueBox<PlatformCo
 }
 
 #[no_mangle]
-pub fn skia_platform_compositor_drop(compositor: &mut *mut ValueBox<PlatformCompositor>) {
-    compositor.drop();
+pub fn skia_platform_compositor_drop(compositor: *mut ValueBox<PlatformCompositor>) {
+    compositor.release();
 }

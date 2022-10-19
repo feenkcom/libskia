@@ -1,4 +1,4 @@
-use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::gpu::gl::TextureInfo;
 use skia_safe::gpu::{BackendAPI, BackendTexture, MipMapped};
 
@@ -71,6 +71,6 @@ pub fn skia_backend_texture_get_gl_texture_info(
 }
 
 #[no_mangle]
-pub fn skia_backend_texture_drop(ptr: &mut *mut ValueBox<BackendTexture>) {
-    drop!(ptr);
+pub fn skia_backend_texture_drop(ptr: *mut ValueBox<BackendTexture>) {
+    ptr.release();
 }

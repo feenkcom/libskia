@@ -1,4 +1,4 @@
-use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::gpu::gl::TextureInfo;
 
 #[no_mangle]
@@ -44,6 +44,6 @@ pub fn skia_texture_info_get_id(
 }
 
 #[no_mangle]
-pub fn skia_texture_info_drop(ptr: &mut *mut ValueBox<TextureInfo>) {
-    drop!(ptr);
+pub fn skia_texture_info_drop(ptr: *mut ValueBox<TextureInfo>) {
+    ptr.release();
 }

@@ -1,6 +1,7 @@
 use boxer::array::BoxerArray;
-use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 use skia_safe::Color;
+use std::ops::Deref;
 
 #[no_mangle]
 pub fn skia_color_default() -> *mut ValueBox<Color> {
@@ -38,8 +39,8 @@ pub fn skia_color_get_alpha(color_ptr: *mut ValueBox<Color>) -> u8 {
 }
 
 #[no_mangle]
-pub fn skia_color_drop(ptr: &mut *mut ValueBox<Color>) {
-    drop!(ptr);
+pub fn skia_color_drop(ptr: *mut ValueBox<Color>) {
+    ptr.release();
 }
 
 #[no_mangle]
@@ -49,27 +50,28 @@ pub fn skia_color_array_default() -> *mut ValueBox<BoxerArray<Color>> {
 
 #[no_mangle]
 pub fn skia_color_array_create_with(
-    element_ptr: *mut ValueBox<Color>,
+    color: *mut ValueBox<Color>,
     amount: usize,
 ) -> *mut ValueBox<BoxerArray<Color>> {
-    element_ptr.with_not_null_value_return(std::ptr::null_mut(), |color| {
-        BoxerArray::<Color>::boxer_array_create_with(color, amount)
-    })
+    color
+        .to_ref()
+        .map(|color| BoxerArray::<Color>::from_vector(vec![color.deref().clone(); amount]))
+        .into_raw()
 }
 
 #[no_mangle]
-pub fn skia_color_array_get_length(_ptr: *mut ValueBox<BoxerArray<Color>>) -> usize {
-    BoxerArray::<Color>::boxer_array_get_length(_ptr)
+pub fn skia_color_array_get_length(ptr: *mut ValueBox<BoxerArray<Color>>) -> usize {
+    BoxerArray::<Color>::boxer_array_get_length(ptr)
 }
 
 #[no_mangle]
-pub fn skia_color_array_get_capacity(_ptr: *mut ValueBox<BoxerArray<Color>>) -> usize {
-    BoxerArray::<Color>::boxer_array_get_capacity(_ptr)
+pub fn skia_color_array_get_capacity(ptr: *mut ValueBox<BoxerArray<Color>>) -> usize {
+    BoxerArray::<Color>::boxer_array_get_capacity(ptr)
 }
 
 #[no_mangle]
-pub fn skia_color_array_get_data(_ptr: *mut ValueBox<BoxerArray<Color>>) -> *mut Color {
-    BoxerArray::<Color>::boxer_array_get_data(_ptr)
+pub fn skia_color_array_get_data(ptr: *mut ValueBox<BoxerArray<Color>>) -> *mut Color {
+    BoxerArray::<Color>::boxer_array_get_data(ptr)
 }
 
 #[no_mangle]
@@ -94,8 +96,8 @@ pub fn skia_color_array_at_put(
 }
 
 #[no_mangle]
-pub fn skia_color_array_drop(ptr: &mut *mut ValueBox<BoxerArray<Color>>) {
-    drop!(ptr);
+pub fn skia_color_array_drop(ptr: *mut ValueBox<BoxerArray<Color>>) {
+    ptr.release();
 }
 
 #[test]
@@ -106,7 +108,7 @@ pub fn test_skia_color_array() {
     assert_eq!(color_ptr.has_value(), true);
     assert_eq!(array_ptr.has_value(), true);
 
-    skia_color_array_drop(&mut array_ptr);
+    skia_color_array_drop(array_ptr);
 
     assert_eq!(color_ptr.has_value(), true);
     assert_eq!(array_ptr.has_value(), false);

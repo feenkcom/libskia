@@ -1,4 +1,4 @@
-use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::gpu::BackendRenderTarget;
 
 #[cfg(feature = "gl")]
@@ -55,6 +55,6 @@ pub fn skia_backend_render_target_is_protected(
 }
 
 #[no_mangle]
-pub fn skia_backend_render_target_drop(ptr: &mut *mut ValueBox<BackendRenderTarget>) {
-    drop!(ptr);
+pub fn skia_backend_render_target_drop(ptr: *mut ValueBox<BackendRenderTarget>) {
+    ptr.release();
 }

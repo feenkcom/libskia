@@ -1,7 +1,7 @@
 use crate::text::font_style::FontStyleWidth;
 use boxer::array::BoxerArrayU8;
 use boxer::string::BoxerString;
-use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::font_style::{Slant, Weight};
 use skia_safe::{FontMgr, FontStyle, FontStyleSet, Typeface};
 
@@ -77,6 +77,6 @@ pub fn skia_font_manager_match_family_style(
 }
 
 #[no_mangle]
-pub fn skia_font_manager_drop(ptr: &mut *mut ValueBox<FontMgr>) {
-    drop!(ptr);
+pub fn skia_font_manager_drop(ptr: *mut ValueBox<FontMgr>) {
+    ptr.release();
 }

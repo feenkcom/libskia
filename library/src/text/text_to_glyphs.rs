@@ -1,6 +1,6 @@
 use boxer::array::BoxerArray;
 use boxer::string::BoxerString;
-use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::{scalar, Font, GlyphId, Paint, TextEncoding};
 
 pub struct TextToGlyphs {
@@ -25,8 +25,8 @@ pub fn skia_text_to_glyphs_batch_create() -> *mut ValueBox<Vec<TextToGlyphs>> {
 }
 
 #[no_mangle]
-pub fn skia_text_to_glyphs_batch_drop(ptr: &mut *mut ValueBox<Vec<TextToGlyphs>>) {
-    drop!(ptr);
+pub fn skia_text_to_glyphs_batch_drop(ptr: *mut ValueBox<Vec<TextToGlyphs>>) {
+    ptr.release();
 }
 
 #[no_mangle]

@@ -1,4 +1,4 @@
-use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::{PixelGeometry, SurfaceProps, SurfacePropsFlags};
 
 #[no_mangle]
@@ -39,6 +39,6 @@ pub fn skia_surface_props_get_flags(surface_props_ptr: *mut ValueBox<SurfaceProp
 }
 
 #[no_mangle]
-pub fn skia_surface_props_drop(ptr: &mut *mut ValueBox<SurfaceProps>) {
-    drop!(ptr);
+pub fn skia_surface_props_drop(ptr: *mut ValueBox<SurfaceProps>) {
+    ptr.release();
 }

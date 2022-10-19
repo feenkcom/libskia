@@ -1,4 +1,4 @@
-use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::{scalar, IRect, Rect};
 
 ///
@@ -44,8 +44,8 @@ pub fn skia_rectangle_f32_bottom(rectangle_ptr: *mut ValueBox<Rect>) -> scalar {
 }
 
 #[no_mangle]
-pub fn skia_rectangle_f32_drop(ptr: &mut *mut ValueBox<Rect>) {
-    drop!(ptr);
+pub fn skia_rectangle_f32_drop(ptr: *mut ValueBox<Rect>) {
+    ptr.release();
 }
 
 ///
@@ -91,6 +91,6 @@ pub fn skia_rectangle_i32_bottom(rectangle_ptr: *mut ValueBox<IRect>) -> i32 {
 }
 
 #[no_mangle]
-pub fn skia_rectangle_i32_drop(ptr: &mut *mut ValueBox<IRect>) {
-    drop!(ptr);
+pub fn skia_rectangle_i32_drop(ptr: *mut ValueBox<IRect>) {
+    ptr.release();
 }

@@ -1,4 +1,4 @@
-use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::{AlphaType, ColorSpace, ColorType, ISize, ImageInfo};
 
 #[no_mangle]
@@ -94,6 +94,6 @@ pub fn skia_image_info_get_shift_per_pixel(image_info_ptr: *mut ValueBox<ImageIn
 }
 
 #[no_mangle]
-pub fn skia_image_info_drop(ptr: &mut *mut ValueBox<ImageInfo>) {
-    drop!(ptr);
+pub fn skia_image_info_drop(ptr: *mut ValueBox<ImageInfo>) {
+    ptr.release();
 }

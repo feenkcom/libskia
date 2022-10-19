@@ -1,6 +1,6 @@
 use boxer::array::BoxerArray;
 use boxer::boxes::{ReferenceBox, ReferenceBoxPointer};
-use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::{Canvas, Picture, Rect};
 
 #[no_mangle]
@@ -50,6 +50,6 @@ pub fn skia_picture_serialize(
 }
 
 #[no_mangle]
-pub fn skia_picture_drop(ptr: &mut *mut ValueBox<Picture>) {
-    drop!(ptr);
+pub fn skia_picture_drop(ptr: *mut ValueBox<Picture>) {
+    ptr.release();
 }

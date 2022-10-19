@@ -1,4 +1,3 @@
-#[macro_use]
 extern crate boxer;
 extern crate byteorder;
 extern crate crossbeam;
@@ -14,14 +13,6 @@ extern crate env_logger;
 extern crate lazy_static;
 
 use std::os::raw::c_void;
-
-#[macro_export]
-macro_rules! drop {
-    ($ptr:expr) => {
-        trace!("{}", function!());
-        $ptr.drop();
-    };
-}
 
 pub mod canvas;
 pub mod canvas_clip;

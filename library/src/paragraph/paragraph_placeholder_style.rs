@@ -1,4 +1,4 @@
-use boxer::{ValueBox, ValueBoxPointer, ValueBoxPointerReference};
+use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::scalar;
 use skia_safe::textlayout::{PlaceholderAlignment, PlaceholderStyle};
 
@@ -38,6 +38,6 @@ pub fn skia_paragraph_placeholder_style_set_alignment(
 }
 
 #[no_mangle]
-pub fn skia_paragraph_placeholder_style_drop(ptr: &mut *mut ValueBox<PlaceholderStyle>) {
-    drop!(ptr);
+pub fn skia_paragraph_placeholder_style_drop(ptr: *mut ValueBox<PlaceholderStyle>) {
+    ptr.release();
 }
