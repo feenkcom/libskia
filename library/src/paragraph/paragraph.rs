@@ -1,21 +1,22 @@
-use boxer::array::BoxerArrayPointF32;
-use boxer::boxes::{ReferenceBox, ReferenceBoxPointer};
-use boxer::point::BoxerPointF32;
-use boxer::string::BoxerString;
-use boxer::{ValueBox, ValueBoxPointer};
+use array_box::ArrayBox;
+use geometry_box::PointBox;
+use std::ops::Range;
+
+use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::textlayout::{
     Affinity, LineMetrics, Paragraph, PlaceholderStyle, PositionWithAffinity, RectHeightStyle,
     RectWidthStyle, TextBox,
 };
 use skia_safe::{scalar, Canvas, Point, Rect};
-use std::ops::Range;
+use string_box::StringBox;
+use value_box::{ValueBox, ValueBoxPointer};
 
 pub type TabSize = usize;
 pub type CharLength = usize;
 
 #[derive(Debug)]
 pub enum ParagraphPiece {
-    Text(BoxerString),
+    Text(StringBox),
     Placeholder(PlaceholderStyle, CharLength),
 }
 
@@ -38,7 +39,7 @@ impl ParagraphText {
         self.char_count
     }
 
-    pub fn add_text(&mut self, text: BoxerString) {
+    pub fn add_text(&mut self, text: StringBox) {
         let char_count = text.char_count();
         self.pieces.push(ParagraphPiece::Text(text));
         self.char_count = self.char_count + char_count;
@@ -388,17 +389,14 @@ pub fn skia_paragraph_get_char_count(paragraph_ptr: *mut ValueBox<ParagraphWithT
 #[no_mangle]
 pub fn skia_paragraph_get_rects_for_placeholders(
     paragraph_ptr: *mut ValueBox<ParagraphWithText>,
-) -> *mut ValueBox<BoxerArrayPointF32> {
+) -> *mut ValueBox<ArrayBox<PointBox<f32>>> {
     paragraph_ptr.with_not_null_return(std::ptr::null_mut(), |paragraph| {
-        let mut points: Vec<BoxerPointF32> = vec![];
+        let mut points: Vec<PointBox<f32>> = vec![];
         for text_box in paragraph.get_rects_for_placeholders().iter() {
-            points.push(BoxerPointF32::new(text_box.rect.x(), text_box.rect.y()));
-            points.push(BoxerPointF32::new(
-                text_box.rect.right(),
-                text_box.rect.bottom(),
-            ));
+            points.push(PointBox::new(text_box.rect.x(), text_box.rect.y()));
+            points.push(PointBox::new(text_box.rect.right(), text_box.rect.bottom()));
         }
-        let mut array = BoxerArrayPointF32::new();
+        let mut array = ArrayBox::new();
         array.set_vector(points);
         ValueBox::new(array).into_raw()
     })
@@ -411,20 +409,17 @@ pub fn skia_paragraph_get_rects_for_glyph_range(
     end: usize,
     rect_height_style: RectHeightStyle,
     rect_width_style: RectWidthStyle,
-) -> *mut ValueBox<BoxerArrayPointF32> {
+) -> *mut ValueBox<ArrayBox<PointBox<f32>>> {
     paragraph_ptr.with_not_null_return(std::ptr::null_mut(), |paragraph| {
-        let mut points: Vec<BoxerPointF32> = vec![];
+        let mut points: Vec<PointBox<f32>> = vec![];
         for text_box in paragraph
             .get_rects_for_range(start..end, rect_height_style, rect_width_style)
             .iter()
         {
-            points.push(BoxerPointF32::new(text_box.rect.x(), text_box.rect.y()));
-            points.push(BoxerPointF32::new(
-                text_box.rect.right(),
-                text_box.rect.bottom(),
-            ));
+            points.push(PointBox::new(text_box.rect.x(), text_box.rect.y()));
+            points.push(PointBox::new(text_box.rect.right(), text_box.rect.bottom()));
         }
-        let mut array = BoxerArrayPointF32::new();
+        let mut array = ArrayBox::new();
         array.set_vector(points);
         ValueBox::new(array).into_raw()
     })
@@ -437,20 +432,17 @@ pub fn skia_paragraph_get_rects_for_char_range(
     end: usize,
     rect_height_style: RectHeightStyle,
     rect_width_style: RectWidthStyle,
-) -> *mut ValueBox<BoxerArrayPointF32> {
+) -> *mut ValueBox<ArrayBox<PointBox<f32>>> {
     paragraph_ptr.with_not_null_return(std::ptr::null_mut(), |paragraph| {
-        let mut points: Vec<BoxerPointF32> = vec![];
+        let mut points: Vec<PointBox<f32>> = vec![];
         for text_box in paragraph
             .get_rects_for_char_range(start..end, rect_height_style, rect_width_style)
             .iter()
         {
-            points.push(BoxerPointF32::new(text_box.rect.x(), text_box.rect.y()));
-            points.push(BoxerPointF32::new(
-                text_box.rect.right(),
-                text_box.rect.bottom(),
-            ));
+            points.push(PointBox::new(text_box.rect.x(), text_box.rect.y()));
+            points.push(PointBox::new(text_box.rect.right(), text_box.rect.bottom()));
         }
-        let mut array = BoxerArrayPointF32::new();
+        let mut array = ArrayBox::new();
         array.set_vector(points);
         ValueBox::new(array).into_raw()
     })

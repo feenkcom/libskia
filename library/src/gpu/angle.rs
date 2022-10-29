@@ -6,12 +6,12 @@ use std::mem::transmute;
 
 use crate::gpu::{PlatformCompositor, PlatformContext};
 use anyhow::{anyhow, Result};
-use boxer::ValueBox;
 use mozangle::egl::ffi::*;
 use mozangle::egl::get_proc_address;
 use skia_safe::gpu::gl::{Format, FramebufferInfo, Interface};
 use skia_safe::gpu::{BackendRenderTarget, DirectContext, RecordingContext, SurfaceOrigin};
 use skia_safe::{ColorType, Surface};
+use value_box::ValueBox;
 use windows::Win32::Foundation::HWND;
 use windows::Win32::Graphics::Gdi::GetDC;
 

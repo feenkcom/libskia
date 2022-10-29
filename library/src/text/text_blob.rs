@@ -1,6 +1,6 @@
-use boxer::string::BoxerString;
-use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::{Font, GlyphId, Point, TextBlob, TextBlobBuilder, TextEncoding};
+use string_box::StringBox;
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_text_blob_default() -> *mut ValueBox<TextBlob> {
@@ -12,7 +12,7 @@ pub fn skia_text_blob_default() -> *mut ValueBox<TextBlob> {
 
 #[no_mangle]
 pub fn skia_text_blob_from_text(
-    text_ptr: *mut ValueBox<BoxerString>,
+    text_ptr: *mut ValueBox<StringBox>,
     encoding: TextEncoding,
     font_ptr: *mut ValueBox<Font>,
 ) -> *mut ValueBox<TextBlob> {

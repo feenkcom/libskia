@@ -1,5 +1,4 @@
 use crate::gpu::platform_compositor::{PlatformCompositor, PlatformContext};
-use boxer::ValueBox;
 use cocoa::base::YES;
 use cocoa::{appkit::NSView, base::id as cocoa_id};
 use core_graphics_types::geometry::CGSize;
@@ -9,6 +8,7 @@ use skia_safe::gpu::mtl::BackendContext;
 use skia_safe::gpu::{mtl, BackendRenderTarget, DirectContext, SurfaceOrigin};
 use skia_safe::{scalar, ColorType, ISize, Size, Surface};
 use std::mem;
+use value_box::ValueBox;
 
 #[allow(dead_code)]
 #[derive(Debug)]

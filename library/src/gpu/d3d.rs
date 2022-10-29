@@ -1,4 +1,3 @@
-use boxer::ValueBox;
 use skia_safe::{ColorType, ISize, Surface};
 use std::mem::transmute;
 
@@ -8,6 +7,7 @@ use skia_safe::gpu::{
     BackendRenderTarget, BackendTexture, DirectContext, FlushInfo, Protected, SurfaceOrigin,
 };
 use skia_safe::surface::BackendSurfaceAccess;
+use value_box::ValueBox;
 use windows::core::{Interface, Result};
 use windows::Win32::Foundation::{HANDLE, HWND};
 use windows::Win32::Graphics::Direct3D::D3D_FEATURE_LEVEL_11_0;

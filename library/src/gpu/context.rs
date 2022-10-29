@@ -1,10 +1,10 @@
 use std::os::raw::c_void;
 
-use boxer::string::BoxerString;
-use boxer::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 use skia_safe::gpu::gl::Interface;
 use skia_safe::gpu::DirectContext;
 use skia_safe::ColorType;
+use string_box::StringBox;
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_interface_new_native() -> *mut ValueBox<Interface> {
@@ -21,10 +21,10 @@ pub fn skia_interface_new_native() -> *mut ValueBox<Interface> {
 
 #[no_mangle]
 pub fn skia_interface_new_load_with(
-    callback: extern "C" fn(*mut ValueBox<BoxerString>) -> *const c_void,
+    callback: extern "C" fn(*mut ValueBox<StringBox>) -> *const c_void,
 ) -> *mut ValueBox<Interface> {
     match Interface::new_load_with(|symbol| {
-        let boxer_string = ValueBox::new(BoxerString::from_string(symbol.to_string())).into_raw();
+        let boxer_string = ValueBox::new(StringBox::from_string(symbol.to_string())).into_raw();
         let func_ptr = callback(boxer_string);
         boxer_string.release();
         if cfg!(debug_assertions) {

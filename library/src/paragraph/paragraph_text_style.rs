@@ -1,7 +1,7 @@
-use boxer::string::BoxerString;
-use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::textlayout::{Decoration, TextStyle};
 use skia_safe::{scalar, Color, FontStyle, Paint};
+use string_box::StringBox;
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_paragraph_text_style_new() -> *mut ValueBox<TextStyle> {
@@ -137,7 +137,7 @@ pub fn skia_paragraph_text_style_set_font_style(
 #[no_mangle]
 pub fn skia_paragraph_text_style_set_font_family(
     text_style_ptr: *mut ValueBox<TextStyle>,
-    font_family_ptr: *mut ValueBox<BoxerString>,
+    font_family_ptr: *mut ValueBox<StringBox>,
 ) {
     text_style_ptr.with_not_null(|text_style| {
         font_family_ptr.with_not_null(|font_family| {

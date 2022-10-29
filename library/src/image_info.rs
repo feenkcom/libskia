@@ -1,5 +1,5 @@
-use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::{AlphaType, ColorSpace, ColorType, ISize, ImageInfo};
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_image_info_new_default() -> *mut ValueBox<ImageInfo> {

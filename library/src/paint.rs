@@ -1,6 +1,6 @@
-use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::paint::{Cap, Join, Style};
 use skia_safe::{scalar, BlendMode, Color, ImageFilter, Paint, PathEffect, Shader};
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_paint_default() -> *mut ValueBox<Paint> {

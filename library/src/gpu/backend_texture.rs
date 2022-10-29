@@ -1,6 +1,6 @@
-use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::gpu::gl::TextureInfo;
 use skia_safe::gpu::{BackendAPI, BackendTexture, MipMapped};
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_backend_texture_new_gl(

@@ -1,12 +1,12 @@
-use boxer::array::BoxerArrayU8;
-use boxer::boxes::ReferenceBox;
-use boxer::{ValueBox, ValueBoxPointer};
+use array_box::ArrayBox;
+use reference_box::ReferenceBox;
 use skia_safe::{AlphaType, Canvas, ColorType, IPoint, ISize, Image, ImageInfo, Surface};
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_surface_new_raster_direct(
     image_info_ptr: *mut ValueBox<ImageInfo>,
-    pixels_ptr: *mut ValueBox<BoxerArrayU8>,
+    pixels_ptr: *mut ValueBox<ArrayBox<u8>>,
     row_bytes: usize,
 ) -> *mut ValueBox<Surface> {
     image_info_ptr.with_not_null_return(std::ptr::null_mut(), |image_info| {
@@ -106,7 +106,7 @@ pub fn skia_surface_get_image_info(
 #[no_mangle]
 pub fn skia_surface_read_all_pixels(
     surface_ptr: *mut ValueBox<Surface>,
-    pixels_ptr: *mut ValueBox<BoxerArrayU8>,
+    pixels_ptr: *mut ValueBox<ArrayBox<u8>>,
 ) -> bool {
     surface_ptr.with_not_null_return(false, |surface| {
         pixels_ptr.with_not_null_return(false, |pixels| {

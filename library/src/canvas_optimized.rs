@@ -1,8 +1,7 @@
-use boxer::boxes::{ReferenceBox, ReferenceBoxPointer};
-use boxer::{ValueBox, ValueBoxPointer};
+use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::{scalar, Canvas, Color, Paint, Point, TextBlob};
+use value_box::{ValueBox, ValueBoxPointer};
 
-use boxer::{assert_reference_box, function};
 /// Fill a given text blob with a color and disabled antialias
 #[no_mangle]
 pub fn skia_canvas_draw_text_blob_with_color(
@@ -16,7 +15,6 @@ pub fn skia_canvas_draw_text_blob_with_color(
     a: u8,
     antialias: bool,
 ) {
-    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         text_blob_ptr.with_not_null(|text_blob| {
             canvas.draw_text_blob(
@@ -39,7 +37,6 @@ pub fn skia_canvas_draw_text_blob_with_black_color(
     y: scalar,
     antialias: bool,
 ) {
-    assert_reference_box(canvas_ptr, function!());
     canvas_ptr.with_not_null(|canvas| {
         text_blob_ptr.with_not_null(|text_blob| {
             canvas.draw_text_blob(
@@ -55,8 +52,9 @@ pub fn skia_canvas_draw_text_blob_with_black_color(
 
 #[cfg(test)]
 mod tests {
-    use skia_safe::{Color, Font, FontStyle, ISize, Paint, Point, Surface, TextBlob, Typeface};
     use std::time::Instant;
+
+    use skia_safe::{Color, Font, FontStyle, ISize, Paint, Point, Surface, TextBlob, Typeface};
 
     #[test]
     fn test_text_performance() {

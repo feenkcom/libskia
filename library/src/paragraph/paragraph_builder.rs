@@ -1,9 +1,9 @@
 use crate::paragraph::paragraph::{CharLength, ParagraphText, ParagraphWithText, TabSize};
-use boxer::string::BoxerString;
-use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::textlayout::{
     FontCollection, ParagraphBuilder, ParagraphStyle, PlaceholderStyle, TextStyle,
 };
+use string_box::StringBox;
+use value_box::{ValueBox, ValueBoxPointer};
 
 pub struct ParagraphBuilderWithText {
     builder: ParagraphBuilder,
@@ -24,7 +24,7 @@ impl ParagraphBuilderWithText {
         }
     }
 
-    pub fn add_text(&mut self, string: BoxerString) {
+    pub fn add_text(&mut self, string: StringBox) {
         let spaces: String = (0..self.tab_size).map(|_| ' ').collect();
 
         let replaced_string = string.as_str().replace('\t', &spaces);
@@ -85,7 +85,7 @@ pub fn skia_paragraph_builder_build(
 #[no_mangle]
 pub fn skia_paragraph_builder_add_text(
     paragraph_builder_ptr: *mut ValueBox<ParagraphBuilderWithText>,
-    mut string_ptr: *mut ValueBox<BoxerString>,
+    mut string_ptr: *mut ValueBox<StringBox>,
 ) {
     paragraph_builder_ptr.with_not_null(|paragraph_builder| {
         string_ptr.with_not_null_value_consumed(|string| {

@@ -1,15 +1,16 @@
-use boxer::array::BoxerArray;
-use boxer::{ValueBox, ValueBoxPointer};
+use array_box::ArrayBox;
+use std::borrow::Borrow;
+
 use skia_safe::gradient_shader::{Flags, GradientShaderColors};
 use skia_safe::{scalar, Color, Matrix, Point, Shader, TileMode};
-use std::borrow::Borrow;
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_gradient_linear_create(
     from_point_ptr: *mut ValueBox<Point>,
     to_point_ptr: *mut ValueBox<Point>,
-    colors_ptr: *mut ValueBox<BoxerArray<Color>>,
-    positions_ptr: *mut ValueBox<BoxerArray<scalar>>,
+    colors_ptr: *mut ValueBox<ArrayBox<Color>>,
+    positions_ptr: *mut ValueBox<ArrayBox<scalar>>,
     mode: TileMode,
     bit_flags: u32,
     matrix_ptr: *mut ValueBox<Matrix>,
@@ -41,8 +42,8 @@ pub fn skia_gradient_linear_create(
 pub fn skia_gradient_radial_create(
     center_ptr: *mut ValueBox<Point>,
     radius: scalar,
-    colors_ptr: *mut ValueBox<BoxerArray<Color>>,
-    positions_ptr: *mut ValueBox<BoxerArray<scalar>>,
+    colors_ptr: *mut ValueBox<ArrayBox<Color>>,
+    positions_ptr: *mut ValueBox<ArrayBox<scalar>>,
     mode: TileMode,
     bit_flags: u32,
     matrix_ptr: *mut ValueBox<Matrix>,
@@ -75,8 +76,8 @@ pub fn skia_gradient_two_point_conical_create(
     start_radius: scalar,
     end_ptr: *mut ValueBox<Point>,
     end_radius: scalar,
-    colors_ptr: *mut ValueBox<BoxerArray<Color>>,
-    positions_ptr: *mut ValueBox<BoxerArray<scalar>>,
+    colors_ptr: *mut ValueBox<ArrayBox<Color>>,
+    positions_ptr: *mut ValueBox<ArrayBox<scalar>>,
     mode: TileMode,
     bit_flags: u32,
     matrix_ptr: *mut ValueBox<Matrix>,
@@ -112,8 +113,8 @@ pub fn skia_gradient_sweep_create(
     center_ptr: *mut ValueBox<Point>,
     start_angle: scalar,
     end_angle: scalar,
-    colors_ptr: *mut ValueBox<BoxerArray<Color>>,
-    positions_ptr: *mut ValueBox<BoxerArray<scalar>>,
+    colors_ptr: *mut ValueBox<ArrayBox<Color>>,
+    positions_ptr: *mut ValueBox<ArrayBox<scalar>>,
     mode: TileMode,
     bit_flags: u32,
     matrix_ptr: *mut ValueBox<Matrix>,

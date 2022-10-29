@@ -1,6 +1,6 @@
-use boxer::string::BoxerString;
-use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::{FontStyle, FontStyleSet, Typeface};
+use string_box::StringBox;
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_font_style_set_default() -> *mut ValueBox<FontStyleSet> {
@@ -26,7 +26,7 @@ pub fn skia_font_style_set_style_at(
 pub fn skia_font_style_set_name_at(
     font_style_set_ptr: *mut ValueBox<FontStyleSet>,
     index: usize,
-    _name_ptr: *mut ValueBox<BoxerString>,
+    _name_ptr: *mut ValueBox<StringBox>,
 ) {
     font_style_set_ptr.with_not_null(|set| {
         _name_ptr.with_not_null(|name| {

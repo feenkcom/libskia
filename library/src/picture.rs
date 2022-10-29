@@ -1,7 +1,7 @@
-use boxer::array::BoxerArray;
-use boxer::boxes::{ReferenceBox, ReferenceBoxPointer};
-use boxer::{ValueBox, ValueBoxPointer};
+use array_box::ArrayBox;
+use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::{Canvas, Picture, Rect};
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_picture_cull_rect(picture_ptr: *mut ValueBox<Picture>) -> *mut ValueBox<Rect> {
@@ -40,7 +40,7 @@ pub fn skia_picture_playback(
 #[no_mangle]
 pub fn skia_picture_serialize(
     picture_ptr: *mut ValueBox<Picture>,
-    data_ptr: *mut ValueBox<BoxerArray<u8>>,
+    data_ptr: *mut ValueBox<ArrayBox<u8>>,
 ) {
     picture_ptr.with_not_null(|picture| {
         data_ptr.with_not_null(|data| {

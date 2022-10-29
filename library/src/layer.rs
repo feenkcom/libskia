@@ -1,5 +1,5 @@
-use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::{scalar, Paint, Rect};
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[derive(Default)]
 #[repr(C)]
@@ -43,12 +43,11 @@ pub fn skia_layer_rec_drop(ptr: *mut ValueBox<SaveLayerRecWrapper>) {
 
 #[cfg(test)]
 pub mod test {
-    use layer::{skia_layer_rec_default, skia_layer_rec_drop};
+    use super::*;
 
     #[test]
     fn default_layer() {
         let mut layer_ptr = skia_layer_rec_default();
-
-        skia_layer_rec_drop(&mut layer_ptr);
+        skia_layer_rec_drop(layer_ptr);
     }
 }

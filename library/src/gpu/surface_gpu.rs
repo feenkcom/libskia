@@ -1,6 +1,6 @@
-use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::gpu::{BackendRenderTarget, BackendTexture, DirectContext, SurfaceOrigin};
 use skia_safe::{Budgeted, ColorType, ImageInfo, Surface};
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_surface_from_render_target(

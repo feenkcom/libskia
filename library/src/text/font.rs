@@ -1,10 +1,10 @@
-use boxer::array::BoxerArray;
-use boxer::string::BoxerString;
-use boxer::{ValueBox, ValueBoxPointer};
+use array_box::ArrayBox;
 use skia_safe::font::Edging;
 use skia_safe::{
     scalar, Font, FontHinting, FontMetrics, GlyphId, Paint, Rect, TextEncoding, Typeface,
 };
+use string_box::StringBox;
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_font_default() -> *mut ValueBox<Font> {
@@ -119,9 +119,9 @@ pub fn skia_font_get_metrics(font_ptr: *mut ValueBox<Font>) -> *mut ValueBox<Fon
 #[no_mangle]
 pub fn skia_font_text_to_glyphs(
     font_ptr: *mut ValueBox<Font>,
-    text_ptr: *mut ValueBox<BoxerString>,
+    text_ptr: *mut ValueBox<StringBox>,
     encoding: TextEncoding,
-    glyphs_ptr: *mut ValueBox<BoxerArray<GlyphId>>,
+    glyphs_ptr: *mut ValueBox<ArrayBox<GlyphId>>,
     paint_ptr: *mut ValueBox<Paint>,
     bounds_ptr: *mut ValueBox<Rect>,
 ) -> scalar {
@@ -156,7 +156,7 @@ pub fn skia_font_text_to_glyphs(
 #[no_mangle]
 pub fn skia_font_measure_text(
     font_ptr: *mut ValueBox<Font>,
-    text_ptr: *mut ValueBox<BoxerString>,
+    text_ptr: *mut ValueBox<StringBox>,
     encoding: TextEncoding,
     paint_ptr: *mut ValueBox<Paint>,
     bounds_ptr: *mut ValueBox<Rect>,

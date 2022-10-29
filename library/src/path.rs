@@ -1,6 +1,6 @@
-use boxer::array::BoxerArray;
-use boxer::{ValueBox, ValueBoxPointer};
+use array_box::ArrayBox;
 use skia_safe::{scalar, Paint, Path, PathFillType, Point, Rect, Vector};
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_path_new() -> *mut ValueBox<Path> {
@@ -148,7 +148,7 @@ pub fn skia_path_count_points(path_ptr: *mut ValueBox<Path>) -> usize {
 #[no_mangle]
 pub fn skia_path_get_points(
     path_ptr: *mut ValueBox<Path>,
-    points_ptr: *mut ValueBox<BoxerArray<Point>>,
+    points_ptr: *mut ValueBox<ArrayBox<Point>>,
 ) -> usize {
     path_ptr.with_not_null_return(0, |path| {
         points_ptr.with_not_null_return(0, |points| {
@@ -221,7 +221,7 @@ pub fn skia_path_stroke_contains_point(
 }
 
 #[no_mangle]
-pub fn skia_path_serialize(path_ptr: *mut ValueBox<Path>, data_ptr: *mut ValueBox<BoxerArray<u8>>) {
+pub fn skia_path_serialize(path_ptr: *mut ValueBox<Path>, data_ptr: *mut ValueBox<ArrayBox<u8>>) {
     path_ptr.with_not_null(|path| {
         data_ptr.with_not_null(|data| {
             data.set_array(path.serialize().as_bytes());

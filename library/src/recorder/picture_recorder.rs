@@ -1,6 +1,6 @@
-use boxer::boxes::ReferenceBox;
-use boxer::{ValueBox, ValueBoxPointer};
+use reference_box::ReferenceBox;
 use skia_safe::{scalar, Canvas, Picture, PictureRecorder, Rect};
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_picture_recorder_new() -> *mut ValueBox<PictureRecorder> {

@@ -1,5 +1,5 @@
-use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::gpu::gl::TextureInfo;
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_texture_info_default() -> *mut ValueBox<TextureInfo> {

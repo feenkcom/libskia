@@ -1,6 +1,6 @@
-use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::scalar;
 use skia_safe::textlayout::{ParagraphStyle, TextStyle};
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_paragraph_style_new() -> *mut ValueBox<ParagraphStyle> {

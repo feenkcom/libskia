@@ -1,5 +1,5 @@
-use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::{scalar, IRect, Rect};
+use value_box::{ValueBox, ValueBoxPointer};
 
 ///
 /// Rect

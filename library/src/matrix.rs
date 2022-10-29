@@ -1,6 +1,6 @@
-use boxer::array::BoxerArray;
-use boxer::{ValueBox, ValueBoxPointer};
+use array_box::ArrayBox;
 use skia_safe::{scalar, Matrix};
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_matrix_new_identity() -> *mut ValueBox<Matrix> {
@@ -10,7 +10,7 @@ pub fn skia_matrix_new_identity() -> *mut ValueBox<Matrix> {
 #[no_mangle]
 pub fn skia_matrix_get_all(
     matrix_ptr: *mut ValueBox<Matrix>,
-    buffer_ptr: *mut ValueBox<BoxerArray<scalar>>,
+    buffer_ptr: *mut ValueBox<ArrayBox<scalar>>,
 ) {
     matrix_ptr.with_not_null(|matrix| {
         buffer_ptr.with_not_null(|buffer| {

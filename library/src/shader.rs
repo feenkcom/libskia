@@ -1,6 +1,6 @@
-use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::shaders::empty;
 use skia_safe::Shader;
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_shader_create_empty() -> *mut ValueBox<Shader> {

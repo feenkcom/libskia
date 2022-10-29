@@ -1,19 +1,20 @@
-use boxer::array::BoxerArrayU8;
-use boxer::string::BoxerString;
-use boxer::{ValueBox, ValueBoxPointer};
+use std::fs::File;
+use std::io::Read;
+use std::io::Write;
+
+use array_box::ArrayBox;
 use skia_safe::gpu::{BackendTexture, SurfaceOrigin};
 use skia_safe::image::CachingHint;
 use skia_safe::{
     AlphaType, ColorSpace, ColorType, Data, EncodedImageFormat, IPoint, ISize, Image, ImageInfo,
     Paint, Surface, M44,
 };
-use std::fs::File;
-use std::io::Read;
-use std::io::Write;
+use string_box::StringBox;
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_image_from_pixels(
-    pixels_ptr: *mut ValueBox<BoxerArrayU8>,
+    pixels_ptr: *mut ValueBox<ArrayBox<u8>>,
     width: i32,
     height: i32,
     row_bytes: usize,
@@ -39,7 +40,7 @@ pub fn skia_image_from_pixels(
 }
 
 #[no_mangle]
-pub fn skia_image_from_file(boxer_string_ptr: *mut ValueBox<BoxerString>) -> *mut ValueBox<Image> {
+pub fn skia_image_from_file(boxer_string_ptr: *mut ValueBox<StringBox>) -> *mut ValueBox<Image> {
     boxer_string_ptr.with_not_null_return(std::ptr::null_mut(), |boxer_string| {
         let file_name = boxer_string.to_string();
         let file = File::open(file_name);
@@ -65,7 +66,7 @@ pub fn skia_image_from_file(boxer_string_ptr: *mut ValueBox<BoxerString>) -> *mu
 
 #[no_mangle]
 pub fn skia_image_from_buffer(
-    buffer_ptr: *mut ValueBox<BoxerArrayU8>,
+    buffer_ptr: *mut ValueBox<ArrayBox<u8>>,
     start: usize,
     end: usize,
 ) -> *mut ValueBox<Image> {
@@ -81,7 +82,7 @@ pub fn skia_image_from_buffer(
 #[no_mangle]
 pub fn skia_image_to_file(
     image_ptr: *mut ValueBox<Image>,
-    name_boxer_string_ptr: *mut ValueBox<BoxerString>,
+    name_boxer_string_ptr: *mut ValueBox<StringBox>,
     encoding: EncodedImageFormat,
     quality: i32,
 ) -> i32 {
@@ -230,7 +231,7 @@ pub fn skia_image_get_backend_texture_origin(image_ptr: *mut ValueBox<Image>) ->
 #[no_mangle]
 pub fn skia_image_read_all_pixels(
     surface_ptr: *mut ValueBox<Image>,
-    pixels_ptr: *mut ValueBox<BoxerArrayU8>,
+    pixels_ptr: *mut ValueBox<ArrayBox<u8>>,
 ) -> bool {
     surface_ptr.with_not_null_return(false, |surface| {
         pixels_ptr.with_not_null_return(false, |pixels| {

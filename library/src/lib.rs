@@ -1,14 +1,5 @@
-extern crate boxer;
-extern crate byteorder;
-extern crate crossbeam;
-extern crate float_cmp;
-extern crate num_cpus;
-extern crate num_enum;
-extern crate ordered_float;
-extern crate widestring;
 #[macro_use]
 extern crate log;
-extern crate env_logger;
 #[macro_use]
 extern crate lazy_static;
 

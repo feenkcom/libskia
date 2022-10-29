@@ -1,11 +1,11 @@
-use boxer::boxes::{ReferenceBox, ReferenceBoxPointer};
-use boxer::{ValueBox, ValueBoxPointer};
 use float_cmp::{ApproxEq, F32Margin};
+use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::{scalar, Canvas, ClipOp, IRect, Path, QuickReject, RRect, Rect, Vector};
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_canvas_clip_rect(
-    canvas_ptr: *mut ReferenceBox<Canvas>,
+    canvas: *mut ReferenceBox<Canvas>,
     left: scalar,
     top: scalar,
     right: scalar,
@@ -15,7 +15,7 @@ pub fn skia_canvas_clip_rect(
     clip_op: ClipOp,
     do_anti_alias: bool,
 ) {
-    canvas_ptr.with_not_null(|canvas| {
+    canvas.with_not_null(|canvas| {
         canvas.clip_rect(
             Rect::new(
                 left + offset_x,

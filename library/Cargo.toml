@@ -6,31 +6,35 @@ edition = "2021"
 
 [dependencies]
 skia-safe = ">=0.55.0"
-typename = "0.1.1"
-float-cmp = "0.6.0"
-ordered-float = "1.0.2"
-libc = "0.2.68"
-crossbeam = "0.8.2"
+typename = "0.1"
+float-cmp = "0.6"
+ordered-float = "1.0"
+libc = "0.2"
+crossbeam = "0.8"
 num_cpus = "1.0"
-byteorder = "1.3.4"
-num_enum = "0.4.3"
-widestring = "0.4.2"
+byteorder = "1.3"
+num_enum = "0.4"
+widestring = "0.4"
 log = "0.4"
 env_logger = "0.8"
-fps_counter = "2.0.0"
-lazy_static = "1.4.0"
-anyhow = "1.0.56"
-metal = { version = "0.23.1", optional = true }
-cocoa = { version = "0.24.0", optional = true }
-core-graphics-types = { version = "0.1.1", optional = true }
-foreign-types-shared = { version = "0.1.1", optional = true }
-boxer = { git = "https://github.com/feenkcom/gtoolkit-boxer", rev = "fdc253f9559acd60e777b0357ec9d6efeff86577" }
+fps_counter = "2.0"
+lazy_static = "1.4"
+anyhow = "1.0"
+metal = { version = "0.23", optional = true }
+cocoa = { version = "0.24", optional = true }
+core-graphics-types = { version = "0.1", optional = true }
+foreign-types-shared = { version = "0.1", optional = true }
+value-box = "1.0"
+reference-box = "1.0"
+array-box = "1.0"
+string-box = "1.1"
+geometry-box = "1.0"
 compositor = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-skia = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-ffi = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-skia-ffi = { git = "https://github.com/feenkcom/compositor-rs" }
 
-#boxer = { path = "../../gtoolkit-boxer/boxer" }
+#value-box = { path = "../../value-box-rs/value-box" }
 #compositor = { path = "../../compositor-rs/compositor" }
 #compositor-skia = { path = "../../compositor-rs/compositor-skia" }
 #compositor-ffi = { path = "../../compositor-rs/compositor-ffi" }

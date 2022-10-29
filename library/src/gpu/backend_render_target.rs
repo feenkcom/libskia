@@ -1,5 +1,5 @@
-use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::gpu::BackendRenderTarget;
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[cfg(feature = "gl")]
 #[no_mangle]

@@ -1,6 +1,6 @@
-use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::rrect::Type;
 use skia_safe::{scalar, RRect, Rect, Vector};
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_rounded_rectangle_default() -> *mut ValueBox<RRect> {
@@ -81,12 +81,8 @@ pub fn skia_rounded_rectangle_drop(ptr: *mut ValueBox<RRect>) {
 
 #[cfg(test)]
 mod test {
-    use boxer::ValueBoxPointerReference;
-    use rectangle::{skia_rectangle_f32_default, skia_rectangle_f32_set_ltrb};
-    use rounded_rectangle::{
-        skia_rounded_rectangle_default, skia_rounded_rectangle_height,
-        skia_rounded_rectangle_set_rect, skia_rounded_rectangle_width,
-    };
+    use super::*;
+    use crate::rectangle::{skia_rectangle_f32_default, skia_rectangle_f32_set_ltrb};
 
     #[test]
     fn set_rect() {
@@ -104,11 +100,11 @@ mod test {
         assert_eq!(skia_rounded_rectangle_width(r_rect), 50.0);
         assert_eq!(skia_rounded_rectangle_height(r_rect), 50.0);
 
-        (&mut rect).drop();
+        rect.release();
 
         assert_eq!(skia_rounded_rectangle_width(r_rect), 50.0);
         assert_eq!(skia_rounded_rectangle_height(r_rect), 50.0);
 
-        (&mut r_rect).drop();
+        r_rect.release();
     }
 }

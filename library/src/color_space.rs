@@ -1,5 +1,5 @@
-use boxer::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 use skia_safe::ColorSpace;
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_color_space_new_srgb() -> *mut ValueBox<ColorSpace> {

@@ -1,10 +1,10 @@
-use boxer::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 use compositor::{Compositor, Layer};
 use compositor_skia::{Cache, SkiaCachelessCompositor, SkiaCompositor};
 use fps_counter::FPSCounter;
 use skia_safe::{Color, Color4f, Font, ISize, Paint, Point, Surface, Typeface};
 use std::ops::Deref;
 use std::sync::{Arc, Mutex};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 lazy_static! {
     static ref FPS_FONT: Font = Font::new(Typeface::default(), 60.0);

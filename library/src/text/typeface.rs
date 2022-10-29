@@ -1,7 +1,7 @@
-use boxer::string::BoxerString;
-use boxer::{ValueBox, ValueBoxPointer};
 use skia_safe::font_style::{Slant, Weight, Width};
 use skia_safe::{FontStyle, Typeface};
+use string_box::StringBox;
+use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_typeface_default() -> *mut ValueBox<Typeface> {
@@ -10,7 +10,7 @@ pub fn skia_typeface_default() -> *mut ValueBox<Typeface> {
 
 #[no_mangle]
 pub fn skia_typeface_from_name(
-    family_name_ptr: *mut ValueBox<BoxerString>,
+    family_name_ptr: *mut ValueBox<StringBox>,
     font_style_ptr: *mut ValueBox<FontStyle>,
 ) -> *mut ValueBox<Typeface> {
     family_name_ptr.with_not_null_return(std::ptr::null_mut(), |family_name| {
@@ -44,7 +44,7 @@ pub fn skia_typeface_get_font_style(
 #[no_mangle]
 pub fn skia_typeface_get_family_name(
     typeface_ptr: *mut ValueBox<Typeface>,
-    _ptr_string: *mut ValueBox<BoxerString>,
+    _ptr_string: *mut ValueBox<StringBox>,
 ) {
     typeface_ptr.with_not_null(|typeface| {
         _ptr_string.with_not_null(|string| string.set_string(typeface.family_name()))
