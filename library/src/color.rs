@@ -1,5 +1,3 @@
-use std::ops::Deref;
-
 use array_box::ArrayBox;
 use skia_safe::Color;
 use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
@@ -20,28 +18,28 @@ pub fn skia_color_create_argb(argb: u32) -> *mut ValueBox<Color> {
 }
 
 #[no_mangle]
-pub fn skia_color_get_red(color_ptr: *mut ValueBox<Color>) -> u8 {
-    color_ptr.with_not_null_return(0, |color| color.r())
+pub fn skia_color_get_red(color: *mut ValueBox<Color>) -> u8 {
+    color.with_clone(Color::r).or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_color_get_green(color_ptr: *mut ValueBox<Color>) -> u8 {
-    color_ptr.with_not_null_return(0, |color| color.g())
+pub fn skia_color_get_green(color: *mut ValueBox<Color>) -> u8 {
+    color.with_clone(Color::g).or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_color_get_blue(color_ptr: *mut ValueBox<Color>) -> u8 {
-    color_ptr.with_not_null_return(0, |color| color.b())
+pub fn skia_color_get_blue(color: *mut ValueBox<Color>) -> u8 {
+    color.with_clone(Color::b).or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_color_get_alpha(color_ptr: *mut ValueBox<Color>) -> u8 {
-    color_ptr.with_not_null_return(0, |color| color.a())
+pub fn skia_color_get_alpha(color: *mut ValueBox<Color>) -> u8 {
+    color.with_clone(Color::a).or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_color_drop(ptr: *mut ValueBox<Color>) {
-    ptr.release();
+pub fn skia_color_drop(color: *mut ValueBox<Color>) {
+    color.release();
 }
 
 #[no_mangle]
@@ -55,37 +53,31 @@ pub fn skia_color_array_create_with(
     amount: usize,
 ) -> *mut ValueBox<ArrayBox<Color>> {
     color
-        .to_ref()
-        .map(|color| ArrayBox::<Color>::from_vector(vec![color.deref().clone(); amount]))
+        .with_clone(|color| ArrayBox::from_vector(vec![color; amount]))
         .into_raw()
 }
 
 #[no_mangle]
 pub fn skia_color_array_get_length(array: *mut ValueBox<ArrayBox<Color>>) -> usize {
-    array.to_ref().map(|array| array.length).or_log(0)
+    array.with_ref(|array| array.length).or_log(0)
 }
 
 #[no_mangle]
 pub fn skia_color_array_get_capacity(array: *mut ValueBox<ArrayBox<Color>>) -> usize {
-    array.to_ref().map(|array| array.capacity).or_log(0)
+    array.with_ref(|array| array.capacity).or_log(0)
 }
 
 #[no_mangle]
 pub fn skia_color_array_get_data(array: *mut ValueBox<ArrayBox<Color>>) -> *mut Color {
-    array
-        .to_ref()
-        .map(|array| array.data)
-        .or_log(std::ptr::null_mut())
+    array.with_ref(|array| array.data).or_log(std::ptr::null_mut())
 }
 
 #[no_mangle]
 pub fn skia_color_array_at(
-    array_ptr: *mut ValueBox<ArrayBox<Color>>,
+    array: *mut ValueBox<ArrayBox<Color>>,
     index: usize,
 ) -> *mut ValueBox<Color> {
-    array_ptr.with_not_null_return(std::ptr::null_mut(), |array| {
-        ValueBox::new(array.to_slice()[index]).into_raw()
-    })
+    array.with_ref(|array| array.at(index)).into_raw()
 }
 
 #[no_mangle]
@@ -111,17 +103,17 @@ pub fn skia_color_array_drop(ptr: *mut ValueBox<ArrayBox<Color>>) {
 
 #[test]
 pub fn test_skia_color_array() {
-    let mut color_ptr = skia_color_default();
-    let mut array_ptr = skia_color_array_create_with(color_ptr, 5);
+    let mut color = skia_color_default();
+    let mut array_ptr = skia_color_array_create_with(color, 5);
 
-    assert_eq!(color_ptr.has_value(), true);
+    assert_eq!(color.has_value(), true);
     assert_eq!(array_ptr.has_value(), true);
 
     skia_color_array_drop(array_ptr);
 
-    assert_eq!(color_ptr.has_value(), true);
+    assert_eq!(color.has_value(), true);
     assert_eq!(array_ptr.has_value(), false);
 
-    skia_color_drop(color_ptr);
-    assert_eq!(color_ptr.has_value(), false);
+    skia_color_drop(color);
+    assert_eq!(color.has_value(), false);
 }

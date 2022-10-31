@@ -25,9 +25,9 @@ checksum = "216261ddc8289130e551ddcd5ce8a064710c0d064a4d2895c67151c92b5443f6"
 
 [[package]]
 name = "array-box"
-version = "1.0.1"
+version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f9ce8da5562d634de02fb4d347a13e46644075f1b4c2a6d6378eb5f5217ba8d7"
+checksum = "be2a725ca901ef49bb56bd31373dbc809641a8347cf7784200e3c6d6da4d957a"
 
 [[package]]
 name = "atty"
@@ -101,9 +101,9 @@ checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
 
 [[package]]
 name = "cc"
-version = "1.0.73"
+version = "1.0.74"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2fff2a6927b3bb87f9595d67196a70493f627687a71d87a0d692242c33f58c11"
+checksum = "581f5dba903aac52ea3feb5ec4810848460ee833876f1f9b0fdeab1f19091574"
 dependencies = [
  "jobserver",
 ]
@@ -1395,9 +1395,9 @@ checksum = "07a91d0648d862a02d641c82292791accfe66d36df75d8149ebc9768f2e36863"
 
 [[package]]
 name = "value-box"
-version = "1.0.1"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9f77870e360c2b546ebb591efa18e2e8d1ead1472e3215cb2347a0ec4b7ed26c"
+checksum = "bcc08f7f8a374edfc9cefdd627f8c402d1ea14668a4d416097c4a2f1e83d0b45"
 dependencies = [
  "log",
  "thiserror",
