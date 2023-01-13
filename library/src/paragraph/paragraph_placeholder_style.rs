@@ -1,6 +1,6 @@
 use skia_safe::scalar;
 use skia_safe::textlayout::{PlaceholderAlignment, PlaceholderStyle};
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_paragraph_placeholder_style_default() -> *mut ValueBox<PlaceholderStyle> {
@@ -34,6 +34,16 @@ pub fn skia_paragraph_placeholder_style_set_alignment(
 ) {
     placeholder_ptr.with_not_null(|placeholder| {
         placeholder.alignment = alignment;
+    })
+}
+
+#[no_mangle]
+pub fn skia_paragraph_placeholder_style_set_baseline_offset(
+    placeholder_ptr: *mut ValueBox<PlaceholderStyle>,
+    baseline_offset: scalar,
+) {
+    placeholder_ptr.with_not_null(|placeholder| {
+        placeholder.baseline_offset = baseline_offset;
     })
 }
 

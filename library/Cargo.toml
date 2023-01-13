@@ -38,6 +38,8 @@ compositor-skia-ffi = { git = "https://github.com/feenkcom/compositor-rs" }
 #compositor-skia = { path = "../../compositor-rs/compositor-skia" }
 #compositor-ffi = { path = "../../compositor-rs/compositor-ffi" }
 #compositor-skia-ffi = { path = "../../compositor-rs/compositor-skia-ffi" }
+phlow = { version = "1.0", features = [ "phlow-derive" ] }
+phlow-extensions = { version = "1.0" }
 
 [dependencies.mozangle]
 git = "https://github.com/syrel/mozangle"

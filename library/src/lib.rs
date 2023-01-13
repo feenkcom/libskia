@@ -1,7 +1,11 @@
+#![feature(specialization)]
+
 #[macro_use]
 extern crate log;
 #[macro_use]
 extern crate lazy_static;
+#[macro_use]
+extern crate phlow;
 
 use std::os::raw::c_void;
 
@@ -33,10 +37,15 @@ pub mod surface;
 pub mod surface_props;
 pub mod text;
 pub mod types;
+mod extensions;
 
 // re-export the ffi methods
 pub use compositor_ffi::*;
 pub use compositor_skia_ffi::*;
+pub use phlow_extensions::CoreExtensions;
+
+define_extensions!(SkiaExtensions);
+import_extensions!(SkiaExtensions, CoreExtensions);
 
 #[no_mangle]
 pub fn skia_test() -> bool {

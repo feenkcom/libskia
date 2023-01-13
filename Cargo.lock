@@ -696,6 +696,8 @@ dependencies = [
  "num_cpus",
  "num_enum",
  "ordered-float",
+ "phlow",
+ "phlow-extensions",
  "reference-box",
  "skia-safe",
  "string-box",
@@ -895,6 +897,35 @@ name = "percent-encoding"
 version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "478c572c3d73181ff3c2539045f6eb99e5491218eae919370993b890cdbdd98e"
+
+[[package]]
+name = "phlow"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9373e7970bb89a445eb3434ca2043d73c5da31bcf11609f6724558d70aacf5ed"
+dependencies = [
+ "phlow-derive",
+]
+
+[[package]]
+name = "phlow-derive"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f602e374060e799b8329d9917c7fd0d92aa4c17d654d2eff494115c3885e7cc1"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "phlow-extensions"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "37ee546ec1b11f355e6c3b9cdbbe51b367b6e5986a2dbed2806ea591cf0aa042"
+dependencies = [
+ "phlow",
+]
 
 [[package]]
 name = "proc-macro-crate"

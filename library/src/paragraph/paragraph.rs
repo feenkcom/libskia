@@ -1,6 +1,8 @@
+use std::cell::{Ref, RefCell};
 use array_box::ArrayBox;
 use geometry_box::PointBox;
 use std::ops::Range;
+use std::rc::Rc;
 
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::textlayout::{
@@ -14,14 +16,15 @@ use value_box::{ValueBox, ValueBoxPointer};
 pub type TabSize = usize;
 pub type CharLength = usize;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ParagraphPiece {
     Text(StringBox),
     Placeholder(PlaceholderStyle, CharLength),
 }
 
+#[derive(Debug, Clone)]
 pub struct ParagraphText {
-    pieces: Vec<ParagraphPiece>,
+    pub (crate) pieces: Vec<ParagraphPiece>,
     char_count: usize,
     tab_size: TabSize,
 }
@@ -37,6 +40,10 @@ impl ParagraphText {
 
     pub fn char_count(&self) -> usize {
         self.char_count
+    }
+
+    pub fn tab_size(&self) -> TabSize {
+        self.tab_size
     }
 
     pub fn add_text(&mut self, text: StringBox) {
@@ -144,22 +151,23 @@ impl ParagraphText {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct ParagraphWithText {
-    paragraph: Paragraph,
-    text: ParagraphText,
+    pub (crate) paragraph: Rc<RefCell<Paragraph>>,
+    pub (crate) text: ParagraphText,
 }
 
 impl ParagraphWithText {
     pub fn new(paragraph: Paragraph, text: ParagraphText) -> Self {
-        Self { paragraph, text }
+        Self { paragraph: Rc::new(RefCell::new(paragraph)), text }
     }
 
     pub fn layout(&mut self, width: scalar) {
-        self.paragraph.layout(width);
+        self.paragraph.borrow_mut().layout(width);
     }
 
     pub fn paint(&self, canvas: &mut Canvas, p: impl Into<Point>) {
-        self.paragraph.paint(canvas, p);
+        self.paragraph.borrow().paint(canvas, p);
     }
 
     pub fn get_rects_for_range(
@@ -168,12 +176,12 @@ impl ParagraphWithText {
         rect_height_style: RectHeightStyle,
         rect_width_style: RectWidthStyle,
     ) -> Vec<TextBox> {
-        self.paragraph
+        self.paragraph.borrow()
             .get_rects_for_range(range, rect_height_style, rect_width_style)
     }
 
     pub fn get_rects_for_placeholders(&self) -> Vec<TextBox> {
-        self.paragraph.get_rects_for_placeholders()
+        self.paragraph.borrow().get_rects_for_placeholders()
     }
 
     pub fn get_coordinate_outside_placeholder(
@@ -209,7 +217,7 @@ impl ParagraphWithText {
     pub fn get_glyph_position_at_coordinate(&self, p: impl Into<Point>) -> PositionWithAffinity {
         let point: Point = p.into();
         let coordinate = self.get_coordinate_outside_placeholder(point, None);
-        self.paragraph.get_glyph_position_at_coordinate(coordinate)
+        self.paragraph.borrow().get_glyph_position_at_coordinate(coordinate)
     }
 
     pub fn get_placeholder_at_index(&self, index: usize) -> &PlaceholderStyle {
@@ -286,24 +294,29 @@ impl ParagraphWithText {
             .get_char_offset_for_glyph_offset(position_with_affinity.position as usize)
     }
 
-    pub fn get_line_metrics(&self) -> Vec<LineMetrics> {
-        self.paragraph.get_line_metrics()
+    // pub fn get_line_metrics<'a>(&'a self) -> (Rc<RefCell<Paragraph>>, Vec<LineMetrics<'a>>) {
+    //     let paragraph = self.paragraph.clone();
+    //     (paragraph, paragraph.borrow().get_line_metrics())
+    // }
+
+    pub fn get_line_metrics<'a>(&self, paragraph: &'a Paragraph) -> Vec<LineMetrics<'a>> {
+        paragraph.get_line_metrics()
     }
 
     pub fn line_number(&self) -> usize {
-        self.paragraph.line_number()
+        self.paragraph.borrow().line_number()
     }
 
     pub fn max_width(&self) -> scalar {
-        self.paragraph.max_width()
+        self.paragraph.borrow().max_width()
     }
 
     pub fn height(&self) -> scalar {
-        self.paragraph.height()
+        self.paragraph.borrow().height()
     }
 
     pub fn longest_line(&self) -> scalar {
-        self.paragraph.longest_line()
+        self.paragraph.borrow().longest_line()
     }
 
     pub fn char_count(&self) -> usize {
@@ -323,7 +336,9 @@ impl ParagraphWithText {
     pub fn get_line_index_for_char(&self, index: usize) -> usize {
         let glyph_offset = self.text.get_glyph_offset_for_char_offset(index);
 
-        for (index, line) in self.get_line_metrics().iter().enumerate() {
+        let paragraph = self.paragraph.borrow();
+        let line_metrics = self.get_line_metrics(&paragraph);
+        for (index, line) in line_metrics.iter().enumerate() {
             if glyph_offset <= line.end_index {
                 return index;
             }
@@ -336,7 +351,9 @@ impl ParagraphWithText {
             return self.height();
         }
 
-        self.get_line_metrics().as_slice()[index].height as scalar
+        let paragraph = self.paragraph.borrow();
+        let line_metrics = self.get_line_metrics(&paragraph);
+        line_metrics.as_slice()[index].height as scalar
     }
 }
 
@@ -450,8 +467,9 @@ pub fn skia_paragraph_get_rects_for_char_range(
 
 #[no_mangle]
 pub fn skia_paragraph_print(paragraph_ptr: *mut ValueBox<ParagraphWithText>) {
-    paragraph_ptr.with_not_null(|paragraph| {
-        let line_metrics = paragraph.get_line_metrics();
+    paragraph_ptr.with_not_null(|paragraph_with_text| {
+        let paragraph = paragraph_with_text.paragraph.borrow();
+        let line_metrics = paragraph_with_text.get_line_metrics(&paragraph);
         for (line, lm) in line_metrics.iter().enumerate() {
             println!(
                 "line: {} width: {} end: {}",
