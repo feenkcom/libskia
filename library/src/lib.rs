@@ -1,13 +1,18 @@
 #![feature(specialization)]
 
 #[macro_use]
-extern crate log;
-#[macro_use]
 extern crate lazy_static;
+#[macro_use]
+extern crate log;
 #[macro_use]
 extern crate phlow;
 
 use std::os::raw::c_void;
+
+// re-export the ffi methods
+pub use compositor_ffi::*;
+pub use compositor_skia_ffi::*;
+pub use phlow_extensions::CoreExtensions;
 
 pub mod canvas;
 pub mod canvas_clip;
@@ -17,6 +22,7 @@ pub mod canvas_optimized;
 pub mod color;
 pub mod color_space;
 pub mod enums;
+mod extensions;
 pub mod gpu;
 pub mod gradient;
 pub mod image;
@@ -37,12 +43,6 @@ pub mod surface;
 pub mod surface_props;
 pub mod text;
 pub mod types;
-mod extensions;
-
-// re-export the ffi methods
-pub use compositor_ffi::*;
-pub use compositor_skia_ffi::*;
-pub use phlow_extensions::CoreExtensions;
 
 define_extensions!(SkiaExtensions);
 import_extensions!(SkiaExtensions, CoreExtensions);

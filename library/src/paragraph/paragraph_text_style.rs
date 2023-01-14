@@ -1,7 +1,7 @@
 use skia_safe::textlayout::{Decoration, TextStyle};
 use skia_safe::{scalar, Color, FontStyle, Paint};
 use string_box::StringBox;
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_paragraph_text_style_new() -> *mut ValueBox<TextStyle> {
@@ -80,46 +80,50 @@ pub fn skia_paragraph_text_style_set_color(
 
 #[no_mangle]
 pub fn skia_paragraph_text_style_get_foreground(
-    text_style_ptr: *mut ValueBox<TextStyle>,
+    text_style: *mut ValueBox<TextStyle>,
 ) -> *mut ValueBox<Paint> {
-    text_style_ptr.with_not_null_return(std::ptr::null_mut(), |style| match style.foreground() {
-        None => std::ptr::null_mut(),
-        Some(paint) => ValueBox::new(paint.clone()).into_raw(),
-    })
+    text_style
+        .with_ref(|text_style| text_style.foreground())
+        .into_raw()
 }
 
 #[no_mangle]
 pub fn skia_paragraph_text_style_set_foreground(
-    text_style_ptr: *mut ValueBox<TextStyle>,
-    paint_ptr: *mut ValueBox<Paint>,
+    text_style: *mut ValueBox<TextStyle>,
+    paint: *mut ValueBox<Paint>,
 ) {
-    text_style_ptr.with_not_null(|style| {
-        paint_ptr.with_not_null_value(|paint| {
-            style.set_foreground_color(paint);
+    paint
+        .to_ref()
+        .and_then(|paint| {
+            text_style.with_mut(|text_style| {
+                text_style.set_foreground_color(&paint);
+            })
         })
-    })
+        .log();
 }
 
 #[no_mangle]
 pub fn skia_paragraph_text_style_get_background(
-    text_style_ptr: *mut ValueBox<TextStyle>,
+    text_style: *mut ValueBox<TextStyle>,
 ) -> *mut ValueBox<Paint> {
-    text_style_ptr.with_not_null_return(std::ptr::null_mut(), |style| match style.background() {
-        None => std::ptr::null_mut(),
-        Some(paint) => ValueBox::new(paint.clone()).into_raw(),
-    })
+    text_style
+        .with_ref(|text_style| text_style.background())
+        .into_raw()
 }
 
 #[no_mangle]
 pub fn skia_paragraph_text_style_set_background(
-    text_style_ptr: *mut ValueBox<TextStyle>,
-    paint_ptr: *mut ValueBox<Paint>,
+    text_style: *mut ValueBox<TextStyle>,
+    paint: *mut ValueBox<Paint>,
 ) {
-    text_style_ptr.with_not_null(|style| {
-        paint_ptr.with_not_null_value(|paint| {
-            style.set_background_color(paint);
+    paint
+        .to_ref()
+        .and_then(|paint| {
+            text_style.with_mut(|text_style| {
+                text_style.set_background_color(&paint);
+            })
         })
-    })
+        .log();
 }
 
 #[no_mangle]

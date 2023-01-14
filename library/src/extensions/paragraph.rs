@@ -1,6 +1,6 @@
-use std::ops::Deref;
 use phlow::{PhlowObject, PhlowView};
 use skia_safe::textlayout::Paragraph;
+use std::ops::Deref;
 use string_box::StringBox;
 use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
@@ -15,12 +15,14 @@ impl ParagraphTextExtensions {
             .priority(5)
             .items(|text: &ParagraphText, object| {
                 phlow_all!(vec![
-                    ("Pieces", phlow!(text.pieces.clone())),
+                    ("Pieces", phlow!(text.pieces.clone(), <ParagraphPiece>)),
                     ("Amount of chars", phlow!(text.char_count())),
                     ("Tab size", phlow!(text.tab_size())),
                 ])
             })
-            .item_text(|each: &(&str, PhlowObject), _| format!("{}: {}", each.0, each.1.to_string()))
+            .item_text(|each: &(&str, PhlowObject), _| {
+                format!("{}: {}", each.0, each.1.to_string())
+            })
             .send(|each: &(&str, PhlowObject), _| each.1.clone())
     }
 }
@@ -34,11 +36,16 @@ impl ParagraphWithTextExtensions {
             .priority(5)
             .items(|paragraph: &ParagraphWithText, object| {
                 phlow_all!(vec![
-                    ("Paragraph", phlow!(paragraph.paragraph.borrow().deref(), object)),
+                    (
+                        "Paragraph",
+                        phlow!(paragraph.paragraph.borrow().deref(), object)
+                    ),
                     ("Text", phlow!(paragraph.text.clone())),
                 ])
             })
-            .item_text(|each: &(&str, PhlowObject), _| format!("{}: {}", each.0, each.1.to_string()))
+            .item_text(|each: &(&str, PhlowObject), _| {
+                format!("{}: {}", each.0, each.1.to_string())
+            })
             .send(|each: &(&str, PhlowObject), _| each.1.clone())
     }
 }
@@ -54,13 +61,21 @@ impl ParagraphExtensions {
                 phlow_all!(vec![
                     ("Max width", phlow!(paragraph.max_width())),
                     ("Height", phlow!(paragraph.height())),
-                    ("Ideographic baseline", phlow!(paragraph.ideographic_baseline())),
+                    (
+                        "Ideographic baseline",
+                        phlow!(paragraph.ideographic_baseline())
+                    ),
                     ("Longest line width", phlow!(paragraph.longest_line())),
-                    ("Did exceed max lines", phlow!(paragraph.did_exceed_max_lines())),
+                    (
+                        "Did exceed max lines",
+                        phlow!(paragraph.did_exceed_max_lines())
+                    ),
                     ("Line number", phlow!(paragraph.line_number())),
                 ])
             })
-            .item_text(|each: &(&str, PhlowObject), _| format!("{}: {}", each.0, each.1.to_string()))
+            .item_text(|each: &(&str, PhlowObject), _| {
+                format!("{}: {}", each.0, each.1.to_string())
+            })
             .send(|each: &(&str, PhlowObject), _| each.1.clone())
     }
 }
@@ -72,27 +87,27 @@ impl ParagraphPieceExtensions {
         view.list()
             .title("Info")
             .priority(5)
-            .items(|paragraph: &ParagraphPiece, object| {
-                match paragraph {
-                    ParagraphPiece::Text(text) => {
-                        phlow_all!(vec![
-                            ("Type", phlow!("Text".to_string())),
-                            ("String", phlow!(text.to_string()))])
-                    }
-                    ParagraphPiece::Placeholder(style, char_length) => {
-                        phlow_all!(vec![
-                            ("Type", phlow!("Placeholder".to_string())),
-                            ("Char length", phlow!(char_length.clone())),
-                            ("Placeholder style", phlow!(style.clone())),
-                        ])
-                    }
+            .items(|paragraph: &ParagraphPiece, object| match paragraph {
+                ParagraphPiece::Text(text) => {
+                    phlow_all!(vec![
+                        ("Type", phlow!("Text".to_string())),
+                        ("String", phlow!(text.to_string()))
+                    ])
+                }
+                ParagraphPiece::Placeholder(style, char_length) => {
+                    phlow_all!(vec![
+                        ("Type", phlow!("Placeholder".to_string())),
+                        ("Char length", phlow!(char_length.clone())),
+                        ("Placeholder style", phlow!(style.clone())),
+                    ])
                 }
             })
-            .item_text(|each: &(&str, PhlowObject), _| format!("{}: {}", each.0, each.1.to_string()))
+            .item_text(|each: &(&str, PhlowObject), _| {
+                format!("{}: {}", each.0, each.1.to_string())
+            })
             .send(|each: &(&str, PhlowObject), _| each.1.clone())
     }
 }
-
 
 #[no_mangle]
 pub fn skia_paragraph_with_text_to_phlow(

@@ -1,6 +1,6 @@
-use std::cell::{Ref, RefCell};
 use array_box::ArrayBox;
 use geometry_box::PointBox;
+use std::cell::{Ref, RefCell};
 use std::ops::Range;
 use std::rc::Rc;
 
@@ -24,7 +24,7 @@ pub enum ParagraphPiece {
 
 #[derive(Debug, Clone)]
 pub struct ParagraphText {
-    pub (crate) pieces: Vec<ParagraphPiece>,
+    pub(crate) pieces: Vec<ParagraphPiece>,
     char_count: usize,
     tab_size: TabSize,
 }
@@ -153,13 +153,16 @@ impl ParagraphText {
 
 #[derive(Debug, Clone)]
 pub struct ParagraphWithText {
-    pub (crate) paragraph: Rc<RefCell<Paragraph>>,
-    pub (crate) text: ParagraphText,
+    pub(crate) paragraph: Rc<RefCell<Paragraph>>,
+    pub(crate) text: ParagraphText,
 }
 
 impl ParagraphWithText {
     pub fn new(paragraph: Paragraph, text: ParagraphText) -> Self {
-        Self { paragraph: Rc::new(RefCell::new(paragraph)), text }
+        Self {
+            paragraph: Rc::new(RefCell::new(paragraph)),
+            text,
+        }
     }
 
     pub fn layout(&mut self, width: scalar) {
@@ -176,7 +179,8 @@ impl ParagraphWithText {
         rect_height_style: RectHeightStyle,
         rect_width_style: RectWidthStyle,
     ) -> Vec<TextBox> {
-        self.paragraph.borrow()
+        self.paragraph
+            .borrow()
             .get_rects_for_range(range, rect_height_style, rect_width_style)
     }
 
@@ -217,7 +221,9 @@ impl ParagraphWithText {
     pub fn get_glyph_position_at_coordinate(&self, p: impl Into<Point>) -> PositionWithAffinity {
         let point: Point = p.into();
         let coordinate = self.get_coordinate_outside_placeholder(point, None);
-        self.paragraph.borrow().get_glyph_position_at_coordinate(coordinate)
+        self.paragraph
+            .borrow()
+            .get_glyph_position_at_coordinate(coordinate)
     }
 
     pub fn get_placeholder_at_index(&self, index: usize) -> &PlaceholderStyle {

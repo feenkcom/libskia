@@ -69,7 +69,9 @@ pub fn skia_color_array_get_capacity(array: *mut ValueBox<ArrayBox<Color>>) -> u
 
 #[no_mangle]
 pub fn skia_color_array_get_data(array: *mut ValueBox<ArrayBox<Color>>) -> *mut Color {
-    array.with_ref(|array| array.data).or_log(std::ptr::null_mut())
+    array
+        .with_ref(|array| array.data)
+        .or_log(std::ptr::null_mut())
 }
 
 #[no_mangle]
