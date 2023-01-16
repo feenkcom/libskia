@@ -54,6 +54,25 @@ checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
 
 [[package]]
 name = "bindgen"
+version = "0.59.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2bd2a9a458e8f4304c52c43ebb0cfbd520289f8379a52e329a38afda99bf8eb8"
+dependencies = [
+ "bitflags",
+ "cexpr",
+ "clang-sys",
+ "lazy_static",
+ "lazycell",
+ "peeking_take_while",
+ "proc-macro2",
+ "quote",
+ "regex",
+ "rustc-hash",
+ "shlex",
+]
+
+[[package]]
+name = "bindgen"
 version = "0.63.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "36d860121800b2a9a94f9b5604b332d5cffb234ce17609ea479d723dbc9d3885"
@@ -684,6 +703,7 @@ dependencies = [
  "mozangle",
  "num_cpus",
  "num_enum",
+ "objc",
  "ordered-float",
  "phlow",
  "phlow-extensions",
@@ -691,6 +711,7 @@ dependencies = [
  "skia-safe",
  "string-box",
  "typename",
+ "uikit-sys",
  "value-box",
  "widestring 0.4.3",
  "windows",
@@ -1155,7 +1176,7 @@ version = "0.58.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "404d98ffda633acd7a3ea68e0e5f160814ee7ae8942c89d60c53f7e0fae99373"
 dependencies = [
- "bindgen",
+ "bindgen 0.63.0",
  "cc",
  "flate2",
  "heck",
@@ -1351,6 +1372,16 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "uikit-sys"
+version = "0.0.1"
+source = "git+https://github.com/syrel/uikit-sys#294772e49b957f17f8ba9307450eb0cfb4fc67ff"
+dependencies = [
+ "bindgen 0.59.2",
+ "block",
+ "objc",
 ]
 
 [[package]]

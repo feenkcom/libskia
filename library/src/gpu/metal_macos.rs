@@ -1,6 +1,7 @@
 use crate::gpu::platform_compositor::{PlatformCompositor, PlatformContext};
-use cocoa::base::YES;
-use cocoa::{appkit::NSView, base::id as cocoa_id};
+use cocoa::appkit::NSView;
+use cocoa::base::{id as cocoa_id, YES};
+
 use core_graphics_types::geometry::CGSize;
 use foreign_types_shared::{ForeignType, ForeignTypeRef};
 use metal::{CommandQueue, Device, MTLPixelFormat, MetalDrawableRef, MetalLayer};

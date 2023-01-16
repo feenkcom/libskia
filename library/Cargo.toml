@@ -68,6 +68,11 @@ features = [
     "Graphics_DirectX_Direct3D11",
 ]
 
+# pathos is used to detect home directory of the app on iOS
+[target.'cfg(target_os="ios")'.dependencies]
+uikit-sys = { git = "https://github.com/syrel/uikit-sys" }
+objc = "0.2"
+
 [features]
 textlayout = ["skia-safe/textlayout"]
 gl = ["skia-safe/gl"]
