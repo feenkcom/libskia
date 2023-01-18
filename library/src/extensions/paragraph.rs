@@ -34,13 +34,14 @@ impl ParagraphWithTextExtensions {
         view.list()
             .title("Info")
             .priority(5)
-            .items(|paragraph: &ParagraphWithText, object| {
+            .items(|paragraph_with_text: &ParagraphWithText, object| {
                 phlow_all!(vec![
                     (
                         "Paragraph",
-                        phlow!(paragraph.paragraph.borrow().deref(), object)
+                        phlow!(paragraph_with_text.paragraph.borrow().deref(), object)
                     ),
-                    ("Text", phlow!(paragraph.text.clone())),
+                    ("Line ranges", phlow!(paragraph_with_text.get_line_ranges())),
+                    ("Text", phlow!(paragraph_with_text.text.clone())),
                 ])
             })
             .item_text(|each: &(&str, PhlowObject), _| {

@@ -1,6 +1,8 @@
 use array_box::ArrayBox;
 use geometry_box::PointBox;
+use std::any::type_name;
 use std::cell::{Ref, RefCell};
+use std::num::TryFromIntError;
 use std::ops::Range;
 use std::rc::Rc;
 
@@ -11,7 +13,7 @@ use skia_safe::textlayout::{
 };
 use skia_safe::{scalar, Canvas, Point, Rect};
 use string_box::StringBox;
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 pub type TabSize = usize;
 pub type CharLength = usize;
@@ -72,20 +74,20 @@ impl ParagraphText {
         }
     }
 
-    pub fn get_glyph_offset_for_char_offset(&self, index: usize) -> usize {
+    pub fn get_glyph_offset_for_char_offset(&self, offset: usize) -> usize {
         let mut current_char_index: usize = 0;
         let mut current_glyph_index: usize = 0;
 
         let mut buf = [0; 2];
 
         for piece in &self.pieces {
-            if current_char_index >= index {
+            if current_char_index >= offset {
                 return current_glyph_index;
             }
             match piece {
                 ParagraphPiece::Text(string) => {
                     for ch in string.as_str().chars() {
-                        if current_char_index >= index {
+                        if current_char_index >= offset {
                             return current_glyph_index;
                         }
                         let n = self.get_char_len(ch, &mut buf);
@@ -300,17 +302,21 @@ impl ParagraphWithText {
             .get_char_offset_for_glyph_offset(position_with_affinity.position as usize)
     }
 
-    // pub fn get_line_metrics<'a>(&'a self) -> (Rc<RefCell<Paragraph>>, Vec<LineMetrics<'a>>) {
-    //     let paragraph = self.paragraph.clone();
-    //     (paragraph, paragraph.borrow().get_line_metrics())
-    // }
-
     pub fn get_line_metrics<'a>(&self, paragraph: &'a Paragraph) -> Vec<LineMetrics<'a>> {
         paragraph.get_line_metrics()
     }
 
     pub fn line_number(&self) -> usize {
         self.paragraph.borrow().line_number()
+    }
+
+    pub fn get_line_ranges(&self) -> Vec<Range<usize>> {
+        let paragraph = self.paragraph.borrow();
+        let line_metrics = self.get_line_metrics(&paragraph);
+        line_metrics
+            .iter()
+            .map(|each_metric| each_metric.start_index..each_metric.end_index)
+            .collect()
     }
 
     pub fn max_width(&self) -> scalar {
@@ -339,17 +345,61 @@ impl ParagraphWithText {
         self.get_rects_for_range(glyph_range, rect_height_style, rect_width_style)
     }
 
-    pub fn get_line_index_for_char(&self, index: usize) -> usize {
-        let glyph_offset = self.text.get_glyph_offset_for_char_offset(index);
-
+    pub fn get_line_index_for_glyph_offset(&self, offset: PositionWithAffinity) -> usize {
         let paragraph = self.paragraph.borrow();
         let line_metrics = self.get_line_metrics(&paragraph);
+
+        let glyph_offset = offset.position;
+        if glyph_offset < 0 {
+            return 0;
+        }
+        let glyph_offset = match TryInto::<usize>::try_into(glyph_offset) {
+            Ok(offset) => offset,
+            Err(error) => {
+                error!(
+                    "Failed to cast {} from {} to {}: {}",
+                    glyph_offset,
+                    type_name::<isize>(),
+                    type_name::<usize>(),
+                    error
+                );
+                0
+            }
+        };
+
+        let affinity = offset.affinity;
         for (index, line) in line_metrics.iter().enumerate() {
-            if glyph_offset <= line.end_index {
+            // line's end_index is exclusive, therefore we should use `less than`
+            if glyph_offset < line.end_index {
+                return index;
+            }
+            if glyph_offset == line.end_index && affinity == Affinity::Upstream {
                 return index;
             }
         }
         self.line_number()
+    }
+
+    pub fn get_line_index_for_char_offset(&self, offset: usize) -> usize {
+        let glyph_offset = self.text.get_glyph_offset_for_char_offset(offset);
+
+        let paragraph = self.paragraph.borrow();
+        let line_metrics = self.get_line_metrics(&paragraph);
+        for (index, line) in line_metrics.iter().enumerate() {
+            // line's end_index is exclusive, therefore we should use `less than`
+            if glyph_offset < line.end_index {
+                return index;
+            }
+        }
+        self.line_number()
+    }
+
+    pub fn get_line_index_at_coordinate(&self, p: impl Into<Point>) -> usize {
+        let position_with_affinity = self.get_glyph_position_at_coordinate(p);
+        if position_with_affinity.position < 0 {
+            return 0;
+        }
+        self.get_line_index_for_glyph_offset(position_with_affinity)
     }
 
     pub fn get_line_height(&self, index: usize) -> scalar {
@@ -360,6 +410,29 @@ impl ParagraphWithText {
         let paragraph = self.paragraph.borrow();
         let line_metrics = self.get_line_metrics(&paragraph);
         line_metrics.as_slice()[index].height as scalar
+    }
+
+    pub fn get_line_width(&self, index: usize) -> scalar {
+        if self.line_number() == 0 && index == 0 {
+            return 0.0;
+        }
+
+        let paragraph = self.paragraph.borrow();
+        let line_metrics = self.get_line_metrics(&paragraph);
+        line_metrics.as_slice()[index].width as scalar
+    }
+
+    pub fn get_line_end_character_index(&self, index: usize) -> usize {
+        if self.line_number() == 0 && index == 0 {
+            return 0;
+        }
+        if self.line_number() == (index + 1) {
+            return self.text.char_count()
+        }
+        let paragraph = self.paragraph.borrow();
+        let line_metrics = self.get_line_metrics(&paragraph);
+        let end_glyph_index = (line_metrics.as_slice()[index].end_index - 1).max(0);
+        self.text.get_char_offset_for_glyph_offset(end_glyph_index)
     }
 }
 
@@ -522,19 +595,64 @@ pub fn skia_paragraph_get_glyph_range_for_char_range(
 }
 
 #[no_mangle]
-pub fn skia_paragraph_get_line_index_for_char(
-    paragraph_ptr: *mut ValueBox<ParagraphWithText>,
-    index: usize,
+pub fn skia_paragraph_get_glyph_offset_for_char_offset(
+    paragraph: *mut ValueBox<ParagraphWithText>,
+    offset: usize,
 ) -> usize {
-    paragraph_ptr.with_not_null_return(0, |paragraph| paragraph.get_line_index_for_char(index))
+    paragraph
+        .with_ref(|paragraph| paragraph.text.get_glyph_offset_for_char_offset(offset))
+        .or_log(0)
 }
 
 #[no_mangle]
 pub fn skia_paragraph_get_line_height(
-    paragraph_ptr: *mut ValueBox<ParagraphWithText>,
+    paragraph: *mut ValueBox<ParagraphWithText>,
     index: usize,
 ) -> scalar {
-    paragraph_ptr.with_not_null_return(0.0, |paragraph| paragraph.get_line_height(index))
+    paragraph
+        .with_ref(|paragraph| paragraph.get_line_height(index))
+        .or_log(0.0)
+}
+
+#[no_mangle]
+pub fn skia_paragraph_get_line_width(
+    paragraph: *mut ValueBox<ParagraphWithText>,
+    index: usize,
+) -> scalar {
+    paragraph
+        .with_ref(|paragraph| paragraph.get_line_width(index))
+        .or_log(0.0)
+}
+
+#[no_mangle]
+pub fn skia_paragraph_get_line_end_character_index(
+    paragraph: *mut ValueBox<ParagraphWithText>,
+    index: usize,
+) -> usize {
+    paragraph
+        .with_ref(|paragraph| paragraph.get_line_end_character_index(index))
+        .or_log(0)
+}
+
+#[no_mangle]
+pub fn skia_paragraph_get_line_index_for_char(
+    paragraph: *mut ValueBox<ParagraphWithText>,
+    index: usize,
+) -> usize {
+    paragraph
+        .with_ref(|paragraph| paragraph.get_line_index_for_char_offset(index))
+        .or_log(0)
+}
+
+#[no_mangle]
+pub fn skia_paragraph_get_line_index_at_coordinate(
+    paragraph: *mut ValueBox<ParagraphWithText>,
+    x: scalar,
+    y: scalar,
+) -> usize {
+    paragraph
+        .with_ref(|paragraph| paragraph.get_line_index_at_coordinate(Point::new(x, y)))
+        .or_log(0)
 }
 
 #[no_mangle]
