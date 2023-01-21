@@ -2,7 +2,6 @@ use array_box::ArrayBox;
 use geometry_box::PointBox;
 use std::any::type_name;
 use std::cell::{Ref, RefCell};
-use std::num::TryFromIntError;
 use std::ops::Range;
 use std::rc::Rc;
 

@@ -1,5 +1,5 @@
 use phlow::{PhlowObject, PhlowView};
-use skia_safe::textlayout::Paragraph;
+use skia_safe::textlayout::{Paragraph, PlaceholderStyle};
 use std::ops::Deref;
 use string_box::StringBox;
 use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
@@ -10,20 +10,19 @@ use crate::paragraph::paragraph::{ParagraphPiece, ParagraphText, ParagraphWithTe
 impl ParagraphTextExtensions {
     #[phlow::view]
     fn info_for(_this: &ParagraphText, view: impl PhlowView) -> impl PhlowView {
-        view.list()
+        view.columned_list()
             .title("Info")
             .priority(5)
-            .items(|text: &ParagraphText, object| {
+            .items::<ParagraphText>(|text| {
                 phlow_all!(vec![
                     ("Pieces", phlow!(text.pieces.clone(), <ParagraphPiece>)),
                     ("Amount of chars", phlow!(text.char_count())),
                     ("Tab size", phlow!(text.tab_size())),
                 ])
             })
-            .item_text(|each: &(&str, PhlowObject), _| {
-                format!("{}: {}", each.0, each.1.to_string())
-            })
-            .send(|each: &(&str, PhlowObject), _| each.1.clone())
+            .column_item::<(&str, PhlowObject)>("Property", |each| phlow!(each.0))
+            .column_item::<(&str, PhlowObject)>("Value", |each| each.1.clone())
+            .send::<(&str, PhlowObject)>(|each| each.1.clone())
     }
 }
 
@@ -34,20 +33,21 @@ impl ParagraphWithTextExtensions {
         view.list()
             .title("Info")
             .priority(5)
-            .items(|paragraph_with_text: &ParagraphWithText, object| {
+            .items::<ParagraphWithText>(|paragraph_with_text| {
                 phlow_all!(vec![
                     (
                         "Paragraph",
-                        phlow!(paragraph_with_text.paragraph.borrow().deref(), object)
+                        phlow_ref!(
+                            paragraph_with_text.paragraph.borrow().deref(),
+                            paragraph_with_text.phlow_object()
+                        )
                     ),
                     ("Line ranges", phlow!(paragraph_with_text.get_line_ranges())),
                     ("Text", phlow!(paragraph_with_text.text.clone())),
                 ])
             })
-            .item_text(|each: &(&str, PhlowObject), _| {
-                format!("{}: {}", each.0, each.1.to_string())
-            })
-            .send(|each: &(&str, PhlowObject), _| each.1.clone())
+            .item_text::<(&str, PhlowObject)>(|each| format!("{}: {}", each.0, each.1.to_string()))
+            .send::<(&str, PhlowObject)>(|each| each.1.clone())
     }
 }
 
@@ -58,7 +58,7 @@ impl ParagraphExtensions {
         view.list()
             .title("Info")
             .priority(5)
-            .items(|paragraph: &Paragraph, object| {
+            .items::<Paragraph>(|paragraph| {
                 phlow_all!(vec![
                     ("Max width", phlow!(paragraph.max_width())),
                     ("Height", phlow!(paragraph.height())),
@@ -74,10 +74,8 @@ impl ParagraphExtensions {
                     ("Line number", phlow!(paragraph.line_number())),
                 ])
             })
-            .item_text(|each: &(&str, PhlowObject), _| {
-                format!("{}: {}", each.0, each.1.to_string())
-            })
-            .send(|each: &(&str, PhlowObject), _| each.1.clone())
+            .item_text::<(&str, PhlowObject)>(|each| format!("{}: {}", each.0, each.1.to_string()))
+            .send::<(&str, PhlowObject)>(|each| each.1.clone())
     }
 }
 
@@ -88,7 +86,7 @@ impl ParagraphPieceExtensions {
         view.list()
             .title("Info")
             .priority(5)
-            .items(|paragraph: &ParagraphPiece, object| match paragraph {
+            .items::<ParagraphPiece>(|paragraph_piece| match paragraph_piece.deref() {
                 ParagraphPiece::Text(text) => {
                     phlow_all!(vec![
                         ("Type", phlow!("Text".to_string())),
@@ -103,11 +101,39 @@ impl ParagraphPieceExtensions {
                     ])
                 }
             })
-            .item_text(|each: &(&str, PhlowObject), _| {
-                format!("{}: {}", each.0, each.1.to_string())
-            })
-            .send(|each: &(&str, PhlowObject), _| each.1.clone())
+            .item_text::<(&str, PhlowObject)>(|each| format!("{}: {}", each.0, each.1.to_string()))
+            .send::<(&str, PhlowObject)>(|each| each.1.clone())
     }
+}
+
+#[phlow::extensions(SkiaExtensions, PlaceholderStyle)]
+impl PlaceholderStyleExtensions {
+    #[phlow::view]
+    fn info_for(_this: &PlaceholderStyle, view: impl PhlowView) -> impl PhlowView {
+        view.list()
+            .title("Info")
+            .priority(5)
+            .items::<PlaceholderStyle>(|style| {
+                phlow_all!(vec![
+                    ("Width", phlow!(style.width)),
+                    ("Height", phlow!(style.height)),
+                    ("Alignment", phlow!(style.alignment)),
+                    ("Baseline", phlow!(style.baseline)),
+                    ("Baseline offset", phlow!(style.baseline_offset)),
+                ])
+            })
+            .item_text::<(&str, PhlowObject)>(|each| format!("{}: {}", each.0, each.1.to_string()))
+            .send::<(&str, PhlowObject)>(|each| each.1.clone())
+    }
+}
+
+#[no_mangle]
+pub fn skia_paragraph_placeholder_style_to_phlow(
+    placeholder_style: *mut ValueBox<PlaceholderStyle>,
+) -> *mut ValueBox<PhlowObject> {
+    placeholder_style
+        .with_clone(|style| phlow!(style))
+        .into_raw()
 }
 
 #[no_mangle]
