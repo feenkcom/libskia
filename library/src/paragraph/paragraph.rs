@@ -426,7 +426,7 @@ impl ParagraphWithText {
             return 0;
         }
         if self.line_number() == (index + 1) {
-            return self.text.char_count()
+            return self.text.char_count();
         }
         let paragraph = self.paragraph.borrow();
         let line_metrics = self.get_line_metrics(&paragraph);

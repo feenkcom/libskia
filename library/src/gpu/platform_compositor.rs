@@ -2,6 +2,7 @@ use compositor::{Compositor, Layer};
 use compositor_skia::{Cache, SkiaCachelessCompositor, SkiaCompositor};
 use fps_counter::FPSCounter;
 use skia_safe::{Color, Color4f, Font, ISize, Paint, Point, Surface, Typeface};
+use std::error::Error;
 use std::ops::Deref;
 use std::sync::{Arc, Mutex};
 use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
@@ -34,8 +35,13 @@ impl PlatformCompositor {
     }
 
     /// Submit the new layer to be rendered next. Can be called from any thread
-    pub fn submit_layer(&mut self, layer: Arc<dyn Layer>) {
-        self.latest_frame.lock().unwrap().replace(layer);
+    pub fn submit_layer(&mut self, layer: Arc<dyn Layer>) -> Result<(), Box<dyn Error>> {
+        self.latest_frame
+            .lock()
+            .map(|mut frame| {
+                frame.replace(layer);
+            })
+            .map_err(|error| format!("Failed to acquire Mutex lock: {}", error).into())
     }
 
     pub fn enable_fps(&mut self) {
@@ -46,8 +52,14 @@ impl PlatformCompositor {
         self.render_fps.take();
     }
 
-    pub fn draw(&mut self) {
-        let current_layer = self.latest_frame.lock().unwrap().clone();
+    pub fn draw(&mut self) -> Result<(), Box<dyn Error>> {
+        let current_layer = self
+            .latest_frame
+            .lock()
+            .map_err(|error| -> Box<dyn Error> {
+                format!("Failed to acquire Mutex lock: {}", error).into()
+            })?
+            .clone();
 
         if let Some(layer) = current_layer {
             self.context.with_surface(|surface| {
@@ -66,10 +78,18 @@ impl PlatformCompositor {
                 });
             })
         }
+
+        Ok(())
     }
 
-    pub fn draw_cacheless(&mut self) {
-        let current_layer = self.latest_frame.lock().unwrap().clone();
+    pub fn draw_cacheless(&mut self) -> Result<(), Box<dyn Error>> {
+        let current_layer = self
+            .latest_frame
+            .lock()
+            .map_err(|error| -> Box<dyn Error> {
+                format!("Failed to acquire Mutex lock: {}", error).into()
+            })?
+            .clone();
 
         if let Some(layer) = current_layer {
             self.context.with_surface(|surface| {
@@ -88,6 +108,8 @@ impl PlatformCompositor {
                 });
             })
         }
+
+        Ok(())
     }
 }
 
@@ -137,9 +159,11 @@ pub fn skia_platform_compositor_submit_layer(
     compositor
         .to_ref()
         .and_then(|mut compositor| {
-            layer
-                .to_ref()
-                .map(|layer| compositor.submit_layer(layer.deref().clone()))
+            layer.to_ref().and_then(|layer| {
+                compositor
+                    .submit_layer(layer.deref().clone())
+                    .map_err(|error| error.into())
+            })
         })
         .log();
 }
@@ -148,7 +172,7 @@ pub fn skia_platform_compositor_submit_layer(
 pub fn skia_platform_compositor_draw(compositor: *mut ValueBox<PlatformCompositor>) {
     compositor
         .to_ref()
-        .map(|mut compositor| compositor.draw())
+        .and_then(|mut compositor| compositor.draw().map_err(|error| error.into()))
         .log();
 }
 
@@ -156,7 +180,7 @@ pub fn skia_platform_compositor_draw(compositor: *mut ValueBox<PlatformComposito
 pub fn skia_platform_compositor_draw_cacheless(compositor: *mut ValueBox<PlatformCompositor>) {
     compositor
         .to_ref()
-        .map(|mut compositor| compositor.draw_cacheless())
+        .and_then(|mut compositor| compositor.draw_cacheless().map_err(|error| error.into()))
         .log();
 }
 
