@@ -121,6 +121,9 @@ impl AngleContext {
 
     fn create_skia_context(&self) -> Result<SkiaContext> {
         let mut direct_context = create_direct_context(self.interface.clone())?;
+        // 512 Mb cache limit
+        direct_context.set_resource_cache_limit(512 * 1024 * 1024);
+
         let skia_surface = create_skia_surface(&mut direct_context, self.width, self.height)?;
 
         Ok(SkiaContext {
