@@ -24,7 +24,7 @@ metal = { version = "0.23", optional = true }
 cocoa = { version = "0.24", optional = true }
 core-graphics-types = { version = "0.1", optional = true }
 foreign-types-shared = { version = "0.1", optional = true }
-value-box = "1.1"
+value-box = { version = "2.1", features = [ "phlow" ] }
 reference-box = "1.0"
 array-box = "1.0"
 string-box = "1.1"
@@ -33,13 +33,14 @@ compositor = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-skia = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-ffi = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-skia-ffi = { git = "https://github.com/feenkcom/compositor-rs" }
-#value-box = { path = "../../value-box-rs/value-box" }
+phlow = { version = "1.3", features = [ "phlow-derive" ] }
+phlow-extensions = { version = "1.3" }
+
 #compositor = { path = "../../compositor-rs/compositor" }
 #compositor-skia = { path = "../../compositor-rs/compositor-skia" }
 #compositor-ffi = { path = "../../compositor-rs/compositor-ffi" }
 #compositor-skia-ffi = { path = "../../compositor-rs/compositor-skia-ffi" }
-phlow = { version = "1.2", features = [ "phlow-derive" ] }
-phlow-extensions = { version = "1.2" }
+#value-box = { path = "../../value-box-rs/value-box", features = [ "phlow" ] }
 
 [dependencies.mozangle]
 git = "https://github.com/syrel/mozangle"

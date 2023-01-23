@@ -7,7 +7,7 @@ use skia_safe::{
     scalar, BlendMode, Canvas, Color, Image, Matrix, Paint, Path, Point, Point3, RRect, Rect,
     TextBlob, Vector, M44,
 };
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 use crate::layer::SaveLayerRecWrapper;
 
@@ -273,15 +273,18 @@ pub fn skia_canvas_draw_image(
     paint_ptr: *mut ValueBox<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        image_ptr.with_not_null(|image| {
-            if paint_ptr.is_valid() {
-                paint_ptr.with_not_null(|paint| {
-                    canvas.draw_image(image, Point::new(x, y), Some(paint));
-                })
-            } else {
-                canvas.draw_image(image, Point::new(x, y), None);
-            }
-        });
+        image_ptr
+            .with_ref(|image| {
+                if paint_ptr.is_valid() {
+                    paint_ptr.with_ref_ok(|paint| {
+                        canvas.draw_image(image, Point::new(x, y), Some(paint));
+                    })
+                } else {
+                    canvas.draw_image(image, Point::new(x, y), None);
+                    Ok(())
+                }
+            })
+            .log();
     });
 }
 

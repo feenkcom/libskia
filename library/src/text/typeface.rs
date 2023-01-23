@@ -1,7 +1,7 @@
 use skia_safe::font_style::{Slant, Weight, Width};
 use skia_safe::{FontStyle, Typeface};
 use string_box::StringBox;
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_typeface_default() -> *mut ValueBox<Typeface> {
@@ -34,11 +34,16 @@ pub fn skia_typeface_clone(typeface_ptr: *mut ValueBox<Typeface>) -> *mut ValueB
 pub fn skia_typeface_get_font_style(
     typeface_ptr: *mut ValueBox<Typeface>,
 ) -> *mut ValueBox<FontStyle> {
-    ValueBox::new(typeface_ptr.with(
-        || FontStyle::new(Weight::NORMAL, Width::NORMAL, Slant::Upright),
-        |typeface| typeface.font_style(),
-    ))
-    .into_raw()
+    typeface_ptr
+        .with_mut_ok(|typeface| typeface.font_style())
+        .or_else(|_| {
+            Ok(FontStyle::new(
+                Weight::NORMAL,
+                Width::NORMAL,
+                Slant::Upright,
+            ))
+        })
+        .into_raw()
 }
 
 #[no_mangle]

@@ -157,13 +157,8 @@ pub fn skia_platform_compositor_submit_layer(
     layer: *mut ValueBox<Arc<dyn Layer>>,
 ) {
     compositor
-        .to_ref()
-        .and_then(|mut compositor| {
-            layer.to_ref().and_then(|layer| {
-                compositor
-                    .submit_layer(layer.deref().clone())
-                    .map_err(|error| error.into())
-            })
+        .with_mut(|compositor| {
+            layer.with_clone(|layer| compositor.submit_layer(layer).map_err(|error| error.into()))
         })
         .log();
 }
@@ -171,16 +166,14 @@ pub fn skia_platform_compositor_submit_layer(
 #[no_mangle]
 pub fn skia_platform_compositor_draw(compositor: *mut ValueBox<PlatformCompositor>) {
     compositor
-        .to_ref()
-        .and_then(|mut compositor| compositor.draw().map_err(|error| error.into()))
+        .with_mut(|compositor| compositor.draw().map_err(|error| error.into()))
         .log();
 }
 
 #[no_mangle]
 pub fn skia_platform_compositor_draw_cacheless(compositor: *mut ValueBox<PlatformCompositor>) {
     compositor
-        .to_ref()
-        .and_then(|mut compositor| compositor.draw_cacheless().map_err(|error| error.into()))
+        .with_mut(|compositor| compositor.draw_cacheless().map_err(|error| error.into()))
         .log();
 }
 
@@ -191,24 +184,21 @@ pub fn skia_platform_compositor_resize(
     height: u32,
 ) {
     compositor
-        .to_ref()
-        .map(|mut compositor| compositor.resize_surface(ISize::new(width as _, height as _)))
+        .with_mut_ok(|compositor| compositor.resize_surface(ISize::new(width as _, height as _)))
         .log();
 }
 
 #[no_mangle]
 pub fn skia_platform_compositor_enable_fps(compositor: *mut ValueBox<PlatformCompositor>) {
     compositor
-        .to_ref()
-        .map(|mut compositor| compositor.enable_fps())
+        .with_mut_ok(|compositor| compositor.enable_fps())
         .log();
 }
 
 #[no_mangle]
 pub fn skia_platform_compositor_disable_fps(compositor: *mut ValueBox<PlatformCompositor>) {
     compositor
-        .to_ref()
-        .map(|mut compositor| compositor.disable_fps())
+        .with_mut_ok(|compositor| compositor.disable_fps())
         .log();
 }
 

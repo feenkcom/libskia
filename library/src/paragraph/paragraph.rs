@@ -599,7 +599,7 @@ pub fn skia_paragraph_get_glyph_offset_for_char_offset(
     offset: usize,
 ) -> usize {
     paragraph
-        .with_ref(|paragraph| paragraph.text.get_glyph_offset_for_char_offset(offset))
+        .with_ref_ok(|paragraph| paragraph.text.get_glyph_offset_for_char_offset(offset))
         .or_log(0)
 }
 
@@ -609,7 +609,7 @@ pub fn skia_paragraph_get_line_height(
     index: usize,
 ) -> scalar {
     paragraph
-        .with_ref(|paragraph| paragraph.get_line_height(index))
+        .with_ref_ok(|paragraph| paragraph.get_line_height(index))
         .or_log(0.0)
 }
 
@@ -619,7 +619,7 @@ pub fn skia_paragraph_get_line_width(
     index: usize,
 ) -> scalar {
     paragraph
-        .with_ref(|paragraph| paragraph.get_line_width(index))
+        .with_ref_ok(|paragraph| paragraph.get_line_width(index))
         .or_log(0.0)
 }
 
@@ -629,7 +629,7 @@ pub fn skia_paragraph_get_line_end_character_index(
     index: usize,
 ) -> usize {
     paragraph
-        .with_ref(|paragraph| paragraph.get_line_end_character_index(index))
+        .with_ref_ok(|paragraph| paragraph.get_line_end_character_index(index))
         .or_log(0)
 }
 
@@ -639,7 +639,7 @@ pub fn skia_paragraph_get_line_index_for_char(
     index: usize,
 ) -> usize {
     paragraph
-        .with_ref(|paragraph| paragraph.get_line_index_for_char_offset(index))
+        .with_ref_ok(|paragraph| paragraph.get_line_index_for_char_offset(index))
         .or_log(0)
 }
 
@@ -650,7 +650,7 @@ pub fn skia_paragraph_get_line_index_at_coordinate(
     y: scalar,
 ) -> usize {
     paragraph
-        .with_ref(|paragraph| paragraph.get_line_index_at_coordinate(Point::new(x, y)))
+        .with_ref_ok(|paragraph| paragraph.get_line_index_at_coordinate(Point::new(x, y)))
         .or_log(0)
 }
 

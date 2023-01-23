@@ -1,7 +1,7 @@
 use array_box::ArrayBox;
 use reference_box::ReferenceBox;
 use skia_safe::{AlphaType, Canvas, ColorType, IPoint, ISize, Image, ImageInfo, Surface};
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_surface_new_raster_direct(
@@ -97,10 +97,10 @@ pub fn skia_surface_get_height(surface_ptr: *mut ValueBox<Surface>) -> i32 {
 pub fn skia_surface_get_image_info(
     surface_ptr: *mut ValueBox<Surface>,
 ) -> *mut ValueBox<ImageInfo> {
-    surface_ptr.with(
-        || ValueBox::new(ImageInfo::default()).into_raw(),
-        |surface| ValueBox::new(surface.image_info()).into_raw(),
-    )
+    surface_ptr
+        .with_mut_ok(|surface| surface.image_info())
+        .or_else(|_| Ok(ImageInfo::default()))
+        .into_raw()
 }
 
 #[no_mangle]

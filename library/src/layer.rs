@@ -1,5 +1,5 @@
 use skia_safe::{scalar, Paint, Rect};
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 #[derive(Default)]
 #[repr(C)]
@@ -21,19 +21,21 @@ pub fn skia_layer_rec_set_bounds(
     right: scalar,
     bottom: scalar,
 ) {
-    save_layer_ptr.with_not_null(|rec| {
-        rec.bounds = Some(Rect::new(left, top, right, bottom));
-    });
+    save_layer_ptr
+        .with_mut_ok(|rec| {
+            rec.bounds = Some(Rect::new(left, top, right, bottom));
+        })
+        .log();
 }
 
 #[no_mangle]
 pub fn skia_layer_rec_set_paint(
     save_layer_ptr: *mut ValueBox<SaveLayerRecWrapper>,
-    mut paint_ptr: *mut ValueBox<Paint>,
+    paint_ptr: *mut ValueBox<Paint>,
 ) {
-    save_layer_ptr.with_not_null(|rec| {
-        paint_ptr.with_not_null_value_consumed(|paint| rec.paint = Some(paint));
-    });
+    save_layer_ptr
+        .with_mut(|rec| paint_ptr.take_value().map(|paint| rec.paint = Some(paint)))
+        .log();
 }
 
 #[no_mangle]

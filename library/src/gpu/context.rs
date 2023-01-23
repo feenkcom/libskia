@@ -70,16 +70,14 @@ pub fn skia_context_new_gl(
 #[no_mangle]
 pub fn skia_context_get_max_texture_size(context: *mut ValueBox<DirectContext>) -> i32 {
     context
-        .to_ref()
-        .map(|context| context.max_texture_size())
+        .with_ref_ok(|context| context.max_texture_size())
         .or_log(0)
 }
 
 #[no_mangle]
 pub fn skia_context_get_max_render_target_size(context: *mut ValueBox<DirectContext>) -> i32 {
     context
-        .to_ref()
-        .map(|context| context.max_render_target_size())
+        .with_ref_ok(|context| context.max_render_target_size())
         .or_log(0)
 }
 
@@ -89,8 +87,7 @@ pub fn skia_context_get_max_surface_sample_count_for_color_type(
     color_type: ColorType,
 ) -> usize {
     context
-        .to_ref()
-        .map(|context| context.max_surface_sample_count_for_color_type(color_type))
+        .with_ref_ok(|context| context.max_surface_sample_count_for_color_type(color_type))
         .or_log(0)
 }
 

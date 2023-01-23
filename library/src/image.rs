@@ -152,10 +152,10 @@ pub fn skia_scale_image(
 
 #[no_mangle]
 pub fn skia_image_get_image_info(image_ptr: *mut ValueBox<Image>) -> *mut ValueBox<ImageInfo> {
-    image_ptr.with(
-        || ValueBox::new(ImageInfo::default()).into_raw(),
-        |image| ValueBox::new(image.image_info().clone()).into_raw(),
-    )
+    image_ptr
+        .with_ref_ok(|image| ValueBox::new(image.image_info().clone()))
+        .unwrap_or_else(|_| ValueBox::new(ImageInfo::default()))
+        .into_raw()
 }
 
 #[no_mangle]
@@ -185,10 +185,12 @@ pub fn skia_image_get_color_type(image_ptr: *mut ValueBox<Image>) -> ColorType {
 
 #[no_mangle]
 pub fn skia_image_get_color_space(image_ptr: *mut ValueBox<Image>) -> *mut ValueBox<ColorSpace> {
-    image_ptr.with(
-        || ValueBox::new(ColorSpace::new_srgb()).into_raw(),
-        |image| ValueBox::new(image.color_space()).into_raw(),
+    ValueBox::new(
+        image_ptr
+            .with_ref_ok(|image| image.color_space())
+            .unwrap_or_else(|_| ColorSpace::new_srgb()),
     )
+    .into_raw()
 }
 
 #[no_mangle]

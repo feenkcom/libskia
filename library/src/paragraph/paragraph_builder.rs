@@ -3,7 +3,7 @@ use skia_safe::textlayout::{
     FontCollection, ParagraphBuilder, ParagraphStyle, PlaceholderStyle, TextStyle,
 };
 use string_box::StringBox;
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 pub struct ParagraphBuilderWithText {
     builder: ParagraphBuilder,
@@ -76,35 +76,40 @@ pub fn skia_paragraph_builder_new(
 pub fn skia_paragraph_builder_build(
     mut paragraph_builder_ptr: *mut ValueBox<ParagraphBuilderWithText>,
 ) -> *mut ValueBox<ParagraphWithText> {
-    paragraph_builder_ptr.with_not_null_value_consumed_return(std::ptr::null_mut(), |builder| {
-        ValueBox::new(builder.build()).into_raw()
-    })
+    paragraph_builder_ptr
+        .take_value()
+        .map(|builder| builder.build())
+        .into_raw()
 }
 
 /// Add a text to the paragraph by copying it
 #[no_mangle]
 pub fn skia_paragraph_builder_add_text(
-    paragraph_builder_ptr: *mut ValueBox<ParagraphBuilderWithText>,
-    mut string_ptr: *mut ValueBox<StringBox>,
+    paragraph_builder: *mut ValueBox<ParagraphBuilderWithText>,
+    string: *mut ValueBox<StringBox>,
 ) {
-    paragraph_builder_ptr.with_not_null(|paragraph_builder| {
-        string_ptr.with_not_null_value_consumed(|string| {
-            paragraph_builder.add_text(string);
+    paragraph_builder
+        .with_mut(|paragraph_builder| {
+            string.take_value().map(|string| {
+                paragraph_builder.add_text(string);
+            })
         })
-    })
+        .log();
 }
 
 #[no_mangle]
 pub fn skia_paragraph_builder_add_placeholder(
-    paragraph_builder_ptr: *mut ValueBox<ParagraphBuilderWithText>,
-    mut placeholder_ptr: *mut ValueBox<PlaceholderStyle>,
+    paragraph_builder: *mut ValueBox<ParagraphBuilderWithText>,
+    placeholder: *mut ValueBox<PlaceholderStyle>,
     char_length: CharLength,
 ) {
-    paragraph_builder_ptr.with_not_null(|paragraph_builder| {
-        placeholder_ptr.with_not_null_value_consumed(|placeholder| {
-            paragraph_builder.add_placeholder(placeholder, char_length);
+    paragraph_builder
+        .with_mut(|paragraph_builder| {
+            placeholder.take_value().map(|placeholder| {
+                paragraph_builder.add_placeholder(placeholder, char_length);
+            })
         })
-    })
+        .log();
 }
 
 #[no_mangle]

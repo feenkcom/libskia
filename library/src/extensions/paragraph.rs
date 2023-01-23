@@ -132,7 +132,7 @@ pub fn skia_paragraph_placeholder_style_to_phlow(
     placeholder_style: *mut ValueBox<PlaceholderStyle>,
 ) -> *mut ValueBox<PhlowObject> {
     placeholder_style
-        .with_clone(|style| phlow!(style))
+        .with_clone_ok(|style| phlow!(style))
         .into_raw()
 }
 
@@ -141,6 +141,6 @@ pub fn skia_paragraph_with_text_to_phlow(
     paragraph: *mut ValueBox<ParagraphWithText>,
 ) -> *mut ValueBox<PhlowObject> {
     paragraph
-        .with_clone(|paragraph| phlow!(paragraph))
+        .with_clone_ok(|paragraph| phlow!(paragraph))
         .into_raw()
 }

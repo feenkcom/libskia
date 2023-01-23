@@ -9,8 +9,7 @@ pub fn skia_color_space_new_srgb() -> *mut ValueBox<ColorSpace> {
 #[no_mangle]
 pub fn skia_color_space_is_srgb(color_space: *mut ValueBox<ColorSpace>) -> bool {
     color_space
-        .to_ref()
-        .map(|color_space| color_space.is_srgb())
+        .with_ref_ok(|color_space| color_space.is_srgb())
         .or_log(false)
 }
 
