@@ -16,26 +16,27 @@ byteorder = "1.3"
 num_enum = "0.4"
 widestring = "0.4"
 log = "0.4"
-env_logger = "0.8"
+env_logger = "0.10"
 fps_counter = "2.0"
 lazy_static = "1.4"
 anyhow = "1.0"
-metal = { version = "0.23", optional = true }
+metal = { version = "0.24", optional = true }
 cocoa = { version = "0.24", optional = true }
 core-graphics-types = { version = "0.1", optional = true }
 foreign-types-shared = { version = "0.1", optional = true }
-value-box = { version = "2.1", features = [ "phlow" ] }
+value-box = { version = "2.2", features = [ "phlow" ] }
 reference-box = "1.0"
 array-box = "1.0"
 string-box = "1.1"
 geometry-box = "1.0"
+value-box-ffi = { version = "1.0", features = [ "phlow", "array-box", "geometry-box", "string-box"] }
 compositor = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-skia = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-ffi = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-skia-ffi = { git = "https://github.com/feenkcom/compositor-rs" }
 phlow = { version = "1.3", features = [ "phlow-derive" ] }
 phlow-extensions = { version = "1.3" }
-
+phlow-ffi = "1.0"
 #compositor = { path = "../../compositor-rs/compositor" }
 #compositor-skia = { path = "../../compositor-rs/compositor-skia" }
 #compositor-ffi = { path = "../../compositor-rs/compositor-ffi" }

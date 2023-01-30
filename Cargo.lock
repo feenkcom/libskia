@@ -119,9 +119,9 @@ checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
 
 [[package]]
 name = "cc"
-version = "1.0.78"
+version = "1.0.79"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a20104e2335ce8a659d6dd92a51a767a0c062599c73b343fd152cb401e828c3d"
+checksum = "50d30906286121d95be3d479533b458f87493b30a4b5f79a607db8f5d11aa91f"
 dependencies = [
  "jobserver",
 ]
@@ -224,8 +224,8 @@ dependencies = [
 
 [[package]]
 name = "compositor"
-version = "1.7.0"
-source = "git+https://github.com/feenkcom/compositor-rs#b8933150418b5d90ddb94d5a46acaf3a969b47d0"
+version = "2.0.0"
+source = "git+https://github.com/feenkcom/compositor-rs#0383c9332ce18caabb3b2dc63862dc87d5e4e032"
 dependencies = [
  "euclid",
  "ordered-float",
@@ -233,8 +233,8 @@ dependencies = [
 
 [[package]]
 name = "compositor-ffi"
-version = "1.7.0"
-source = "git+https://github.com/feenkcom/compositor-rs#b8933150418b5d90ddb94d5a46acaf3a969b47d0"
+version = "2.0.0"
+source = "git+https://github.com/feenkcom/compositor-rs#0383c9332ce18caabb3b2dc63862dc87d5e4e032"
 dependencies = [
  "array-box",
  "compositor",
@@ -246,8 +246,8 @@ dependencies = [
 
 [[package]]
 name = "compositor-skia"
-version = "1.7.0"
-source = "git+https://github.com/feenkcom/compositor-rs#b8933150418b5d90ddb94d5a46acaf3a969b47d0"
+version = "2.0.0"
+source = "git+https://github.com/feenkcom/compositor-rs#0383c9332ce18caabb3b2dc63862dc87d5e4e032"
 dependencies = [
  "compositor",
  "log",
@@ -256,8 +256,8 @@ dependencies = [
 
 [[package]]
 name = "compositor-skia-ffi"
-version = "1.7.0"
-source = "git+https://github.com/feenkcom/compositor-rs#b8933150418b5d90ddb94d5a46acaf3a969b47d0"
+version = "2.0.0"
+source = "git+https://github.com/feenkcom/compositor-rs#0383c9332ce18caabb3b2dc63862dc87d5e4e032"
 dependencies = [
  "compositor",
  "compositor-skia",
@@ -405,18 +405,18 @@ dependencies = [
 
 [[package]]
 name = "either"
-version = "1.8.0"
+version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "90e5c1c8368803113bf0c9584fc495a58b86dc8a29edbf8fe877d21d9507e797"
+checksum = "7fcaabb2fef8c910e7f4c7ce9f67a1283a1715879a7c230ca9d6d1ae31f16d91"
 
 [[package]]
 name = "env_logger"
-version = "0.8.4"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a19187fea3ac7e84da7dacf48de0c45d63c6a76f9490dae389aead16c243fce3"
+checksum = "85cdab6a89accf66733ad5a1693a4dcced6aeff64602b634530dd73c1f3ee9f0"
 dependencies = [
- "atty",
  "humantime",
+ "is-terminal",
  "log",
  "regex",
  "termcolor",
@@ -429,6 +429,27 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e4ca605381c017ec7a5fef5e548f1cfaa419ed0f6df6367339300db74c92aa7d"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "errno"
+version = "0.2.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f639046355ee4f37944e44f60642c6f3a7efa3cf6b78c78a0d989a8ce6c396a1"
+dependencies = [
+ "errno-dragonfly",
+ "libc",
+ "winapi",
+]
+
+[[package]]
+name = "errno-dragonfly"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aa68f1b12764fab894d2755d2518754e71b4fd80ecfb822714a1206c2aab39bf"
+dependencies = [
+ "cc",
+ "libc",
 ]
 
 [[package]]
@@ -620,6 +641,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "io-lifetimes"
+version = "1.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e7d6c6f8c91b4b9ed43484ad1a938e393caf35960fce7f82a040497207bd8e9e"
+dependencies = [
+ "libc",
+ "windows-sys",
+]
+
+[[package]]
+name = "is-terminal"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "28dfb6c8100ccc63462345b67d1bbc3679177c75ee4bf59bf29c8b1d110b8189"
+dependencies = [
+ "hermit-abi 0.2.6",
+ "io-lifetimes",
+ "rustix",
+ "windows-sys",
+]
+
+[[package]]
 name = "itoa"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -707,12 +750,14 @@ dependencies = [
  "ordered-float",
  "phlow",
  "phlow-extensions",
+ "phlow-ffi",
  "reference-box",
  "skia-safe",
  "string-box",
  "typename",
  "uikit-sys",
  "value-box",
+ "value-box-ffi",
  "widestring 0.4.3",
  "windows",
 ]
@@ -731,6 +776,12 @@ version = "0.2.0"
 dependencies = [
  "shared-library-builder",
 ]
+
+[[package]]
+name = "linux-raw-sys"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f051f77a7c8e6957c0696eac88f26b0117e54f52d3fc682ab19397a8812846a4"
 
 [[package]]
 name = "log"
@@ -767,9 +818,9 @@ dependencies = [
 
 [[package]]
 name = "metal"
-version = "0.23.1"
+version = "0.24.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e0514f491f4cc03632ab399ee01e2c1c1b12d3e1cf2d667c1ff5f87d6dcd2084"
+checksum = "de11355d1f6781482d027a3b4d4de7825dcedb197bf573e0596d00008402d060"
 dependencies = [
  "bitflags",
  "block",
@@ -940,6 +991,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "phlow-ffi"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b6763a66a770e97f6e51f304f324fab8aac0cf2db54ee75f99f06dc300b89c4b"
+dependencies = [
+ "env_logger",
+ "phlow",
+ "string-box",
+ "value-box",
+]
+
+[[package]]
 name = "proc-macro-crate"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1062,6 +1125,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "rustix"
+version = "0.36.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d4fdebc4b395b7fbb9ab11e462e20ed9051e7b16e42d24042c776eca0ac81b03"
+dependencies = [
+ "bitflags",
+ "errno",
+ "io-lifetimes",
+ "libc",
+ "linux-raw-sys",
+ "windows-sys",
+]
+
+[[package]]
 name = "rustls"
 version = "0.20.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1159,7 +1236,7 @@ dependencies = [
 [[package]]
 name = "shared-library-builder"
 version = "0.3.8"
-source = "git+https://github.com/feenkcom/shared-library-builder-rs#df5ddbb46897cb5d6cec97b832a1c2ca528fe6be"
+source = "git+https://github.com/feenkcom/shared-library-builder-rs#edad72ccfa213c958480c67f8544965309ed1154"
 dependencies = [
  "clap",
  "file-matcher",
@@ -1456,14 +1533,29 @@ checksum = "07a91d0648d862a02d641c82292791accfe66d36df75d8149ebc9768f2e36863"
 
 [[package]]
 name = "value-box"
-version = "2.1.1"
+version = "2.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3860559aa430557aa16165cf48f4c12ce5fbf2b3f36a38b92392a36886aca3db"
+checksum = "149a442dec280def3c266923a9e5c105fd501ad48df242b6c34c4e9bec501345"
 dependencies = [
  "log",
  "phlow",
  "thiserror",
  "user-error",
+]
+
+[[package]]
+name = "value-box-ffi"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7ced01083b14ea1ea23ca5674148931e94ebb08cb23135c8c5bf1867c880973c"
+dependencies = [
+ "array-box",
+ "crossbeam",
+ "geometry-box",
+ "phlow",
+ "phlow-extensions",
+ "string-box",
+ "value-box",
 ]
 
 [[package]]
