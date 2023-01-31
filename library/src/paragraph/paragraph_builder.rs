@@ -74,7 +74,7 @@ pub fn skia_paragraph_builder_new(
 
 #[no_mangle]
 pub fn skia_paragraph_builder_build(
-    mut paragraph_builder_ptr: *mut ValueBox<ParagraphBuilderWithText>,
+    paragraph_builder_ptr: *mut ValueBox<ParagraphBuilderWithText>,
 ) -> *mut ValueBox<ParagraphWithText> {
     paragraph_builder_ptr
         .take_value()
