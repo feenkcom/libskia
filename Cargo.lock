@@ -1551,9 +1551,9 @@ dependencies = [
 
 [[package]]
 name = "value-box-ffi"
-version = "1.1.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aa949e8b928dba3e1522a526b55e58641bc699a670b8280adc380c8a14c1a0be"
+checksum = "f04f0d852bba02e460e87ea10e6935f2bb91f799f71dea757f2a728578109b3d"
 dependencies = [
  "array-box",
  "crossbeam",
