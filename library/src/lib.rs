@@ -12,9 +12,9 @@ use std::os::raw::c_void;
 // re-export the ffi methods
 pub use compositor_ffi::*;
 pub use compositor_skia_ffi::*;
-pub use value_box_ffi::*;
-pub use phlow_ffi::*;
 pub use phlow_extensions::CoreExtensions;
+pub use phlow_ffi::*;
+pub use value_box_ffi::*;
 
 pub mod canvas;
 pub mod canvas_clip;

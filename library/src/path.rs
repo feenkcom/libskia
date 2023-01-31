@@ -1,6 +1,6 @@
 use array_box::ArrayBox;
 use skia_safe::{scalar, Paint, Path, PathFillType, Point, Rect, Vector};
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_path_new() -> *mut ValueBox<Path> {
@@ -147,17 +147,24 @@ pub fn skia_path_count_points(path_ptr: *mut ValueBox<Path>) -> usize {
 
 #[no_mangle]
 pub fn skia_path_get_points(
-    path_ptr: *mut ValueBox<Path>,
-    points_ptr: *mut ValueBox<ArrayBox<Point>>,
+    path: *mut ValueBox<Path>,
+    points: *mut ValueBox<ArrayBox<f32>>,
 ) -> usize {
-    path_ptr.with_not_null_return(0, |path| {
-        points_ptr.with_not_null_return(0, |points| {
+    path.with_ref(|path| {
+        points.with_mut_ok(|points| {
             let mut path_points = vec![Point::default(); path.count_points()];
             let points_count = path.get_points(&mut path_points);
-            points.set_vector(path_points);
+
+            let mut flattened_points: Vec<f32> = Vec::with_capacity(points_count * 2);
+            for point in path_points {
+                flattened_points.push(point.x);
+                flattened_points.push(point.y);
+            }
+            points.set_vector(flattened_points);
             points_count
         })
     })
+    .or_log(0)
 }
 
 #[no_mangle]
