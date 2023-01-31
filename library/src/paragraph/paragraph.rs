@@ -483,64 +483,69 @@ pub fn skia_paragraph_get_char_count(paragraph_ptr: *mut ValueBox<ParagraphWithT
 
 #[no_mangle]
 pub fn skia_paragraph_get_rects_for_placeholders(
-    paragraph_ptr: *mut ValueBox<ParagraphWithText>,
-) -> *mut ValueBox<ArrayBox<PointBox<f32>>> {
-    paragraph_ptr.with_not_null_return(std::ptr::null_mut(), |paragraph| {
-        let mut points: Vec<PointBox<f32>> = vec![];
-        for text_box in paragraph.get_rects_for_placeholders().iter() {
-            points.push(PointBox::new(text_box.rect.x(), text_box.rect.y()));
-            points.push(PointBox::new(text_box.rect.right(), text_box.rect.bottom()));
-        }
-        let mut array = ArrayBox::new();
-        array.set_vector(points);
-        ValueBox::new(array).into_raw()
-    })
+    paragraph: *mut ValueBox<ParagraphWithText>,
+) -> *mut ValueBox<ArrayBox<f32>> {
+    paragraph
+        .with_ref_ok(|paragraph| {
+            let rectangles = paragraph.get_rects_for_placeholders();
+            let mut points: Vec<f32> = Vec::with_capacity(rectangles.len() * 4);
+            for text_box in rectangles {
+                points.push(text_box.rect.left);
+                points.push(text_box.rect.top);
+                points.push(text_box.rect.right);
+                points.push(text_box.rect.bottom);
+            }
+            ArrayBox::from_vector(points)
+        })
+        .into_raw()
 }
 
 #[no_mangle]
 pub fn skia_paragraph_get_rects_for_glyph_range(
-    paragraph_ptr: *mut ValueBox<ParagraphWithText>,
+    paragraph: *mut ValueBox<ParagraphWithText>,
     start: usize,
     end: usize,
     rect_height_style: RectHeightStyle,
     rect_width_style: RectWidthStyle,
-) -> *mut ValueBox<ArrayBox<PointBox<f32>>> {
-    paragraph_ptr.with_not_null_return(std::ptr::null_mut(), |paragraph| {
-        let mut points: Vec<PointBox<f32>> = vec![];
-        for text_box in paragraph
-            .get_rects_for_range(start..end, rect_height_style, rect_width_style)
-            .iter()
-        {
-            points.push(PointBox::new(text_box.rect.x(), text_box.rect.y()));
-            points.push(PointBox::new(text_box.rect.right(), text_box.rect.bottom()));
-        }
-        let mut array = ArrayBox::new();
-        array.set_vector(points);
-        ValueBox::new(array).into_raw()
-    })
+) -> *mut ValueBox<ArrayBox<f32>> {
+    paragraph
+        .with_ref_ok(|paragraph| {
+            let rectangles =
+                paragraph.get_rects_for_range(start..end, rect_height_style, rect_width_style);
+            let mut points: Vec<f32> = Vec::with_capacity(rectangles.len() * 4);
+            for text_box in rectangles {
+                points.push(text_box.rect.left);
+                points.push(text_box.rect.top);
+                points.push(text_box.rect.right);
+                points.push(text_box.rect.bottom);
+            }
+            ArrayBox::from_vector(points)
+        })
+        .into_raw()
 }
 
 #[no_mangle]
 pub fn skia_paragraph_get_rects_for_char_range(
-    paragraph_ptr: *mut ValueBox<ParagraphWithText>,
+    paragraph: *mut ValueBox<ParagraphWithText>,
     start: usize,
     end: usize,
     rect_height_style: RectHeightStyle,
     rect_width_style: RectWidthStyle,
-) -> *mut ValueBox<ArrayBox<PointBox<f32>>> {
-    paragraph_ptr.with_not_null_return(std::ptr::null_mut(), |paragraph| {
-        let mut points: Vec<PointBox<f32>> = vec![];
-        for text_box in paragraph
-            .get_rects_for_char_range(start..end, rect_height_style, rect_width_style)
-            .iter()
-        {
-            points.push(PointBox::new(text_box.rect.x(), text_box.rect.y()));
-            points.push(PointBox::new(text_box.rect.right(), text_box.rect.bottom()));
-        }
-        let mut array = ArrayBox::new();
-        array.set_vector(points);
-        ValueBox::new(array).into_raw()
-    })
+) -> *mut ValueBox<ArrayBox<f32>> {
+    paragraph
+        .with_ref_ok(|paragraph| {
+            let rectangles =
+                paragraph.get_rects_for_char_range(start..end, rect_height_style, rect_width_style);
+            let mut points: Vec<f32> = Vec::with_capacity(rectangles.len() * 4);
+            for text_box in rectangles {
+                points.push(text_box.rect.left);
+                points.push(text_box.rect.top);
+                points.push(text_box.rect.right);
+                points.push(text_box.rect.bottom);
+            }
+            ArrayBox::from_vector(points)
+        })
+        .into_raw()
 }
 
 #[no_mangle]

@@ -948,6 +948,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b7820b9daea5457c9f21c69448905d723fbd21136ccf521748f23fd49e723ee"
 
 [[package]]
+name = "paste"
+version = "1.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d01a5bd0424d00070b0098dd17ebca6f961a959dead1dbcbbbc1d1cd8d3deeba"
+
+[[package]]
 name = "peeking_take_while"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1545,13 +1551,14 @@ dependencies = [
 
 [[package]]
 name = "value-box-ffi"
-version = "1.0.1"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7ced01083b14ea1ea23ca5674148931e94ebb08cb23135c8c5bf1867c880973c"
+checksum = "aa949e8b928dba3e1522a526b55e58641bc699a670b8280adc380c8a14c1a0be"
 dependencies = [
  "array-box",
  "crossbeam",
  "geometry-box",
+ "paste",
  "phlow",
  "phlow-extensions",
  "string-box",
