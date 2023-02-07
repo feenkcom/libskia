@@ -1,6 +1,6 @@
 use skia_safe::rrect::Type;
 use skia_safe::{scalar, RRect, Rect, Vector};
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_rounded_rectangle_default() -> *mut ValueBox<RRect> {
@@ -35,19 +35,23 @@ pub fn skia_rounded_rectangle_new_radii(
 
 #[no_mangle]
 pub fn skia_rounded_rectangle_get_type(rounded_rectangle_ptr: *mut ValueBox<RRect>) -> Type {
-    rounded_rectangle_ptr.with_not_null_return(Type::Empty, |rounded_rectangle| {
-        rounded_rectangle.get_type()
-    })
+    rounded_rectangle_ptr
+        .with_ref_ok(|rounded_rectangle| rounded_rectangle.get_type())
+        .or_log(Type::Empty)
 }
 
 #[no_mangle]
 pub fn skia_rounded_rectangle_width(rounded_rectangle_ptr: *mut ValueBox<RRect>) -> scalar {
-    rounded_rectangle_ptr.with_not_null_return(0.0, |rounded_rectangle| rounded_rectangle.width())
+    rounded_rectangle_ptr
+        .with_ref_ok(|rounded_rectangle| rounded_rectangle.width())
+        .or_log(0.0)
 }
 
 #[no_mangle]
 pub fn skia_rounded_rectangle_height(rounded_rectangle_ptr: *mut ValueBox<RRect>) -> scalar {
-    rounded_rectangle_ptr.with_not_null_return(0.0, |rounded_rectangle| rounded_rectangle.height())
+    rounded_rectangle_ptr
+        .with_ref_ok(|rounded_rectangle| rounded_rectangle.height())
+        .or_log(0.0)
 }
 
 #[no_mangle]
@@ -55,11 +59,13 @@ pub fn skia_rounded_rectangle_set_rect(
     rounded_rectangle_ptr: *mut ValueBox<RRect>,
     rectangle_ptr: *mut ValueBox<Rect>,
 ) {
-    rounded_rectangle_ptr.with_not_null(|rounded_rectangle| {
-        rectangle_ptr.with_not_null(|rectangle| {
-            rounded_rectangle.set_rect(rectangle);
+    rounded_rectangle_ptr
+        .with_mut(|rounded_rectangle| {
+            rectangle_ptr.with_ref_ok(|rectangle| {
+                rounded_rectangle.set_rect(rectangle);
+            })
         })
-    });
+        .log();
 }
 
 #[no_mangle]
@@ -67,11 +73,13 @@ pub fn skia_rounded_rectangle_set_oval(
     rounded_rectangle_ptr: *mut ValueBox<RRect>,
     oval_ptr: *mut ValueBox<Rect>,
 ) {
-    rounded_rectangle_ptr.with_not_null(|rounded_rectangle| {
-        oval_ptr.with_not_null(|oval| {
-            rounded_rectangle.set_oval(oval);
+    rounded_rectangle_ptr
+        .with_mut(|rounded_rectangle| {
+            oval_ptr.with_ref_ok(|oval| {
+                rounded_rectangle.set_oval(oval);
+            })
         })
-    });
+        .log();
 }
 
 #[no_mangle]

@@ -1,10 +1,9 @@
-use array_box::ArrayBox;
-use geometry_box::PointBox;
 use std::any::type_name;
-use std::cell::{Ref, RefCell};
+use std::cell::RefCell;
 use std::ops::Range;
 use std::rc::Rc;
 
+use array_box::ArrayBox;
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::textlayout::{
     Affinity, LineMetrics, Paragraph, PlaceholderStyle, PositionWithAffinity, RectHeightStyle,
@@ -12,7 +11,7 @@ use skia_safe::textlayout::{
 };
 use skia_safe::{scalar, Canvas, Point, Rect};
 use string_box::StringBox;
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
 
 pub type TabSize = usize;
 pub type CharLength = usize;
@@ -437,9 +436,11 @@ impl ParagraphWithText {
 
 #[no_mangle]
 pub fn skia_paragraph_layout(paragraph_ptr: *mut ValueBox<ParagraphWithText>, width: scalar) {
-    paragraph_ptr.with_not_null(|paragraph| {
-        paragraph.layout(width);
-    })
+    paragraph_ptr
+        .with_mut_ok(|paragraph| {
+            paragraph.layout(width);
+        })
+        .log();
 }
 
 #[no_mangle]
@@ -449,36 +450,48 @@ pub fn skia_paragraph_paint(
     x: scalar,
     y: scalar,
 ) {
-    paragraph_ptr.with_not_null(|paragraph| {
-        canvas_ptr.with_not_null(|canvas| {
-            paragraph.paint(canvas, Point::new(x, y));
+    paragraph_ptr
+        .with_ref_ok(|paragraph| {
+            canvas_ptr.with_not_null(|canvas| {
+                paragraph.paint(canvas, Point::new(x, y));
+            })
         })
-    })
+        .log();
 }
 
 #[no_mangle]
 pub fn skia_paragraph_get_height(paragraph_ptr: *mut ValueBox<ParagraphWithText>) -> scalar {
-    paragraph_ptr.with_not_null_return(0.0, |paragraph| paragraph.height())
+    paragraph_ptr
+        .with_ref_ok(|paragraph| paragraph.height())
+        .or_log(0.0)
 }
 
 #[no_mangle]
 pub fn skia_paragraph_get_max_width(paragraph_ptr: *mut ValueBox<ParagraphWithText>) -> scalar {
-    paragraph_ptr.with_not_null_return(0.0, |paragraph| paragraph.max_width())
+    paragraph_ptr
+        .with_ref_ok(|paragraph| paragraph.max_width())
+        .or_log(0.0)
 }
 
 #[no_mangle]
 pub fn skia_paragraph_get_longest_line(paragraph_ptr: *mut ValueBox<ParagraphWithText>) -> scalar {
-    paragraph_ptr.with_not_null_return(0.0, |paragraph| paragraph.longest_line())
+    paragraph_ptr
+        .with_ref_ok(|paragraph| paragraph.longest_line())
+        .or_log(0.0)
 }
 
 #[no_mangle]
 pub fn skia_paragraph_get_line_number(paragraph_ptr: *mut ValueBox<ParagraphWithText>) -> usize {
-    paragraph_ptr.with_not_null_return(0, |paragraph| paragraph.line_number())
+    paragraph_ptr
+        .with_ref_ok(|paragraph| paragraph.line_number())
+        .or_log(0)
 }
 
 #[no_mangle]
 pub fn skia_paragraph_get_char_count(paragraph_ptr: *mut ValueBox<ParagraphWithText>) -> usize {
-    paragraph_ptr.with_not_null_return(0, |paragraph| paragraph.char_count())
+    paragraph_ptr
+        .with_ref_ok(|paragraph| paragraph.char_count())
+        .or_log(0)
 }
 
 #[no_mangle]
@@ -495,7 +508,7 @@ pub fn skia_paragraph_get_rects_for_placeholders(
                 points.push(text_box.rect.right);
                 points.push(text_box.rect.bottom);
             }
-            ArrayBox::from_vector(points)
+            ValueBox::new(ArrayBox::from_vector(points))
         })
         .into_raw()
 }
@@ -519,7 +532,7 @@ pub fn skia_paragraph_get_rects_for_glyph_range(
                 points.push(text_box.rect.right);
                 points.push(text_box.rect.bottom);
             }
-            ArrayBox::from_vector(points)
+            ValueBox::new(ArrayBox::from_vector(points))
         })
         .into_raw()
 }
@@ -543,7 +556,7 @@ pub fn skia_paragraph_get_rects_for_char_range(
                 points.push(text_box.rect.right);
                 points.push(text_box.rect.bottom);
             }
-            ArrayBox::from_vector(points)
+            ValueBox::new(ArrayBox::from_vector(points))
         })
         .into_raw()
 }

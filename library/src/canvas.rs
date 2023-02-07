@@ -38,9 +38,11 @@ pub fn skia_canvas_draw_paint(
     paint_ptr: *mut ValueBox<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        paint_ptr.with_not_null(|paint| {
-            canvas.draw_paint(paint);
-        });
+        paint_ptr
+            .with_ref_ok(|paint| {
+                canvas.draw_paint(paint);
+            })
+            .log();
     });
 }
 
@@ -52,11 +54,13 @@ pub fn skia_canvas_draw_points(
     paint_ptr: *mut ValueBox<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        paint_ptr.with_not_null(|paint| {
-            points_ptr.with_not_null(|points| {
-                canvas.draw_points(point_mode, points.to_slice(), paint);
+        paint_ptr
+            .with_ref(|paint| {
+                points_ptr.with_ref_ok(|points| {
+                    canvas.draw_points(point_mode, points.to_slice(), paint);
+                })
             })
-        });
+            .log();
     });
 }
 
@@ -68,9 +72,11 @@ pub fn skia_canvas_draw_point(
     paint_ptr: *mut ValueBox<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        paint_ptr.with_not_null(|paint| {
-            canvas.draw_point(Point::new(x, y), paint);
-        });
+        paint_ptr
+            .with_ref_ok(|paint| {
+                canvas.draw_point(Point::new(x, y), paint);
+            })
+            .log();
     });
 }
 

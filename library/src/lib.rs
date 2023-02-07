@@ -1,3 +1,4 @@
+#![allow(incomplete_features)]
 #![feature(specialization)]
 
 #[macro_use]
@@ -6,6 +7,8 @@ extern crate lazy_static;
 extern crate log;
 #[macro_use]
 extern crate phlow;
+#[macro_use]
+extern crate value_box;
 
 use std::os::raw::c_void;
 

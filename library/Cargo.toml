@@ -24,7 +24,7 @@ metal = { version = "0.24", optional = true }
 cocoa = { version = "0.24", optional = true }
 core-graphics-types = { version = "0.1", optional = true }
 foreign-types-shared = { version = "0.1", optional = true }
-value-box = { version = "2.2", features = [ "phlow" ] }
+value-box = { version = "2.3", features = [ "phlow" ] }
 reference-box = "1.0"
 array-box = "1.0"
 string-box = "1.1"
@@ -36,7 +36,7 @@ compositor-ffi = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-skia-ffi = { git = "https://github.com/feenkcom/compositor-rs" }
 phlow = { version = "1.3", features = [ "phlow-derive" ] }
 phlow-extensions = { version = "1.3" }
-phlow-ffi = "1.0"
+phlow-ffi = "1.1"
 #compositor = { path = "../../compositor-rs/compositor" }
 #compositor-skia = { path = "../../compositor-rs/compositor-skia" }
 #compositor-ffi = { path = "../../compositor-rs/compositor-ffi" }

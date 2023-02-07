@@ -1,5 +1,5 @@
 use array_box::ArrayBox;
-use skia_safe::{Paint, Path, PathFillType, Point, Rect, scalar, Vector};
+use skia_safe::{scalar, Paint, Path, PathFillType, Point, Rect, Vector};
 use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 #[no_mangle]

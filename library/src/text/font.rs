@@ -4,7 +4,7 @@ use skia_safe::{
     scalar, Font, FontHinting, FontMetrics, GlyphId, Paint, Rect, TextEncoding, Typeface,
 };
 use string_box::StringBox;
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_font_default() -> *mut ValueBox<Font> {
@@ -23,17 +23,23 @@ pub fn skia_font_from_typeface(
 
 #[no_mangle]
 pub fn skia_font_is_force_auto_hinting(font_ptr: *mut ValueBox<Font>) -> bool {
-    font_ptr.with_not_null_return(false, |font| font.is_force_auto_hinting())
+    font_ptr
+        .with_ref_ok(|font| font.is_force_auto_hinting())
+        .or_log(false)
 }
 
 #[no_mangle]
 pub fn skia_font_is_embedded_bitmaps(font_ptr: *mut ValueBox<Font>) -> bool {
-    font_ptr.with_not_null_return(false, |font| font.is_embedded_bitmaps())
+    font_ptr
+        .with_ref_ok(|font| font.is_embedded_bitmaps())
+        .or_log(false)
 }
 
 #[no_mangle]
 pub fn skia_font_is_subpixel(font_ptr: *mut ValueBox<Font>) -> bool {
-    font_ptr.with_not_null_return(false, |font| font.is_subpixel())
+    font_ptr
+        .with_ref_ok(|font| font.is_subpixel())
+        .or_log(false)
 }
 
 #[no_mangle]
@@ -45,22 +51,30 @@ pub fn skia_font_set_subpixel(font_ptr: *mut ValueBox<Font>, is_subpixel: bool) 
 
 #[no_mangle]
 pub fn skia_font_is_linear_metrics(font_ptr: *mut ValueBox<Font>) -> bool {
-    font_ptr.with_not_null_return(false, |font| font.is_linear_metrics())
+    font_ptr
+        .with_ref_ok(|font| font.is_linear_metrics())
+        .or_log(false)
 }
 
 #[no_mangle]
 pub fn skia_font_is_embolden(font_ptr: *mut ValueBox<Font>) -> bool {
-    font_ptr.with_not_null_return(false, |font| font.is_embolden())
+    font_ptr
+        .with_ref_ok(|font| font.is_embolden())
+        .or_log(false)
 }
 
 #[no_mangle]
 pub fn skia_font_is_baseline_snap(font_ptr: *mut ValueBox<Font>) -> bool {
-    font_ptr.with_not_null_return(false, |font| font.is_baseline_snap())
+    font_ptr
+        .with_ref_ok(|font| font.is_baseline_snap())
+        .or_log(false)
 }
 
 #[no_mangle]
 pub fn skia_font_get_edging(font_ptr: *mut ValueBox<Font>) -> Edging {
-    font_ptr.with_not_null_return(Edging::Alias, |font| font.edging())
+    font_ptr
+        .with_ref_ok(|font| font.edging())
+        .or_log(Edging::Alias)
 }
 
 #[no_mangle]
@@ -72,7 +86,9 @@ pub fn skia_font_set_edging(font_ptr: *mut ValueBox<Font>, font_edging: Edging) 
 
 #[no_mangle]
 pub fn skia_font_get_hinting(font_ptr: *mut ValueBox<Font>) -> FontHinting {
-    font_ptr.with_not_null_return(FontHinting::None, |font| font.hinting())
+    font_ptr
+        .with_ref_ok(|font| font.hinting())
+        .or_log(FontHinting::None)
 }
 
 #[no_mangle]
@@ -91,22 +107,22 @@ pub fn skia_font_get_typeface_or_default(font_ptr: *mut ValueBox<Font>) -> *mut 
 
 #[no_mangle]
 pub fn skia_font_get_size(font_ptr: *mut ValueBox<Font>) -> scalar {
-    font_ptr.with_not_null_return(0.0, |font| font.size())
+    font_ptr.with_ref_ok(|font| font.size()).or_log(0.0)
 }
 
 #[no_mangle]
 pub fn skia_font_get_scale_x(font_ptr: *mut ValueBox<Font>) -> scalar {
-    font_ptr.with_not_null_return(0.0, |font| font.scale_x())
+    font_ptr.with_ref_ok(|font| font.scale_x()).or_log(0.0)
 }
 
 #[no_mangle]
 pub fn skia_font_get_skew_x(font_ptr: *mut ValueBox<Font>) -> scalar {
-    font_ptr.with_not_null_return(0.0, |font| font.skew_x())
+    font_ptr.with_ref_ok(|font| font.skew_x()).or_log(0.0)
 }
 
 #[no_mangle]
 pub fn skia_font_get_spacing(font_ptr: *mut ValueBox<Font>) -> scalar {
-    font_ptr.with_not_null_return(0.0, |font| font.spacing())
+    font_ptr.with_ref_ok(|font| font.spacing()).or_log(0.0)
 }
 
 #[no_mangle]

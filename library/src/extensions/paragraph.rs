@@ -1,8 +1,7 @@
+use std::ops::Deref;
+
 use phlow::{PhlowObject, PhlowView};
 use skia_safe::textlayout::{Paragraph, PlaceholderStyle};
-use std::ops::Deref;
-use string_box::StringBox;
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 use crate::paragraph::paragraph::{ParagraphPiece, ParagraphText, ParagraphWithText};
 
@@ -110,7 +109,7 @@ impl ParagraphPieceExtensions {
 impl PlaceholderStyleExtensions {
     #[phlow::view]
     fn info_for(_this: &PlaceholderStyle, view: impl PhlowView) -> impl PhlowView {
-        view.list()
+        view.columned_list()
             .title("Info")
             .priority(5)
             .items::<PlaceholderStyle>(|style| {
@@ -122,25 +121,8 @@ impl PlaceholderStyleExtensions {
                     ("Baseline offset", phlow!(style.baseline_offset)),
                 ])
             })
-            .item_text::<(&str, PhlowObject)>(|each| format!("{}: {}", each.0, each.1.to_string()))
+            .column_item::<(&str, PhlowObject)>("Property", |item| phlow!(item.0))
+            .column_item::<(&str, PhlowObject)>("Value", |item| item.1.clone())
             .send::<(&str, PhlowObject)>(|each| each.1.clone())
     }
-}
-
-#[no_mangle]
-pub fn skia_paragraph_placeholder_style_to_phlow(
-    placeholder_style: *mut ValueBox<PlaceholderStyle>,
-) -> *mut ValueBox<PhlowObject> {
-    placeholder_style
-        .with_clone_ok(|style| phlow!(style))
-        .into_raw()
-}
-
-#[no_mangle]
-pub fn skia_paragraph_with_text_to_phlow(
-    paragraph: *mut ValueBox<ParagraphWithText>,
-) -> *mut ValueBox<PhlowObject> {
-    paragraph
-        .with_clone_ok(|paragraph| phlow!(paragraph))
-        .into_raw()
 }

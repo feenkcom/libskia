@@ -1,53 +1,61 @@
 use skia_safe::scalar;
 use skia_safe::textlayout::{PlaceholderAlignment, PlaceholderStyle};
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_paragraph_placeholder_style_default() -> *mut ValueBox<PlaceholderStyle> {
-    ValueBox::new(PlaceholderStyle::default()).into_raw()
+    value_box!(PlaceholderStyle::default()).into_raw()
 }
 
 #[no_mangle]
 pub fn skia_paragraph_placeholder_style_set_width(
-    placeholder_ptr: *mut ValueBox<PlaceholderStyle>,
+    placeholder_style: *mut ValueBox<PlaceholderStyle>,
     width: scalar,
 ) {
-    placeholder_ptr.with_not_null(|placeholder| {
-        placeholder.width = width;
-    })
+    placeholder_style
+        .with_mut_ok(|placeholder| {
+            placeholder.width = width;
+        })
+        .log();
 }
 
 #[no_mangle]
 pub fn skia_paragraph_placeholder_style_set_height(
-    placeholder_ptr: *mut ValueBox<PlaceholderStyle>,
+    placeholder_style: *mut ValueBox<PlaceholderStyle>,
     height: scalar,
 ) {
-    placeholder_ptr.with_not_null(|placeholder| {
-        placeholder.height = height;
-    })
+    placeholder_style
+        .with_mut_ok(|placeholder| {
+            placeholder.height = height;
+        })
+        .log();
 }
 
 #[no_mangle]
 pub fn skia_paragraph_placeholder_style_set_alignment(
-    placeholder_ptr: *mut ValueBox<PlaceholderStyle>,
+    placeholder_style: *mut ValueBox<PlaceholderStyle>,
     alignment: PlaceholderAlignment,
 ) {
-    placeholder_ptr.with_not_null(|placeholder| {
-        placeholder.alignment = alignment;
-    })
+    placeholder_style
+        .with_mut_ok(|placeholder| {
+            placeholder.alignment = alignment;
+        })
+        .log()
 }
 
 #[no_mangle]
 pub fn skia_paragraph_placeholder_style_set_baseline_offset(
-    placeholder_ptr: *mut ValueBox<PlaceholderStyle>,
+    placeholder_style: *mut ValueBox<PlaceholderStyle>,
     baseline_offset: scalar,
 ) {
-    placeholder_ptr.with_not_null(|placeholder| {
-        placeholder.baseline_offset = baseline_offset;
-    })
+    placeholder_style
+        .with_mut_ok(|placeholder| {
+            placeholder.baseline_offset = baseline_offset;
+        })
+        .log();
 }
 
 #[no_mangle]
-pub fn skia_paragraph_placeholder_style_drop(ptr: *mut ValueBox<PlaceholderStyle>) {
-    ptr.release();
+pub fn skia_paragraph_placeholder_style_drop(placeholder_style: *mut ValueBox<PlaceholderStyle>) {
+    placeholder_style.release();
 }

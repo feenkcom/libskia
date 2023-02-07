@@ -1,6 +1,6 @@
 use array_box::ArrayBox;
 use skia_safe::Color;
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_color_default() -> *mut ValueBox<Color> {
@@ -53,7 +53,7 @@ pub fn skia_color_array_create_with(
     amount: usize,
 ) -> *mut ValueBox<ArrayBox<Color>> {
     color
-        .with_clone_ok(|color| ArrayBox::from_vector(vec![color; amount]))
+        .with_clone_ok(|color| ValueBox::new(ArrayBox::from_vector(vec![color; amount])))
         .into_raw()
 }
 
@@ -79,7 +79,7 @@ pub fn skia_color_array_at(
     array: *mut ValueBox<ArrayBox<Color>>,
     index: usize,
 ) -> *mut ValueBox<Color> {
-    array.with_ref_ok(|array| array.at(index)).into_raw()
+    array.with_ref_ok(|array| ValueBox::new(array.at(index))).into_raw()
 }
 
 #[no_mangle]

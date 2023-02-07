@@ -1,7 +1,7 @@
 use array_box::ArrayBox;
 use reference_box::ReferenceBox;
 use skia_safe::{AlphaType, Canvas, ColorType, IPoint, ISize, Image, ImageInfo, Surface};
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_surface_new_raster_direct(
@@ -44,10 +44,10 @@ pub fn skia_surface_new_default() -> *mut ValueBox<Surface> {
 
 #[no_mangle]
 pub fn skia_surface_new_similar(
-    surface_ptr: *mut ValueBox<Surface>,
+    surface: *mut ValueBox<Surface>,
     ptr_image_info: *mut ValueBox<ImageInfo>,
 ) -> *mut ValueBox<Surface> {
-    surface_ptr.with_not_null_return(std::ptr::null_mut(), |surface| {
+    surface.with_not_null_return(std::ptr::null_mut(), |surface| {
         ptr_image_info.with_not_null_return(std::ptr::null_mut(), |image_info| {
             let surface_option = surface.new_surface(image_info);
             match surface_option {
@@ -63,52 +63,50 @@ pub fn skia_surface_new_similar(
 }
 
 #[no_mangle]
-pub fn skia_surface_get_canvas(surface_ptr: *mut ValueBox<Surface>) -> *mut ReferenceBox<Canvas> {
-    surface_ptr.with_not_null_return(std::ptr::null_mut(), |surface| {
+pub fn skia_surface_get_canvas(surface: *mut ValueBox<Surface>) -> *mut ReferenceBox<Canvas> {
+    surface.with_mut_ok( |surface| {
         ReferenceBox::new(surface.canvas()).into_raw()
-    })
+    }).or_log(std::ptr::null_mut())
 }
 
 #[no_mangle]
-pub fn skia_surface_get_width(surface_ptr: *mut ValueBox<Surface>) -> i32 {
-    surface_ptr.with_not_null_return(0, |surface| surface.width())
+pub fn skia_surface_get_width(surface: *mut ValueBox<Surface>) -> i32 {
+    surface.with_ref_ok(|surface| surface.width()).or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_surface_get_color_type(surface_ptr: *mut ValueBox<Surface>) -> ColorType {
-    surface_ptr.with_not_null_return(ColorType::Unknown, |surface| {
-        surface.image_info().color_type()
-    })
+pub fn skia_surface_get_color_type(surface: *mut ValueBox<Surface>) -> ColorType {
+    surface
+        .with_mut_ok(|surface| surface.image_info().color_type())
+        .or_log(ColorType::Unknown)
 }
 
 #[no_mangle]
-pub fn skia_surface_get_alpha_type(surface_ptr: *mut ValueBox<Surface>) -> AlphaType {
-    surface_ptr.with_not_null_return(AlphaType::Unknown, |surface| {
-        surface.image_info().alpha_type()
-    })
+pub fn skia_surface_get_alpha_type(surface: *mut ValueBox<Surface>) -> AlphaType {
+    surface
+        .with_mut_ok(|surface| surface.image_info().alpha_type())
+        .or_log(AlphaType::Unknown)
 }
 
 #[no_mangle]
-pub fn skia_surface_get_height(surface_ptr: *mut ValueBox<Surface>) -> i32 {
-    surface_ptr.with_not_null_return(0, |surface| surface.height())
+pub fn skia_surface_get_height(surface: *mut ValueBox<Surface>) -> i32 {
+    surface.with_ref_ok(|surface| surface.height()).or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_surface_get_image_info(
-    surface_ptr: *mut ValueBox<Surface>,
-) -> *mut ValueBox<ImageInfo> {
-    surface_ptr
-        .with_mut_ok(|surface| surface.image_info())
-        .or_else(|_| Ok(ImageInfo::default()))
+pub fn skia_surface_get_image_info(surface: *mut ValueBox<Surface>) -> *mut ValueBox<ImageInfo> {
+    surface
+        .with_mut_ok(|surface| value_box!(surface.image_info()))
+        .or_else(|_| Ok(value_box!(ImageInfo::default())))
         .into_raw()
 }
 
 #[no_mangle]
 pub fn skia_surface_read_all_pixels(
-    surface_ptr: *mut ValueBox<Surface>,
+    surface: *mut ValueBox<Surface>,
     pixels_ptr: *mut ValueBox<ArrayBox<u8>>,
 ) -> bool {
-    surface_ptr.with_not_null_return(false, |surface| {
+    surface.with_not_null_return(false, |surface| {
         pixels_ptr.with_not_null_return(false, |pixels| {
             let image_info = surface.image_info();
             let row_bytes = image_info.min_row_bytes();
@@ -118,17 +116,15 @@ pub fn skia_surface_read_all_pixels(
 }
 
 #[no_mangle]
-pub fn skia_surface_get_image_snapshot(
-    surface_ptr: *mut ValueBox<Surface>,
-) -> *mut ValueBox<Image> {
-    surface_ptr.with_not_null_return(std::ptr::null_mut(), |surface| {
+pub fn skia_surface_get_image_snapshot(surface: *mut ValueBox<Surface>) -> *mut ValueBox<Image> {
+    surface.with_not_null_return(std::ptr::null_mut(), |surface| {
         ValueBox::new(surface.image_snapshot()).into_raw()
     })
 }
 
 #[no_mangle]
-pub fn skia_surface_flush(surface_ptr: *mut ValueBox<Surface>) {
-    surface_ptr.with_not_null(|surface| surface.flush_and_submit());
+pub fn skia_surface_flush(surface: *mut ValueBox<Surface>) {
+    surface.with_not_null(|surface| surface.flush_and_submit());
 }
 
 #[no_mangle]

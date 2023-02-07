@@ -1,7 +1,7 @@
 use skia_safe::textlayout::{Decoration, TextStyle};
 use skia_safe::{scalar, Color, FontStyle, Paint};
 use string_box::StringBox;
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_paragraph_text_style_new() -> *mut ValueBox<TextStyle> {
@@ -89,7 +89,7 @@ pub fn skia_paragraph_text_style_get_foreground(
     text_style: *mut ValueBox<TextStyle>,
 ) -> *mut ValueBox<Paint> {
     text_style
-        .with_ref_ok(|text_style| text_style.foreground())
+        .with_ref_ok(|text_style| value_box!(text_style.foreground()))
         .into_raw()
 }
 
@@ -112,7 +112,7 @@ pub fn skia_paragraph_text_style_get_background(
     text_style: *mut ValueBox<TextStyle>,
 ) -> *mut ValueBox<Paint> {
     text_style
-        .with_ref_ok(|text_style| text_style.background())
+        .with_ref_ok(|text_style| value_box!(text_style.background()))
         .into_raw()
 }
 

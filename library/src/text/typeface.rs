@@ -1,7 +1,7 @@
 use skia_safe::font_style::{Slant, Weight, Width};
 use skia_safe::{FontStyle, Typeface};
 use string_box::StringBox;
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_typeface_default() -> *mut ValueBox<Typeface> {
@@ -24,24 +24,22 @@ pub fn skia_typeface_from_name(
 }
 
 #[no_mangle]
-pub fn skia_typeface_clone(typeface_ptr: *mut ValueBox<Typeface>) -> *mut ValueBox<Typeface> {
-    typeface_ptr.with_not_null_value_return(std::ptr::null_mut(), |typeface| {
-        ValueBox::new(typeface).into_raw()
-    })
+pub fn skia_typeface_clone(typeface: *mut ValueBox<Typeface>) -> *mut ValueBox<Typeface> {
+    typeface
+        .with_clone_ok(|typeface| value_box!(typeface))
+        .into_raw()
 }
 
 #[no_mangle]
-pub fn skia_typeface_get_font_style(
-    typeface_ptr: *mut ValueBox<Typeface>,
-) -> *mut ValueBox<FontStyle> {
-    typeface_ptr
-        .with_mut_ok(|typeface| typeface.font_style())
+pub fn skia_typeface_get_font_style(typeface: *mut ValueBox<Typeface>) -> *mut ValueBox<FontStyle> {
+    typeface
+        .with_mut_ok(|typeface| value_box!(typeface.font_style()))
         .or_else(|_| {
-            Ok(FontStyle::new(
+            Ok(value_box!(FontStyle::new(
                 Weight::NORMAL,
                 Width::NORMAL,
                 Slant::Upright,
-            ))
+            )))
         })
         .into_raw()
 }
@@ -58,17 +56,23 @@ pub fn skia_typeface_get_family_name(
 
 #[no_mangle]
 pub fn skia_typeface_is_bold(typeface_ptr: *mut ValueBox<Typeface>) -> bool {
-    typeface_ptr.with_not_null_return(false, |typeface| typeface.is_bold())
+    typeface_ptr
+        .with_ref_ok(|typeface| typeface.is_bold())
+        .or_log(false)
 }
 
 #[no_mangle]
 pub fn skia_typeface_is_italic(typeface_ptr: *mut ValueBox<Typeface>) -> bool {
-    typeface_ptr.with_not_null_return(false, |typeface| typeface.is_italic())
+    typeface_ptr
+        .with_ref_ok(|typeface| typeface.is_italic())
+        .or_log(false)
 }
 
 #[no_mangle]
 pub fn skia_typeface_is_fixed_pitch(typeface_ptr: *mut ValueBox<Typeface>) -> bool {
-    typeface_ptr.with_not_null_return(false, |typeface| typeface.is_fixed_pitch())
+    typeface_ptr
+        .with_ref_ok(|typeface| typeface.is_fixed_pitch())
+        .or_log(false)
 }
 
 #[no_mangle]
