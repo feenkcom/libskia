@@ -75,12 +75,15 @@ features = [
 uikit-sys = { git = "https://github.com/syrel/uikit-sys" }
 objc = "0.2"
 
+[target.'cfg(target_os="linux")'.dependencies]
+x11 = { version = "2.21", features = ["xlib", "glx"], optional = true }
+
 [features]
 textlayout = ["skia-safe/textlayout"]
 gl = ["skia-safe/gl"]
 d3d = ["skia-safe/d3d", "windows" ]
 angle = ["gl", "mozangle"]
-x11 = ["skia-safe/x11"]
+x11 = ["skia-safe/x11", "dep:x11"]
 shaper = ["skia-safe/shaper"]
 default = ["gl", "textlayout"]
 skia_windows = [ "d3d", "angle" ]

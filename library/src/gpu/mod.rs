@@ -32,4 +32,7 @@ pub use self::angle::*;
 
 mod platform_compositor;
 
+#[cfg(feature = "x11")]
+mod gl_x11;
+
 pub use platform_compositor::*;
