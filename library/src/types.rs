@@ -13,7 +13,8 @@ pub fn skia_scalar_name(string: *mut ValueBox<StringBox>) {
 
 #[no_mangle]
 pub fn skia_glyph_id_name(string: *mut ValueBox<StringBox>) {
-    string.with_mut_ok(|string| string.set_string(skia_safe::GlyphId::type_name()))
+    string
+        .with_mut_ok(|string| string.set_string(skia_safe::GlyphId::type_name()))
         .log();
 }
 

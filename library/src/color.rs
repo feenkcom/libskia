@@ -79,7 +79,9 @@ pub fn skia_color_array_at(
     array: *mut ValueBox<ArrayBox<Color>>,
     index: usize,
 ) -> *mut ValueBox<Color> {
-    array.with_ref_ok(|array| ValueBox::new(array.at(index))).into_raw()
+    array
+        .with_ref_ok(|array| ValueBox::new(array.at(index)))
+        .into_raw()
 }
 
 #[no_mangle]

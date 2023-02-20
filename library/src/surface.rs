@@ -64,9 +64,9 @@ pub fn skia_surface_new_similar(
 
 #[no_mangle]
 pub fn skia_surface_get_canvas(surface: *mut ValueBox<Surface>) -> *mut ReferenceBox<Canvas> {
-    surface.with_mut_ok( |surface| {
-        ReferenceBox::new(surface.canvas()).into_raw()
-    }).or_log(std::ptr::null_mut())
+    surface
+        .with_mut_ok(|surface| ReferenceBox::new(surface.canvas()).into_raw())
+        .or_log(std::ptr::null_mut())
 }
 
 #[no_mangle]
