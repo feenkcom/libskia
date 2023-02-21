@@ -1,3 +1,16 @@
+pub use platform_compositor::*;
+
+#[cfg(feature = "angle")]
+pub use self::angle::*;
+#[cfg(feature = "d3d")]
+pub use self::d3d::*;
+#[cfg(feature = "x11")]
+pub use self::gl_x11::*;
+#[cfg(all(feature = "metal", target_os = "ios"))]
+pub use self::metal_ios::*;
+#[cfg(all(feature = "metal", target_os = "macos"))]
+pub use self::metal_macos::*;
+
 pub mod backend_render_target;
 pub mod backend_texture;
 pub mod context;
@@ -18,21 +31,7 @@ pub mod angle;
 #[cfg(feature = "angle")]
 pub mod angle_utils;
 
-#[cfg(all(feature = "metal", target_os = "macos"))]
-pub use self::metal_macos::*;
-
-#[cfg(all(feature = "metal", target_os = "ios"))]
-pub use self::metal_ios::*;
-
-#[cfg(feature = "d3d")]
-pub use self::d3d::*;
-
-#[cfg(feature = "angle")]
-pub use self::angle::*;
-
 mod platform_compositor;
 
 #[cfg(feature = "x11")]
-mod gl_x11;
-
-pub use platform_compositor::*;
+pub mod gl_x11;

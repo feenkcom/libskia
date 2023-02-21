@@ -119,6 +119,8 @@ pub enum PlatformContext {
     D3D(crate::gpu::D3D12Context),
     #[cfg(feature = "angle")]
     Angle(crate::gpu::AngleContext),
+    #[cfg(feature = "x11")]
+    XlibGl(crate::gpu::XlibGlWindowContext),
     Unsupported,
 }
 
@@ -131,6 +133,8 @@ impl PlatformContext {
             PlatformContext::D3D(context) => context.with_surface(callback),
             #[cfg(feature = "angle")]
             PlatformContext::Angle(context) => context.with_surface(callback),
+            #[cfg(feature = "x11")]
+            PlatformContext::XlibGl(context) => context.with_surface(callback),
             PlatformContext::Unsupported => {}
         }
     }
@@ -145,6 +149,10 @@ impl PlatformContext {
             PlatformContext::Angle(context) => context
                 .resize(size.width, size.height)
                 .unwrap_or_else(|error| error!("{}", error)),
+            #[cfg(feature = "x11")]
+            PlatformContext::XlibGl(context) => context
+                .resize_surface(size)
+                .unwrap_or_else(|error| error!("Failed to resize surface: {:?}", error)),
             PlatformContext::Unsupported => {}
         }
     }

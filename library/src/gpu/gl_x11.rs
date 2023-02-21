@@ -1,22 +1,27 @@
 use skia_safe::gpu::gl::{Enum, FramebufferInfo, Interface, UInt};
 use skia_safe::gpu::{BackendRenderTarget, ContextOptions, DirectContext, SurfaceOrigin};
 use skia_safe::{ColorType, ISize, Surface};
+use std::error::Error;
 use std::ffi::{c_void, CString};
+use std::fmt::{Display, Formatter};
 use std::os::raw::{c_int, c_ulong};
+use std::ptr::{slice_from_raw_parts, slice_from_raw_parts_mut};
 use std::sync::Mutex;
+use value_box::{BoxerError, ValueBox, ValueBoxIntoRaw};
 
+use crate::gpu::{PlatformCompositor, PlatformContext};
 use x11::glx;
 use x11::glx::{GLXContext, GLXFBConfig};
 use x11::xlib;
+use x11::xlib::XWindowAttributes;
 
 pub type GLenum = i32;
 pub type GLint = i32;
 pub type GLuint = u32;
+pub type GLsizei = u32;
 
 #[derive(Clone, Debug)]
 pub struct GlConfig {
-    pub version: (u8, u8),
-    pub profile: Profile,
     pub red_bits: u8,
     pub blue_bits: u8,
     pub green_bits: u8,
@@ -29,15 +34,17 @@ pub struct GlConfig {
     pub vsync: bool,
 }
 
+//   visual  x   bf lv rg d st  colorbuffer  sr ax dp st accumbuffer  ms  cav
+//   id dep cl sp  sz l  ci b ro  r  g  b  a F gb bf th cl  r  g  b  a ns b eat
+// ----------------------------------------------------------------------------
+// 0x05e 24 tc  0  24  0 r  y .   8  8  8  0 .  s  4 24  8 16 16 16 16  0 0 None
 impl Default for GlConfig {
     fn default() -> Self {
         GlConfig {
-            version: (3, 2),
-            profile: Profile::Core,
             red_bits: 8,
             blue_bits: 8,
             green_bits: 8,
-            alpha_bits: 8,
+            alpha_bits: 0,
             depth_bits: 24,
             stencil_bits: 8,
             samples: None,
@@ -58,9 +65,17 @@ pub enum Profile {
 pub enum GlError {
     InvalidWindowHandle,
     VersionNotSupported,
-    CreationFailed,
+    CreationFailed(String),
     FunctionNotFound(String),
 }
+
+impl Display for GlError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl Error for GlError {}
 
 // See https://www.khronos.org/registry/OpenGL/extensions/ARB/GLX_ARB_create_context.txt
 
@@ -78,9 +93,11 @@ type GlXSwapIntervalEXT =
 
 // See https://registry.khronos.org/OpenGL-Refpages/gl4/html/glGet.xhtml
 type GlGetIntegerv = unsafe extern "C" fn(pname: GLenum, data: *mut GLint);
+// https://registry.khronos.org/OpenGL-Refpages/es2.0/xhtml/glClearStencil.xml
+type GlClearStencil = unsafe extern "C" fn(s: GLint);
+type GlViewport = unsafe extern "C" fn(x: GLint, y: GLint, width: GLsizei, height: GLsizei);
 
 // See https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_framebuffer_sRGB.txt
-
 const GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB: i32 = 0x20B2;
 
 // See https://chromium.googlesource.com/external/skia/gpu/+/refs/heads/master/include/GrGLDefines.h
@@ -120,7 +137,8 @@ fn get_proc_address_arb(symbol: &str) -> Result<*const c_void, GlError> {
     }
 }
 
-pub struct GlWindowContext {
+#[derive(Debug)]
+pub struct XlibGlWindowContext {
     display: *mut xlib::Display,
     window: c_ulong,
     gl: Gl,
@@ -130,10 +148,13 @@ pub struct GlWindowContext {
     height: i32,
 }
 
+#[derive(Debug)]
 struct Gl {
     glx_create_context_attribs_arb: Option<GlXCreateContextAttribsARB>,
     glx_swap_interval_ext: Option<GlXSwapIntervalEXT>,
     gl_get_integerv: GlGetIntegerv,
+    gl_clear_stencil: GlClearStencil,
+    gl_viewport: GlViewport,
 }
 
 impl Gl {
@@ -147,18 +168,22 @@ impl Gl {
                 .ok(),
             gl_get_integerv: get_proc_address("glGetIntegerv")
                 .map(|addr| unsafe { std::mem::transmute(addr) })?,
+            gl_clear_stencil: get_proc_address("glClearStencil")
+                .map(|addr| unsafe { std::mem::transmute(addr) })?,
+            gl_viewport: get_proc_address("glViewport")
+                .map(|addr| unsafe { std::mem::transmute(addr) })?,
         })
     }
 }
 
-impl GlWindowContext {
-    pub unsafe fn create(
-        window: c_ulong,
+impl XlibGlWindowContext {
+    pub fn create(
         display: *mut c_void,
+        window: c_ulong,
         width: i32,
         height: i32,
         config: GlConfig,
-    ) -> Result<GlWindowContext, GlError> {
+    ) -> Result<XlibGlWindowContext, GlError> {
         if display.is_null() {
             return Err(GlError::InvalidWindowHandle);
         }
@@ -166,7 +191,7 @@ impl GlWindowContext {
         let display = display as *mut xlib::_XDisplay;
         let gl = Gl::new()?;
 
-        Ok(GlWindowContext {
+        Ok(XlibGlWindowContext {
             display,
             window,
             gl,
@@ -182,21 +207,17 @@ impl GlWindowContext {
 
         if let Some(surface) = self.get_surface() {
             callback(surface);
+            surface.flush_and_submit();
         }
         self.swap_buffers();
     }
 
-    pub fn resize_surface(&mut self, size: ISize) {
+    pub fn resize_surface(&mut self, size: ISize) -> Result<(), GlError> {
         self.width = size.width;
         self.height = size.height;
 
         self.destroy_context();
-        match self.initialize_context() {
-            Ok(_) => {}
-            Err(error) => {
-                error!("Failed to initialize context: {:?}", error);
-            }
-        }
+        self.initialize_context()
     }
 
     fn make_current(&mut self) {
@@ -237,24 +258,48 @@ impl GlWindowContext {
     }
 
     fn initialize_context(&mut self) -> Result<(), GlError> {
+        info!("Trying to initialize context for {:?}", self);
+
+        let visual_id = {
+            let mut attributes = XWindowAttributes {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0,
+                border_width: 0,
+                depth: 0,
+                visual: std::ptr::null_mut(),
+                root: 0,
+                class: 0,
+                bit_gravity: 0,
+                win_gravity: 0,
+                backing_store: 0,
+                backing_planes: 0,
+                backing_pixel: 0,
+                save_under: 0,
+                colormap: 0,
+                map_installed: 0,
+                map_state: 0,
+                all_event_masks: 0,
+                your_event_mask: 0,
+                do_not_propagate_mask: 0,
+                override_redirect: 0,
+                screen: std::ptr::null_mut(),
+            };
+            unsafe { xlib::XGetWindowAttributes(self.display, self.window, &mut attributes) };
+            let visual = unsafe { &*attributes.visual };
+            let visual_id = visual.visualid;
+            drop(attributes);
+            visual_id
+        };
+
         let screen = unsafe { xlib::XDefaultScreen(self.display) };
 
         #[rustfmt::skip]
         let fb_attribs = [
+            glx::GLX_VISUAL_ID, visual_id.try_into().unwrap(),
             glx::GLX_X_RENDERABLE, 1,
-            glx::GLX_X_VISUAL_TYPE, glx::GLX_TRUE_COLOR,
             glx::GLX_DRAWABLE_TYPE, glx::GLX_WINDOW_BIT,
-            glx::GLX_RENDER_TYPE, glx::GLX_RGBA_BIT,
-            glx::GLX_RED_SIZE, self.config.red_bits as i32,
-            glx::GLX_GREEN_SIZE, self.config.green_bits as i32,
-            glx::GLX_BLUE_SIZE, self.config.blue_bits as i32,
-            glx::GLX_ALPHA_SIZE, self.config.alpha_bits as i32,
-            glx::GLX_DEPTH_SIZE, self.config.depth_bits as i32,
-            glx::GLX_STENCIL_SIZE, self.config.stencil_bits as i32,
-            glx::GLX_DOUBLEBUFFER, self.config.double_buffer as i32,
-            glx::GLX_SAMPLE_BUFFERS, self.config.samples.is_some() as i32,
-            glx::GLX_SAMPLES, self.config.samples.unwrap_or(0) as i32,
-            GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB, self.config.srgb as i32,
             0,
         ];
 
@@ -285,6 +330,7 @@ impl GlWindowContext {
     }
 }
 
+#[derive(Debug)]
 struct GlContext {
     display: *mut xlib::Display,
     window: c_ulong,
@@ -311,9 +357,12 @@ impl GlContext {
                 let prev_callback = xlib::XSetErrorHandler(Some(err_handler));
                 for (major, minor) in Self::versions().iter().rev() {
                     for profile in Self::profiles() {
+                        if !glx_context.is_null() {
+                            break;
+                        }
                         *GL_CTX_ERROR_OCCURRED.lock().unwrap() = false;
                         #[rustfmt::skip]
-                            let ctx_attribs = [
+                        let ctx_attribs = [
                             glx::arb::GLX_CONTEXT_MAJOR_VERSION_ARB, *major as i32,
                             glx::arb::GLX_CONTEXT_MINOR_VERSION_ARB, *minor as i32,
                             glx::arb::GLX_CONTEXT_PROFILE_MASK_ARB, *profile as i32,
@@ -331,6 +380,10 @@ impl GlContext {
                         // // Sync to ensure any errors generated are processed.
                         xlib::XSync(display, 0);
                         if *GL_CTX_ERROR_OCCURRED.lock().unwrap() {
+                            continue;
+                        }
+
+                        if glx_context.is_null() {
                             continue;
                         }
 
@@ -352,9 +405,6 @@ impl GlContext {
                                 }
                             }
                         }
-                        if !glx_context.is_null() {
-                            break;
-                        }
                     }
                 }
                 xlib::XSetErrorHandler(prev_callback);
@@ -362,24 +412,45 @@ impl GlContext {
         }
 
         if glx_context.is_null() {
-            return Err(GlError::CreationFailed);
+            return Err(GlError::CreationFailed(
+                "Could not instantiate glx context".to_string(),
+            ));
         }
 
         if !current && glx::glXMakeCurrent(display, window, glx_context) == 0 {
             glx::glXDestroyContext(display, glx_context);
-            return Err(GlError::CreationFailed);
+            return Err(GlError::CreationFailed(
+                "Failed to make glx context current".to_string(),
+            ));
         }
 
         if let Some(ref glx_swap_interval_ext) = gl.glx_swap_interval_ext {
             (glx_swap_interval_ext)(display, window, if config.vsync { 1 } else { 0 });
         }
 
+        let (mut root, mut x, mut y, mut width, mut height, mut border_width, mut depth) =
+            (0, 0, 0, 0, 0, 0, 0);
+        xlib::XGetGeometry(
+            display,
+            window,
+            &mut root,
+            &mut x,
+            &mut y,
+            &mut width,
+            &mut height,
+            &mut border_width,
+            &mut depth,
+        );
+        (gl.gl_viewport)(0, 0, width, height);
+
         if interface.is_none() {
             interface = Interface::new_native();
         }
 
         match interface {
-            None => Err(GlError::CreationFailed),
+            None => Err(GlError::CreationFailed(
+                "Could not instantiate native Interface".to_string(),
+            )),
             Some(interface) => Ok(Self {
                 display,
                 window,
@@ -395,7 +466,9 @@ impl GlContext {
         let context_options = ContextOptions::default();
         let direct_context = DirectContext::new_gl(self.backend_context.clone(), &context_options);
         if direct_context.is_none() {
-            return Err(GlError::CreationFailed);
+            return Err(GlError::CreationFailed(
+                "Failed to create direct context".to_string(),
+            ));
         }
         self.direct_context = direct_context;
         Ok(())
@@ -441,12 +514,16 @@ impl GlContext {
         if self.surface.is_some() {
             Ok(())
         } else {
-            Err(GlError::CreationFailed)
+            Err(GlError::CreationFailed(
+                "Failed to create skia Surface".to_string(),
+            ))
         }
     }
 
     unsafe fn make_current(&self) {
-        glx::glXMakeCurrent(self.display, self.window, self.glx_context);
+        if glx::glXMakeCurrent(self.display, self.window, self.glx_context) == 0 {
+            error!("Failed to make context current");
+        }
     }
 
     unsafe fn make_not_current(&self) {
@@ -496,4 +573,24 @@ impl Drop for GlContext {
     fn drop(&mut self) {
         unsafe { self.destroy_context() };
     }
+}
+
+#[no_mangle]
+pub fn skia_xlib_gl_compositor_new_size(
+    display: *mut c_void,
+    window: c_ulong,
+    width: u32,
+    height: u32,
+) -> *mut ValueBox<PlatformCompositor> {
+    XlibGlWindowContext::create(
+        display,
+        window,
+        width as i32,
+        height as i32,
+        GlConfig::default(),
+    )
+    .and_then(|mut context| context.initialize_context().map(|_| context))
+    .map(|context| ValueBox::new(PlatformCompositor::new(PlatformContext::XlibGl(context))))
+    .map_err(|error| BoxerError::AnyError(Box::new(error).into()))
+    .into_raw()
 }
