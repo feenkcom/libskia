@@ -4,6 +4,8 @@ pub use platform_compositor::*;
 pub use self::angle::*;
 #[cfg(feature = "d3d")]
 pub use self::d3d::*;
+#[cfg(all(feature = "egl", target_os = "android"))]
+pub use self::egl_android::*;
 #[cfg(feature = "x11")]
 pub use self::gl_x11::*;
 #[cfg(all(feature = "metal", target_os = "ios"))]
@@ -33,5 +35,7 @@ pub mod angle_utils;
 
 mod platform_compositor;
 
+#[cfg(all(feature = "egl", target_os = "android"))]
+mod egl_android;
 #[cfg(feature = "x11")]
 pub mod gl_x11;
