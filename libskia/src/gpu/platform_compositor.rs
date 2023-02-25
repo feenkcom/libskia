@@ -138,7 +138,9 @@ impl PlatformContext {
             #[cfg(feature = "x11")]
             PlatformContext::XlibGl(context) => context.with_surface(callback),
             #[cfg(feature = "egl")]
-            PlatformContext::Egl(context) => {}
+            PlatformContext::Egl(context) => context
+                .with_surface(callback)
+                .unwrap_or_else(|error| error!("Failed to draw on a surface: {}", error)),
             PlatformContext::Unsupported => {}
         }
     }
@@ -158,7 +160,9 @@ impl PlatformContext {
                 .resize_surface(size)
                 .unwrap_or_else(|error| error!("Failed to resize surface: {:?}", error)),
             #[cfg(feature = "egl")]
-            PlatformContext::Egl(context) => {}
+            PlatformContext::Egl(context) => context
+                .resize_surface(size)
+                .unwrap_or_else(|error| error!("Failed to resize surface: {:?}", error)),
             PlatformContext::Unsupported => {}
         }
     }

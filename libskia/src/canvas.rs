@@ -90,9 +90,11 @@ pub fn skia_canvas_draw_line(
     paint_ptr: *mut ValueBox<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        paint_ptr.with_not_null(|paint| {
-            canvas.draw_line(Point::new(from_x, from_y), Point::new(to_x, to_y), paint);
-        });
+        paint_ptr
+            .with_ref_ok(|paint| {
+                canvas.draw_line(Point::new(from_x, from_y), Point::new(to_x, to_y), paint);
+            })
+            .log();
     });
 }
 
@@ -106,9 +108,11 @@ pub fn skia_canvas_draw_rectangle(
     paint_ptr: *mut ValueBox<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        paint_ptr.with_not_null(|paint| {
-            canvas.draw_rect(Rect::new(left, top, right, bottom), paint);
-        });
+        paint_ptr
+            .with_ref_ok(|paint| {
+                canvas.draw_rect(Rect::new(left, top, right, bottom), paint);
+            })
+            .log();
     });
 }
 
@@ -122,9 +126,11 @@ pub fn skia_canvas_draw_oval(
     paint_ptr: *mut ValueBox<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        paint_ptr.with_not_null(|paint| {
-            canvas.draw_oval(Rect::new(left, top, right, bottom), paint);
-        });
+        paint_ptr
+            .with_ref_ok(|paint| {
+                canvas.draw_oval(Rect::new(left, top, right, bottom), paint);
+            })
+            .log();
     });
 }
 
@@ -137,9 +143,11 @@ pub fn skia_canvas_draw_circle(
     paint_ptr: *mut ValueBox<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        paint_ptr.with_not_null(|paint| {
-            canvas.draw_circle(Point::new(center_x, center_y), radius, paint);
-        });
+        paint_ptr
+            .with_ref_ok(|paint| {
+                canvas.draw_circle(Point::new(center_x, center_y), radius, paint);
+            })
+            .log();
     });
 }
 
@@ -150,11 +158,13 @@ pub fn skia_canvas_draw_rrect(
     paint_ptr: *mut ValueBox<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        rrect_ptr.with_not_null(|rrect| {
-            paint_ptr.with_not_null(|paint| {
-                canvas.draw_rrect(rrect, paint);
-            });
-        });
+        rrect_ptr
+            .with_ref(|rrect| {
+                paint_ptr.with_ref_ok(|paint| {
+                    canvas.draw_rrect(rrect, paint);
+                })
+            })
+            .log();
     });
 }
 
@@ -172,34 +182,36 @@ pub fn skia_canvas_draw_rounded_rectangle(
     paint_ptr: *mut ValueBox<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        paint_ptr.with_not_null(|paint| {
-            // if all radii are same we can use a simpler optimized drawing method
-            if r_top_left.approx_eq_ulps(&r_top_right, 2)
-                && r_top_right.approx_eq_ulps(&r_bottom_right, 2)
-                && r_bottom_right.approx_eq_ulps(&r_bottom_left, 2)
-                && r_bottom_left.approx_eq_ulps(&r_top_left, 2)
-            {
-                canvas.draw_round_rect(
-                    Rect::new(left, top, right, bottom),
-                    r_top_right,
-                    r_top_right,
-                    paint,
-                );
-            } else {
-                canvas.draw_rrect(
-                    RRect::new_rect_radii(
+        paint_ptr
+            .with_ref_ok(|paint| {
+                // if all radii are same we can use a simpler optimized drawing method
+                if r_top_left.approx_eq_ulps(&r_top_right, 2)
+                    && r_top_right.approx_eq_ulps(&r_bottom_right, 2)
+                    && r_bottom_right.approx_eq_ulps(&r_bottom_left, 2)
+                    && r_bottom_left.approx_eq_ulps(&r_top_left, 2)
+                {
+                    canvas.draw_round_rect(
                         Rect::new(left, top, right, bottom),
-                        &[
-                            Vector::new(r_top_left, r_top_left),
-                            Vector::new(r_top_right, r_top_right),
-                            Vector::new(r_bottom_right, r_bottom_right),
-                            Vector::new(r_bottom_left, r_bottom_left),
-                        ],
-                    ),
-                    paint,
-                );
-            };
-        });
+                        r_top_right,
+                        r_top_right,
+                        paint,
+                    );
+                } else {
+                    canvas.draw_rrect(
+                        RRect::new_rect_radii(
+                            Rect::new(left, top, right, bottom),
+                            &[
+                                Vector::new(r_top_left, r_top_left),
+                                Vector::new(r_top_right, r_top_right),
+                                Vector::new(r_bottom_right, r_bottom_right),
+                                Vector::new(r_bottom_left, r_bottom_left),
+                            ],
+                        ),
+                        paint,
+                    );
+                };
+            })
+            .log();
     });
 }
 
@@ -210,11 +222,13 @@ pub fn skia_canvas_draw_path(
     paint_ptr: *mut ValueBox<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        paint_ptr.with_not_null(|paint| {
-            path_ptr.with_not_null(|path| {
-                canvas.draw_path(path, paint);
+        paint_ptr
+            .with_ref(|paint| {
+                path_ptr.with_ref_ok(|path| {
+                    canvas.draw_path(path, paint);
+                })
             })
-        });
+            .log();
     });
 }
 
@@ -227,12 +241,14 @@ pub fn skia_canvas_draw_text_blob(
     paint_ptr: *mut ValueBox<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        paint_ptr.with_not_null(|paint| {
-            // text blob can be nil if it was created from an empty string
-            text_blob_ptr.with_not_null(|text_blob| {
-                canvas.draw_text_blob(text_blob, Point::new(x, y), paint);
+        paint_ptr
+            .with_ref(|paint| {
+                // text blob can be nil if it was created from an empty string
+                text_blob_ptr.with_ref_ok(|text_blob| {
+                    canvas.draw_text_blob(text_blob, Point::new(x, y), paint);
+                })
             })
-        });
+            .log();
     });
 }
 
@@ -248,25 +264,27 @@ pub fn skia_canvas_draw_shadow(
     _bit_flags: u32,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        path_ptr.with_not_null(|path| {
-            z_plane_ptr.with_not_null_value(|z_plane| {
-                light_pos_ptr.with_not_null_value(|light_pos| {
-                    ambient_color_ptr.with_not_null_value(|ambient_color| {
-                        spot_color_ptr.with_not_null_value(|spot_color| {
-                            canvas.draw_shadow(
-                                path,
-                                z_plane,
-                                light_pos,
-                                light_radius,
-                                ambient_color,
-                                spot_color,
-                                ShadowFlags::ALL, /*from_bits_truncate(bit_flags)*/
-                            );
+        path_ptr
+            .with_ref(|path| {
+                z_plane_ptr.with_clone(|z_plane| {
+                    light_pos_ptr.with_clone(|light_pos| {
+                        ambient_color_ptr.with_clone(|ambient_color| {
+                            spot_color_ptr.with_clone_ok(|spot_color| {
+                                canvas.draw_shadow(
+                                    path,
+                                    z_plane,
+                                    light_pos,
+                                    light_radius,
+                                    ambient_color,
+                                    spot_color,
+                                    ShadowFlags::ALL, /*from_bits_truncate(bit_flags)*/
+                                );
+                            })
                         })
                     })
                 })
             })
-        })
+            .log();
     })
 }
 
@@ -281,7 +299,7 @@ pub fn skia_canvas_draw_image(
     canvas_ptr.with_not_null(|canvas| {
         image_ptr
             .with_ref(|image| {
-                if paint_ptr.is_valid() {
+                if paint_ptr.has_value() {
                     paint_ptr.with_ref_ok(|paint| {
                         canvas.draw_image(image, Point::new(x, y), Some(paint));
                     })
@@ -333,9 +351,11 @@ pub fn skia_canvas_concat_matrix(
     matrix_ptr: *mut ValueBox<Matrix>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        matrix_ptr.with_not_null(|matrix| {
-            canvas.concat(matrix);
-        })
+        matrix_ptr
+            .with_ref_ok(|matrix| {
+                canvas.concat(matrix);
+            })
+            .log()
     });
 }
 
@@ -345,9 +365,11 @@ pub fn skia_canvas_set_matrix(
     matrix_ptr: *mut ValueBox<Matrix>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        matrix_ptr.with_not_null(|matrix| {
-            canvas.set_matrix(&M44::from(matrix as &Matrix));
-        })
+        matrix_ptr
+            .with_ref_ok(|matrix| {
+                canvas.set_matrix(&M44::from(matrix));
+            })
+            .log();
     });
 }
 
@@ -357,12 +379,14 @@ pub fn skia_canvas_get_matrix(
     matrix_ptr: *mut ValueBox<Matrix>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        matrix_ptr.with_not_null(|matrix| {
-            let m = canvas.local_to_device_as_3x3();
-            let mut buffer: [scalar; 9] = [0.0; 9];
-            m.get_9(&mut buffer);
-            matrix.set_9(&buffer);
-        })
+        matrix_ptr
+            .with_mut_ok(|matrix| {
+                let m = canvas.local_to_device_as_3x3();
+                let mut buffer: [scalar; 9] = [0.0; 9];
+                m.get_9(&mut buffer);
+                matrix.set_9(&buffer);
+            })
+            .log();
     });
 }
 
@@ -375,7 +399,9 @@ pub fn skia_canvas_reset_matrix(canvas_ptr: *mut ReferenceBox<Canvas>) {
 
 #[no_mangle]
 #[deprecated(since = "0.38.0", note = "Replace usage with DirectContext::flush()")]
-pub fn skia_canvas_flush(_canvas_ptr: *mut ReferenceBox<Canvas>) {}
+pub fn skia_canvas_flush(_canvas_ptr: *mut ReferenceBox<Canvas>) {
+    eprintln!("skia_canvas_flush is deprecated. Use DirectContext::flush() instead")
+}
 
 #[no_mangle]
 pub fn skia_canvas_save(canvas_ptr: *mut ReferenceBox<Canvas>) -> usize {
@@ -407,16 +433,18 @@ pub fn skia_canvas_save_layer(
     _save_layer_ptr: *mut ValueBox<SaveLayerRecWrapper>,
 ) -> usize {
     canvas_ptr.with_not_null_return(0, |canvas| {
-        _save_layer_ptr.with_not_null_return(0, |save_rec| {
-            let mut rec: SaveLayerRec = SaveLayerRec::default();
-            if save_rec.bounds.is_some() {
-                rec = rec.bounds(save_rec.bounds.as_ref().unwrap())
-            };
-            if save_rec.paint.is_some() {
-                rec = rec.paint(save_rec.paint.as_ref().unwrap())
-            };
-            canvas.save_layer(&rec)
-        })
+        _save_layer_ptr
+            .with_ref_ok(|save_rec| {
+                let mut rec: SaveLayerRec = SaveLayerRec::default();
+                if save_rec.bounds.is_some() {
+                    rec = rec.bounds(save_rec.bounds.as_ref().unwrap())
+                };
+                if save_rec.paint.is_some() {
+                    rec = rec.paint(save_rec.paint.as_ref().unwrap())
+                };
+                canvas.save_layer(&rec)
+            })
+            .or_log(0)
     })
 }
 

@@ -2,9 +2,8 @@
 resolver = "2"
 
 members = [
-    "library",
-    "shared-library-builder/library",
-    "shared-library-builder/builder",
+    "libskia",
+    "libskia-builder",
 ]
 
 exclude = [ "target" ]

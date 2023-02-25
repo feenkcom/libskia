@@ -15,10 +15,10 @@ use x11::glx::{GLXContext, GLXFBConfig};
 use x11::xlib;
 use x11::xlib::XWindowAttributes;
 
-pub type GLenum = i32;
-pub type GLint = i32;
-pub type GLuint = u32;
-pub type GLsizei = u32;
+type GLenum = i32;
+type GLint = i32;
+type GLuint = u32;
+type GLsizei = u32;
 
 #[derive(Clone, Debug)]
 pub struct GlConfig {

@@ -22,6 +22,10 @@ pub fn libskia(target: LibraryTarget, version: Option<impl Into<String>>) -> Rus
         library = library.feature("skia_linux");
     };
 
+    if target.is_android() {
+        library = library.feature("skia_android");
+    };
+
     library
 }
 

@@ -1,20 +1,20 @@
 [package]
 name = "libskia"
-version = "0.1.0"
-authors = ["Aliaksei Syrel <alex.syrel@gmail.com>"]
+version = "0.2.0"
+authors = ["feenk gmbh <contact@feenk.com>"]
 edition = "2021"
 
 [dependencies]
 skia-safe = ">=0.55.0"
 typename = "0.1"
-float-cmp = "0.6"
-ordered-float = "1.0"
+float-cmp = "0.9"
+ordered-float = "3.4"
 libc = "0.2"
 crossbeam = "0.8"
 num_cpus = "1.0"
 byteorder = "1.3"
-num_enum = "0.4"
-widestring = "0.4"
+num_enum = "0.5"
+widestring = "1.0"
 log = "0.4"
 env_logger = "0.10"
 fps_counter = "2.0"
@@ -75,7 +75,8 @@ uikit-sys = { git = "https://github.com/syrel/uikit-sys" }
 objc = "0.2"
 
 [target.'cfg(target_os="android")'.dependencies]
-ndk = { version = "0.7", optional = true }
+khronos-egl = { version = "4.1", features = ["dynamic"], optional = true }
+libloading = {version = "0.7", optional = true }
 
 [target.'cfg(target_os="linux")'.dependencies]
 x11 = { version = "2.21", features = ["xlib", "glx"], optional = true }
@@ -86,14 +87,14 @@ gl = ["skia-safe/gl"]
 d3d = ["skia-safe/d3d", "windows" ]
 angle = ["gl", "mozangle"]
 x11 = ["skia-safe/x11", "dep:x11"]
-egl = ["skia-safe/egl"]
+egl = ["skia-safe/egl", "khronos-egl", "libloading" ]
 shaper = ["skia-safe/shaper"]
 default = ["gl", "textlayout"]
 skia_windows = [ "d3d", "angle" ]
 skia_mac = ["skia-safe/metal", "metal", "cocoa", "foreign-types-shared", "core-graphics-types" ]
 skia_linux = ["x11", "shaper"]
-skia_android = [ "shaper", "dep:ndk", "egl" ]
+skia_android = [ "shaper", "egl" ]
 
 [lib]
 name = "Skia"
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "lib"]

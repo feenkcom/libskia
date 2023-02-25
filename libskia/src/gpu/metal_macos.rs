@@ -1,6 +1,7 @@
 use crate::gpu::platform_compositor::{PlatformCompositor, PlatformContext};
 use cocoa::appkit::NSView;
 use cocoa::base::{id as cocoa_id, YES};
+use std::ffi::c_void;
 
 use core_graphics_types::geometry::CGSize;
 use foreign_types_shared::{ForeignType, ForeignTypeRef};
@@ -110,12 +111,15 @@ impl MetalContext {
 
 #[no_mangle]
 pub fn skia_metal_compositor_new_size(
-    ns_view: cocoa_id,
+    ns_view: *mut c_void,
     width: u32,
     height: u32,
 ) -> *mut ValueBox<PlatformCompositor> {
     ValueBox::new(PlatformCompositor::new(PlatformContext::Metal(
-        MetalContext::new(ns_view, Some(CGSize::new(width.into(), height.into()))),
+        MetalContext::new(
+            ns_view as cocoa_id,
+            Some(CGSize::new(width.into(), height.into())),
+        ),
     )))
     .into_raw()
 }

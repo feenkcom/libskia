@@ -1,6 +1,6 @@
 use skia_safe::paint::{Cap, Join, Style};
 use skia_safe::{scalar, BlendMode, Color, ImageFilter, Paint, PathEffect, Shader};
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_paint_default() -> *mut ValueBox<Paint> {
@@ -9,26 +9,34 @@ pub fn skia_paint_default() -> *mut ValueBox<Paint> {
 
 #[no_mangle]
 pub fn skia_paint_reset(paint_ptr: *mut ValueBox<Paint>) {
-    paint_ptr.with_not_null(|paint| {
-        paint.reset();
-    });
+    paint_ptr
+        .with_mut_ok(|paint| {
+            paint.reset();
+        })
+        .log();
 }
 
 #[no_mangle]
 pub fn skia_paint_is_anti_alias(paint_ptr: *mut ValueBox<Paint>) -> bool {
-    paint_ptr.with_not_null_return(false, |paint| paint.is_anti_alias())
+    paint_ptr
+        .with_ref_ok(|paint| paint.is_anti_alias())
+        .or_log(false)
 }
 
 #[no_mangle]
 pub fn skia_paint_set_anti_alias(paint_ptr: *mut ValueBox<Paint>, anti_alias: bool) {
-    paint_ptr.with_not_null(|paint| {
-        paint.set_anti_alias(anti_alias);
-    });
+    paint_ptr
+        .with_mut_ok(|paint| {
+            paint.set_anti_alias(anti_alias);
+        })
+        .log();
 }
 
 #[no_mangle]
 pub fn skia_paint_is_dither(paint_ptr: *mut ValueBox<Paint>) -> bool {
-    paint_ptr.with_not_null_return(false, |paint| paint.is_dither())
+    paint_ptr
+        .with_ref_ok(|paint| paint.is_dither())
+        .or_log(false)
 }
 
 #[no_mangle]
