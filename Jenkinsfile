@@ -241,7 +241,7 @@ pipeline {
                         lib${LIBRARY_NAME}-${LINUX_ARM64_TARGET}.so \
                         lib${LIBRARY_NAME}-${MACOS_INTEL_TARGET}.dylib \
                         lib${LIBRARY_NAME}-${MACOS_M1_TARGET}.dylib \
-                        lib${LIBRARY_NAME}-${ANDROID_ARM64_TARGET}.so \\
+                        lib${LIBRARY_NAME}-${ANDROID_ARM64_TARGET}.so \
                         ${LIBRARY_NAME}-${WINDOWS_AMD64_TARGET}.dll \
                         ${LIBRARY_NAME}-${WINDOWS_ARM64_TARGET}.dll """
             }
