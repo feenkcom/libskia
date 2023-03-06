@@ -172,6 +172,7 @@ impl XlibGlWindowContext {
             surface.flush_and_submit();
         }
         self.swap_buffers();
+        self.make_not_current();
     }
 
     pub fn resize_surface(&mut self, size: ISize) -> Result<(), GlError> {

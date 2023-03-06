@@ -80,6 +80,9 @@ libloading = {version = "0.7", optional = true }
 
 [target.'cfg(target_os="linux")'.dependencies]
 x11 = { version = "2.21", features = ["xlib", "glx"], optional = true }
+wayland-sys = { version = "0.30.0", default-features = false, features = ["egl", "client", "dlopen"], optional = true }
+khronos-egl = { version = "4.1", features = ["dynamic"], optional = true }
+libloading = {version = "0.7", optional = true }
 
 [features]
 textlayout = ["skia-safe/textlayout"]
@@ -87,12 +90,13 @@ gl = ["skia-safe/gl"]
 d3d = ["skia-safe/d3d", "windows" ]
 angle = ["gl", "mozangle"]
 x11 = ["skia-safe/x11", "dep:x11"]
+wayland = [ "skia-safe/wayland", "dep:wayland-sys" ]
 egl = ["skia-safe/egl", "khronos-egl", "libloading" ]
 shaper = ["skia-safe/shaper"]
 default = ["gl", "textlayout"]
 skia_windows = [ "d3d", "angle" ]
 skia_mac = ["skia-safe/metal", "metal", "cocoa", "foreign-types-shared", "core-graphics-types" ]
-skia_linux = ["x11", "shaper"]
+skia_linux = ["x11", "wayland", "shaper", "egl" ]
 skia_android = [ "shaper", "egl" ]
 
 [lib]
