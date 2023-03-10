@@ -54,6 +54,11 @@ impl AngleContext {
         self.make_current()?;
 
         if let Some(surface) = self.get_surface() {
+            trace!(
+                "About to draw on a surface of size {}x{}",
+                surface.width(),
+                surface.height()
+            );
             callback(surface);
             surface.flush_and_submit();
         }
@@ -64,10 +69,9 @@ impl AngleContext {
     }
 
     pub fn resize_surface(&mut self, size: ISize) -> Result<()> {
-        trace!(
+        debug!(
             "About to resize angle context to {}x{}",
-            size.width,
-            size.height
+            size.width, size.height
         );
         self.width = size.width;
         self.height = size.height;
@@ -182,6 +186,10 @@ impl AngleWindowContext {
     }
 
     fn try_create_surface(&mut self, size: (i32, i32)) -> Result<()> {
+        debug!(
+            "About to create a skia surface of size {}x{}",
+            size.width, size.height
+        );
         let skia_surface = create_skia_surface(&mut self.direct_context, size.0, size.1)?;
         self.skia_surface = Some(skia_surface);
         Ok(())

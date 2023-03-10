@@ -1580,9 +1580,9 @@ checksum = "07a91d0648d862a02d641c82292791accfe66d36df75d8149ebc9768f2e36863"
 
 [[package]]
 name = "value-box"
-version = "2.3.1"
+version = "2.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ccd280fcd3b0d68119674f99a5739f72ce016a40e6edf6256a65b62eb4413266"
+checksum = "a701735f0807beba15da94177096a0ae67ec949899f29d822675f932c5c5a85f"
 dependencies = [
  "anyhow",
  "log",
