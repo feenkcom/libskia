@@ -167,7 +167,7 @@ impl AngleWindowContext {
         let egl_config = choose_config(egl_display)?;
         let egl_context = create_context(egl_display, egl_config)?;
         let egl_surface = create_window_surface(egl_display, egl_config, window, width, height)?;
-        make_current(display, egl_surface, egl_surface, egl_context)?;
+        make_current(egl_display, egl_surface, egl_surface, egl_context)?;
         let interface = assemble_interface()?;
         let context_options = ContextOptions::default();
         let direct_context = DirectContext::new_gl(interface.clone(), &context_options)
