@@ -200,7 +200,7 @@ impl AngleWindowContext {
     }
 
     fn make_not_current(&self) -> Result<()> {
-        make_current(self.egl_display, None, None, None)
+        make_current(self.egl_display, NO_SURFACE, NO_SURFACE, NO_CONTEXT)
     }
 
     fn swap_buffers(&self) -> Result<()> {
@@ -208,7 +208,7 @@ impl AngleWindowContext {
     }
 
     fn destroy_context(&mut self) -> Result<()> {
-        make_current(self.egl_display, NO_SURFACE, NO_SURFACE, None)?;
+        self.make_not_current()?;
         destroy_window_surface(self.egl_display, self.egl_surface)?;
         destroy_egl_context(self.egl_display, self.egl_context)?;
         self.egl_context = NO_CONTEXT;
