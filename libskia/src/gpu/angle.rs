@@ -5,13 +5,15 @@ use std::fmt::{Debug, Formatter};
 use std::mem::transmute;
 
 use crate::gpu::{PlatformCompositor, PlatformContext};
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use mozangle::egl::ffi::*;
 use mozangle::egl::get_proc_address;
 use skia_safe::gpu::gl::{Format, FramebufferInfo, Interface};
-use skia_safe::gpu::{BackendRenderTarget, DirectContext, RecordingContext, SurfaceOrigin};
-use skia_safe::{ColorType, Surface};
-use value_box::ValueBox;
+use skia_safe::gpu::{
+    BackendRenderTarget, ContextOptions, DirectContext, RecordingContext, SurfaceOrigin,
+};
+use skia_safe::{ColorType, ISize, Surface};
+use value_box::{ValueBox, ValueBoxIntoRaw};
 use windows::Win32::Foundation::HWND;
 use windows::Win32::Graphics::Gdi::GetDC;
 
@@ -20,16 +22,10 @@ pub const SAMPLE_COUNT: u32 = 1;
 #[derive(Debug)]
 pub struct AngleContext {
     window: HWND,
-    display: types::EGLDisplay,
-    egl_config: types::EGLConfig,
-    egl_context: types::EGLContext,
-    egl_surface: types::EGLSurface,
-    interface: Interface,
-    major_version: EGLint,
-    minor_version: EGLint,
+    egl_display: types::EGLDisplay,
+    egl_context: Option<AngleWindowContext>,
     width: i32,
     height: i32,
-    skia_context: Option<SkiaContext>,
 }
 
 impl AngleContext {
@@ -37,165 +33,196 @@ impl AngleContext {
         let window: HWND = unsafe { transmute(window) };
 
         let hdc = unsafe { GetDC(window) };
+        let (egl_display, _major_version, _minor_version) = get_display(hdc)?;
 
-        let (display, major_version, minor_version) = get_display(hdc)?;
-        let egl_config = choose_config(display)?;
-        let context = create_context(display, egl_config)?;
-        let egl_surface = create_window_surface(display, egl_config, window, width, height)?;
-        make_current(display, egl_surface, egl_surface, context)?;
-        let interface = assemble_interface()?;
-
-        let angle_context = Self {
+        let mut angle_context = Self {
             window,
-            display,
-            egl_config,
-            egl_context: context,
-            egl_surface,
-            interface,
-            major_version,
-            minor_version,
+            egl_display,
+            egl_context: None,
             width,
             height,
-            skia_context: None,
         };
+
+        angle_context.initialize_context()?;
 
         info!("Initialized Angle context {:?}", &angle_context);
 
         Ok(angle_context)
     }
 
-    pub fn major_version(&self) -> u32 {
-        self.major_version as u32
-    }
+    pub fn with_surface(&mut self, callback: impl FnOnce(&mut Surface)) -> Result<()> {
+        self.make_current()?;
 
-    pub fn minor_version(&self) -> u32 {
-        self.minor_version as u32
-    }
-
-    pub fn make_current(&self) -> Result<()> {
-        make_current(
-            self.display,
-            self.egl_surface,
-            self.egl_surface,
-            self.egl_context,
-        )
-    }
-
-    pub fn swap_buffers(&self) -> Result<()> {
-        swap_buffers(self.display, self.egl_surface)
-    }
-
-    pub fn surface(&mut self) -> Result<Surface> {
-        if let Some(ref skia_context) = self.skia_context {
-            Ok(skia_context.skia_surface.clone())
-        } else {
-            let skia_context = self.create_skia_context()?;
-            let surface = skia_context.skia_surface.clone();
-            self.skia_context = Some(skia_context);
-            Ok(surface)
+        if let Some(surface) = self.get_surface() {
+            callback(surface);
+            surface.flush_and_submit();
         }
-    }
-
-    pub fn with_surface(&mut self, callback: impl FnOnce(&mut Surface)) {
-        self.make_current().expect("Make current");
-        let mut surface = self.surface().expect("Get surface");
-        callback(&mut surface);
-        surface.flush_and_submit();
-        self.swap_buffers()
-            .unwrap_or_else(|error| error!("{}", error));
-    }
-
-    pub fn resize(&mut self, width: i32, height: i32) -> Result<()> {
-        trace!("About to resize angle context to {}x{}", width, height);
-        drop(self.skia_context.take());
-
-        self.width = width;
-        self.height = height;
-
-        self.clear_egl_context()?;
-        self.destroy_egl_surface()?;
-        self.initialize_egl_surface()?;
+        self.swap_buffers()?;
+        self.make_not_current()?;
 
         Ok(())
     }
 
-    fn create_skia_context(&self) -> Result<SkiaContext> {
-        let mut direct_context = create_direct_context(self.interface.clone())?;
-        // 512 Mb cache limit
-        direct_context.set_resource_cache_limit(512 * 1024 * 1024);
+    pub fn resize_surface(&mut self, size: ISize) -> Result<()> {
+        trace!(
+            "About to resize angle context to {}x{}",
+            size.width,
+            size.height
+        );
+        self.width = size.width;
+        self.height = size.height;
 
-        let skia_surface = create_skia_surface(&mut direct_context, self.width, self.height)?;
-
-        Ok(SkiaContext {
-            direct_context,
-            skia_surface,
-        })
+        self.destroy_context()?;
+        self.initialize_context()?;
+        Ok(())
     }
 
-    fn initialize_egl_surface(&mut self) -> Result<()> {
-        self.egl_surface = create_window_surface(
-            self.display,
-            self.egl_config,
+    fn get_surface(&mut self) -> Option<&mut Surface> {
+        if let Some(ref mut egl_context) = self.egl_context {
+            if egl_context.skia_surface.is_none() {
+                match egl_context.try_create_surface((self.width, self.height)) {
+                    Ok(_) => {}
+                    Err(error) => {
+                        error!("Failed to initialize surface: {:?}", error);
+                    }
+                };
+            }
+            return egl_context.skia_surface.as_mut();
+        }
+        None
+    }
+
+    fn initialize_context(&mut self) -> Result<()> {
+        if self.egl_context.is_some() {
+            bail!("Context already initialized")
+        }
+        self.egl_context = Some(AngleWindowContext::try_create(
+            self.egl_display,
             self.window,
             self.width,
             self.height,
-        )?;
+        )?);
         Ok(())
     }
 
-    fn clear_egl_context(&self) -> Result<()> {
-        make_current(self.display, NO_SURFACE, NO_SURFACE, self.egl_context)
-    }
-
-    fn destroy_egl_surface(&mut self) -> Result<()> {
-        destroy_window_surface(self.display, self.egl_surface)?;
-        self.egl_surface = NO_SURFACE;
-        Ok(())
-    }
-
-    fn destroy_egl_context(&mut self) -> Result<()> {
-        destroy_egl_context(self.display, self.egl_context)?;
-        self.egl_context = NO_CONTEXT;
-        Ok(())
-    }
-
-    fn terminate_egl_display(&mut self) -> Result<()> {
+    fn destroy_context(&mut self) -> Result<()> {
+        if let Some(mut egl_context) = self.egl_context.take() {
+            egl_context.destroy_context()?;
+        }
         terminate_display(self.display)?;
-        self.display = NO_DISPLAY;
+        self.egl_display = NO_DISPLAY;
+        Ok(())
+    }
+
+    fn make_current(&mut self) -> Result<()> {
+        if let Some(ref mut egl_context) = self.egl_context {
+            egl_context.make_current()?;
+        }
+        Ok(())
+    }
+
+    fn make_not_current(&mut self) -> Result<()> {
+        if let Some(ref mut egl_context) = self.egl_context {
+            egl_context.make_not_current()?;
+        }
+        Ok(())
+    }
+
+    fn swap_buffers(&mut self) -> Result<()> {
+        if let Some(ref mut egl_context) = self.egl_context {
+            egl_context.swap_buffers()?;
+        }
         Ok(())
     }
 }
 
 impl Drop for AngleContext {
     fn drop(&mut self) {
-        drop(self.skia_context.take());
-        self.clear_egl_context()
-            .unwrap_or_else(|error| debug!("{}", error));
-        self.destroy_egl_surface()
-            .unwrap_or_else(|error| debug!("{}", error));
-        self.destroy_egl_context()
-            .unwrap_or_else(|error| debug!("{}", error));
-        self.terminate_egl_display()
-            .unwrap_or_else(|error| debug!("{}", error));
+        match self.destroy_context() {
+            Ok(_) => {}
+            Err(error) => {
+                error!("Failed to destroy context: {}", error)
+            }
+        }
     }
 }
 
-pub struct SkiaContext {
+pub struct AngleWindowContext {
+    egl_display: types::EGLDisplay,
+    egl_config: types::EGLConfig,
+    egl_context: types::EGLContext,
+    egl_surface: types::EGLSurface,
+    backend_context: Interface,
     direct_context: DirectContext,
-    skia_surface: Surface,
+    skia_surface: Option<Surface>,
 }
 
-impl Debug for SkiaContext {
+impl AngleWindowContext {
+    fn try_create(
+        egl_display: types::EGLDisplay,
+        window: HWND,
+        width: i32,
+        height: i32,
+    ) -> Result<Self> {
+        let egl_config = choose_config(egl_display)?;
+        let egl_context = create_context(egl_display, egl_config)?;
+        let egl_surface = create_window_surface(egl_display, egl_config, window, width, height)?;
+        make_current(display, egl_surface, egl_surface, egl_context)?;
+        let interface = assemble_interface()?;
+        let context_options = ContextOptions::default();
+        let direct_context = DirectContext::new_gl(interface.clone(), &context_options)
+            .ok_or_else(|| anyhow!("Failed to create direct context"))?;
+
+        Ok(Self {
+            egl_display,
+            egl_config,
+            egl_context,
+            egl_surface,
+            backend_context: interface,
+            direct_context,
+            skia_surface: None,
+        })
+    }
+
+    fn try_create_surface(&mut self, size: (i32, i32)) -> Result<()> {
+        let skia_surface = create_skia_surface(&mut self.direct_context, size.0, size.1)?;
+        self.skia_surface = Some(skia_surface);
+        Ok(())
+    }
+
+    fn make_current(&self) -> Result<()> {
+        make_current(
+            self.egl_display,
+            self.egl_surface,
+            self.egl_surface,
+            self.egl_context,
+        )
+    }
+
+    fn make_not_current(&self) -> Result<()> {
+        make_current(self.egl_display, None, None, None)
+    }
+
+    fn swap_buffers(&self) -> Result<()> {
+        swap_buffers(self.egl_display, self.egl_surface)
+    }
+
+    fn destroy_context(&mut self) -> Result<()> {
+        make_current(self.egl_display, NO_SURFACE, NO_SURFACE, self.egl_context)?;
+        make_current(self.egl_display, None, None, None)?;
+        destroy_window_surface(self.egl_display, self.egl_surface)?;
+        destroy_egl_context(self.egl_display, self.egl_context)?;
+        self.egl_context = NO_CONTEXT;
+        self.egl_surface = NO_SURFACE;
+        Ok(())
+    }
+}
+
+impl Debug for AngleWindowContext {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("SkiaContext")
             .field("skia_surface", &self.skia_surface)
             .finish()
-    }
-}
-
-impl Drop for SkiaContext {
-    fn drop(&mut self) {
-        self.direct_context.abandon();
     }
 }
 
@@ -241,8 +268,8 @@ pub fn skia_angle_compositor_new_size(
     width: u32,
     height: u32,
 ) -> *mut ValueBox<PlatformCompositor> {
-    ValueBox::new(PlatformCompositor::new(PlatformContext::Angle(
-        AngleContext::new(window, width as i32, height as i32).expect("Create angle context"),
-    )))
-    .into_raw()
+    AngleContext::new(window, width as i32, height as i32)
+        .map(|context| ValueBox::new(PlatformCompositor::new(PlatformContext::Angle(context))))
+        .map_err(|error| error.into())
+        .into_raw()
 }

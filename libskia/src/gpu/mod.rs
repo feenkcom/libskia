@@ -39,7 +39,7 @@ mod platform_compositor;
 
 #[cfg(all(feature = "egl", target_os = "android"))]
 pub mod egl_android;
-#[cfg(feature = "x11")]
-pub mod gl_x11;
 #[cfg(feature = "wayland")]
 pub mod egl_wayland;
+#[cfg(feature = "x11")]
+pub mod gl_x11;

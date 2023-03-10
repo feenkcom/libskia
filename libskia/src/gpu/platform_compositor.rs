@@ -134,7 +134,9 @@ impl PlatformContext {
             #[cfg(feature = "d3d")]
             PlatformContext::D3D(context) => context.with_surface(callback),
             #[cfg(feature = "angle")]
-            PlatformContext::Angle(context) => context.with_surface(callback),
+            PlatformContext::Angle(context) => context
+                .with_surface(callback)
+                .unwrap_or_else(|error| error!("Failed to draw on a surface: {}", error)),
             #[cfg(feature = "x11")]
             PlatformContext::XlibGl(context) => context.with_surface(callback),
             #[cfg(feature = "egl")]
@@ -153,8 +155,8 @@ impl PlatformContext {
             PlatformContext::D3D(context) => context.resize(size),
             #[cfg(feature = "angle")]
             PlatformContext::Angle(context) => context
-                .resize(size.width, size.height)
-                .unwrap_or_else(|error| error!("{}", error)),
+                .resize_surface(size)
+                .unwrap_or_else(|error| error!("Failed to resize surface: {:?}", error)),
             #[cfg(feature = "x11")]
             PlatformContext::XlibGl(context) => context
                 .resize_surface(size)

@@ -75,7 +75,7 @@ uikit-sys = { git = "https://github.com/syrel/uikit-sys" }
 objc = "0.2"
 
 [target.'cfg(target_os="android")'.dependencies]
-khronos-egl = { version = "4.1", features = ["dynamic"], optional = true }
+khronos-egl = { version = "4.1", features = [ "dynamic" ], optional = true }
 libloading = {version = "0.7", optional = true }
 
 [target.'cfg(target_os="linux")'.dependencies]
@@ -96,9 +96,9 @@ shaper = ["skia-safe/shaper"]
 default = ["gl", "textlayout"]
 skia_windows = [ "d3d", "angle" ]
 skia_mac = ["skia-safe/metal", "metal", "cocoa", "foreign-types-shared", "core-graphics-types" ]
-skia_linux = ["x11", "wayland", "shaper", "egl" ]
-skia_android = [ "shaper", "egl" ]
+skia_linux = ["x11", "wayland", "egl" ]
+skia_android = [ "egl" ]
 
 [lib]
 name = "Skia"
-crate-type = ["cdylib", "lib"]
+crate-type = [ "cdylib", "lib" ]
