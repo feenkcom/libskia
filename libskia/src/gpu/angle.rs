@@ -84,7 +84,7 @@ impl AngleContext {
     fn get_surface(&mut self) -> Option<&mut Surface> {
         if let Some(ref mut egl_context) = self.egl_context {
             if egl_context.skia_surface.is_none() {
-                match egl_context.try_create_surface((self.width, self.height)) {
+                match egl_context.try_create_surface(self.width, self.height) {
                     Ok(_) => {}
                     Err(error) => {
                         error!("Failed to initialize surface: {:?}", error);
@@ -185,12 +185,12 @@ impl AngleWindowContext {
         })
     }
 
-    fn try_create_surface(&mut self, size: (i32, i32)) -> Result<()> {
+    fn try_create_surface(&mut self, width: i32, height: i32) -> Result<()> {
         debug!(
             "About to create a skia surface of size {}x{}",
-            size.width, size.height
+            width, height
         );
-        let skia_surface = create_skia_surface(&mut self.direct_context, size.0, size.1)?;
+        let skia_surface = create_skia_surface(&mut self.direct_context, width, height)?;
         self.skia_surface = Some(skia_surface);
         Ok(())
     }
