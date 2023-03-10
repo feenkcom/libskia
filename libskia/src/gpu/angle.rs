@@ -109,8 +109,6 @@ impl AngleContext {
         if let Some(mut egl_context) = self.egl_context.take() {
             egl_context.destroy_context()?;
         }
-        terminate_display(self.egl_display)?;
-        self.egl_display = NO_DISPLAY;
         Ok(())
     }
 
@@ -138,12 +136,11 @@ impl AngleContext {
 
 impl Drop for AngleContext {
     fn drop(&mut self) {
-        match self.destroy_context() {
-            Ok(_) => {}
-            Err(error) => {
-                error!("Failed to destroy context: {}", error)
-            }
-        }
+        self.destroy_context()
+            .unwrap_or_else(|error| error!("Failed to destroy context: {}", error));
+        terminate_display(self.egl_display)
+            .unwrap_or_else(|error| error!("Failed to terminate display: {}", error));
+        self.egl_display = NO_DISPLAY;
     }
 }
 
