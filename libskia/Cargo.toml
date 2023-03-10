@@ -24,7 +24,7 @@ metal = { version = "0.24", optional = true }
 cocoa = { version = "0.24", optional = true }
 core-graphics-types = { version = "0.1", optional = true }
 foreign-types-shared = { version = "0.1", optional = true }
-value-box = { version = "2.3", features = [ "phlow" ] }
+value-box = { version = "2.3", features = [ "phlow", "anyhow" ] }
 reference-box = "1.0"
 array-box = "1.0"
 string-box = "1.1"

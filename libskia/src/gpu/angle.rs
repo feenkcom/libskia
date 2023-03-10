@@ -109,7 +109,7 @@ impl AngleContext {
         if let Some(mut egl_context) = self.egl_context.take() {
             egl_context.destroy_context()?;
         }
-        terminate_display(self.display)?;
+        terminate_display(self.egl_display)?;
         self.egl_display = NO_DISPLAY;
         Ok(())
     }
@@ -208,8 +208,7 @@ impl AngleWindowContext {
     }
 
     fn destroy_context(&mut self) -> Result<()> {
-        make_current(self.egl_display, NO_SURFACE, NO_SURFACE, self.egl_context)?;
-        make_current(self.egl_display, None, None, None)?;
+        make_current(self.egl_display, NO_SURFACE, NO_SURFACE, None)?;
         destroy_window_surface(self.egl_display, self.egl_surface)?;
         destroy_egl_context(self.egl_display, self.egl_context)?;
         self.egl_context = NO_CONTEXT;
