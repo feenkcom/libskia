@@ -68,8 +68,10 @@ pipeline {
                     }
 
                     steps {
-                        if (env.CLEANUP) {
-                            sh "rm -rf target"
+                        script {
+                            if (env.CLEANUP) {
+                                sh "rm -rf target"
+                            }
                         }
 
                         sh "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release"
@@ -91,8 +93,10 @@ pipeline {
                     }
 
                     steps {
-                        if (env.CLEANUP) {
-                            sh "rm -rf target"
+                        script {
+                            if (env.CLEANUP) {
+                                sh "rm -rf target"
+                            }
                         }
 
                         sh "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release"
@@ -114,10 +118,11 @@ pipeline {
                     }
 
                     steps {
-                        if (env.CLEANUP) {
-                            sh "rm -rf target"
+                        script {
+                            if (env.CLEANUP) {
+                                sh "rm -rf target"
+                            }
                         }
-
                         sh "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release"
 
                         sh "mv -f target/${TARGET}/release/lib${LIBRARY_NAME}.${EXTENSION} lib${LIBRARY_NAME}-${TARGET}.${EXTENSION}"
@@ -137,8 +142,10 @@ pipeline {
                     }
 
                     steps {
-                        if (env.CLEANUP) {
-                            sh "rm -rf target"
+                        script {
+                            if (env.CLEANUP) {
+                                sh "rm -rf target"
+                            }
                         }
 
                         sh "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release"
@@ -161,8 +168,10 @@ pipeline {
                     }
 
                     steps {
-                        if (env.CLEANUP) {
-                            sh "rm -rf target"
+                        script {
+                            if (env.CLEANUP) {
+                                sh "rm -rf target"
+                            }
                         }
 
                         sh "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release -- --target ${TARGET}"
@@ -194,8 +203,10 @@ pipeline {
                     }
 
                     steps {
-                        if (env.CLEANUP) {
-                            powershell "Remove-Item target -Recurse -Force"
+                        script {
+                            if (env.CLEANUP) {
+                                powershell "Remove-Item target -Recurse -Force"
+                            }
                         }
                         powershell "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release -- --target ${TARGET}"
                         powershell "Move-Item -Force -Path target/${TARGET}/release/${LIBRARY_NAME}.${EXTENSION} -Destination ${LIBRARY_NAME}-${TARGET}.${EXTENSION}"
@@ -222,8 +233,10 @@ pipeline {
                     }
 
                     steps {
-                        if (env.CLEANUP) {
-                            powershell "Remove-Item target -Recurse -Force"
+                        script {
+                            if (env.CLEANUP) {
+                                powershell "Remove-Item target -Recurse -Force"
+                            }
                         }
                         powershell "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release -- --target ${TARGET}"
                         powershell "Move-Item -Force -Path target/${TARGET}/release/${LIBRARY_NAME}.${EXTENSION} -Destination ${LIBRARY_NAME}-${TARGET}.${EXTENSION}"
