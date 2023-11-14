@@ -6,6 +6,7 @@ pipeline {
     agent none
     parameters {
         booleanParam(name: 'BUILD', defaultValue: true, description: 'Set to true to build a new version')
+        booleanParam(name: 'CLEANUP', defaultValue: false, description: 'Remove target directory before the build')
         choice(name: 'BUMP', choices: ['minor', 'patch', 'major'], description: 'What to bump when releasing') }
     options {
         buildDiscarder(logRotator(numToKeepStr: '50'))
@@ -67,6 +68,10 @@ pipeline {
                     }
 
                     steps {
+                        if (env.CLEANUP) {
+                            sh "rm -rf target"
+                        }
+
                         sh "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release"
 
                         sh "mv -f target/${TARGET}/release/lib${LIBRARY_NAME}.${EXTENSION} lib${LIBRARY_NAME}-${TARGET}.${EXTENSION}"
@@ -86,6 +91,10 @@ pipeline {
                     }
 
                     steps {
+                        if (env.CLEANUP) {
+                            sh "rm -rf target"
+                        }
+
                         sh "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release"
 
                         sh "mv target/${TARGET}/release/lib${LIBRARY_NAME}.${EXTENSION} lib${LIBRARY_NAME}-${TARGET}.${EXTENSION}"
@@ -105,6 +114,10 @@ pipeline {
                     }
 
                     steps {
+                        if (env.CLEANUP) {
+                            sh "rm -rf target"
+                        }
+
                         sh "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release"
 
                         sh "mv -f target/${TARGET}/release/lib${LIBRARY_NAME}.${EXTENSION} lib${LIBRARY_NAME}-${TARGET}.${EXTENSION}"
@@ -124,6 +137,10 @@ pipeline {
                     }
 
                     steps {
+                        if (env.CLEANUP) {
+                            sh "rm -rf target"
+                        }
+
                         sh "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release"
 
                         sh "mv -f target/${TARGET}/release/lib${LIBRARY_NAME}.${EXTENSION} lib${LIBRARY_NAME}-${TARGET}.${EXTENSION}"
@@ -144,6 +161,10 @@ pipeline {
                     }
 
                     steps {
+                        if (env.CLEANUP) {
+                            sh "rm -rf target"
+                        }
+
                         sh "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release -- --target ${TARGET}"
 
                         sh "mv target/${TARGET}/release/lib${LIBRARY_NAME}.${EXTENSION} lib${LIBRARY_NAME}-${TARGET}.${EXTENSION}"
@@ -173,6 +194,9 @@ pipeline {
                     }
 
                     steps {
+                        if (env.CLEANUP) {
+                            powershell "Remove-Item target -Recurse -Force"
+                        }
                         powershell "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release -- --target ${TARGET}"
                         powershell "Move-Item -Force -Path target/${TARGET}/release/${LIBRARY_NAME}.${EXTENSION} -Destination ${LIBRARY_NAME}-${TARGET}.${EXTENSION}"
                         stash includes: "${LIBRARY_NAME}-${TARGET}.${EXTENSION}", name: "${TARGET}"
@@ -198,6 +222,9 @@ pipeline {
                     }
 
                     steps {
+                        if (env.CLEANUP) {
+                            powershell "Remove-Item target -Recurse -Force"
+                        }
                         powershell "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release -- --target ${TARGET}"
                         powershell "Move-Item -Force -Path target/${TARGET}/release/${LIBRARY_NAME}.${EXTENSION} -Destination ${LIBRARY_NAME}-${TARGET}.${EXTENSION}"
                         stash includes: "${LIBRARY_NAME}-${TARGET}.${EXTENSION}", name: "${TARGET}"
