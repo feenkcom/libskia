@@ -169,7 +169,7 @@ impl ParagraphWithText {
         self.paragraph.borrow_mut().layout(width);
     }
 
-    pub fn paint(&self, canvas: &mut Canvas, p: impl Into<Point>) {
+    pub fn paint(&self, canvas: &Canvas, p: impl Into<Point>) {
         self.paragraph.borrow().paint(canvas, p);
     }
 

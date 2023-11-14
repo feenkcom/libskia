@@ -1,4 +1,4 @@
-use skia_safe::gpu::BackendRenderTarget;
+use skia_safe::gpu::{BackendRenderTarget, Protected};
 use value_box::{ValueBox, ValueBoxPointer};
 
 #[cfg(feature = "gl")]
@@ -15,7 +15,11 @@ pub fn skia_backend_render_target_new_gl(
         (width, height),
         Some(sample_count),
         stencil_bits,
-        skia_safe::gpu::gl::FramebufferInfo { fboid, format },
+        skia_safe::gpu::gl::FramebufferInfo {
+            fboid,
+            format,
+            protected: Protected::No,
+        },
     );
 
     ValueBox::new(render_target).into_raw()
@@ -26,12 +30,11 @@ pub fn skia_backend_render_target_new_gl(
 pub fn skia_backend_render_target_new_metal(
     width: i32,
     height: i32,
-    sample_count: usize,
 ) -> *mut ValueBox<BackendRenderTarget> {
     let texture_info = unsafe { skia_safe::gpu::mtl::TextureInfo::new(std::ptr::null_mut()) };
 
     let render_target =
-        BackendRenderTarget::new_metal((width, height), sample_count as i32, &texture_info);
+        BackendRenderTarget::new_metal((width, height), &texture_info);
 
     ValueBox::new(render_target).into_raw()
 }

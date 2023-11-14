@@ -84,13 +84,13 @@ pub fn skia_image_to_file(
     image_ptr: *mut ValueBox<Image>,
     name_boxer_string_ptr: *mut ValueBox<StringBox>,
     encoding: EncodedImageFormat,
-    quality: i32,
+    quality: u32,
 ) -> i32 {
     image_ptr.with_not_null_return(-1, |image| {
         name_boxer_string_ptr.with_not_null_return(-1, |name_boxer_string| {
             let file_name = name_boxer_string.to_string();
 
-            let encoded = image.encode_to_data_with_quality(encoding, quality);
+            let encoded = image.encode_to_data_with_context(None, encoding, quality);
             if encoded.is_none() {
                 return -2;
             }

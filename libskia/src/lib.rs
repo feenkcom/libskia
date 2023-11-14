@@ -48,6 +48,7 @@ pub mod surface;
 pub mod surface_props;
 pub mod text;
 pub mod types;
+pub mod svg;
 
 define_extensions!(SkiaExtensions);
 import_extensions!(SkiaExtensions, CoreExtensions);

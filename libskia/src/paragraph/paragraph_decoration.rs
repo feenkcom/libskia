@@ -51,7 +51,7 @@ pub fn skia_paragraph_decoration_get_style(ptr: *mut ValueBox<Decoration>) -> Te
 #[no_mangle]
 pub fn skia_paragraph_decoration_set_type(ptr: *mut ValueBox<Decoration>, ty: u32) {
     ptr.with_not_null(|decoration| {
-        decoration.ty = unsafe { TextDecoration::from_bits_unchecked(ty) };
+        decoration.ty = unsafe { TextDecoration::from_bits_retain(ty) };
     })
 }
 

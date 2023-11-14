@@ -1,11 +1,11 @@
 use float_cmp::ApproxEqUlps;
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::{scalar, Canvas, Color, Image, Paint, Point, RRect, Rect, Vector};
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_canvas_fill_rectangle_with_color(
-    canvas_ptr: *mut ReferenceBox<Canvas>,
+    canvas: *mut ReferenceBox<Canvas>,
     left: scalar,
     top: scalar,
     right: scalar,
@@ -16,7 +16,7 @@ pub fn skia_canvas_fill_rectangle_with_color(
     a: u8,
     antialias: bool,
 ) {
-    canvas_ptr.with_not_null(|canvas| {
+    canvas.with_not_null(|canvas| {
         canvas.draw_rect(
             Rect::new(left, top, right, bottom),
             Paint::default()
@@ -29,7 +29,7 @@ pub fn skia_canvas_fill_rectangle_with_color(
 /// I fill a rounded rectangle (each corner radius is different) with a given color
 #[no_mangle]
 pub fn skia_canvas_fill_rounded_rectangle_with_color(
-    canvas_ptr: *mut ReferenceBox<Canvas>,
+    canvas: *mut ReferenceBox<Canvas>,
     left: scalar,
     top: scalar,
     right: scalar,
@@ -44,7 +44,7 @@ pub fn skia_canvas_fill_rounded_rectangle_with_color(
     a: u8,
     antialias: bool,
 ) {
-    canvas_ptr.with_not_null(|canvas| {
+    canvas.with_not_null(|canvas| {
         // if all radii are same we can use a simpler optimized drawing method
         if r_top_left.approx_eq_ulps(&r_top_right, 2)
             && r_top_right.approx_eq_ulps(&r_bottom_right, 2)
@@ -80,14 +80,16 @@ pub fn skia_canvas_fill_rounded_rectangle_with_color(
 
 #[no_mangle]
 pub fn skia_canvas_fill_image_without_paint(
-    canvas_ptr: *mut ReferenceBox<Canvas>,
-    image_ptr: *mut ValueBox<Image>,
+    canvas: *mut ReferenceBox<Canvas>,
+    image: *mut ValueBox<Image>,
     x: scalar,
     y: scalar,
 ) {
-    canvas_ptr.with_not_null(|canvas| {
-        image_ptr.with_not_null(|image| {
-            canvas.draw_image(image, Point::new(x, y), None);
-        });
-    });
+    image
+        .with_ref_ok(|image| {
+            canvas.with_not_null(|canvas| {
+                canvas.draw_image(image, Point::new(x, y), None);
+            })
+        })
+        .log();
 }

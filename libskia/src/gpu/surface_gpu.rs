@@ -1,5 +1,6 @@
+use skia_safe::gpu::Budgeted;
 use skia_safe::gpu::{BackendRenderTarget, BackendTexture, DirectContext, SurfaceOrigin};
-use skia_safe::{Budgeted, ColorType, ImageInfo, Surface};
+use skia_safe::{ColorType, ImageInfo, Surface};
 use value_box::{ValueBox, ValueBoxPointer};
 
 #[no_mangle]

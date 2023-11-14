@@ -1,7 +1,7 @@
 use float_cmp::{ApproxEq, F32Margin};
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::{scalar, Canvas, ClipOp, IRect, Path, QuickReject, RRect, Rect, Vector};
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_canvas_clip_rect(
@@ -31,15 +31,15 @@ pub fn skia_canvas_clip_rect(
 
 #[no_mangle]
 pub fn skia_canvas_clip_path(
-    canvas_ptr: *mut ReferenceBox<Canvas>,
-    path_ptr: *mut ValueBox<Path>,
+    canvas: *mut ReferenceBox<Canvas>,
+    path: *mut ValueBox<Path>,
     offset_x: scalar,
     offset_y: scalar,
     clip_op: ClipOp,
     do_anti_alias: bool,
 ) {
-    canvas_ptr.with_not_null(|canvas| {
-        path_ptr.with_not_null(|path| {
+    path.with_ref_ok(|path| {
+        canvas.with_not_null(|canvas| {
             if offset_x.approx_eq(0.0, F32Margin::default())
                 && offset_y.approx_eq(0.0, F32Margin::default())
             {
@@ -51,14 +51,15 @@ pub fn skia_canvas_clip_path(
                     do_anti_alias,
                 );
             }
-        })
-    });
+        });
+    })
+    .log();
 }
 
 /// I clip the canvas with a rounded rectangle using Intersect operation and anti-alias
 #[no_mangle]
 pub fn skia_canvas_clip_rounded_rectangle(
-    canvas_ptr: *mut ReferenceBox<Canvas>,
+    canvas: *mut ReferenceBox<Canvas>,
     left: scalar,
     top: scalar,
     right: scalar,
@@ -70,7 +71,7 @@ pub fn skia_canvas_clip_rounded_rectangle(
     offset_x: scalar,
     offset_y: scalar,
 ) {
-    canvas_ptr.with_not_null(|canvas| {
+    canvas.with_not_null(|canvas| {
         canvas.clip_rrect(
             RRect::new_rect_radii(
                 Rect::new(
@@ -94,14 +95,14 @@ pub fn skia_canvas_clip_rounded_rectangle(
 
 #[no_mangle]
 pub fn skia_canvas_clip_circle(
-    canvas_ptr: *mut ReferenceBox<Canvas>,
+    canvas: *mut ReferenceBox<Canvas>,
     center_x: scalar,
     center_y: scalar,
     radius: scalar,
     offset_x: scalar,
     offset_y: scalar,
 ) {
-    canvas_ptr.with_not_null(|canvas| {
+    canvas.with_not_null(|canvas| {
         canvas.clip_rrect(
             RRect::new_oval(Rect::new(
                 center_x + offset_x - radius,
@@ -117,7 +118,7 @@ pub fn skia_canvas_clip_circle(
 
 #[no_mangle]
 pub fn skia_canvas_clip_oval(
-    canvas_ptr: *mut ReferenceBox<Canvas>,
+    canvas: *mut ReferenceBox<Canvas>,
     left: scalar,
     top: scalar,
     right: scalar,
@@ -125,7 +126,7 @@ pub fn skia_canvas_clip_oval(
     offset_x: scalar,
     offset_y: scalar,
 ) {
-    canvas_ptr.with_not_null(|canvas| {
+    canvas.with_not_null(|canvas| {
         canvas.clip_rrect(
             RRect::new_oval(Rect::new(
                 left + offset_x,
@@ -140,60 +141,60 @@ pub fn skia_canvas_clip_oval(
 }
 
 #[no_mangle]
-pub fn skia_canvas_local_clip_bounds(
-    canvas_ptr: *mut ReferenceBox<Canvas>,
-    rect_ptr: *mut ValueBox<Rect>,
-) {
-    canvas_ptr.with_not_null(|canvas| {
-        rect_ptr.with_not_null(|rectangle| match canvas.local_clip_bounds() {
+pub fn skia_canvas_local_clip_bounds(canvas: *mut ReferenceBox<Canvas>, rect: *mut ValueBox<Rect>) {
+    rect.with_mut_ok(|rect| {
+        canvas.with_not_null(|canvas| match canvas.local_clip_bounds() {
             None => {}
-            Some(local_bounds) => rectangle.set_ltrb(
+            Some(local_bounds) => rect.set_ltrb(
                 local_bounds.left,
                 local_bounds.top,
                 local_bounds.right,
                 local_bounds.bottom,
             ),
-        })
-    });
+        });
+    })
+    .log();
 }
 
 #[no_mangle]
 pub fn skia_canvas_device_clip_bounds(
-    canvas_ptr: *mut ReferenceBox<Canvas>,
-    rect_ptr: *mut ValueBox<IRect>,
+    canvas: *mut ReferenceBox<Canvas>,
+    rect: *mut ValueBox<IRect>,
 ) {
-    canvas_ptr.with_not_null(|canvas| {
-        rect_ptr.with_not_null(|rectangle| match canvas.device_clip_bounds() {
+    rect.with_mut_ok(|rect| {
+        canvas.with_not_null(|canvas| match canvas.device_clip_bounds() {
             None => {}
-            Some(device_bounds) => rectangle.set_ltrb(
+            Some(device_bounds) => rect.set_ltrb(
                 device_bounds.left,
                 device_bounds.top,
                 device_bounds.right,
                 device_bounds.bottom,
             ),
         })
-    });
+    })
+    .log();
 }
 
 #[no_mangle]
 pub fn skia_canvas_quick_reject_rectangle(
-    canvas_ptr: *mut ReferenceBox<Canvas>,
+    canvas: *mut ReferenceBox<Canvas>,
     left: scalar,
     top: scalar,
     right: scalar,
     bottom: scalar,
 ) -> bool {
-    canvas_ptr.with_not_null_return(false, |canvas| {
+    canvas.with_not_null_return(false, |canvas| {
         canvas.quick_reject(&Rect::new(left, top, right, bottom))
     })
 }
 
 #[no_mangle]
 pub fn skia_canvas_quick_reject_path(
-    canvas_ptr: *mut ReferenceBox<Canvas>,
-    path_ptr: *mut ValueBox<Path>,
+    canvas: *mut ReferenceBox<Canvas>,
+    path: *mut ValueBox<Path>,
 ) -> bool {
-    canvas_ptr.with_not_null_return(false, |canvas| {
-        path_ptr.with_not_null_return(false, |path| canvas.quick_reject(path.as_ref()))
+    path.with_ref_ok(|path| {
+        canvas.with_not_null_return(false, |canvas| canvas.quick_reject(path.as_ref()))
     })
+    .or_log(false)
 }

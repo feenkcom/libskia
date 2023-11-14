@@ -2,7 +2,7 @@ use array_box::ArrayBox;
 use float_cmp::ApproxEqUlps;
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::canvas::{PointMode, SaveLayerRec};
-use skia_safe::utils::shadow_utils::ShadowFlags;
+use skia_safe::utils::shadow_utils::{draw_shadow, ShadowFlags};
 use skia_safe::{
     scalar, BlendMode, Canvas, Color, Image, Matrix, Paint, Path, Point, Point3, RRect, Rect,
     TextBlob, Vector, M44,
@@ -270,7 +270,8 @@ pub fn skia_canvas_draw_shadow(
                     light_pos_ptr.with_clone(|light_pos| {
                         ambient_color_ptr.with_clone(|ambient_color| {
                             spot_color_ptr.with_clone_ok(|spot_color| {
-                                canvas.draw_shadow(
+                                draw_shadow(
+                                    canvas,
                                     path,
                                     z_plane,
                                     light_pos,

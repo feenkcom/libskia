@@ -1,4 +1,5 @@
 use array_box::ArrayBox;
+use skia_safe::path_utils::fill_path_with_paint;
 use skia_safe::{scalar, Paint, Path, PathFillType, Point, Rect, Vector};
 use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
@@ -198,9 +199,9 @@ pub fn skia_path_get_stroke_bounds(
 ) {
     path.with_ref(|path| {
         paint.with_ref(|paint| {
-            rect.with_mut_ok(|rect| match paint.get_fill_path(path, None, None) {
-                None => {}
-                Some(fill_path) => {
+            rect.with_mut_ok(|rect| {
+                let mut fill_path: Path = Path::new();
+                if fill_path_with_paint(path, paint, &mut fill_path, None, None) {
                     let fill_rect = fill_path.compute_tight_bounds();
                     rect.set_ltrb(
                         fill_rect.left,
@@ -229,9 +230,13 @@ pub fn skia_path_stroke_contains_point(
     paint_ptr: *mut ValueBox<Paint>,
 ) -> bool {
     path.with_ref(|path| {
-        paint_ptr.with_ref_ok(|paint| match paint.get_fill_path(path, None, None) {
-            None => false,
-            Some(fill_path) => fill_path.contains(Point::new(x, y)),
+        paint_ptr.with_ref_ok(|paint| {
+            let mut fill_path: Path = Path::new();
+            if fill_path_with_paint(path, paint, &mut fill_path, None, None) {
+                fill_path.contains(Point::new(x, y))
+            } else {
+                false
+            }
         })
     })
     .or_log(false)
