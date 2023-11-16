@@ -19,7 +19,7 @@ use foreign_types_shared::{ForeignType, ForeignTypeRef};
 use metal::{CommandQueue, Device, MTLPixelFormat, MetalDrawableRef, MetalLayer};
 use skia_safe::gpu::mtl::BackendContext;
 use skia_safe::gpu::{mtl, BackendRenderTarget, DirectContext, SurfaceOrigin};
-use skia_safe::{scalar, ColorType, ISize, Size, Surface};
+use skia_safe::{scalar, ColorType, ISize, Size, Surface, gpu};
 use std::fmt::{Debug, Formatter};
 use std::mem;
 use std::mem::transmute;
@@ -118,11 +118,10 @@ impl MetalContext {
 
             let backend_render_target = BackendRenderTarget::new_metal(
                 (drawable_size.width as i32, drawable_size.height as i32),
-                1,
                 &texture_info,
             );
 
-            if let Some(mut surface) = Surface::from_backend_render_target(
+            if let Some(mut surface) = gpu::surfaces::wrap_backend_render_target(
                 &mut self.direct_context,
                 &backend_render_target,
                 SurfaceOrigin::TopLeft,

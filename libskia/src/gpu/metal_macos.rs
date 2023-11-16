@@ -8,7 +8,7 @@ use foreign_types_shared::{ForeignType, ForeignTypeRef};
 use metal::{CommandQueue, Device, MTLPixelFormat, MetalDrawableRef, MetalLayer};
 use skia_safe::gpu::mtl::BackendContext;
 use skia_safe::gpu::{mtl, BackendRenderTarget, DirectContext, SurfaceOrigin};
-use skia_safe::{scalar, ColorType, ISize, Size, Surface};
+use skia_safe::{scalar, ColorType, ISize, Size, Surface, surfaces, gpu};
 use std::mem;
 use value_box::ValueBox;
 
@@ -83,7 +83,7 @@ impl MetalContext {
                 &texture_info,
             );
 
-            if let Some(mut surface) = Surface::from_backend_render_target(
+            if let Some(mut surface) = gpu::surfaces::wrap_backend_render_target(
                 &mut self.direct_context,
                 &backend_render_target,
                 SurfaceOrigin::TopLeft,

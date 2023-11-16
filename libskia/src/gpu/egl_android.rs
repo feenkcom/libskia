@@ -2,6 +2,7 @@ use crate::gpu::{PlatformCompositor, PlatformContext};
 use khronos_egl as egl;
 use skia_safe::gpu::gl::{Enum, FramebufferInfo, Interface, UInt};
 use skia_safe::gpu::MipMapped::No;
+use skia_safe::gpu::Protected;
 use skia_safe::gpu::{BackendRenderTarget, ContextOptions, DirectContext, SurfaceOrigin};
 use skia_safe::{ColorType, ISize, Surface};
 use std::error::Error;
@@ -70,7 +71,7 @@ impl EglContext {
 
         if let Some(surface) = self.get_surface() {
             callback(surface);
-            surface.flush_and_submit();
+            self.flush_and_submit();
         }
         self.swap_buffers()?;
         self.make_not_current()?;
@@ -133,6 +134,12 @@ impl EglContext {
             egl_context.make_not_current(&self.egl)?;
         }
         Ok(())
+    }
+
+    fn flush_and_submit(&mut self) {
+        if let Some(ref mut egl_context) = self.egl_context {
+            egl_context.direct_context.flush_and_submit();
+        }
     }
 
     fn swap_buffers(&mut self) -> Result<(), Box<dyn Error>> {
@@ -276,6 +283,7 @@ impl AndroidWindowContext {
         let framebuffer_info = FramebufferInfo {
             fboid: buffer as UInt,
             format: GL_RGBA8 as Enum,
+            protected: Protected::No,
         };
 
         let backend_render_target = BackendRenderTarget::new_gl(size, 0, 8, framebuffer_info);

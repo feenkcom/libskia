@@ -169,7 +169,7 @@ impl XlibGlWindowContext {
 
         if let Some(surface) = self.get_surface() {
             callback(surface);
-            surface.flush_and_submit();
+            self.flush_and_submit();
         }
         self.swap_buffers();
         self.make_not_current();
@@ -319,6 +319,12 @@ impl XlibGlWindowContext {
 
         self.gl_context = Some(gl_context);
         Ok(())
+    }
+
+    fn flush_and_submit(&mut self) {
+        if let Some(ref mut gl_context) = self.gl_context {
+            gl_context.direct_context.flush_and_submit();
+        }
     }
 
     fn destroy_context(&mut self) {

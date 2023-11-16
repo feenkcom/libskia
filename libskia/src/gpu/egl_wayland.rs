@@ -94,7 +94,7 @@ impl EglContext {
 
         if let Some(surface) = self.get_surface() {
             callback(surface);
-            surface.flush_and_submit();
+            self.flush_and_submit();
         }
         self.swap_buffers()?;
         self.make_not_current()?;
@@ -177,6 +177,12 @@ impl EglContext {
             egl_context.swap_buffers(&self.egl)?;
         }
         Ok(())
+    }
+
+    fn flush_and_submit(&mut self) {
+        if let Some(ref mut egl_context) = self.egl_context {
+            egl_context.direct_context.flush_and_submit();
+        }
     }
 }
 
