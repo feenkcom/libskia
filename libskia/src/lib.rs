@@ -46,10 +46,10 @@ pub mod rounded_rectangle;
 pub mod shader;
 pub mod surface;
 pub mod surface_props;
-pub mod text;
-pub mod types;
 #[cfg(feature = "svg")]
 pub mod svg;
+pub mod text;
+pub mod types;
 
 define_extensions!(SkiaExtensions);
 import_extensions!(SkiaExtensions, CoreExtensions);

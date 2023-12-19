@@ -8,7 +8,7 @@ use foreign_types_shared::{ForeignType, ForeignTypeRef};
 use metal::{CommandQueue, Device, MTLPixelFormat, MetalDrawableRef, MetalLayer};
 use skia_safe::gpu::mtl::BackendContext;
 use skia_safe::gpu::{mtl, BackendRenderTarget, DirectContext, SurfaceOrigin};
-use skia_safe::{scalar, ColorType, ISize, Size, Surface, surfaces, gpu};
+use skia_safe::{gpu, scalar, surfaces, ColorType, ISize, Size, Surface};
 use std::mem;
 use value_box::ValueBox;
 

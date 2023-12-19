@@ -19,7 +19,7 @@ use foreign_types_shared::{ForeignType, ForeignTypeRef};
 use metal::{CommandQueue, Device, MTLPixelFormat, MetalDrawableRef, MetalLayer};
 use skia_safe::gpu::mtl::BackendContext;
 use skia_safe::gpu::{mtl, BackendRenderTarget, DirectContext, SurfaceOrigin};
-use skia_safe::{scalar, ColorType, ISize, Size, Surface, gpu};
+use skia_safe::{gpu, scalar, ColorType, ISize, Size, Surface};
 use std::fmt::{Debug, Formatter};
 use std::mem;
 use std::mem::transmute;

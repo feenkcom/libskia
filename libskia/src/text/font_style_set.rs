@@ -22,9 +22,9 @@ pub fn skia_font_style_get_style_at(
     font_style_set_ptr: *mut ValueBox<FontStyleSet>,
     index: usize,
 ) -> *mut ValueBox<FontStyle> {
-    font_style_set_ptr.with_mut_ok(|set| {
-        ValueBox::new(set.style(index).0)
-    }).into_raw()
+    font_style_set_ptr
+        .with_mut_ok(|set| ValueBox::new(set.style(index).0))
+        .into_raw()
 }
 
 #[no_mangle]

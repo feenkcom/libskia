@@ -30,9 +30,9 @@ compositor = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-skia = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-ffi = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-skia-ffi = { git = "https://github.com/feenkcom/compositor-rs" }
-phlow = { version = "1.3", features = [ "phlow-derive" ] }
-phlow-extensions = { version = "1.3" }
-phlow-ffi = "1.1"
+phlow = { version = "1", features = [ "phlow-derive" ] }
+phlow-extensions = { version = "1" }
+phlow-ffi = "1"
 #compositor = { path = "../../compositor-rs/compositor" }
 #compositor-skia = { path = "../../compositor-rs/compositor-skia" }
 #compositor-ffi = { path = "../../compositor-rs/compositor-ffi" }

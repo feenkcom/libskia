@@ -33,8 +33,7 @@ pub fn skia_backend_render_target_new_metal(
 ) -> *mut ValueBox<BackendRenderTarget> {
     let texture_info = unsafe { skia_safe::gpu::mtl::TextureInfo::new(std::ptr::null_mut()) };
 
-    let render_target =
-        BackendRenderTarget::new_metal((width, height), &texture_info);
+    let render_target = BackendRenderTarget::new_metal((width, height), &texture_info);
 
     ValueBox::new(render_target).into_raw()
 }

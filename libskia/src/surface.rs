@@ -1,6 +1,6 @@
 use array_box::ArrayBox;
 use reference_box::ReferenceBox;
-use skia_safe::{AlphaType, Canvas, ColorType, IPoint, ISize, Image, ImageInfo, Surface, surfaces};
+use skia_safe::{surfaces, AlphaType, Canvas, ColorType, IPoint, ISize, Image, ImageInfo, Surface};
 use value_box::{ReturnBoxerResult, ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
 
 #[no_mangle]
