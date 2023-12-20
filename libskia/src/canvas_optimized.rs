@@ -64,10 +64,11 @@ mod tests {
         let mut surface = Surface::new_raster_n32_premul(ISize::new(width, height)).unwrap();
         let canvas = surface.canvas();
 
-        let font = Font::new(
-            Typeface::new("Source Sans Pro", FontStyle::normal()).unwrap(),
-            Some(14.0),
-        );
+        let font =
+            Font::new(
+                Typeface::new("Source Sans Pro", FontStyle::normal()).unwrap(),
+                Some(14.0),
+            );
 
         let now = Instant::now();
         for _ in 0..25000 {

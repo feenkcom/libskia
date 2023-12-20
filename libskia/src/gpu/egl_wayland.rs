@@ -3,7 +3,7 @@ use khronos_egl as egl;
 use skia_safe::gpu::gl::{Enum, FramebufferInfo, Interface, UInt};
 use skia_safe::gpu::MipMapped::No;
 use skia_safe::gpu::{BackendRenderTarget, ContextOptions, DirectContext, SurfaceOrigin};
-use skia_safe::{ColorType, gpu, ISize, Surface};
+use skia_safe::{gpu, ColorType, ISize, Surface};
 use std::error::Error;
 use std::ffi::{c_int, c_void};
 use value_box::{ValueBox, ValueBoxIntoRaw};
@@ -54,15 +54,16 @@ impl EglContext {
             Err("Wayland surface is null")?;
         }
 
-        let egl_window = unsafe {
-            ffi_dispatch!(
-                WAYLAND_EGL_HANDLE,
-                wl_egl_window_create,
-                wayland_surface.cast(),
-                width as _,
-                height as _
-            )
-        };
+        let egl_window =
+            unsafe {
+                ffi_dispatch!(
+                    WAYLAND_EGL_HANDLE,
+                    wl_egl_window_create,
+                    wayland_surface.cast(),
+                    width as _,
+                    height as _
+                )
+            };
         if egl_window.is_null() {
             return Err("Failed to create wayland egl window")?;
         }
@@ -325,19 +326,21 @@ impl WaylandWindowContext {
         let framebuffer_info = FramebufferInfo {
             fboid: buffer as UInt,
             format: GL_RGBA8 as Enum,
-            protected: skgpu_Protected::No,
+            protected: gpu::Protected::No,
         };
 
-        let backend_render_target = gpu::backend_render_targets::make_gl(size, 0, 8, framebuffer_info);
+        let backend_render_target =
+            gpu::backend_render_targets::make_gl(size, 0, 8, framebuffer_info);
 
-        let surface = gpu::surfaces::wrap_backend_render_target(
-            &mut self.direct_context,
-            &backend_render_target,
-            SurfaceOrigin::BottomLeft,
-            ColorType::RGBA8888,
-            None,
-            None,
-        );
+        let surface =
+            gpu::surfaces::wrap_backend_render_target(
+                &mut self.direct_context,
+                &backend_render_target,
+                SurfaceOrigin::BottomLeft,
+                ColorType::RGBA8888,
+                None,
+                None,
+            );
 
         self.surface = surface;
         self.surface

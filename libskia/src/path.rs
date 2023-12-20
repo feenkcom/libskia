@@ -126,10 +126,11 @@ pub fn skia_path_arc_to(
         let rect = if is_absolute {
             Rect::new(left, top, right, bottom)
         } else {
-            let current_point = match path.last_pt() {
-                None => Point::new(0.0, 0.0),
-                Some(point) => point,
-            };
+            let current_point =
+                match path.last_pt() {
+                    None => Point::new(0.0, 0.0),
+                    Some(point) => point,
+                };
             Rect::new(
                 current_point.x + left,
                 current_point.y + top,

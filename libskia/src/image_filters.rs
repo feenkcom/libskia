@@ -58,26 +58,27 @@ pub fn skia_image_filter_drop_shadow(
     a: u8,
     input_ptr: *mut ValueBox<ImageFilter>,
 ) -> *mut ValueBox<ImageFilter> {
-    let filter_option = input_ptr.with_value(
-        || {
-            drop_shadow(
-                Vector::new(delta_x, delta_y),
-                (sigma_x, sigma_y),
-                Color::from_argb(a, r, g, b),
-                None,
-                None,
-            )
-        },
-        |input| {
-            drop_shadow(
-                Vector::new(delta_x, delta_y),
-                (sigma_x, sigma_y),
-                Color::from_argb(a, r, g, b),
-                Some(input),
-                None,
-            )
-        },
-    );
+    let filter_option =
+        input_ptr.with_value(
+            || {
+                drop_shadow(
+                    Vector::new(delta_x, delta_y),
+                    (sigma_x, sigma_y),
+                    Color::from_argb(a, r, g, b),
+                    None,
+                    None,
+                )
+            },
+            |input| {
+                drop_shadow(
+                    Vector::new(delta_x, delta_y),
+                    (sigma_x, sigma_y),
+                    Color::from_argb(a, r, g, b),
+                    Some(input),
+                    None,
+                )
+            },
+        );
 
     match filter_option {
         None => std::ptr::null_mut(),

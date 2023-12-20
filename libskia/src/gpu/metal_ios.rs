@@ -67,16 +67,17 @@ impl MetalContext {
             ui_view.addSubview_(metal_view.clone());
         }
 
-        let layer = {
-            let layer: MetalLayer = unsafe { transmute(metal_view.clone().layer()) };
-            layer.set_device(&device);
-            layer.set_pixel_format(MTLPixelFormat::BGRA8Unorm);
-            layer.set_presents_with_transaction(true);
-            if let Some(size) = size {
-                layer.set_drawable_size(size);
-            }
-            layer
-        };
+        let layer =
+            {
+                let layer: MetalLayer = unsafe { transmute(metal_view.clone().layer()) };
+                layer.set_device(&device);
+                layer.set_pixel_format(MTLPixelFormat::BGRA8Unorm);
+                layer.set_presents_with_transaction(true);
+                if let Some(size) = size {
+                    layer.set_drawable_size(size);
+                }
+                layer
+            };
 
         let queue = device.new_command_queue();
 

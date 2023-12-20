@@ -4,7 +4,7 @@ use skia_safe::gpu::gl::{Enum, FramebufferInfo, Interface, UInt};
 use skia_safe::gpu::MipMapped::No;
 use skia_safe::gpu::Protected;
 use skia_safe::gpu::{BackendRenderTarget, ContextOptions, DirectContext, SurfaceOrigin};
-use skia_safe::{ColorType, gpu, ISize, Surface};
+use skia_safe::{gpu, ColorType, ISize, Surface};
 use std::error::Error;
 use std::ffi::{c_int, c_void};
 use value_box::{ValueBox, ValueBoxIntoRaw};
@@ -286,16 +286,18 @@ impl AndroidWindowContext {
             protected: Protected::No,
         };
 
-        let backend_render_target = gpu::backend_render_targets::make_gl(size, 0, 8, framebuffer_info);
+        let backend_render_target =
+            gpu::backend_render_targets::make_gl(size, 0, 8, framebuffer_info);
 
-        let surface = gpu::surfaces::wrap_backend_render_target(
-            &mut self.direct_context,
-            &backend_render_target,
-            SurfaceOrigin::BottomLeft,
-            ColorType::RGBA8888,
-            None,
-            None,
-        );
+        let surface =
+            gpu::surfaces::wrap_backend_render_target(
+                &mut self.direct_context,
+                &backend_render_target,
+                SurfaceOrigin::BottomLeft,
+                ColorType::RGBA8888,
+                None,
+                None,
+            );
 
         self.surface = surface;
         self.surface

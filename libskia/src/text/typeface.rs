@@ -49,9 +49,9 @@ pub fn skia_typeface_get_family_name(
     typeface_ptr: *mut ValueBox<Typeface>,
     _ptr_string: *mut ValueBox<StringBox>,
 ) {
-    typeface_ptr.with_not_null(|typeface| {
-        _ptr_string.with_not_null(|string| string.set_string(typeface.family_name()))
-    });
+    typeface_ptr.with_not_null(
+        |typeface| _ptr_string.with_not_null(|string| string.set_string(typeface.family_name()))
+    );
 }
 
 #[no_mangle]

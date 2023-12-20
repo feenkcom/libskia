@@ -24,9 +24,9 @@ pub fn skia_font_collection_set_asset_font_manager(
     font_collection_ptr
         .with_mut(|font_collection| {
             typeface_font_provider.with_ref_ok(|typeface_font_provider| {
-                font_collection.set_asset_font_manager(Some(Into::<FontMgr>::into(
-                    typeface_font_provider.clone(),
-                )));
+                font_collection.set_asset_font_manager(
+                    Some(Into::<FontMgr>::into(typeface_font_provider.clone()))
+                );
             })
         })
         .log();

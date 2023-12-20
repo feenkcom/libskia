@@ -1,4 +1,3 @@
-use metal::bitflags::Flags;
 use skia_safe::textlayout::{Decoration, TextDecoration, TextDecorationMode, TextDecorationStyle};
 use skia_safe::{scalar, Color};
 use value_box::{ValueBox, ValueBoxPointer};

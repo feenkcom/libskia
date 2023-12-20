@@ -1,19 +1,19 @@
 use std::mem::transmute;
 
-use skia_safe::{ColorType, gpu, ISize, Surface};
+use skia_safe::gpu::d3d::{cp, BackendContext};
 use skia_safe::gpu::{
     BackendRenderTarget, BackendTexture, DirectContext, FlushInfo, Protected, SurfaceOrigin,
     SyncCpu,
 };
-use skia_safe::gpu::d3d::{BackendContext, cp};
 use skia_safe::surface::BackendSurfaceAccess;
+use skia_safe::{gpu, ColorType, ISize, Surface};
 use value_box::ValueBox;
 use windows::core::{Interface, Result};
 use windows::Win32::Foundation::{HANDLE, HWND};
-use windows::Win32::Graphics::Direct3D12::*;
 use windows::Win32::Graphics::Direct3D::D3D_FEATURE_LEVEL_11_0;
-use windows::Win32::Graphics::Dxgi::*;
+use windows::Win32::Graphics::Direct3D12::*;
 use windows::Win32::Graphics::Dxgi::Common::DXGI_FORMAT_R8G8B8A8_UNORM;
+use windows::Win32::Graphics::Dxgi::*;
 use windows::Win32::System::Threading::{CreateEventW, WaitForSingleObjectEx};
 
 use crate::gpu::platform_compositor::{PlatformCompositor, PlatformContext};
