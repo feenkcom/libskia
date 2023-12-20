@@ -1,20 +1,22 @@
-use skia_safe::{ColorType, ISize, Surface};
 use std::mem::transmute;
 
-use crate::gpu::platform_compositor::{PlatformCompositor, PlatformContext};
-use skia_safe::gpu::d3d::{cp, BackendContext};
+use skia_safe::{ColorType, gpu, ISize, Surface};
 use skia_safe::gpu::{
     BackendRenderTarget, BackendTexture, DirectContext, FlushInfo, Protected, SurfaceOrigin,
+    SyncCpu,
 };
+use skia_safe::gpu::d3d::{BackendContext, cp};
 use skia_safe::surface::BackendSurfaceAccess;
 use value_box::ValueBox;
 use windows::core::{Interface, Result};
 use windows::Win32::Foundation::{HANDLE, HWND};
-use windows::Win32::Graphics::Direct3D::D3D_FEATURE_LEVEL_11_0;
 use windows::Win32::Graphics::Direct3D12::*;
-use windows::Win32::Graphics::Dxgi::Common::DXGI_FORMAT_R8G8B8A8_UNORM;
+use windows::Win32::Graphics::Direct3D::D3D_FEATURE_LEVEL_11_0;
 use windows::Win32::Graphics::Dxgi::*;
+use windows::Win32::Graphics::Dxgi::Common::DXGI_FORMAT_R8G8B8A8_UNORM;
 use windows::Win32::System::Threading::{CreateEventW, WaitForSingleObjectEx};
+
+use crate::gpu::platform_compositor::{PlatformCompositor, PlatformContext};
 
 pub const NUM_FRAMES: usize = 2;
 
@@ -47,18 +49,19 @@ impl D3D12Context {
         let factory: IDXGIFactory4 = create_factory().expect("Creating DXGI factory");
         let adapter: IDXGIAdapter1 = Self::create_hardware_adapter(&factory);
 
-        let device: ID3D12Device = resolve_interface(|ptr| unsafe {
-            D3D12CreateDevice(&adapter, D3D_FEATURE_LEVEL_11_0, ptr)
-        })
+        let device: ID3D12Device = resolve_interface(
+            |ptr| unsafe { D3D12CreateDevice(&adapter, D3D_FEATURE_LEVEL_11_0, ptr) }
+        )
         .expect("Creating D3D device");
 
         let queue: ID3D12CommandQueue = {
-            let desc = D3D12_COMMAND_QUEUE_DESC {
-                Type: D3D12_COMMAND_LIST_TYPE_DIRECT,
-                Priority: D3D12_COMMAND_QUEUE_PRIORITY_NORMAL.0,
-                Flags: D3D12_COMMAND_QUEUE_FLAG_NONE,
-                NodeMask: 0,
-            };
+            let desc =
+                D3D12_COMMAND_QUEUE_DESC {
+                    Type: D3D12_COMMAND_LIST_TYPE_DIRECT,
+                    Priority: D3D12_COMMAND_QUEUE_PRIORITY_NORMAL.0,
+                    Flags: D3D12_COMMAND_QUEUE_FLAG_NONE,
+                    NodeMask: 0,
+                };
 
             unsafe { device.CreateCommandQueue(&desc) }.expect("Creating command queue")
         };
@@ -141,7 +144,9 @@ impl D3D12Context {
         self.hardware_context
             .direct_context
             .flush(&FlushInfo::default());
-        self.hardware_context.direct_context.submit(true);
+        self.hardware_context
+            .direct_context
+            .submit(Some(SyncCpu::Yes));
         self.hardware_context.direct_context.free_gpu_resources();
 
         for surface_buffer in self.surface_buffers.take().unwrap() {
@@ -197,7 +202,9 @@ impl D3D12Context {
     pub fn swap_buffers(&mut self) {
         let surface = &mut self.surface_buffers.as_mut().unwrap()[self.buffer_index].surface;
         let flush_info = skia_safe::gpu::FlushInfo::default();
-        surface.flush_with_access_info(BackendSurfaceAccess::Present, &flush_info);
+        self.hardware_context
+            .direct_context
+            .flush_surface_with_access(surface, BackendSurfaceAccess::Present, &flush_info);
         self.hardware_context.direct_context.submit(None);
 
         unsafe {
@@ -236,9 +243,10 @@ impl D3D12Context {
         loop {
             match unsafe { factory.EnumAdapters1(index) } {
                 Ok(adapter) => {
-                    let device: Result<ID3D12Device> = resolve_interface(|ptr| unsafe {
-                        D3D12CreateDevice(&adapter, D3D_FEATURE_LEVEL_11_0, ptr)
-                    });
+                    let device: Result<ID3D12Device> =
+                        resolve_interface(|ptr| unsafe {
+                            D3D12CreateDevice(&adapter, D3D_FEATURE_LEVEL_11_0, ptr)
+                        });
 
                     if device.is_ok() {
                         return adapter;
@@ -296,7 +304,7 @@ impl D3D12HardwareContext {
         let surface = if true {
             let backend_texture =
                 BackendTexture::new_d3d((width as i32, height as i32), &texture_info);
-            Surface::from_backend_texture(
+            gpu::surfaces::wrap_backend_texture(
                 &mut self.direct_context,
                 &backend_texture,
                 SurfaceOrigin::TopLeft,
@@ -310,7 +318,7 @@ impl D3D12HardwareContext {
             let backend_render_target =
                 BackendRenderTarget::new_d3d((width as i32, height as i32), &texture_info);
 
-            Surface::from_backend_render_target(
+            gpu::surfaces::wrap_backend_render_target(
                 &mut self.direct_context,
                 &backend_render_target,
                 SurfaceOrigin::TopLeft,
@@ -352,8 +360,8 @@ pub fn skia_d3d_compositor_new_size(
     width: u32,
     height: u32,
 ) -> *mut ValueBox<PlatformCompositor> {
-    ValueBox::new(PlatformCompositor::new(PlatformContext::D3D(
-        D3D12Context::new(window, width, height),
-    )))
+    ValueBox::new(
+        PlatformCompositor::new(PlatformContext::D3D(D3D12Context::new(window, width, height)))
+    )
     .into_raw()
 }

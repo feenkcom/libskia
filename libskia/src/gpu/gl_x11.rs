@@ -1,6 +1,6 @@
 use skia_safe::gpu::gl::{Enum, FramebufferInfo, Interface, UInt};
 use skia_safe::gpu::{BackendRenderTarget, ContextOptions, DirectContext, SurfaceOrigin};
-use skia_safe::{ColorType, ISize, Surface};
+use skia_safe::{ColorType, gpu, ISize, Surface};
 use std::error::Error;
 use std::ffi::{c_void, CString};
 use std::fmt::{Display, Formatter};
@@ -435,6 +435,7 @@ impl GlContext {
             let framebuffer_info = FramebufferInfo {
                 fboid: buffer as UInt,
                 format: GL_RGBA8 as Enum,
+                protected: skgpu_Protected::No,
             };
 
             let backend_render_target = BackendRenderTarget::new_gl(
@@ -444,7 +445,7 @@ impl GlContext {
                 framebuffer_info,
             );
 
-            let surface = Surface::from_backend_render_target(
+            let surface = gpu::surfaces::wrap_backend_render_target(
                 direct_context,
                 &backend_render_target,
                 SurfaceOrigin::BottomLeft,

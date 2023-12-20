@@ -1,10 +1,7 @@
-use crate::gpu::angle_utils::*;
-
 use std::ffi::c_void;
 use std::fmt::{Debug, Formatter};
 use std::mem::transmute;
 
-use crate::gpu::{PlatformCompositor, PlatformContext};
 use anyhow::{anyhow, bail, Result};
 use mozangle::egl::ffi::*;
 use mozangle::egl::get_proc_address;
@@ -12,10 +9,13 @@ use skia_safe::gpu::gl::{Format, FramebufferInfo, Interface};
 use skia_safe::gpu::{
     BackendRenderTarget, ContextOptions, DirectContext, RecordingContext, SurfaceOrigin,
 };
-use skia_safe::{ColorType, ISize, Surface};
+use skia_safe::{gpu, ColorType, ISize, Surface};
 use value_box::{ValueBox, ValueBoxIntoRaw};
 use windows::Win32::Foundation::HWND;
 use windows::Win32::Graphics::Gdi::GetDC;
+
+use crate::gpu::angle_utils::*;
+use crate::gpu::{PlatformCompositor, PlatformContext};
 
 pub const SAMPLE_COUNT: u32 = 1;
 
@@ -100,12 +100,9 @@ impl AngleContext {
         if self.egl_context.is_some() {
             bail!("Context already initialized")
         }
-        self.egl_context = Some(AngleWindowContext::try_create(
-            self.egl_display,
-            self.window,
-            self.width,
-            self.height,
-        )?);
+        self.egl_context = Some(
+            AngleWindowContext::try_create(self.egl_display, self.window, self.width, self.height)?
+        );
         Ok(())
     }
 
@@ -256,12 +253,17 @@ fn create_skia_surface(
     let framebuffer_info = FramebufferInfo {
         fboid: framebuffer.try_into().unwrap(),
         format: Format::RGBA8.into(),
+        protected: skia_safe::gpu::Protected::No,
     };
 
-    let backend_render_target =
-        BackendRenderTarget::new_gl((width, height), SAMPLE_COUNT as usize, 0, framebuffer_info);
+    let backend_render_target = gpu::backend_render_targets::make_gl(
+        (width, height),
+        SAMPLE_COUNT as usize,
+        0,
+        framebuffer_info,
+    );
 
-    Surface::from_backend_render_target(
+    gpu::surfaces::wrap_backend_render_target(
         recording_context,
         &backend_render_target,
         SurfaceOrigin::BottomLeft,
