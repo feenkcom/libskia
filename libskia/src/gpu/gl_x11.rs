@@ -431,10 +431,10 @@ impl GlContext {
             let framebuffer_info = FramebufferInfo {
                 fboid: buffer as UInt,
                 format: GL_RGBA8 as Enum,
-                protected: skgpu_Protected::No,
+                protected: gpu::Protected::No,
             };
 
-            let backend_render_target = BackendRenderTarget::new_gl(
+            let backend_render_target = gpu::backend_render_targets::make_gl(
                 size,
                 self.config.samples.clone().map(|samples| samples as usize),
                 self.config.stencil_bits as usize,
