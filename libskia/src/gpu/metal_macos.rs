@@ -1,16 +1,17 @@
-use crate::gpu::platform_compositor::{PlatformCompositor, PlatformContext};
+use std::ffi::c_void;
+use std::mem;
+
 use cocoa::appkit::NSView;
 use cocoa::base::{id as cocoa_id, YES};
-use std::ffi::c_void;
-
 use core_graphics_types::geometry::CGSize;
 use foreign_types_shared::{ForeignType, ForeignTypeRef};
-use metal::{CommandQueue, Device, MTLPixelFormat, MetalDrawableRef, MetalLayer};
+use metal::{CommandQueue, Device, MetalDrawableRef, MetalLayer, MTLPixelFormat};
+use skia_safe::{ColorType, gpu, ISize, scalar, Size, Surface};
+use skia_safe::gpu::{BackendRenderTarget, DirectContext, mtl, SurfaceOrigin};
 use skia_safe::gpu::mtl::BackendContext;
-use skia_safe::gpu::{mtl, BackendRenderTarget, DirectContext, SurfaceOrigin};
-use skia_safe::{gpu, scalar, surfaces, ColorType, ISize, Size, Surface};
-use std::mem;
 use value_box::ValueBox;
+
+use crate::gpu::platform_compositor::{PlatformCompositor, PlatformContext};
 
 #[allow(dead_code)]
 #[derive(Debug)]

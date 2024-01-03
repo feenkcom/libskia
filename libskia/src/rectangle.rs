@@ -1,5 +1,5 @@
 use skia_safe::{scalar, IRect, Rect};
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 ///
 /// Rect
@@ -18,29 +18,39 @@ pub fn skia_rectangle_f32_set_ltrb(
     right: scalar,
     bottom: scalar,
 ) {
-    rectangle_ptr.with_not_null(|rectangle| {
-        rectangle.set_ltrb(left, top, right, bottom);
-    });
+    rectangle_ptr
+        .with_mut_ok(|rectangle| {
+            rectangle.set_ltrb(left, top, right, bottom);
+        })
+        .log();
 }
 
 #[no_mangle]
 pub fn skia_rectangle_f32_left(rectangle_ptr: *mut ValueBox<Rect>) -> scalar {
-    rectangle_ptr.with_not_null_return(0.0, |rectangle| rectangle.left())
+    rectangle_ptr
+        .with_ref_ok(|rectangle| rectangle.left())
+        .or_log(0.0)
 }
 
 #[no_mangle]
 pub fn skia_rectangle_f32_top(rectangle_ptr: *mut ValueBox<Rect>) -> scalar {
-    rectangle_ptr.with_not_null_return(0.0, |rectangle| rectangle.top())
+    rectangle_ptr
+        .with_ref_ok(|rectangle| rectangle.top())
+        .or_log(0.0)
 }
 
 #[no_mangle]
 pub fn skia_rectangle_f32_right(rectangle_ptr: *mut ValueBox<Rect>) -> scalar {
-    rectangle_ptr.with_not_null_return(0.0, |rectangle| rectangle.right())
+    rectangle_ptr
+        .with_ref_ok(|rectangle| rectangle.right())
+        .or_log(0.0)
 }
 
 #[no_mangle]
 pub fn skia_rectangle_f32_bottom(rectangle_ptr: *mut ValueBox<Rect>) -> scalar {
-    rectangle_ptr.with_not_null_return(0.0, |rectangle| rectangle.bottom())
+    rectangle_ptr
+        .with_ref_ok(|rectangle| rectangle.bottom())
+        .or_log(0.0)
 }
 
 #[no_mangle]
@@ -65,29 +75,37 @@ pub fn skia_rectangle_i32_set_ltrb(
     right: i32,
     bottom: i32,
 ) {
-    rectangle_ptr.with_not_null(|rectangle| {
+    rectangle_ptr.with_mut_ok(|rectangle| {
         rectangle.set_ltrb(left, top, right, bottom);
-    });
+    }).log();
 }
 
 #[no_mangle]
 pub fn skia_rectangle_i32_left(rectangle_ptr: *mut ValueBox<IRect>) -> i32 {
-    rectangle_ptr.with_not_null_return(0, |rectangle| rectangle.left())
+    rectangle_ptr
+        .with_ref_ok(|rectangle| rectangle.left())
+        .or_log(0)
 }
 
 #[no_mangle]
 pub fn skia_rectangle_i32_top(rectangle_ptr: *mut ValueBox<IRect>) -> i32 {
-    rectangle_ptr.with_not_null_return(0, |rectangle| rectangle.top())
+    rectangle_ptr
+        .with_ref_ok(|rectangle| rectangle.top())
+        .or_log(0)
 }
 
 #[no_mangle]
 pub fn skia_rectangle_i32_right(rectangle_ptr: *mut ValueBox<IRect>) -> i32 {
-    rectangle_ptr.with_not_null_return(0, |rectangle| rectangle.right())
+    rectangle_ptr
+        .with_ref_ok(|rectangle| rectangle.right())
+        .or_log(0)
 }
 
 #[no_mangle]
 pub fn skia_rectangle_i32_bottom(rectangle_ptr: *mut ValueBox<IRect>) -> i32 {
-    rectangle_ptr.with_not_null_return(0, |rectangle| rectangle.bottom())
+    rectangle_ptr
+        .with_ref_ok(|rectangle| rectangle.bottom())
+        .or_log(0)
 }
 
 #[no_mangle]

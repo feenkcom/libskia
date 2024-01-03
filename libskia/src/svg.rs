@@ -1,7 +1,7 @@
-use reference_box::{ReferenceBox, ReferenceBoxPointer};
-use skia_safe::{scalar, Canvas, Vector};
 use std::error::Error;
 
+use reference_box::{ReferenceBox, ReferenceBoxPointer};
+use skia_safe::{Canvas, scalar, Vector};
 use skia_safe::svg::Dom;
 use string_box::StringBox;
 use value_box::{ReturnBoxerResult, ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
@@ -32,4 +32,9 @@ pub fn skia_canvas_render_svg(
         })
         .log();
     });
+}
+
+#[no_mangle]
+pub fn skia_svg_dom_drop(ptr: *mut ValueBox<Dom>) {
+    ptr.drop();
 }
