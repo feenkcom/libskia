@@ -69,7 +69,7 @@ pipeline {
 
                     steps {
                         script {
-                            if (env.CLEANUP) {
+                            if (params.CLEANUP) {
                                 sh "rm -rf target"
                             }
                         }
@@ -94,7 +94,7 @@ pipeline {
 
                     steps {
                         script {
-                            if (env.CLEANUP) {
+                            if (params.CLEANUP) {
                                 sh "rm -rf target"
                             }
                         }
@@ -119,7 +119,7 @@ pipeline {
 
                     steps {
                         script {
-                            if (env.CLEANUP) {
+                            if (params.CLEANUP) {
                                 sh "rm -rf target"
                             }
                         }
@@ -143,7 +143,7 @@ pipeline {
 
                     steps {
                         script {
-                            if (env.CLEANUP) {
+                            if (params.CLEANUP) {
                                 sh "rm -rf target"
                             }
                         }
@@ -169,7 +169,7 @@ pipeline {
 
                     steps {
                         script {
-                            if (env.CLEANUP) {
+                            if (params.CLEANUP) {
                                 sh "rm -rf target"
                             }
                         }
@@ -202,7 +202,7 @@ pipeline {
 
                     steps {
                         script {
-                            if (env.CLEANUP) {
+                            if (params.CLEANUP) {
                                 powershell "Remove-Item target -Recurse -Force"
                             }
                         }
@@ -232,7 +232,7 @@ pipeline {
 
                     steps {
                         script {
-                            if (env.CLEANUP) {
+                            if (params.CLEANUP) {
                                 powershell "Remove-Item target -Recurse -Force"
                             }
                         }
