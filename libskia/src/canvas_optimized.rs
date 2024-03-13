@@ -1,6 +1,6 @@
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::{scalar, Canvas, Color, Paint, Point, TextBlob};
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 /// Fill a given text blob with a color and disabled antialias
 #[no_mangle]
@@ -16,7 +16,7 @@ pub fn skia_canvas_draw_text_blob_with_color(
     antialias: bool,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        text_blob_ptr.with_not_null(|text_blob| {
+        text_blob_ptr.with_ref_ok(|text_blob| {
             canvas.draw_text_blob(
                 text_blob,
                 Point::new(x, y),
@@ -24,7 +24,7 @@ pub fn skia_canvas_draw_text_blob_with_color(
                     .set_color(Color::from_argb(a, r, g, b))
                     .set_anti_alias(antialias),
             );
-        });
+        }).log();
     });
 }
 
@@ -38,7 +38,7 @@ pub fn skia_canvas_draw_text_blob_with_black_color(
     antialias: bool,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        text_blob_ptr.with_not_null(|text_blob| {
+        text_blob_ptr.with_ref_ok(|text_blob| {
             canvas.draw_text_blob(
                 text_blob,
                 Point::new(x, y),
@@ -46,7 +46,7 @@ pub fn skia_canvas_draw_text_blob_with_black_color(
                     .set_color(Color::BLACK)
                     .set_anti_alias(antialias),
             );
-        });
+        }).log();
     });
 }
 

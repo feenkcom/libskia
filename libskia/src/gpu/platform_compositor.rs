@@ -1,13 +1,16 @@
+use std::error::Error;
+use std::sync::{Arc, Mutex};
+
 use compositor::{Compositor, Layer};
 use compositor_skia::{Cache, SkiaCachelessCompositor, SkiaCompositor};
 use fps_counter::FPSCounter;
-use skia_safe::{Color, Color4f, Font, ISize, Paint, Point, Surface, Typeface};
-use std::error::Error;
-use std::sync::{Arc, Mutex};
+use skia_safe::{Color, Color4f, Font, FontMgr, FontStyle, ISize, Paint, Point, Surface};
 use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 lazy_static! {
-    static ref FPS_FONT: Font = Font::new(Typeface::default(), 60.0);
+    static ref FPS_FONT: Font = Font::new(FontMgr::new()
+            .legacy_make_typeface(None, FontStyle::normal())
+            .unwrap(), 60.0);
     static ref FPS_PAINT: Paint = Paint::new(Color4f::from(Color::BLUE), None);
 }
 

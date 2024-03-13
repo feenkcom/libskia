@@ -1,6 +1,7 @@
+use skia_safe::gpu;
 use skia_safe::gpu::gl::TextureInfo;
-use skia_safe::gpu::{BackendAPI, BackendTexture, MipMapped};
-use value_box::{ValueBox, ValueBoxPointer};
+use skia_safe::gpu::{BackendAPI, BackendTexture, Mipmapped};
+use value_box::{ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_backend_texture_new_gl(
@@ -9,20 +10,20 @@ pub fn skia_backend_texture_new_gl(
     mip_mapped: bool,
     texture_info_ptr: *mut ValueBox<TextureInfo>,
 ) -> *mut ValueBox<BackendTexture> {
-    texture_info_ptr.with_not_null_value_return(std::ptr::null_mut(), |texture_info| {
-        ValueBox::new(unsafe {
-            BackendTexture::new_gl(
+    texture_info_ptr
+        .with_clone_ok(|texture_info| unsafe {
+            ValueBox::new(gpu::backend_textures::make_gl(
                 (width, height),
                 if mip_mapped {
-                    MipMapped::Yes
+                    Mipmapped::Yes
                 } else {
-                    MipMapped::No
+                    Mipmapped::No
                 },
                 texture_info,
-            )
+                "Backend texture",
+            ))
         })
         .into_raw()
-    })
 }
 
 #[no_mangle]

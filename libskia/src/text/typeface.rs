@@ -1,11 +1,14 @@
 use skia_safe::font_style::{Slant, Weight, Width};
-use skia_safe::{FontStyle, Typeface};
+use skia_safe::{FontMgr, FontStyle, Typeface};
 use string_box::StringBox;
 use value_box::{ReturnBoxerResult, ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_typeface_default() -> *mut ValueBox<Typeface> {
-    ValueBox::new(Typeface::default()).into_raw()
+    FontMgr::new()
+        .legacy_make_typeface(None, FontStyle::normal())
+        .map(|typeface| value_box!(typeface).into_raw())
+        .unwrap_or_else(|| std::ptr::null_mut())
 }
 
 #[no_mangle]
@@ -13,14 +16,14 @@ pub fn skia_typeface_from_name(
     family_name_ptr: *mut ValueBox<StringBox>,
     font_style_ptr: *mut ValueBox<FontStyle>,
 ) -> *mut ValueBox<Typeface> {
-    family_name_ptr.with_not_null_return(std::ptr::null_mut(), |family_name| {
-        font_style_ptr.with_not_null_value_return(std::ptr::null_mut(), |font_style| {
-            match Typeface::from_name(family_name.to_string(), font_style) {
-                None => std::ptr::null_mut(),
-                Some(typeface) => ValueBox::new(typeface).into_raw(),
-            }
+    family_name_ptr
+        .with_ref(|family_name| {
+            font_style_ptr.with_clone_ok(|font_style| {
+                Typeface::from_name(family_name.to_string(), font_style)
+                    .map(|typeface| ValueBox::new(typeface))
+            })
         })
-    })
+        .into_raw()
 }
 
 #[no_mangle]

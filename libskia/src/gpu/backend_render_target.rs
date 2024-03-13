@@ -1,6 +1,6 @@
 use skia_safe::gpu;
 use skia_safe::gpu::{BackendRenderTarget, Protected};
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 #[cfg(feature = "gl")]
 #[no_mangle]
@@ -43,18 +43,18 @@ pub fn skia_backend_render_target_new_metal(
 pub fn skia_backend_render_target_is_valid(
     backend_render_target_ptr: *mut ValueBox<BackendRenderTarget>,
 ) -> bool {
-    backend_render_target_ptr.with_not_null_return(false, |backend_render_target| {
-        backend_render_target.is_valid()
-    })
+    backend_render_target_ptr
+        .with_ref_ok(|_| true)
+        .or_log(false)
 }
 
 #[no_mangle]
 pub fn skia_backend_render_target_is_protected(
     backend_render_target_ptr: *mut ValueBox<BackendRenderTarget>,
 ) -> bool {
-    backend_render_target_ptr.with_not_null_return(false, |backend_render_target| {
-        backend_render_target.is_protected()
-    })
+    backend_render_target_ptr
+        .with_ref_ok(|backend_render_target| backend_render_target.is_protected())
+        .or_log(false)
 }
 
 #[no_mangle]

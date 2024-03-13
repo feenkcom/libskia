@@ -1,23 +1,23 @@
 [package]
 name = "libskia"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["feenk gmbh <contact@feenk.com>"]
 edition = "2021"
 
 [dependencies]
-skia-safe = "0.68"
+skia-safe = "0.70"
 typename = "0.1"
 float-cmp = "0.9"
-ordered-float = "4.1"
+ordered-float = "4.2"
 libc = "0.2"
 crossbeam = "0.8"
-num_cpus = "1.0"
-byteorder = "1.3"
+num_cpus = "1.16"
+byteorder = "1.5"
 num_enum = "0.7"
 widestring = "1.0"
 log = "0.4"
 env_logger = "0.10"
-fps_counter = "2.0"
+fps_counter = "3.0"
 lazy_static = "1.4"
 anyhow = "1.0"
 value-box = { version = "2.3", features = [ "phlow", "anyhow" ] }
