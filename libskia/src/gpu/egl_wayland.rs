@@ -1,7 +1,6 @@
 use crate::gpu::{PlatformCompositor, PlatformContext};
 use khronos_egl as egl;
 use skia_safe::gpu::gl::{Enum, FramebufferInfo, Interface, UInt};
-use skia_safe::gpu::MipMapped::No;
 use skia_safe::gpu::{BackendRenderTarget, ContextOptions, DirectContext, SurfaceOrigin};
 use skia_safe::{gpu, ColorType, ISize, Surface};
 use std::error::Error;

@@ -1,6 +1,6 @@
 use std::mem::transmute;
 
-use skia_safe::gpu::d3d::{cp, BackendContext};
+use skia_safe::gpu::d3d::BackendContext;
 use skia_safe::gpu::{
     BackendRenderTarget, BackendTexture, DirectContext, FlushInfo, Protected, SurfaceOrigin,
     SyncCpu,
@@ -67,11 +67,11 @@ impl D3D12Context {
         };
 
         let backend_context = {
-            let skia_adapter: cp<skia_safe::gpu::d3d::IDXGIAdapter1> =
+            let skia_adapter: skia_safe::gpu::d3d::IDXGIAdapter1 =
                 unsafe { transmute(adapter.clone()) };
-            let skia_device: cp<skia_safe::gpu::d3d::ID3D12Device> =
+            let skia_device: skia_safe::gpu::d3d::ID3D12Device =
                 unsafe { transmute(device.clone()) };
-            let skia_queue: cp<skia_safe::gpu::d3d::ID3D12CommandQueue> =
+            let skia_queue: skia_safe::gpu::d3d::ID3D12CommandQueue =
                 unsafe { transmute(queue.clone()) };
 
             BackendContext {
