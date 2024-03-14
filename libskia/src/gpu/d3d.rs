@@ -293,8 +293,8 @@ impl D3D12HardwareContext {
         let texture_info = skia_safe::gpu::d3d::TextureResourceInfo {
             resource: unsafe { transmute(buffer.clone()) },
             alloc: None,
-            resource_state: D3D12_RESOURCE_STATE_PRESENT.0,
-            format: DXGI_FORMAT_R8G8B8A8_UNORM.0,
+            resource_state: D3D12_RESOURCE_STATE_PRESENT,
+            format: DXGI_FORMAT_R8G8B8A8_UNORM,
             sample_count: 1,
             level_count: 1,
             sample_quality_pattern: 0,
