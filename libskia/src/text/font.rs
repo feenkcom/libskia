@@ -92,7 +92,7 @@ pub fn skia_font_set_hinting(font: *mut ValueBox<Font>, font_hinting: FontHintin
 
 #[no_mangle]
 pub fn skia_font_get_typeface_or_default(font: *mut ValueBox<Font>) -> *mut ValueBox<Typeface> {
-    font.with_ref_ok(|font| font.typeface().map(|typeface| ValueBox::new(typeface)))
+    font.with_ref_ok(|font| ValueBox::new(font.typeface()))
         .into_raw()
 }
 
@@ -137,20 +137,22 @@ pub fn skia_font_text_to_glyphs(
                 let mut advance = 0.0;
                 let glyphs_vec = font.text_to_glyphs_vec(text.as_str());
                 if glyphs_vec.len() > 0 {
-                    paint_ptr.with_ref(|paint| {
-                        bounds_ptr.with_mut_ok(|bounds| {
-                            // this is faster than computing ourselves
-                            let (text_advance, text_bounds) =
-                                font.measure_text(text.as_str(), Some(paint));
-                            advance = text_advance;
-                            bounds.set_ltrb(
-                                text_bounds.left,
-                                text_bounds.top,
-                                text_bounds.right,
-                                text_bounds.bottom,
-                            );
+                    paint_ptr
+                        .with_ref(|paint| {
+                            bounds_ptr.with_mut_ok(|bounds| {
+                                // this is faster than computing ourselves
+                                let (text_advance, text_bounds) =
+                                    font.measure_text(text.as_str(), Some(paint));
+                                advance = text_advance;
+                                bounds.set_ltrb(
+                                    text_bounds.left,
+                                    text_bounds.top,
+                                    text_bounds.right,
+                                    text_bounds.bottom,
+                                );
+                            })
                         })
-                    }).ok();
+                        .ok();
                     glyphs.set_vector(glyphs_vec)
                 }
                 advance

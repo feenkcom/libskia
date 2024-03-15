@@ -55,7 +55,7 @@ pub fn skia_context_new_gl(
     interface_ptr: *mut ValueBox<Interface>,
 ) -> *mut ValueBox<DirectContext> {
     interface_ptr.with_not_null_value_return(std::ptr::null_mut(), |interface| {
-        match DirectContext::new_gl(Some(interface), None) {
+        match DirectContext::new_gl(interface, None) {
             None => {
                 if cfg!(debug_assertions) {
                     eprintln!("[skia_context_new_gl] Unable to create OpenGL context");

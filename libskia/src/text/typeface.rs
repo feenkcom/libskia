@@ -19,7 +19,8 @@ pub fn skia_typeface_from_name(
     family_name_ptr
         .with_ref(|family_name| {
             font_style_ptr.with_clone_ok(|font_style| {
-                Typeface::from_name(family_name.to_string(), font_style)
+                FontMgr::new()
+                    .legacy_make_typeface(Some(family_name.as_str()), font_style)
                     .map(|typeface| ValueBox::new(typeface))
             })
         })
