@@ -1970,9 +1970,9 @@ checksum = "653f141f39ec16bba3c5abe400a0c60da7468261cc2cbf36805022876bc721a8"
 
 [[package]]
 name = "wildmatch"
-version = "2.3.1"
+version = "2.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "017f0a8ed8331210d91b7a4c30d4edef8f21a65c02f2540496e2e79725f6d8a8"
+checksum = "939e59c1bc731542357fdaad98b209ef78c8743d652bb61439d16b16a79eb025"
 
 [[package]]
 name = "winapi"

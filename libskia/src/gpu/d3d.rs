@@ -100,9 +100,9 @@ impl D3D12Context {
             let swap_chain1: IDXGISwapChain1 = unsafe {
                 factory.CreateSwapChainForHwnd(
                     &queue,
-                    &window,
+                    window,
                     &swap_chain_desc,
-                    std::ptr::null_mut(),
+                    None,
                     None,
                 )
             }
@@ -116,7 +116,7 @@ impl D3D12Context {
             unsafe { transmute(swap_chain1) }
         };
 
-        unsafe { factory.MakeWindowAssociation(&window, DXGI_MWA_NO_ALT_ENTER) }
+        unsafe { factory.MakeWindowAssociation(window, DXGI_MWA_NO_ALT_ENTER) }
             .expect("Prevent DXGI from responding to an alt-enter sequence");
 
         let mut hardware_context = D3D12HardwareContext {
@@ -129,7 +129,7 @@ impl D3D12Context {
         let surface_buffers = hardware_context.create_surface_buffers(width, height);
         let buffer_index = hardware_context.get_current_back_buffer_index();
         let fence = hardware_context.create_fence(surface_buffers[buffer_index].fence_value);
-        let fence_event: HANDLE = unsafe { CreateEventW(std::ptr::null(), false, false, None) };
+        let fence_event: HANDLE = unsafe { CreateEventW(None, false, false, None) }.unwrap();
 
         Self {
             hardware_context,
@@ -215,6 +215,7 @@ impl D3D12Context {
             self.hardware_context
                 .swap_chain
                 .Present(1, 0)
+                .ok()
                 .expect("Present swap chain");
             self.hardware_context
                 .queue

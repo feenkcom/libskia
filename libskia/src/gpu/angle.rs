@@ -239,7 +239,7 @@ fn assemble_interface() -> Result<Interface> {
 }
 
 fn create_direct_context(interface: Interface) -> Result<DirectContext> {
-    DirectContext::new_gl(Some(interface.clone()), None)
+    DirectContext::new_gl(interface.clone(), None)
         .ok_or_else(|| anyhow!("Failed to create direct context"))
 }
 
