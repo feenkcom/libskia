@@ -873,6 +873,7 @@ dependencies = [
  "reference-box",
  "skia-safe",
  "string-box",
+ "thiserror",
  "typename",
  "uikit-sys",
  "value-box",

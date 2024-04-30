@@ -144,9 +144,8 @@ impl AngleContext {
 impl Drop for AngleContext {
     fn drop(&mut self) {
         self.destroy_context()
-            .unwrap_or_else(|error| error!("Failed to destroy context: {}", error));
-        terminate_display(self.egl_display)
-            .unwrap_or_else(|error| error!("Failed to terminate display: {}", error));
+            .unwrap_or_else(|error| error!("{:?}", error));
+        terminate_display(self.egl_display).unwrap_or_else(|error| error!("{:?}", error));
         self.egl_display = NO_DISPLAY;
     }
 }

@@ -20,6 +20,7 @@ env_logger = "0.10"
 fps_counter = "3.0"
 lazy_static = "1.4"
 anyhow = "1.0"
+thiserror = { version = "1.0" }
 value-box = { version = "2.3", features = [ "phlow", "anyhow" ] }
 reference-box = "1.1"
 array-box = "1.0"
