@@ -2,19 +2,24 @@ use std::error::Error;
 use std::ops::Deref;
 
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
+use skia_safe::{Canvas, FontMgr, Rect, scalar, Size, Vector};
 use skia_safe::svg::Canvas as SvgCanvas;
+use skia_safe::svg::canvas::Flags as SvgCanvasFlags;
 use skia_safe::svg::Dom;
-use skia_safe::svg::Flags as SvgCanvasFlags;
-use skia_safe::{scalar, Canvas, Data, Rect, Size, Vector};
 use string_box::StringBox;
 use value_box::{ReturnBoxerResult, ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
 
 #[no_mangle]
-pub fn skia_svg_parse(svg_string: *mut ValueBox<StringBox>) -> *mut ValueBox<Dom> {
+pub fn skia_svg_parse(
+    svg_string: *mut ValueBox<StringBox>,
+    font_mgr: *mut ValueBox<FontMgr>,
+) -> *mut ValueBox<Dom> {
     svg_string
         .with_ref(|svg_string| {
-            str::parse::<Dom>(svg_string.as_str())
-                .map_err(|error| (Box::new(error) as Box<dyn Error>).into())
+            font_mgr.with_clone(|font_mgr| {
+                Dom::from_str(svg_string.as_str(), font_mgr)
+                    .map_err(|error| (Box::new(error) as Box<dyn Error>).into())
+            })
         })
         .map(|dom| ValueBox::new(dom))
         .into_raw()
@@ -45,7 +50,7 @@ pub fn skia_canvas_render_svg(
 
 #[no_mangle]
 pub fn skia_svg_dom_drop(ptr: *mut ValueBox<Dom>) {
-    ptr.drop();
+    ptr.release();
 }
 
 #[no_mangle]
@@ -74,11 +79,17 @@ pub fn skia_svg_canvas_get_canvas(
 }
 
 #[no_mangle]
-pub fn skia_svg_canvas_end(svg_canvas: *mut ValueBox<SvgCanvas>) -> *mut ValueBox<Data> {
+pub fn skia_svg_canvas_end(svg_canvas: *mut ValueBox<SvgCanvas>, data: *mut ValueBox<StringBox>) {
     svg_canvas
         .take_value()
-        .map(|mut svg_canvas| ValueBox::new(svg_canvas.end()))
-        .into_raw()
+        .map(|mut svg_canvas| {
+            data.with_mut_ok(|data| {
+                let svg = svg_canvas.end();
+                let string = std::str::from_utf8(svg.as_bytes()).unwrap();
+                data.set_string(string.to_string());
+            })
+        })
+        .log();
 }
 
 #[no_mangle]

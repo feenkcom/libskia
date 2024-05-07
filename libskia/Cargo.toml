@@ -5,7 +5,7 @@ authors = ["feenk gmbh <contact@feenk.com>"]
 edition = "2021"
 
 [dependencies]
-skia-safe = "0.72"
+skia-safe = "0.73"
 typename = "0.1"
 float-cmp = "0.9"
 ordered-float = "4.2"
@@ -95,7 +95,7 @@ wayland = [ "skia-safe/wayland", "dep:wayland-sys" ]
 egl = ["skia-safe/egl", "khronos-egl", "libloading" ]
 shaper = ["skia-safe/shaper"]
 svg = [ "skia-safe/svg" ]
-default = ["gl", "skia-safe/textlayout", "skia-safe/embed-freetype" ]
+default = ["gl", "skia-safe/textlayout", "skia-safe/embed-freetype", "svg" ]
 skia_windows = [ "d3d", "angle" ]
 skia_mac = ["skia-safe/metal", "metal", "cocoa", "foreign-types-shared", "core-graphics-types" ]
 skia_linux = ["x11", "wayland", "egl" ]
