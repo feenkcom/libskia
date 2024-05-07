@@ -291,7 +291,7 @@ impl D3D12HardwareContext {
         let buffer: ID3D12Resource =
             unsafe { self.swap_chain.GetBuffer(index) }.expect(&format!("Get buffer {}", index));
 
-        let texture_info = skia_safe::gpu::d3d::TextureResourceInfo {
+        let texture_info = gpu::d3d::TextureResourceInfo {
             resource: unsafe { transmute(buffer.clone()) },
             alloc: None,
             resource_state: D3D12_RESOURCE_STATE_PRESENT,

@@ -47,7 +47,7 @@ optional = true
 features = [ "egl" ]
 
 [dependencies.windows]
-version = "0.54.0"
+version = "0.56.0"
 optional = true
 features = [
     "Foundation",
