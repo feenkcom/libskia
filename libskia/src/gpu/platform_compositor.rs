@@ -139,13 +139,13 @@ impl PlatformContext {
             #[cfg(feature = "angle")]
             PlatformContext::Angle(context) => context
                 .with_surface(callback)
-                .unwrap_or_else(|error| error!("Failed to draw on a surface: {}", error)),
+                .unwrap_or_else(|error| error!("Failed to draw on a surface: {:?}", error)),
             #[cfg(feature = "x11")]
             PlatformContext::XlibGl(context) => context.with_surface(callback),
             #[cfg(feature = "egl")]
             PlatformContext::Egl(context) => context
                 .with_surface(callback)
-                .unwrap_or_else(|error| error!("Failed to draw on a surface: {}", error)),
+                .unwrap_or_else(|error| error!("Failed to draw on a surface: {:?}", error)),
             PlatformContext::Unsupported => {}
         }
     }

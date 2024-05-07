@@ -32,8 +32,7 @@ impl AngleContext {
     pub fn new(window: *mut c_void, width: i32, height: i32) -> Result<Self> {
         let window: HWND = unsafe { transmute(window) };
 
-        let hdc = unsafe { GetDC(window) };
-        let (egl_display, _major_version, _minor_version) = get_display(hdc)?;
+        let (egl_display, _major_version, _minor_version) = get_display(window)?;
 
         let mut angle_context = Self {
             window,
@@ -51,7 +50,17 @@ impl AngleContext {
     }
 
     pub fn with_surface(&mut self, callback: impl FnOnce(&mut Surface)) -> Result<()> {
-        self.make_current()?;
+        match self.make_current() {
+            Ok(_) => {}
+            Err(error) => {
+                let _ = self.destroy_context();
+
+                let (egl_display, _major_version, _minor_version) = get_display(self.window)?;
+                self.egl_display = egl_display;
+                self.initialize_context()?;
+                self.make_current()?;
+            }
+        }
 
         if let Some(surface) = self.get_surface() {
             trace!(
@@ -63,7 +72,6 @@ impl AngleContext {
             self.flush_and_submit();
         }
         self.swap_buffers()?;
-        self.make_not_current()?;
 
         Ok(())
     }

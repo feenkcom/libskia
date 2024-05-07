@@ -11,7 +11,7 @@ use std::convert::TryFrom;
 use std::mem::transmute;
 use thiserror::Error;
 use windows::Win32::Foundation::HWND;
-use windows::Win32::Graphics::Gdi::HDC;
+use windows::Win32::Graphics::Gdi::{GetDC, HDC};
 
 pub const PLATFORM_ANGLE_TYPE_D3D11_ANGLE: EGLint = 0x3208;
 pub const PLATFORM_ANGLE_ENABLE_AUTOMATIC_TRIM_ANGLE: EGLint = 0x320F;
@@ -123,7 +123,9 @@ pub(crate) fn get_error() -> EGLError {
     EGLError::from(result as u32)
 }
 
-pub(crate) fn get_display(hdc: HDC) -> Result<(types::EGLDisplay, EGLint, EGLint)> {
+pub(crate) fn get_display(window: HWND) -> Result<(types::EGLDisplay, EGLint, EGLint)> {
+    let hdc = unsafe { GetDC(window) };
+
     for config in &DISPLAY_CONFIGS {
         let display =
             unsafe { GetPlatformDisplayEXT(PLATFORM_ANGLE_ANGLE, transmute(hdc), config.as_ptr()) };
