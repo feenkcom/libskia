@@ -23,33 +23,32 @@ const fn int(value: EGLenum) -> EGLint {
     value as EGLint
 }
 
-const DISPLAY_CONFIGS: [&'static [EGLint]; 2] =
-    [
-        &[
-            int(PLATFORM_ANGLE_TYPE_ANGLE),
-            PLATFORM_ANGLE_TYPE_D3D11_ANGLE,
-            // EGL_PLATFORM_ANGLE_ENABLE_AUTOMATIC_TRIM_ANGLE is an option that will
-            // enable ANGLE to automatically call the IDXGIDevice3::Trim method on
-            // behalf of the application when it gets suspended.
-            PLATFORM_ANGLE_ENABLE_AUTOMATIC_TRIM_ANGLE,
-            int(TRUE),
-            // This extension allows angle to render directly on a D3D swapchain
-            // in the correct orientation on D3D11.
-            int(EXPERIMENTAL_PRESENT_PATH_ANGLE),
-            int(EXPERIMENTAL_PRESENT_PATH_FAST_ANGLE),
-            int(NONE),
-        ],
-        // if D3D11 doesn't work we fallback to a Warp Device (https://docs.microsoft.com/en-us/windows/win32/direct3d11/overviews-direct3d-11-devices-create-warp)
-        &[
-            int(PLATFORM_ANGLE_TYPE_ANGLE),
-            PLATFORM_ANGLE_TYPE_D3D11_ANGLE,
-            int(PLATFORM_ANGLE_DEVICE_TYPE_ANGLE),
-            PLATFORM_ANGLE_DEVICE_TYPE_D3D_WARP_ANGLE,
-            PLATFORM_ANGLE_ENABLE_AUTOMATIC_TRIM_ANGLE,
-            int(TRUE),
-            int(NONE),
-        ],
-    ];
+const DISPLAY_CONFIGS: [&'static [EGLint]; 2] = [
+    &[
+        int(PLATFORM_ANGLE_TYPE_ANGLE),
+        PLATFORM_ANGLE_TYPE_D3D11_ANGLE,
+        // EGL_PLATFORM_ANGLE_ENABLE_AUTOMATIC_TRIM_ANGLE is an option that will
+        // enable ANGLE to automatically call the IDXGIDevice3::Trim method on
+        // behalf of the application when it gets suspended.
+        PLATFORM_ANGLE_ENABLE_AUTOMATIC_TRIM_ANGLE,
+        int(TRUE),
+        // This extension allows angle to render directly on a D3D swapchain
+        // in the correct orientation on D3D11.
+        int(EXPERIMENTAL_PRESENT_PATH_ANGLE),
+        int(EXPERIMENTAL_PRESENT_PATH_FAST_ANGLE),
+        int(NONE),
+    ],
+    // if D3D11 doesn't work we fallback to a Warp Device (https://docs.microsoft.com/en-us/windows/win32/direct3d11/overviews-direct3d-11-devices-create-warp)
+    &[
+        int(PLATFORM_ANGLE_TYPE_ANGLE),
+        PLATFORM_ANGLE_TYPE_D3D11_ANGLE,
+        int(PLATFORM_ANGLE_DEVICE_TYPE_ANGLE),
+        PLATFORM_ANGLE_DEVICE_TYPE_D3D_WARP_ANGLE,
+        PLATFORM_ANGLE_ENABLE_AUTOMATIC_TRIM_ANGLE,
+        int(TRUE),
+        int(NONE),
+    ],
+];
 
 #[derive(Error, Debug)]
 pub enum AngleError {
@@ -124,6 +123,12 @@ pub(crate) fn get_error() -> EGLError {
 }
 
 pub(crate) fn get_display(window: HWND) -> Result<(types::EGLDisplay, EGLint, EGLint)> {
+    let window = if window.is_invalid() {
+        None
+    } else {
+        Some(window)
+    };
+
     let hdc = unsafe { GetDC(window) };
 
     for config in &DISPLAY_CONFIGS {
@@ -224,15 +229,14 @@ pub(crate) fn create_context(
         2,
         NONE.try_into().unwrap(),
     ];
-    let egl_context: types::EGLContext =
-        unsafe {
-            CreateContext(
-                display,
-                surface_config,
-                std::ptr::null_mut(),
-                context_attributes.as_ptr(),
-            )
-        };
+    let egl_context: types::EGLContext = unsafe {
+        CreateContext(
+            display,
+            surface_config,
+            std::ptr::null_mut(),
+            context_attributes.as_ptr(),
+        )
+    };
     if egl_context == NO_CONTEXT {
         Err(AngleError::FailedToCreateContext(display, get_error()).into())
     } else {

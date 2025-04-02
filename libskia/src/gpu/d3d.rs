@@ -161,7 +161,7 @@ impl D3D12Context {
                     size.width as _,
                     size.height as _,
                     DXGI_FORMAT_R8G8B8A8_UNORM,
-                    0,
+                    DXGI_SWAP_CHAIN_FLAG::default(),
                 )
                 .expect(&format!(
                     "Resize buffers to width = {} height = {}",
@@ -214,7 +214,7 @@ impl D3D12Context {
                 .expect("Device is not removed");
             self.hardware_context
                 .swap_chain
-                .Present(1, 0)
+                .Present(1, DXGI_PRESENT::default())
                 .ok()
                 .expect("Present swap chain");
             self.hardware_context
@@ -351,7 +351,7 @@ fn create_factory<T: Interface>() -> Result<T> {
             "Could not create Debug factory: {:?}. We will try a default one.",
             error
         );
-        unsafe { CreateDXGIFactory2(0) }
+        unsafe { CreateDXGIFactory2(DXGI_CREATE_FACTORY_FLAGS::default()) }
     })
 }
 
