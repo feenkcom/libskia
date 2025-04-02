@@ -5,10 +5,10 @@ use cocoa::appkit::NSView;
 use cocoa::base::{id as cocoa_id, YES};
 use core_graphics_types::geometry::CGSize;
 use foreign_types_shared::{ForeignType, ForeignTypeRef};
-use metal::{CommandQueue, Device, MetalDrawableRef, MetalLayer, MTLPixelFormat};
-use skia_safe::{ColorType, gpu, ISize, scalar, Size, Surface};
-use skia_safe::gpu::{BackendRenderTarget, DirectContext, mtl, SurfaceOrigin};
+use metal::{CommandQueue, Device, MTLPixelFormat, MetalDrawableRef, MetalLayer};
 use skia_safe::gpu::mtl::BackendContext;
+use skia_safe::gpu::{mtl, BackendRenderTarget, DirectContext, SurfaceOrigin};
+use skia_safe::{gpu, scalar, ColorType, ISize, Size, Surface};
 use value_box::ValueBox;
 
 use crate::gpu::platform_compositor::{PlatformCompositor, PlatformContext};
@@ -46,14 +46,13 @@ impl MetalContext {
         let queue = device.new_command_queue();
 
         let backend_context = unsafe {
-            mtl::BackendContext::new(
+            BackendContext::new(
                 device.as_ptr() as mtl::Handle,
                 queue.as_ptr() as mtl::Handle,
-                std::ptr::null(),
             )
         };
 
-        let direct_context = DirectContext::new_metal(&backend_context, None).unwrap();
+        let direct_context = gpu::direct_contexts::make_metal(&backend_context, None).unwrap();
 
         MetalContext {
             device,
@@ -79,7 +78,7 @@ impl MetalContext {
             let texture_info =
                 unsafe { mtl::TextureInfo::new(drawable.texture().as_ptr() as mtl::Handle) };
 
-            let backend_render_target = BackendRenderTarget::new_metal(
+            let backend_render_target = gpu::backend_render_targets::make_mtl(
                 (drawable_size.width as i32, drawable_size.height as i32),
                 &texture_info,
             );

@@ -126,7 +126,7 @@ pub fn skia_font_get_metrics(font: *mut ValueBox<Font>) -> *mut ValueBox<FontMet
 pub fn skia_font_text_to_glyphs(
     font: *mut ValueBox<Font>,
     text_ptr: *mut ValueBox<StringBox>,
-    encoding: TextEncoding,
+    _encoding: TextEncoding,
     glyphs_ptr: *mut ValueBox<ArrayBox<GlyphId>>,
     paint_ptr: *mut ValueBox<Paint>,
     bounds_ptr: *mut ValueBox<Rect>,
@@ -166,7 +166,7 @@ pub fn skia_font_text_to_glyphs(
 pub fn skia_font_measure_text(
     font: *mut ValueBox<Font>,
     text_ptr: *mut ValueBox<StringBox>,
-    encoding: TextEncoding,
+    _encoding: TextEncoding,
     paint_ptr: *mut ValueBox<Paint>,
     bounds_ptr: *mut ValueBox<Rect>,
 ) -> scalar {

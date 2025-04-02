@@ -1,4 +1,4 @@
-use skia_safe::image_filters::{blur, drop_shadow, drop_shadow_only, image};
+use skia_safe::image_filters::{blur, drop_shadow, drop_shadow_only, image, CropRect};
 use skia_safe::{scalar, Color, Image, ImageFilter, Rect, SamplingOptions, TileMode, Vector};
 use value_box::{ValueBox, ValueBoxPointer};
 
@@ -58,27 +58,28 @@ pub fn skia_image_filter_drop_shadow(
     a: u8,
     input_ptr: *mut ValueBox<ImageFilter>,
 ) -> *mut ValueBox<ImageFilter> {
-    let filter_option =
-        input_ptr.with_value(
-            || {
-                drop_shadow(
-                    Vector::new(delta_x, delta_y),
-                    (sigma_x, sigma_y),
-                    Color::from_argb(a, r, g, b),
-                    None,
-                    None,
-                )
-            },
-            |input| {
-                drop_shadow(
-                    Vector::new(delta_x, delta_y),
-                    (sigma_x, sigma_y),
-                    Color::from_argb(a, r, g, b),
-                    Some(input),
-                    None,
-                )
-            },
-        );
+    let filter_option = input_ptr.with_value(
+        || {
+            drop_shadow(
+                Vector::new(delta_x, delta_y),
+                (sigma_x, sigma_y),
+                Color::from_argb(a, r, g, b),
+                None,
+                None,
+                CropRect::NO_CROP_RECT,
+            )
+        },
+        |input| {
+            drop_shadow(
+                Vector::new(delta_x, delta_y),
+                (sigma_x, sigma_y),
+                Color::from_argb(a, r, g, b),
+                None,
+                Some(input),
+                CropRect::NO_CROP_RECT,
+            )
+        },
+    );
 
     match filter_option {
         None => std::ptr::null_mut(),
@@ -106,6 +107,7 @@ pub fn skia_image_filter_drop_shadow_only(
                 Color::from_argb(a, r, g, b),
                 None,
                 None,
+                CropRect::NO_CROP_RECT,
             )
         },
         |input| {
@@ -113,8 +115,9 @@ pub fn skia_image_filter_drop_shadow_only(
                 Vector::new(delta_x, delta_y),
                 (sigma_x, sigma_y),
                 Color::from_argb(a, r, g, b),
-                Some(input),
                 None,
+                Some(input),
+                CropRect::NO_CROP_RECT,
             )
         },
     );

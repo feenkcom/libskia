@@ -1,13 +1,13 @@
 [package]
 name = "libskia"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["feenk gmbh <contact@feenk.com>"]
 edition = "2021"
 
 [dependencies]
-skia-safe = "0.73"
+skia-safe = "0.84"
 typename = "0.1"
-float-cmp = "0.9"
+float-cmp = "0.10"
 ordered-float = "4.2"
 libc = "0.2"
 crossbeam = "0.8"
@@ -16,7 +16,7 @@ byteorder = "1.5"
 num_enum = "0.7"
 widestring = "1.0"
 log = "0.4"
-env_logger = "0.10"
+env_logger = "0.11"
 fps_counter = "3.0"
 lazy_static = "1.4"
 anyhow = "1.0"
@@ -40,13 +40,33 @@ phlow-ffi = "1"
 #compositor-skia-ffi = { path = "../../compositor-rs/compositor-skia-ffi" }
 #value-box = { path = "../../value-box-rs/value-box", features = [ "phlow" ] }
 
-[dependencies.mozangle]
+[target.'cfg(target_os="macos")'.dependencies]
+metal = { version = "0.32", optional = true }
+cocoa = { version = "0.26", optional = true }
+core-graphics-types = { version = "0.2", optional = true }
+foreign-types-shared = { version = "0.3", optional = true }
+
+[target.'cfg(target_os="ios")'.dependencies]
+uikit-sys = { git = "https://github.com/syrel/uikit-sys" }
+objc = "0.2"
+
+[target.'cfg(target_os="android")'.dependencies]
+khronos-egl = { version = "4.1", features = [ "dynamic" ], optional = true }
+libloading = {version = "0.7", optional = true }
+
+[target.'cfg(target_os="linux")'.dependencies]
+x11 = { version = "2.21", features = ["xlib", "glx"], optional = true }
+wayland-sys = { version = "0.30.0", default-features = false, features = ["egl", "client", "dlopen"], optional = true }
+khronos-egl = { version = "4.1", features = ["dynamic"], optional = true }
+libloading = {version = "0.7", optional = true }
+
+[target.'cfg(target_os="windows")'.dependencies.mozangle]
 git = "https://github.com/syrel/mozangle"
 rev = "8ad3227cbfe59b9ddbaa95379b5d45804427630d"
 optional = true
 features = [ "egl" ]
 
-[dependencies.windows]
+[target.'cfg(target_os="windows")'.dependencies.windows]
 version = "0.54.0"
 optional = true
 features = [
@@ -66,27 +86,8 @@ features = [
     "Graphics_DirectX_Direct3D11",
 ]
 
-[target.'cfg(target_os="macos")'.dependencies]
-metal = { version = "0.27", optional = true }
-cocoa = { version = "0.25", optional = true }
-core-graphics-types = { version = "0.1", optional = true }
-foreign-types-shared = { version = "0.3", optional = true }
-
-[target.'cfg(target_os="ios")'.dependencies]
-uikit-sys = { git = "https://github.com/syrel/uikit-sys" }
-objc = "0.2"
-
-[target.'cfg(target_os="android")'.dependencies]
-khronos-egl = { version = "4.1", features = [ "dynamic" ], optional = true }
-libloading = {version = "0.7", optional = true }
-
-[target.'cfg(target_os="linux")'.dependencies]
-x11 = { version = "2.21", features = ["xlib", "glx"], optional = true }
-wayland-sys = { version = "0.30.0", default-features = false, features = ["egl", "client", "dlopen"], optional = true }
-khronos-egl = { version = "4.1", features = ["dynamic"], optional = true }
-libloading = {version = "0.7", optional = true }
-
 [features]
+default = ["gl", "skia-safe/textlayout", "skia-safe/embed-freetype", "svg" ]
 gl = ["skia-safe/gl"]
 d3d = ["skia-safe/d3d", "windows" ]
 angle = ["gl", "mozangle"]
@@ -95,7 +96,6 @@ wayland = [ "skia-safe/wayland", "dep:wayland-sys" ]
 egl = ["skia-safe/egl", "khronos-egl", "libloading" ]
 shaper = ["skia-safe/shaper"]
 svg = [ "skia-safe/svg" ]
-default = ["gl", "skia-safe/textlayout", "skia-safe/embed-freetype", "svg" ]
 skia_windows = [ "d3d", "angle" ]
 skia_mac = ["skia-safe/metal", "metal", "cocoa", "foreign-types-shared", "core-graphics-types" ]
 skia_linux = ["x11", "wayland", "egl" ]

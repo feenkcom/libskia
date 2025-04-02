@@ -32,8 +32,8 @@ pub fn skia_text_blob_from_glyphs(
     let glyphs = unsafe { std::slice::from_raw_parts(glyphs, glyphs_length) };
 
     font.with_ref_ok(|font| {
-        let mut blob_builder = TextBlobBuilder::new();
-        let allocated_glyphs =
+        let mut blob_builder: TextBlobBuilder = TextBlobBuilder::new();
+        let allocated_glyphs: &mut [GlyphId] =
             blob_builder.alloc_run(font, glyphs_length, Point::new(0.0, 0.0), None);
         allocated_glyphs.copy_from_slice(glyphs);
 
