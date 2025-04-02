@@ -25,7 +25,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let src_dir = options.source_dir.unwrap_or_else(|| target_dir.join("src"));
 
-    build(target_dir, src_dir, options.target, |target| {
+    build(src_dir, target_dir, options.target, |target| {
         Ok(Box::new(latest_libskia(target)))
     })
 }
