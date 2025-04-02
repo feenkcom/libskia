@@ -22,10 +22,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let target_dir = options
         .target_dir
         .unwrap_or_else(|| PathBuf::from("target"));
+
     let src_dir = options.source_dir.unwrap_or_else(|| target_dir.join("src"));
-    if !src_dir.exists() {
-        std::fs::create_dir_all(src_dir.as_path())?;
-    }
 
     build(target_dir, src_dir, options.target, |target| {
         Ok(Box::new(latest_libskia(target)))
