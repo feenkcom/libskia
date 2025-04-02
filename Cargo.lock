@@ -1084,6 +1084,7 @@ dependencies = [
 name = "libskia-builder"
 version = "0.3.0"
 dependencies = [
+ "clap",
  "shared-library-builder",
 ]
 
@@ -1691,7 +1692,7 @@ dependencies = [
 [[package]]
 name = "shared-library-builder"
 version = "0.4.0"
-source = "git+https://github.com/feenkcom/shared-library-builder-rs#3de8f3234b9f515b17ae2164ec321d66b20ceb9f"
+source = "git+https://github.com/feenkcom/shared-library-builder-rs#bc378f58c926d521be4b50b85ead193e5bd9d7a8"
 dependencies = [
  "clap",
  "file-matcher",

@@ -217,7 +217,7 @@ pipeline {
                     agent {
                         node {
                           label "${WINDOWS_ARM64_TARGET}-${WINDOWS_ARM64_SERVER_NAME}"
-                          customWorkspace 'C:\\j\\skia'
+                          customWorkspace 'C:\\s'
                         }
                     }
 
@@ -237,8 +237,8 @@ pipeline {
                                 powershell "Remove-Item target -Recurse -Force"
                             }
                         }
-                        powershell "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release -- --target ${TARGET}"
-                        powershell "Move-Item -Force -Path target/${TARGET}/release/${LIBRARY_NAME}.${EXTENSION} -Destination ${LIBRARY_NAME}-${TARGET}.${EXTENSION}"
+                        powershell "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release -- --target-dir C:\\s\\o --source-dir C:\\s --target ${TARGET}"
+                        powershell "Move-Item -Force -Path o/${TARGET}/release/${LIBRARY_NAME}.${EXTENSION} -Destination ${LIBRARY_NAME}-${TARGET}.${EXTENSION}"
                         stash includes: "${LIBRARY_NAME}-${TARGET}.${EXTENSION}", name: "${TARGET}"
                     }
                 }
