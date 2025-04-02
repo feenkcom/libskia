@@ -226,7 +226,7 @@ pipeline {
                         EXTENSION = "dll"
                         LLVM_HOME = 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\Llvm\\x64'
                         LIBCLANG_PATH = "${LLVM_HOME}\\bin"
-                        CARGO_HOME = "C:\\j\\skia\\target\\aarch64-pc-windows-msvc\.cargo"
+                        CARGO_HOME = "C:\\j\\skia\\target\\aarch64-pc-windows-msvc\\.cargo"
                         CARGO_PATH = "${CARGO_HOME}\\bin"
                         PATH = "${CARGO_PATH};${LIBCLANG_PATH};$PATH"
                     }
