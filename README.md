@@ -3,6 +3,13 @@ C api wrapper around [rust-skia](https://github.com/rust-skia/rust-skia)
 
 # Building
 
+## MacOS
+Requires `curl` at least `v7.67.0`.
+
+```
+brew install curl ninja
+```
+
 ## Windows
 
 ```

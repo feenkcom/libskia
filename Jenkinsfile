@@ -64,7 +64,8 @@ pipeline {
                     environment {
                         TARGET = "${MACOS_INTEL_TARGET}"
                         EXTENSION = "dylib"
-                        PATH = "$HOME/.cargo/bin:/usr/local/bin/:$PATH"
+                        CURL_PATH = "/usr/local/opt/curl/bin"
+                        PATH = "$HOME/.cargo/bin:/usr/local/bin/:$CURL_PATH:$PATH"
                     }
 
                     steps {
