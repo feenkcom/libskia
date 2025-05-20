@@ -1,6 +1,9 @@
 use float_cmp::ApproxEqUlps;
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
-use skia_safe::{scalar, Canvas, Color, Image, Paint, Point, RRect, Rect, Vector};
+use skia_safe::{
+    scalar, Canvas, Color, FilterMode, Image, MipmapMode, Paint, Point, RRect, Rect,
+    SamplingOptions, Vector,
+};
 use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 #[no_mangle]
@@ -88,7 +91,12 @@ pub fn skia_canvas_fill_image_without_paint(
     image
         .with_ref_ok(|image| {
             canvas.with_not_null(|canvas| {
-                canvas.draw_image(image, Point::new(x, y), None);
+                canvas.draw_image_with_sampling_options(
+                    image,
+                    Point::new(x, y),
+                    SamplingOptions::new(FilterMode::Linear, MipmapMode::Linear),
+                    None,
+                );
             })
         })
         .log();
