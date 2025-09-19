@@ -3,7 +3,7 @@ use std::sync::{Arc, Mutex};
 
 use compositor::{Compositor, Layer};
 use compositor_skia::{Cache, SkiaCachelessCompositor, SkiaCompositor};
-use compositor_skia_platform::{MetalPlatform, Platform};
+use compositor_skia_platform::Platform;
 use fps_counter::FPSCounter;
 use skia_safe::{Color, Color4f, Font, FontMgr, FontStyle, ISize, Paint, Point, Surface};
 use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
