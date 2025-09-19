@@ -49,19 +49,18 @@ impl D3D12Context {
         let factory: IDXGIFactory4 = create_factory().expect("Creating DXGI factory");
         let adapter: IDXGIAdapter1 = Self::create_hardware_adapter(&factory);
 
-        let device: ID3D12Device = resolve_interface(
-            |ptr| unsafe { D3D12CreateDevice(&adapter, D3D_FEATURE_LEVEL_11_0, ptr) }
-        )
+        let device: ID3D12Device = resolve_interface(|ptr| unsafe {
+            D3D12CreateDevice(&adapter, D3D_FEATURE_LEVEL_11_0, ptr)
+        })
         .expect("Creating D3D device");
 
         let queue: ID3D12CommandQueue = {
-            let desc =
-                D3D12_COMMAND_QUEUE_DESC {
-                    Type: D3D12_COMMAND_LIST_TYPE_DIRECT,
-                    Priority: D3D12_COMMAND_QUEUE_PRIORITY_NORMAL.0,
-                    Flags: D3D12_COMMAND_QUEUE_FLAG_NONE,
-                    NodeMask: 0,
-                };
+            let desc = D3D12_COMMAND_QUEUE_DESC {
+                Type: D3D12_COMMAND_LIST_TYPE_DIRECT,
+                Priority: D3D12_COMMAND_QUEUE_PRIORITY_NORMAL.0,
+                Flags: D3D12_COMMAND_QUEUE_FLAG_NONE,
+                NodeMask: 0,
+            };
 
             unsafe { device.CreateCommandQueue(&desc) }.expect("Creating command queue")
         };
@@ -98,13 +97,7 @@ impl D3D12Context {
             swap_chain_desc.SampleDesc.Count = 1;
 
             let swap_chain1: IDXGISwapChain1 = unsafe {
-                factory.CreateSwapChainForHwnd(
-                    &queue,
-                    window,
-                    &swap_chain_desc,
-                    None,
-                    None,
-                )
+                factory.CreateSwapChainForHwnd(&queue, window, &swap_chain_desc, None, None)
             }
             .unwrap_or_else(|e| {
                 panic!(
@@ -244,10 +237,9 @@ impl D3D12Context {
         loop {
             match unsafe { factory.EnumAdapters1(index) } {
                 Ok(adapter) => {
-                    let device: Result<ID3D12Device> =
-                        resolve_interface(|ptr| unsafe {
-                            D3D12CreateDevice(&adapter, D3D_FEATURE_LEVEL_11_0, ptr)
-                        });
+                    let device: Result<ID3D12Device> = resolve_interface(|ptr| unsafe {
+                        D3D12CreateDevice(&adapter, D3D_FEATURE_LEVEL_11_0, ptr)
+                    });
 
                     if device.is_ok() {
                         return adapter;
@@ -361,8 +353,8 @@ pub fn skia_d3d_compositor_new_size(
     width: u32,
     height: u32,
 ) -> *mut ValueBox<PlatformCompositor> {
-    ValueBox::new(
-        PlatformCompositor::new(PlatformContext::D3D(D3D12Context::new(window, width, height)))
-    )
+    ValueBox::new(PlatformCompositor::new(PlatformContext::D3D(
+        D3D12Context::new(window, width, height),
+    )))
     .into_raw()
 }

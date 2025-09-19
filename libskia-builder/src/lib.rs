@@ -8,6 +8,10 @@ pub fn libskia(target: LibraryTarget, version: Option<impl Into<String>>) -> Rus
 
     let mut library = RustLibrary::new("Skia", LibraryLocation::Git(location))
         .package("libskia")
+        .env(
+            "SKIA_GN_ARGS",
+            "extra_cflags+=[\"-DSK_AVOID_SLOW_RASTER_PIPELINE_BLURS\"]",
+        )
         .requires("python");
 
     if target.is_windows() {

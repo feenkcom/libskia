@@ -53,16 +53,15 @@ impl EglContext {
             Err("Wayland surface is null")?;
         }
 
-        let egl_window =
-            unsafe {
-                ffi_dispatch!(
-                    WAYLAND_EGL_HANDLE,
-                    wl_egl_window_create,
-                    wayland_surface.cast(),
-                    width as _,
-                    height as _
-                )
-            };
+        let egl_window = unsafe {
+            ffi_dispatch!(
+                WAYLAND_EGL_HANDLE,
+                wl_egl_window_create,
+                wayland_surface.cast(),
+                width as _,
+                height as _
+            )
+        };
         if egl_window.is_null() {
             return Err("Failed to create wayland egl window")?;
         }
@@ -331,15 +330,14 @@ impl WaylandWindowContext {
         let backend_render_target =
             gpu::backend_render_targets::make_gl(size, 0, 8, framebuffer_info);
 
-        let surface =
-            gpu::surfaces::wrap_backend_render_target(
-                &mut self.direct_context,
-                &backend_render_target,
-                SurfaceOrigin::BottomLeft,
-                ColorType::RGBA8888,
-                None,
-                None,
-            );
+        let surface = gpu::surfaces::wrap_backend_render_target(
+            &mut self.direct_context,
+            &backend_render_target,
+            SurfaceOrigin::BottomLeft,
+            ColorType::RGBA8888,
+            None,
+            None,
+        );
 
         self.surface = surface;
         self.surface

@@ -16,9 +16,9 @@ pub fn skia_text_blob_from_text(
     font: *mut ValueBox<Font>,
 ) -> *mut ValueBox<TextBlob> {
     text.with_ref(|text| {
-        font.with_ref_ok(
-            |font| TextBlob::from_text(text.as_str(), font).map(|blob| value_box!(blob))
-        )
+        font.with_ref_ok(|font| {
+            TextBlob::from_text(text.as_str(), font).map(|blob| value_box!(blob))
+        })
     })
     .into_raw()
 }

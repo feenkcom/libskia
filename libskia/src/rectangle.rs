@@ -75,9 +75,11 @@ pub fn skia_rectangle_i32_set_ltrb(
     right: i32,
     bottom: i32,
 ) {
-    rectangle_ptr.with_mut_ok(|rectangle| {
-        rectangle.set_ltrb(left, top, right, bottom);
-    }).log();
+    rectangle_ptr
+        .with_mut_ok(|rectangle| {
+            rectangle.set_ltrb(left, top, right, bottom);
+        })
+        .log();
 }
 
 #[no_mangle]

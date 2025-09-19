@@ -362,12 +362,16 @@ impl GlContext {
         glx_context = glx::glXCreateContext(display, visual_info, std::ptr::null_mut(), xlib::True);
 
         if glx_context.is_null() {
-            return Err(GlError::CreationFailed("Could not instantiate glx context".to_string()));
+            return Err(GlError::CreationFailed(
+                "Could not instantiate glx context".to_string(),
+            ));
         }
 
         if !current && glx::glXMakeCurrent(display, window, glx_context) == 0 {
             glx::glXDestroyContext(display, glx_context);
-            return Err(GlError::CreationFailed("Failed to make glx context current".to_string()));
+            return Err(GlError::CreationFailed(
+                "Failed to make glx context current".to_string(),
+            ));
         }
 
         if let Some(ref glx_swap_interval_ext) = gl.glx_swap_interval_ext {
@@ -394,9 +398,9 @@ impl GlContext {
         }
 
         match interface {
-            None => {
-                Err(GlError::CreationFailed("Could not instantiate native Interface".to_string()))
-            }
+            None => Err(GlError::CreationFailed(
+                "Could not instantiate native Interface".to_string(),
+            )),
             Some(interface) => Ok(Self {
                 display,
                 window,
@@ -413,7 +417,9 @@ impl GlContext {
         let context_options = ContextOptions::default();
         let direct_context = DirectContext::new_gl(self.backend_context.clone(), &context_options);
         if direct_context.is_none() {
-            return Err(GlError::CreationFailed("Failed to create direct context".to_string()));
+            return Err(GlError::CreationFailed(
+                "Failed to create direct context".to_string(),
+            ));
         }
         self.direct_context = direct_context;
         Ok(())
@@ -441,22 +447,23 @@ impl GlContext {
                 framebuffer_info,
             );
 
-            let surface =
-                gpu::surfaces::wrap_backend_render_target(
-                    direct_context,
-                    &backend_render_target,
-                    SurfaceOrigin::BottomLeft,
-                    ColorType::RGBA8888,
-                    None,
-                    None,
-                );
+            let surface = gpu::surfaces::wrap_backend_render_target(
+                direct_context,
+                &backend_render_target,
+                SurfaceOrigin::BottomLeft,
+                ColorType::RGBA8888,
+                None,
+                None,
+            );
 
             self.surface = surface;
         }
         if self.surface.is_some() {
             Ok(())
         } else {
-            Err(GlError::CreationFailed("Failed to create skia Surface".to_string()))
+            Err(GlError::CreationFailed(
+                "Failed to create skia Surface".to_string(),
+            ))
         }
     }
 

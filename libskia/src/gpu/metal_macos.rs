@@ -16,9 +16,9 @@ use crate::gpu::platform_compositor::{PlatformCompositor, PlatformContext};
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct MetalContext {
-    device: Device,
+    pub device: Device,
     layer: MetalLayer,
-    queue: CommandQueue,
+    pub queue: CommandQueue,
     backend_context: BackendContext,
     direct_context: DirectContext,
 }
@@ -52,7 +52,8 @@ impl MetalContext {
             )
         };
 
-        let direct_context = gpu::direct_contexts::make_metal(&backend_context, None).unwrap();
+        let direct_context = DirectContext::new_metal(&backend_context, None).unwrap();
+        //let direct_context = gpu::direct_contexts::make_metal(&backend_context, None).unwrap();
 
         MetalContext {
             device,
@@ -78,7 +79,8 @@ impl MetalContext {
             let texture_info =
                 unsafe { mtl::TextureInfo::new(drawable.texture().as_ptr() as mtl::Handle) };
 
-            let backend_render_target = gpu::backend_render_targets::make_mtl(
+            let backend_render_target = BackendRenderTarget::new_metal(
+                //let backend_render_target = gpu::backend_render_targets::make_mtl(
                 (drawable_size.width as i32, drawable_size.height as i32),
                 &texture_info,
             );

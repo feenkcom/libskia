@@ -108,9 +108,12 @@ impl AngleContext {
         if self.egl_context.is_some() {
             bail!("Context already initialized")
         }
-        self.egl_context = Some(
-            AngleWindowContext::try_create(self.egl_display, self.window, self.width, self.height)?
-        );
+        self.egl_context = Some(AngleWindowContext::try_create(
+            self.egl_display,
+            self.window,
+            self.width,
+            self.height,
+        )?);
         Ok(())
     }
 

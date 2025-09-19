@@ -193,8 +193,8 @@ pub fn skia_canvas_quick_reject_path(
     canvas: *mut ReferenceBox<Canvas>,
     path: *mut ValueBox<Path>,
 ) -> bool {
-    path.with_ref_ok(
-        |path| canvas.with_not_null_return(false, |canvas| canvas.quick_reject(path.as_ref()))
-    )
+    path.with_ref_ok(|path| {
+        canvas.with_not_null_return(false, |canvas| canvas.quick_reject(path.as_ref()))
+    })
     .or_log(false)
 }

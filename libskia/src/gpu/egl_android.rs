@@ -288,15 +288,14 @@ impl AndroidWindowContext {
         let backend_render_target =
             gpu::backend_render_targets::make_gl(size, 0, 8, framebuffer_info);
 
-        let surface =
-            gpu::surfaces::wrap_backend_render_target(
-                &mut self.direct_context,
-                &backend_render_target,
-                SurfaceOrigin::BottomLeft,
-                ColorType::RGBA8888,
-                None,
-                None,
-            );
+        let surface = gpu::surfaces::wrap_backend_render_target(
+            &mut self.direct_context,
+            &backend_render_target,
+            SurfaceOrigin::BottomLeft,
+            ColorType::RGBA8888,
+            None,
+            None,
+        );
 
         self.surface = surface;
         self.surface

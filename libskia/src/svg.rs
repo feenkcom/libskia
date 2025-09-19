@@ -2,10 +2,10 @@ use std::error::Error;
 use std::ops::Deref;
 
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
-use skia_safe::{Canvas, FontMgr, Rect, scalar, Size, Vector};
-use skia_safe::svg::Canvas as SvgCanvas;
 use skia_safe::svg::canvas::Flags as SvgCanvasFlags;
+use skia_safe::svg::Canvas as SvgCanvas;
 use skia_safe::svg::Dom;
+use skia_safe::{scalar, Canvas, FontMgr, Rect, Size, Vector};
 use string_box::StringBox;
 use value_box::{ReturnBoxerResult, ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
 

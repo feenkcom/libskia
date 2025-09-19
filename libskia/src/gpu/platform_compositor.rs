@@ -3,14 +3,18 @@ use std::sync::{Arc, Mutex};
 
 use compositor::{Compositor, Layer};
 use compositor_skia::{Cache, SkiaCachelessCompositor, SkiaCompositor};
+use compositor_skia_platform::{MetalPlatform, Platform};
 use fps_counter::FPSCounter;
 use skia_safe::{Color, Color4f, Font, FontMgr, FontStyle, ISize, Paint, Point, Surface};
 use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
 lazy_static! {
-    static ref FPS_FONT: Font = Font::new(FontMgr::new()
+    static ref FPS_FONT: Font = Font::new(
+        FontMgr::new()
             .legacy_make_typeface(None, FontStyle::normal())
-            .unwrap(), 60.0);
+            .unwrap(),
+        60.0
+    );
     static ref FPS_PAINT: Paint = Paint::new(Color4f::from(Color::BLUE), None);
 }
 
@@ -55,6 +59,8 @@ impl PlatformCompositor {
     }
 
     pub fn draw(&mut self) -> Result<(), Box<dyn Error>> {
+        let platform = self.context.platform();
+
         let current_layer = self
             .latest_frame
             .lock()
@@ -68,7 +74,7 @@ impl PlatformCompositor {
                 let canvas = surface.canvas();
                 canvas.clear(Color::WHITE);
 
-                SkiaCompositor::new(canvas, &mut self.cache).compose(layer);
+                SkiaCompositor::new(platform, canvas, &mut self.cache).compose(layer);
 
                 self.render_fps.as_mut().map(|counter| {
                     canvas.draw_str(
@@ -130,6 +136,17 @@ pub enum PlatformContext {
 }
 
 impl PlatformContext {
+    pub fn platform(&self) -> Option<Platform> {
+        match self {
+            #[cfg(feature = "metal")]
+            PlatformContext::Metal(context) => Some(Platform::Metal(MetalPlatform {
+                device: context.device.clone(),
+                queue: context.queue.clone(),
+            })),
+            _ => None,
+        }
+    }
+
     pub fn with_surface(&mut self, callback: impl FnOnce(&mut Surface)) {
         match self {
             #[cfg(feature = "metal")]

@@ -20,13 +20,12 @@ pub fn skia_image_from_pixels(
     row_bytes: usize,
     color_type: ColorType,
 ) -> *mut ValueBox<Image> {
-    let image_info =
-        ImageInfo::new(
-            ISize::new(width, height),
-            color_type,
-            AlphaType::Unpremul,
-            None,
-        );
+    let image_info = ImageInfo::new(
+        ISize::new(width, height),
+        color_type,
+        AlphaType::Unpremul,
+        None,
+    );
     pixels_ptr.with_not_null_return(std::ptr::null_mut(), |array| {
         match Image::from_raster_data(&image_info, Data::new_copy(array.to_slice()), row_bytes) {
            None => {

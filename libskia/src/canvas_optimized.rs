@@ -16,15 +16,17 @@ pub fn skia_canvas_draw_text_blob_with_color(
     antialias: bool,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        text_blob_ptr.with_ref_ok(|text_blob| {
-            canvas.draw_text_blob(
-                text_blob,
-                Point::new(x, y),
-                Paint::default()
-                    .set_color(Color::from_argb(a, r, g, b))
-                    .set_anti_alias(antialias),
-            );
-        }).log();
+        text_blob_ptr
+            .with_ref_ok(|text_blob| {
+                canvas.draw_text_blob(
+                    text_blob,
+                    Point::new(x, y),
+                    Paint::default()
+                        .set_color(Color::from_argb(a, r, g, b))
+                        .set_anti_alias(antialias),
+                );
+            })
+            .log();
     });
 }
 
@@ -38,15 +40,17 @@ pub fn skia_canvas_draw_text_blob_with_black_color(
     antialias: bool,
 ) {
     canvas_ptr.with_not_null(|canvas| {
-        text_blob_ptr.with_ref_ok(|text_blob| {
-            canvas.draw_text_blob(
-                text_blob,
-                Point::new(x, y),
-                Paint::default()
-                    .set_color(Color::BLACK)
-                    .set_anti_alias(antialias),
-            );
-        }).log();
+        text_blob_ptr
+            .with_ref_ok(|text_blob| {
+                canvas.draw_text_blob(
+                    text_blob,
+                    Point::new(x, y),
+                    Paint::default()
+                        .set_color(Color::BLACK)
+                        .set_anti_alias(antialias),
+                );
+            })
+            .log();
     });
 }
 
@@ -64,11 +68,10 @@ mod tests {
         let mut surface = Surface::new_raster_n32_premul(ISize::new(width, height)).unwrap();
         let canvas = surface.canvas();
 
-        let font =
-            Font::new(
-                Typeface::new("Source Sans Pro", FontStyle::normal()).unwrap(),
-                Some(14.0),
-            );
+        let font = Font::new(
+            Typeface::new("Source Sans Pro", FontStyle::normal()).unwrap(),
+            Some(14.0),
+        );
 
         let now = Instant::now();
         for _ in 0..25000 {

@@ -106,13 +106,15 @@ pub fn skia_surface_read_all_pixels(
     surface: *mut ValueBox<Surface>,
     pixels_ptr: *mut ValueBox<ArrayBox<u8>>,
 ) -> bool {
-    surface.with_mut(|surface| {
-        pixels_ptr.with_mut_ok(|pixels| {
-            let image_info = surface.image_info();
-            let row_bytes = image_info.min_row_bytes();
-            surface.read_pixels(&image_info, pixels.to_slice(), row_bytes, IPoint::new(0, 0))
+    surface
+        .with_mut(|surface| {
+            pixels_ptr.with_mut_ok(|pixels| {
+                let image_info = surface.image_info();
+                let row_bytes = image_info.min_row_bytes();
+                surface.read_pixels(&image_info, pixels.to_slice(), row_bytes, IPoint::new(0, 0))
+            })
         })
-    }).or_log(false)
+        .or_log(false)
 }
 
 #[no_mangle]
