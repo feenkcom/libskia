@@ -139,7 +139,7 @@ impl PlatformContext {
     pub fn platform(&self) -> Option<Platform> {
         match self {
             #[cfg(feature = "metal")]
-            PlatformContext::Metal(context) => Some(Platform::Metal(MetalPlatform {
+            PlatformContext::Metal(context) => Some(Platform::Metal(compositor_skia_platform::MetalPlatform {
                 device: context.device.clone(),
                 queue: context.queue.clone(),
             })),
