@@ -69,9 +69,9 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.99"
+version = "1.0.100"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b0674a1ddeecb70197781e945de4b3b8ffb61fa939a5597bcf48503737663100"
+checksum = "a23eb6b1614318a8071c9b2521f36b424b2c83db5eb3a0fead4a6c0809af6e61"
 
 [[package]]
 name = "array-box"
@@ -200,7 +200,7 @@ checksum = "0b023947811758c97c59bf9d1c188fd619ad4718dcaa767947df1cadb14f39f4"
 dependencies = [
  "glob",
  "libc",
- "libloading 0.8.8",
+ "libloading 0.8.9",
 ]
 
 [[package]]
@@ -280,7 +280,7 @@ checksum = "b05b61dc5112cbb17e4b6cd61790d9845d13888356391624cbe7e41efeac1e75"
 [[package]]
 name = "compositor"
 version = "2.3.0"
-source = "git+https://github.com/feenkcom/compositor-rs#d5d1f5eca79731b32d4efc704bdaa962c5314224"
+source = "git+https://github.com/feenkcom/compositor-rs#f3056cd54184a9a4b9c42ac82a26d303e77be87b"
 dependencies = [
  "cfg-if",
  "cocoa",
@@ -300,7 +300,7 @@ dependencies = [
 [[package]]
 name = "compositor-ffi"
 version = "2.3.0"
-source = "git+https://github.com/feenkcom/compositor-rs#d5d1f5eca79731b32d4efc704bdaa962c5314224"
+source = "git+https://github.com/feenkcom/compositor-rs#f3056cd54184a9a4b9c42ac82a26d303e77be87b"
 dependencies = [
  "array-box",
  "cfg-if",
@@ -316,7 +316,7 @@ dependencies = [
 [[package]]
 name = "compositor-skia"
 version = "2.3.0"
-source = "git+https://github.com/feenkcom/compositor-rs#d5d1f5eca79731b32d4efc704bdaa962c5314224"
+source = "git+https://github.com/feenkcom/compositor-rs#f3056cd54184a9a4b9c42ac82a26d303e77be87b"
 dependencies = [
  "anyhow",
  "cfg-if",
@@ -335,7 +335,7 @@ dependencies = [
 [[package]]
 name = "compositor-skia-ffi"
 version = "2.2.0"
-source = "git+https://github.com/feenkcom/compositor-rs#d5d1f5eca79731b32d4efc704bdaa962c5314224"
+source = "git+https://github.com/feenkcom/compositor-rs#f3056cd54184a9a4b9c42ac82a26d303e77be87b"
 dependencies = [
  "compositor",
  "compositor-skia",
@@ -346,7 +346,7 @@ dependencies = [
 [[package]]
 name = "compositor-skia-platform"
 version = "0.1.0"
-source = "git+https://github.com/feenkcom/compositor-rs#d5d1f5eca79731b32d4efc704bdaa962c5314224"
+source = "git+https://github.com/feenkcom/compositor-rs#f3056cd54184a9a4b9c42ac82a26d303e77be87b"
 dependencies = [
  "anyhow",
  "cocoa",
@@ -364,7 +364,7 @@ dependencies = [
 [[package]]
 name = "compositor-texture"
 version = "0.1.0"
-source = "git+https://github.com/feenkcom/compositor-rs#d5d1f5eca79731b32d4efc704bdaa962c5314224"
+source = "git+https://github.com/feenkcom/compositor-rs#f3056cd54184a9a4b9c42ac82a26d303e77be87b"
 
 [[package]]
 name = "core-foundation"
@@ -488,7 +488,7 @@ version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "330c60081dcc4c72131f8eb70510f1ac07223e5d4163db481a04a0befcffa412"
 dependencies = [
- "libloading 0.8.8",
+ "libloading 0.8.9",
 ]
 
 [[package]]
@@ -1014,12 +1014,12 @@ dependencies = [
 
 [[package]]
 name = "libloading"
-version = "0.8.8"
+version = "0.8.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "07033963ba89ebaf1584d767badaa2e8fcec21aedea6b8c0346d487d49c28667"
+checksum = "d7c4b02199fee7c5d21a5ae7d8cfa79a6ef5bb2fc834d6e9058e89c825efdc55"
 dependencies = [
  "cfg-if",
- "windows-targets 0.53.3",
+ "windows-link 0.2.0",
 ]
 
 [[package]]
@@ -1673,9 +1673,9 @@ checksum = "d767eb0aabc880b29956c35734170f26ed551a859dbd361d140cdbeca61ab1e2"
 
 [[package]]
 name = "serde"
-version = "1.0.225"
+version = "1.0.226"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fd6c24dee235d0da097043389623fb913daddf92c76e9f5a1db88607a0bcbd1d"
+checksum = "0dca6411025b24b60bfa7ec1fe1f8e710ac09782dca409ee8237ba74b51295fd"
 dependencies = [
  "serde_core",
  "serde_derive",
@@ -1683,18 +1683,18 @@ dependencies = [
 
 [[package]]
 name = "serde_core"
-version = "1.0.225"
+version = "1.0.226"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "659356f9a0cb1e529b24c01e43ad2bdf520ec4ceaf83047b83ddcc2251f96383"
+checksum = "ba2ba63999edb9dac981fb34b3e5c0d111a69b0924e253ed29d83f7c99e966a4"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.225"
+version = "1.0.226"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ea936adf78b1f766949a4977b91d2f5595825bd6ec079aa9543ad2685fc4516"
+checksum = "8db53ae22f34573731bafa1db20f04027b2d25e02d8205921b569171699cdb33"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2543,9 +2543,9 @@ dependencies = [
 
 [[package]]
 name = "xattr"
-version = "1.5.1"
+version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "af3a19837351dc82ba89f8a125e22a3c475f05aba604acc023d62b2739ae2909"
+checksum = "32e45ad4206f6d2479085147f02bc2ef834ac85886624a23575ae137c8aa8156"
 dependencies = [
  "libc",
  "rustix 1.1.2",
