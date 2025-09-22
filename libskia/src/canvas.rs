@@ -4,8 +4,8 @@ use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::canvas::{PointMode, SaveLayerRec};
 use skia_safe::utils::shadow_utils::{draw_shadow, ShadowFlags};
 use skia_safe::{
-    scalar, BlendMode, Canvas, Color, Image, Matrix, Paint, Path, Point, Point3, RRect, Rect,
-    TextBlob, Vector, M44,
+    scalar, BlendMode, Canvas, Color, FilterMode, Image, Matrix, MipmapMode, Paint, Path, Point,
+    Point3, RRect, Rect, SamplingOptions, TextBlob, Vector, M44,
 };
 use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 
@@ -302,10 +302,20 @@ pub fn skia_canvas_draw_image(
             .with_ref(|image| {
                 if paint_ptr.has_value() {
                     paint_ptr.with_ref_ok(|paint| {
-                        canvas.draw_image(image, Point::new(x, y), Some(paint));
+                        canvas.draw_image_with_sampling_options(
+                            image,
+                            Point::new(x, y),
+                            SamplingOptions::new(FilterMode::Linear, MipmapMode::Linear),
+                            Some(paint),
+                        );
                     })
                 } else {
-                    canvas.draw_image(image, Point::new(x, y), None);
+                    canvas.draw_image_with_sampling_options(
+                        image,
+                        Point::new(x, y),
+                        SamplingOptions::new(FilterMode::Linear, MipmapMode::Linear),
+                        None,
+                    );
                     Ok(())
                 }
             })
