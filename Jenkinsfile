@@ -241,7 +241,7 @@ pipeline {
                         }
                         powershell "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release -- --target-dir C:\\s\\o --source-dir C:\\s --target ${TARGET}"
                         powershell "Move-Item -Force -Path target/${TARGET}/release/${LIBRARY_NAME}.${EXTENSION} -Destination ${LIBRARY_NAME}-${TARGET}.${EXTENSION}"
-                        powershell "Move-Item -Force -Path target/release/${LIBRARY_NAME}.pdb -Destination ${LIBRARY_NAME}-${TARGET}.pdb"
+                        powershell "Move-Item -Force -Path o/${TARGET}/release/${LIBRARY_NAME}.pdb -Destination ${LIBRARY_NAME}-${TARGET}.pdb"
                         stash includes: "${LIBRARY_NAME}-${TARGET}.${EXTENSION}", name: "${TARGET}"
                         stash includes: "${LIBRARY_NAME}-${TARGET}.pdb", name: "${TARGET}-debug"
                     }
