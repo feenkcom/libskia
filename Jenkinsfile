@@ -209,7 +209,9 @@ pipeline {
                         }
                         powershell "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release -- --target ${TARGET}"
                         powershell "Move-Item -Force -Path target/${TARGET}/release/${LIBRARY_NAME}.${EXTENSION} -Destination ${LIBRARY_NAME}-${TARGET}.${EXTENSION}"
+                        powershell "Move-Item -Force -Path target/${TARGET}/release/${LIBRARY_NAME}.pdb -Destination ${LIBRARY_NAME}-${TARGET}.pdb"
                         stash includes: "${LIBRARY_NAME}-${TARGET}.${EXTENSION}", name: "${TARGET}"
+                        stash includes: "${LIBRARY_NAME}-${TARGET}.pdb", name: "${TARGET}-debug"
                     }
                 }
 
@@ -238,8 +240,10 @@ pipeline {
                             }
                         }
                         powershell "cargo run --package ${REPOSITORY_NAME}-builder --bin builder --release -- --target-dir C:\\s\\o --source-dir C:\\s --target ${TARGET}"
-                        powershell "Move-Item -Force -Path o/${TARGET}/release/${LIBRARY_NAME}.${EXTENSION} -Destination ${LIBRARY_NAME}-${TARGET}.${EXTENSION}"
+                        powershell "Move-Item -Force -Path target/${TARGET}/release/${LIBRARY_NAME}.${EXTENSION} -Destination ${LIBRARY_NAME}-${TARGET}.${EXTENSION}"
+                        powershell "Move-Item -Force -Path target/${TARGET}/release/${LIBRARY_NAME}.pdb -Destination ${LIBRARY_NAME}-${TARGET}.pdb"
                         stash includes: "${LIBRARY_NAME}-${TARGET}.${EXTENSION}", name: "${TARGET}"
+                        stash includes: "${LIBRARY_NAME}-${TARGET}.pdb", name: "${TARGET}-debug"
                     }
                 }
             }
@@ -264,6 +268,8 @@ pipeline {
                 unstash "${ANDROID_ARM64_TARGET}"
                 unstash "${WINDOWS_AMD64_TARGET}"
                 unstash "${WINDOWS_ARM64_TARGET}"
+                unstash "${WINDOWS_AMD64_TARGET}-debug"
+                unstash "${WINDOWS_ARM64_TARGET}-debug"
 
                 sh "curl -o feenk-releaser -LsS https://github.com/feenkcom/releaser-rs/releases/download/${FEENK_RELEASER_VERSION}/feenk-releaser-${TARGET}"
                 sh "chmod +x feenk-releaser"
@@ -282,7 +288,9 @@ pipeline {
                         lib${LIBRARY_NAME}-${MACOS_M1_TARGET}.dylib \
                         lib${LIBRARY_NAME}-${ANDROID_ARM64_TARGET}.so \
                         ${LIBRARY_NAME}-${WINDOWS_AMD64_TARGET}.dll \
-                        ${LIBRARY_NAME}-${WINDOWS_ARM64_TARGET}.dll """
+                        ${LIBRARY_NAME}-${WINDOWS_ARM64_TARGET}.pdb \
+                        ${LIBRARY_NAME}-${WINDOWS_AMD64_TARGET}.dll \
+                        ${LIBRARY_NAME}-${WINDOWS_ARM64_TARGET}.pdb """
             }
         }
     }
