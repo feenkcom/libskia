@@ -4,7 +4,31 @@ use value_box::{ReturnBoxerResult, ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_paragraph_style_new() -> *mut ValueBox<ParagraphStyle> {
-    ValueBox::new(ParagraphStyle::new()).into_raw()
+    let mut style = ParagraphStyle::new();
+    style.set_apply_rounding_hack(false);
+    style.set_replace_tab_characters(true);
+    ValueBox::new(style).into_raw()
+}
+
+#[no_mangle]
+pub fn skia_paragraph_style_get_apply_rounding_hack(
+    paragraph: *mut ValueBox<ParagraphStyle>,
+) -> bool {
+    paragraph
+        .with_mut_ok(|style| style.apply_rounding_hack())
+        .or_log(false)
+}
+
+#[no_mangle]
+pub fn skia_paragraph_style_set_apply_rounding_hack(
+    paragraph: *mut ValueBox<ParagraphStyle>,
+    apply_rounding_hack: bool,
+) {
+    paragraph
+        .with_mut_ok(|style| {
+            style.set_apply_rounding_hack(apply_rounding_hack);
+        })
+        .log();
 }
 
 #[no_mangle]
