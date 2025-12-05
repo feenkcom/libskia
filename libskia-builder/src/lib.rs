@@ -12,7 +12,8 @@ pub fn libskia(target: LibraryTarget, version: Option<impl Into<String>>) -> Rus
             "SKIA_GN_ARGS",
             "extra_cflags+=[\"-DSK_AVOID_SLOW_RASTER_PIPELINE_BLURS\"]",
         )
-        .requires("python");
+        .requires("python")
+        .feature("phlow");
 
     if target.is_windows() {
         library = library.feature("skia_windows");

@@ -21,26 +21,26 @@ fps_counter = "3.0"
 lazy_static = "1.4"
 anyhow = "1.0"
 thiserror = { version = "1.0" }
-value-box = { version = "2.3", features = [ "phlow", "anyhow" ] }
+value-box = { version = "2.3", features = [ "anyhow" ] }
 reference-box = "1.1"
 array-box = "1.0"
 string-box = "1.1"
 geometry-box = "1.0"
-value-box-ffi = { version = "1.1", features = [ "phlow", "array-box", "geometry-box", "string-box"] }
-compositor = { git = "https://github.com/feenkcom/compositor-rs", features = [ "phlow" ] }
-compositor-skia = { git = "https://github.com/feenkcom/compositor-rs", features = [ "phlow" ] }
-compositor-ffi = { git = "https://github.com/feenkcom/compositor-rs", features = [ "phlow" ] }
+value-box-ffi = { version = "1.1", features = [ "array-box", "geometry-box", "string-box"] }
+compositor = { git = "https://github.com/feenkcom/compositor-rs" }
+compositor-skia = { git = "https://github.com/feenkcom/compositor-rs" }
+compositor-ffi = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-skia-ffi = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-skia-platform = { git = "https://github.com/feenkcom/compositor-rs" }
-phlow = { version = "1", features = [ "phlow-derive" ] }
-phlow-extensions = { version = "1" }
-phlow-ffi = "1"
-#compositor = { path = "../../compositor-rs/compositor", features = [ "phlow" ] }
-#compositor-skia = { path = "../../compositor-rs/compositor-skia", features = [ "phlow" ] }
-#compositor-ffi = { path = "../../compositor-rs/compositor-ffi", features = [ "phlow" ] }
+phlow = { version = "1", features = [ "phlow-derive" ], optional = true }
+phlow-extensions = { version = "1", optional = true }
+phlow-ffi = { version = "1", optional = true }
+#compositor = { path = "../../compositor-rs/compositor" }
+#compositor-skia = { path = "../../compositor-rs/compositor-skia" }
+#compositor-ffi = { path = "../../compositor-rs/compositor-ffi" }
 #compositor-skia-ffi = { path = "../../compositor-rs/compositor-skia-ffi" }
 #compositor-skia-platform = { path = "../../compositor-rs/compositor-skia-platform" }
-#value-box = { path = "../../value-box-rs/value-box", features = [ "phlow" ] }
+#value-box = { path = "../../value-box-rs/value-box" }
 
 [target.'cfg(target_os="macos")'.dependencies]
 metal = { version = "0.32", optional = true }
@@ -101,6 +101,7 @@ skia_windows = [ "d3d", "angle" ]
 skia_mac = ["compositor-skia/metal", "skia-safe/metal", "metal", "cocoa", "foreign-types-shared", "core-graphics-types" ]
 skia_linux = ["x11", "wayland", "egl" ]
 skia_android = [ "egl" ]
+phlow = [ "value-box-ffi/phlow", "value-box/phlow","compositor/phlow", "compositor-ffi/phlow", "compositor-skia/phlow", "dep:phlow", "dep:phlow", "phlow-extensions", "phlow-ffi" ]
 
 [lib]
 name = "Skia"

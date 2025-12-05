@@ -5,6 +5,7 @@
 extern crate lazy_static;
 #[macro_use]
 extern crate log;
+#[cfg(feature = "phlow")]
 #[macro_use]
 extern crate phlow;
 #[macro_use]
@@ -15,7 +16,9 @@ use std::os::raw::c_void;
 // re-export the ffi methods
 pub use compositor_ffi::*;
 pub use compositor_skia_ffi::*;
+#[cfg(feature = "phlow")]
 pub use phlow_extensions::CoreExtensions;
+#[cfg(feature = "phlow")]
 pub use phlow_ffi::*;
 pub use value_box_ffi::*;
 
@@ -27,6 +30,7 @@ pub mod canvas_optimized;
 pub mod color;
 pub mod color_space;
 pub mod enums;
+#[cfg(feature = "phlow")]
 mod extensions;
 pub mod gpu;
 pub mod gradient;
@@ -51,7 +55,9 @@ pub mod svg;
 pub mod text;
 pub mod types;
 
+#[cfg(feature = "phlow")]
 define_extensions!(SkiaExtensions);
+#[cfg(feature = "phlow")]
 import_extensions!(SkiaExtensions, CoreExtensions);
 
 #[no_mangle]
