@@ -82,7 +82,7 @@ pub fn skia_svg_canvas_get_canvas(
 pub fn skia_svg_canvas_end(svg_canvas: *mut ValueBox<SvgCanvas>, data: *mut ValueBox<StringBox>) {
     svg_canvas
         .take_value()
-        .map(|mut svg_canvas| {
+        .map(|svg_canvas| {
             data.with_mut_ok(|data| {
                 let svg = svg_canvas.end();
                 let string = std::str::from_utf8(svg.as_bytes()).unwrap();

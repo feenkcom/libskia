@@ -5,10 +5,9 @@ authors = ["feenk gmbh <contact@feenk.com>"]
 edition = "2021"
 
 [dependencies]
-skia-safe = "0.87"
+skia-safe = "0.90"
 typename = "0.1"
 float-cmp = "0.10"
-ordered-float = "4.2"
 libc = "0.2"
 crossbeam = "0.8"
 num_cpus = "1.16"

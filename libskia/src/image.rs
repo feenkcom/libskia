@@ -10,7 +10,7 @@ use skia_safe::{
     Paint, Surface, M44,
 };
 use string_box::StringBox;
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{ReturnBoxerResult, ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
 
 #[no_mangle]
 pub fn skia_image_from_pixels(
@@ -160,52 +160,59 @@ pub fn skia_image_get_image_info(image_ptr: *mut ValueBox<Image>) -> *mut ValueB
 
 #[no_mangle]
 pub fn skia_image_get_width(image_ptr: *mut ValueBox<Image>) -> i32 {
-    image_ptr.with_not_null_return(0, |image| image.width())
+    image_ptr.with_ref_ok(|image| image.width()).or_log(0)
 }
 
 #[no_mangle]
 pub fn skia_image_get_height(image_ptr: *mut ValueBox<Image>) -> i32 {
-    image_ptr.with_not_null_return(0, |image| image.height())
+    image_ptr.with_ref_ok(|image| image.height()).or_log(0)
 }
 
 #[no_mangle]
 pub fn skia_image_get_unique_id(image_ptr: *mut ValueBox<Image>) -> u32 {
-    image_ptr.with_not_null_return(0, |image| image.unique_id())
+    image_ptr.with_ref_ok(|image| image.unique_id()).or_log(0)
 }
 
 #[no_mangle]
 pub fn skia_image_get_alpha_type(image_ptr: *mut ValueBox<Image>) -> AlphaType {
-    image_ptr.with_not_null_return(AlphaType::Unknown, |image| image.alpha_type())
+    image_ptr
+        .with_ref_ok(|image| image.alpha_type())
+        .or_log(AlphaType::Unknown)
 }
 
 #[no_mangle]
 pub fn skia_image_get_color_type(image_ptr: *mut ValueBox<Image>) -> ColorType {
-    image_ptr.with_not_null_return(ColorType::Unknown, |image| image.color_type())
+    image_ptr
+        .with_ref_ok(|image| image.color_type())
+        .or_log(ColorType::Unknown)
 }
 
 #[no_mangle]
-pub fn skia_image_get_color_space(image_ptr: *mut ValueBox<Image>) -> *mut ValueBox<ColorSpace> {
-    ValueBox::new(
-        image_ptr
-            .with_ref_ok(|image| image.color_space())
-            .unwrap_or_else(|_| ColorSpace::new_srgb()),
-    )
-    .into_raw()
+pub fn skia_image_get_color_space(image: *mut ValueBox<Image>) -> *mut ValueBox<ColorSpace> {
+    image
+        .with_ref_ok(|image| image.color_space().map(|space| ValueBox::new(space)))
+        .into_raw()
 }
 
 #[no_mangle]
-pub fn skia_image_is_alpha_only(image_ptr: *mut ValueBox<Image>) -> bool {
-    image_ptr.with_not_null_return(false, |image| image.is_alpha_only())
+pub fn skia_image_is_alpha_only(image: *mut ValueBox<Image>) -> bool {
+    image
+        .with_ref_ok(|image| image.is_alpha_only())
+        .unwrap_or(false)
 }
 
 #[no_mangle]
-pub fn skia_image_is_opaque(image_ptr: *mut ValueBox<Image>) -> bool {
-    image_ptr.with_not_null_return(false, |image| image.is_opaque())
+pub fn skia_image_is_opaque(image: *mut ValueBox<Image>) -> bool {
+    image
+        .with_ref_ok(|image| image.is_opaque())
+        .unwrap_or(false)
 }
 
 #[no_mangle]
-pub fn skia_image_is_texture_backend(image_ptr: *mut ValueBox<Image>) -> bool {
-    image_ptr.with_not_null_return(false, |image| image.is_texture_backed())
+pub fn skia_image_is_texture_backend(image: *mut ValueBox<Image>) -> bool {
+    image
+        .with_ref_ok(|image| image.is_texture_backed())
+        .unwrap_or(false)
 }
 
 #[no_mangle]
