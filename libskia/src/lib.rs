@@ -1,5 +1,5 @@
 #![allow(incomplete_features)]
-#![feature(specialization)]
+#![cfg_attr(feature = "phlow", feature(specialization))]
 
 #[macro_use]
 extern crate lazy_static;

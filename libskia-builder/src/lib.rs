@@ -12,6 +12,8 @@ pub fn libskia(target: LibraryTarget, version: Option<impl Into<String>>) -> Rus
             "SKIA_GN_ARGS",
             "extra_cflags+=[\"-DSK_AVOID_SLOW_RASTER_PIPELINE_BLURS\"]",
         )
+        // "phlow" feature requires a nightly toolchain
+        .env("RUSTUP_TOOLCHAIN", "nightly")
         .requires("python")
         .feature("phlow");
 
