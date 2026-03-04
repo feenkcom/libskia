@@ -144,7 +144,7 @@ trait PlatformContextExt {
 #[cfg(any(target_os = "macos", target_os = "windows"))]
 impl PlatformContextExt for PlatformContext {
     fn platform(&self) -> Option<Platform> {
-        None
+        compositor_skia_platform::PlatformContext::platform(self)
     }
 
     fn with_surface(&mut self, callback: impl FnOnce(&mut Surface)) {

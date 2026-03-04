@@ -1,8 +1,8 @@
 pub use platform_compositor::*;
 
-#[cfg(all(feature = "angle", target_os = "windows"))]
+#[cfg(target_os = "windows")]
 pub use self::angle::*;
-#[cfg(all(feature = "d3d", target_os = "windows"))]
+#[cfg(target_os = "windows")]
 pub use self::d3d::*;
 #[cfg(all(feature = "egl", target_os = "android"))]
 pub use self::egl_android::*;
