@@ -65,7 +65,11 @@ pipeline {
                         TARGET = "${MACOS_INTEL_TARGET}"
                         EXTENSION = "dylib"
                         CURL_PATH = "/usr/local/opt/curl/bin"
-                        PATH = "$HOME/.cargo/bin:/usr/local/bin/:$CURL_PATH:$PATH"
+                        PATH = "/opt/llvm-15.0.7/bin:$HOME/.cargo/bin:/usr/local/bin/:$CURL_PATH:$PATH"
+                        CC="/opt/llvm-15.0.7/bin/clang"
+                        CXX="/opt/llvm-15.0.7/bin/clang++"
+                        AR="/opt/llvm-15.0.7/bin/llvm-ar"
+                        RANLIB="/opt/llvm-15.0.7/bin/llvm-ranlib"
                     }
 
                     steps {

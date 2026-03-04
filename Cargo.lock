@@ -280,7 +280,7 @@ checksum = "b05b61dc5112cbb17e4b6cd61790d9845d13888356391624cbe7e41efeac1e75"
 [[package]]
 name = "compositor"
 version = "2.3.0"
-source = "git+https://github.com/feenkcom/compositor-rs#f4f2f7055157a2f991d58574a94d21d079424fd1"
+source = "git+https://github.com/feenkcom/compositor-rs#901f06ebf632633efc9a0ca4a92e56d175beb2f7"
 dependencies = [
  "cfg-if",
  "cocoa",
@@ -300,7 +300,7 @@ dependencies = [
 [[package]]
 name = "compositor-ffi"
 version = "2.3.0"
-source = "git+https://github.com/feenkcom/compositor-rs#f4f2f7055157a2f991d58574a94d21d079424fd1"
+source = "git+https://github.com/feenkcom/compositor-rs#901f06ebf632633efc9a0ca4a92e56d175beb2f7"
 dependencies = [
  "array-box",
  "cfg-if",
@@ -316,7 +316,7 @@ dependencies = [
 [[package]]
 name = "compositor-skia"
 version = "2.3.0"
-source = "git+https://github.com/feenkcom/compositor-rs#f4f2f7055157a2f991d58574a94d21d079424fd1"
+source = "git+https://github.com/feenkcom/compositor-rs#901f06ebf632633efc9a0ca4a92e56d175beb2f7"
 dependencies = [
  "anyhow",
  "cfg-if",
@@ -335,7 +335,7 @@ dependencies = [
 [[package]]
 name = "compositor-skia-ffi"
 version = "2.2.0"
-source = "git+https://github.com/feenkcom/compositor-rs#f4f2f7055157a2f991d58574a94d21d079424fd1"
+source = "git+https://github.com/feenkcom/compositor-rs#901f06ebf632633efc9a0ca4a92e56d175beb2f7"
 dependencies = [
  "compositor",
  "compositor-skia",
@@ -346,7 +346,7 @@ dependencies = [
 [[package]]
 name = "compositor-skia-platform"
 version = "0.1.0"
-source = "git+https://github.com/feenkcom/compositor-rs#f4f2f7055157a2f991d58574a94d21d079424fd1"
+source = "git+https://github.com/feenkcom/compositor-rs#901f06ebf632633efc9a0ca4a92e56d175beb2f7"
 dependencies = [
  "anyhow",
  "cocoa",
@@ -356,15 +356,17 @@ dependencies = [
  "lazy_static",
  "log",
  "metal",
+ "mozangle",
  "objc",
  "skia-safe",
  "uikit-sys",
+ "windows",
 ]
 
 [[package]]
 name = "compositor-texture"
 version = "0.1.0"
-source = "git+https://github.com/feenkcom/compositor-rs#f4f2f7055157a2f991d58574a94d21d079424fd1"
+source = "git+https://github.com/feenkcom/compositor-rs#901f06ebf632633efc9a0ca4a92e56d175beb2f7"
 
 [[package]]
 name = "core-foundation"
