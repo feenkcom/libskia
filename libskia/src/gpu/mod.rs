@@ -32,8 +32,6 @@ pub mod d3d;
 
 #[cfg(target_os = "windows")]
 pub mod angle;
-#[cfg(target_os = "windows")]
-pub mod angle_utils;
 
 mod platform_compositor;
 
