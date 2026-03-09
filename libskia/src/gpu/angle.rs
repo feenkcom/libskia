@@ -10,7 +10,7 @@ pub fn skia_angle_compositor_new_size(
     width: u32,
     height: u32,
 ) -> *mut ValueBox<PlatformCompositor> {
-    compositor_skia_platform::AngleContext::new(window, width as i32, height as i32)
+    compositor_skia_platform::AngleContext::new(window, width as i32, height as i32, false)
         .map(|context| ValueBox::new(PlatformCompositor::new(PlatformContext::Angle(context))))
         .map_err(|error| error.into())
         .into_raw()

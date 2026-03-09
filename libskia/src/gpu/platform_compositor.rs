@@ -3,7 +3,7 @@ use std::sync::{Arc, Mutex};
 
 use compositor::{Compositor, Layer};
 use compositor_skia::{Cache, SkiaCachelessCompositor, SkiaCompositor};
-use compositor_skia_platform::Platform;
+use compositor_skia_platform::{AngleContext, D3D12Context, Platform};
 use fps_counter::FPSCounter;
 use skia_safe::{Color, Color4f, Font, FontMgr, FontStyle, ISize, Paint, Point, Surface};
 use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
@@ -11,7 +11,7 @@ use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
 lazy_static! {
     static ref FPS_FONT: Font = Font::new(
         FontMgr::new()
-            .legacy_make_typeface(None, FontStyle::normal())
+            .legacy_make_typeface("Arial", FontStyle::normal())
             .unwrap(),
         60.0
     );
@@ -37,7 +37,8 @@ impl PlatformCompositor {
 
     /// Resize the surface we render on. Must only be called from the main thread
     pub fn resize_surface(&mut self, size: ISize) {
-        PlatformContextExt::resize_surface(&mut self.context, size);
+        self.cache = Cache::new();
+        self.context.resize_surface(size);
     }
 
     /// Submit the new layer to be rendered next. Can be called from any thread
@@ -59,7 +60,7 @@ impl PlatformCompositor {
     }
 
     pub fn draw(&mut self) -> Result<(), Box<dyn Error>> {
-        let platform = PlatformContextExt::platform(&self.context);
+        let platform = self.context.platform();
 
         let current_layer = self
             .latest_frame
@@ -70,7 +71,7 @@ impl PlatformCompositor {
             .clone();
 
         if let Some(layer) = current_layer {
-            PlatformContextExt::with_surface(&mut self.context, |surface| {
+            self.context.with_surface(|surface| {
                 let canvas = surface.canvas();
                 canvas.clear(Color::WHITE);
 
@@ -100,7 +101,7 @@ impl PlatformCompositor {
             .clone();
 
         if let Some(layer) = current_layer {
-            PlatformContextExt::with_surface(&mut self.context, |surface| {
+            self.context.with_surface(|surface| {
                 let canvas = surface.canvas();
                 canvas.clear(Color::WHITE);
 
@@ -121,13 +122,13 @@ impl PlatformCompositor {
     }
 }
 
-#[cfg(any(target_os = "macos", target_os = "windows"))]
-pub type PlatformContext = compositor_skia_platform::PlatformContext;
-
-#[cfg(not(any(target_os = "macos", target_os = "windows")))]
 pub enum PlatformContext {
     #[cfg(feature = "metal")]
     Metal(crate::gpu::MetalContext),
+    #[cfg(target_os = "windows")]
+    D3D(D3D12Context),
+    #[cfg(target_os = "windows")]
+    Angle(AngleContext),
     #[cfg(feature = "x11")]
     XlibGl(crate::gpu::XlibGlWindowContext),
     #[cfg(feature = "egl")]
@@ -135,37 +136,34 @@ pub enum PlatformContext {
     Unsupported,
 }
 
-trait PlatformContextExt {
-    fn platform(&self) -> Option<Platform>;
-    fn with_surface(&mut self, callback: impl FnOnce(&mut Surface));
-    fn resize_surface(&mut self, size: ISize);
-}
-
-#[cfg(any(target_os = "macos", target_os = "windows"))]
-impl PlatformContextExt for PlatformContext {
-    fn platform(&self) -> Option<Platform> {
-        compositor_skia_platform::PlatformContext::platform(self)
+impl PlatformContext {
+    pub fn platform(&self) -> Option<Platform> {
+        match self {
+            #[cfg(feature = "metal")]
+            PlatformContext::Metal(context) => {
+                Some(Platform::Metal(compositor_skia_platform::MetalPlatform {
+                    device: context.device.clone(),
+                    queue: context.queue.clone(),
+                }))
+            }
+            #[cfg(target_os = "windows")]
+            PlatformContext::Angle(context) => {
+                context.platform().map(|platform| Platform::Angle(platform))
+            },
+            _ => None,
+        }
     }
 
-    fn with_surface(&mut self, callback: impl FnOnce(&mut Surface)) {
-        compositor_skia_platform::PlatformContext::with_surface(self, callback);
-    }
-
-    fn resize_surface(&mut self, size: ISize) {
-        compositor_skia_platform::PlatformContext::resize_surface(self, size);
-    }
-}
-
-#[cfg(not(any(target_os = "macos", target_os = "windows")))]
-impl PlatformContextExt for PlatformContext {
-    fn platform(&self) -> Option<Platform> {
-        None
-    }
-
-    fn with_surface(&mut self, callback: impl FnOnce(&mut Surface)) {
+    pub fn with_surface(&mut self, callback: impl FnOnce(&mut Surface)) {
         match self {
             #[cfg(feature = "metal")]
             PlatformContext::Metal(context) => context.with_surface(callback),
+            #[cfg(target_os = "windows")]
+            PlatformContext::D3D(context) => context.with_surface(callback),
+            #[cfg(target_os = "windows")]
+            PlatformContext::Angle(context) => context
+                .with_surface(callback)
+                .unwrap_or_else(|error| error!("Failed to draw on a surface: {:?}", error)),
             #[cfg(feature = "x11")]
             PlatformContext::XlibGl(context) => context.with_surface(callback),
             #[cfg(feature = "egl")]
@@ -176,10 +174,16 @@ impl PlatformContextExt for PlatformContext {
         }
     }
 
-    fn resize_surface(&mut self, size: ISize) {
+    pub fn resize_surface(&mut self, size: ISize) {
         match self {
             #[cfg(feature = "metal")]
             PlatformContext::Metal(context) => context.resize_surface(size),
+            #[cfg(target_os = "windows")]
+            PlatformContext::D3D(context) => context.resize(size),
+            #[cfg(target_os = "windows")]
+            PlatformContext::Angle(context) => context
+                .resize_surface(size)
+                .unwrap_or_else(|error| error!("Failed to resize surface: {:?}", error)),
             #[cfg(feature = "x11")]
             PlatformContext::XlibGl(context) => context
                 .resize_surface(size)
@@ -192,6 +196,7 @@ impl PlatformContextExt for PlatformContext {
         }
     }
 }
+
 
 #[no_mangle]
 pub fn skia_platform_compositor_submit_layer(
