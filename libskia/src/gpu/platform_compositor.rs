@@ -3,7 +3,7 @@ use std::sync::{Arc, Mutex};
 
 use compositor::{Compositor, Layer};
 use compositor_skia::{Cache, SkiaCachelessCompositor, SkiaCompositor};
-use compositor_skia_platform::{AngleContext, D3D12Context, Platform};
+use compositor_skia_platform::{Platform};
 use fps_counter::FPSCounter;
 use skia_safe::{Color, Color4f, Font, FontMgr, FontStyle, ISize, Paint, Point, Surface};
 use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
@@ -123,12 +123,14 @@ impl PlatformCompositor {
 }
 
 pub enum PlatformContext {
-    #[cfg(feature = "metal")]
+    #[cfg(target_os = "macos")]
+    Metal(compositor_skia_platform::MetalContext),
+    #[cfg(target_os = "ios")]
     Metal(crate::gpu::MetalContext),
     #[cfg(target_os = "windows")]
-    D3D(D3D12Context),
+    D3D(compositor_skia_platform::D3D12Context),
     #[cfg(target_os = "windows")]
-    Angle(AngleContext),
+    Angle(compositor_skia_platform::AngleContext),
     #[cfg(feature = "x11")]
     XlibGl(crate::gpu::XlibGlWindowContext),
     #[cfg(feature = "egl")]
@@ -139,12 +141,9 @@ pub enum PlatformContext {
 impl PlatformContext {
     pub fn platform(&self) -> Option<Platform> {
         match self {
-            #[cfg(feature = "metal")]
+            #[cfg(target_os = "macos")]
             PlatformContext::Metal(context) => {
-                Some(Platform::Metal(compositor_skia_platform::MetalPlatform {
-                    device: context.device.clone(),
-                    queue: context.queue.clone(),
-                }))
+                Some(Platform::Metal(context.platform()))
             }
             #[cfg(target_os = "windows")]
             PlatformContext::Angle(context) => {
@@ -156,7 +155,9 @@ impl PlatformContext {
 
     pub fn with_surface(&mut self, callback: impl FnOnce(&mut Surface)) {
         match self {
-            #[cfg(feature = "metal")]
+            #[cfg(target_os = "macos")]
+            PlatformContext::Metal(context) => context.with_surface(callback),
+            #[cfg(target_os = "ios")]
             PlatformContext::Metal(context) => context.with_surface(callback),
             #[cfg(target_os = "windows")]
             PlatformContext::D3D(context) => context.with_surface(callback),
@@ -176,7 +177,9 @@ impl PlatformContext {
 
     pub fn resize_surface(&mut self, size: ISize) {
         match self {
-            #[cfg(feature = "metal")]
+            #[cfg(target_os = "macos")]
+            PlatformContext::Metal(context) => context.resize_surface(size),
+            #[cfg(target_os = "ios")]
             PlatformContext::Metal(context) => context.resize_surface(size),
             #[cfg(target_os = "windows")]
             PlatformContext::D3D(context) => context.resize(size),
