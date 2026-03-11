@@ -3,7 +3,7 @@ use std::sync::{Arc, Mutex};
 
 use compositor::{Compositor, Layer};
 use compositor_skia::{Cache, SkiaCachelessCompositor, SkiaCompositor};
-use compositor_skia_platform::{Platform};
+use compositor_skia_platform::Platform;
 use fps_counter::FPSCounter;
 use skia_safe::{Color, Color4f, Font, FontMgr, FontStyle, ISize, Paint, Point, Surface};
 use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
@@ -142,13 +142,11 @@ impl PlatformContext {
     pub fn platform(&self) -> Option<Platform> {
         match self {
             #[cfg(target_os = "macos")]
-            PlatformContext::Metal(context) => {
-                Some(Platform::Metal(context.platform()))
-            }
+            PlatformContext::Metal(context) => Some(Platform::Metal(context.platform())),
             #[cfg(target_os = "windows")]
             PlatformContext::Angle(context) => {
                 context.platform().map(|platform| Platform::Angle(platform))
-            },
+            }
             _ => None,
         }
     }
@@ -199,7 +197,6 @@ impl PlatformContext {
         }
     }
 }
-
 
 #[no_mangle]
 pub fn skia_platform_compositor_submit_layer(

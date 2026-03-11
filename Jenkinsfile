@@ -24,7 +24,7 @@ pipeline {
 
         WINDOWS_AMD64_SERVER_NAME = 'daffy-duck'
         WINDOWS_AMD64_TARGET = 'x86_64-pc-windows-msvc'
-        WINDOWS_ARM64_SERVER_NAME = 'bugs-bunny'
+        WINDOWS_ARM64_SERVER_NAME = 'johnny-bravo'
         WINDOWS_ARM64_TARGET = 'aarch64-pc-windows-msvc'
 
         LINUX_AMD64_SERVER_NAME = 'mickey-mouse'
