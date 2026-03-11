@@ -14,7 +14,6 @@ pub fn libskia(target: LibraryTarget, version: Option<impl Into<String>>) -> Rus
         )
         // "phlow" feature requires a nightly toolchain
         .env("RUSTUP_TOOLCHAIN", "nightly")
-        .requires("python")
         .feature("phlow");
 
     if target.is_windows() {
