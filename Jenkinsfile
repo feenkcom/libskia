@@ -223,7 +223,6 @@ pipeline {
                     agent {
                         node {
                           label "${WINDOWS_ARM64_TARGET}-${WINDOWS_ARM64_SERVER_NAME}"
-                          customWorkspace 'C:\\s'
                         }
                     }
 
@@ -232,9 +231,7 @@ pipeline {
                         EXTENSION = "dll"
                         LLVM_HOME = 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\Llvm\\x64'
                         LIBCLANG_PATH = "${LLVM_HOME}\\bin"
-                        CARGO_HOME = "C:\\s\\o\\${TARGET}\\c"
-                        CARGO_PATH = "${CARGO_HOME}\\bin"
-                        PATH = "${CARGO_PATH};${LIBCLANG_PATH};$PATH"
+                        PATH = "${LIBCLANG_PATH};$PATH"
                     }
 
                     steps {
