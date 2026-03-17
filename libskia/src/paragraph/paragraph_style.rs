@@ -1,4 +1,3 @@
-use crate::value_box_compat::*;
 use skia_safe::scalar;
 use skia_safe::textlayout::{ParagraphStyle, TextStyle};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
@@ -8,7 +7,7 @@ pub fn skia_paragraph_style_new() -> OwnedPtr<ParagraphStyle> {
     let mut style = ParagraphStyle::new();
     style.set_apply_rounding_hack(false);
     style.set_replace_tab_characters(true);
-    OwnedPtr::new(style).into_raw()
+    OwnedPtr::new(style)
 }
 
 #[no_mangle]
@@ -38,7 +37,7 @@ pub fn skia_paragraph_style_get_text_style(
 ) -> OwnedPtr<TextStyle> {
     paragraph_ptr
         .with_ref_ok(|style| OwnedPtr::new(style.text_style().clone()))
-        .into_raw()
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
@@ -99,5 +98,5 @@ pub fn skia_paragraph_style_get_max_lines(paragraph_ptr: BorrowedPtr<ParagraphSt
 
 #[no_mangle]
 pub fn skia_paragraph_style_drop(mut ptr: OwnedPtr<ParagraphStyle>) {
-    ptr.release();
+    drop(ptr);
 }

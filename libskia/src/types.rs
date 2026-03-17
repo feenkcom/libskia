@@ -20,7 +20,7 @@ pub fn skia_glyph_id_name(mut string: BorrowedPtr<StringBox>) {
 
 #[test]
 fn scalar_name() {
-    let string_ptr = OwnedPtr::new(StringBox::new()).into_raw();
+    let string_ptr = OwnedPtr::new(StringBox::new());
     skia_scalar_name(string_ptr);
     string_ptr
         .with_ref_ok(|string| {
@@ -31,7 +31,7 @@ fn scalar_name() {
 
 #[test]
 fn glyph_id_name() {
-    let string_ptr = OwnedPtr::new(StringBox::new()).into_raw();
+    let string_ptr = OwnedPtr::new(StringBox::new());
     skia_glyph_id_name(string_ptr);
     string_ptr
         .with_ref_ok(|string| {

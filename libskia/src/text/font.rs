@@ -1,4 +1,3 @@
-use crate::value_box_compat::*;
 use array_box::ArrayBox;
 use skia_safe::font::Edging;
 use skia_safe::{
@@ -9,14 +8,14 @@ use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
 pub fn skia_font_default() -> OwnedPtr<Font> {
-    OwnedPtr::new(Font::default()).into_raw()
+    OwnedPtr::new(Font::default())
 }
 
 #[no_mangle]
 pub fn skia_font_from_typeface(typeface: BorrowedPtr<Typeface>, size: scalar) -> OwnedPtr<Font> {
     typeface
         .with_clone_ok(|typeface| OwnedPtr::new(Font::from_typeface(typeface, size)))
-        .into_raw()
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
@@ -91,7 +90,7 @@ pub fn skia_font_set_hinting(mut font: BorrowedPtr<Font>, font_hinting: FontHint
 #[no_mangle]
 pub fn skia_font_get_typeface_or_default(font: BorrowedPtr<Font>) -> OwnedPtr<Typeface> {
     font.with_ref_ok(|font| OwnedPtr::new(font.typeface()))
-        .into_raw()
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
@@ -117,7 +116,7 @@ pub fn skia_font_get_spacing(font: BorrowedPtr<Font>) -> scalar {
 #[no_mangle]
 pub fn skia_font_get_metrics(font: BorrowedPtr<Font>) -> OwnedPtr<FontMetrics> {
     font.with_ref_ok(|font| OwnedPtr::new(font.metrics().1))
-        .into_raw()
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
@@ -189,5 +188,5 @@ pub fn skia_font_measure_text(
 
 #[no_mangle]
 pub fn skia_font_drop(mut ptr: OwnedPtr<Font>) {
-    ptr.release();
+    drop(ptr);
 }

@@ -1,4 +1,3 @@
-use crate::value_box_compat::*;
 use skia_safe::{scalar, Paint, Rect};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
@@ -11,7 +10,7 @@ pub struct SaveLayerRecWrapper {
 
 #[no_mangle]
 pub fn skia_layer_rec_default() -> OwnedPtr<SaveLayerRecWrapper> {
-    OwnedPtr::new(SaveLayerRecWrapper::default()).into_raw()
+    OwnedPtr::new(SaveLayerRecWrapper::default())
 }
 
 #[no_mangle]
@@ -32,16 +31,16 @@ pub fn skia_layer_rec_set_bounds(
 #[no_mangle]
 pub fn skia_layer_rec_set_paint(
     mut save_layer_ptr: BorrowedPtr<SaveLayerRecWrapper>,
-    mut paint_ptr: OwnedPtr<Paint>,
+    paint_ptr: OwnedPtr<Paint>,
 ) {
     save_layer_ptr
-        .with_mut(|rec| paint_ptr.take_value().map(|paint| rec.paint = Some(paint)))
+        .with_mut(|rec| paint_ptr.with_value_ok(|paint| rec.paint = Some(paint)))
         .log();
 }
 
 #[no_mangle]
 pub fn skia_layer_rec_drop(mut ptr: OwnedPtr<SaveLayerRecWrapper>) {
-    ptr.release();
+    drop(ptr);
 }
 
 #[cfg(test)]

@@ -1,4 +1,3 @@
-use crate::value_box_compat::*;
 use array_box::ArrayBox;
 use reference_box::ReferenceBox;
 use skia_safe::{surfaces, AlphaType, Canvas, ColorType, IPoint, ISize, Image, ImageInfo, Surface};
@@ -7,22 +6,28 @@ use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 #[no_mangle]
 pub fn skia_surface_new_raster_direct(
     image_info_ptr: BorrowedPtr<ImageInfo>,
-    pixels_ptr: BorrowedPtr<ArrayBox<u8>>,
+    mut pixels_ptr: BorrowedPtr<ArrayBox<u8>>,
     row_bytes: usize,
 ) -> OwnedPtr<Surface> {
-    image_info_ptr.with_not_null_return(OwnedPtr::null(), |image_info| {
-        pixels_ptr.with_not_null_return(OwnedPtr::null(), |pixels| {
-            let surface_option =
-                surfaces::wrap_pixels(image_info, pixels.to_slice_mut(), Some(row_bytes), None);
-            match surface_option {
-                None => OwnedPtr::null(),
-                Some(borrows_surface) => {
-                    let surface = unsafe { borrows_surface.release() };
-                    OwnedPtr::new(surface)
+    image_info_ptr
+        .with_clone(|image_info| {
+            pixels_ptr.with_mut_ok(|pixels| {
+                let surface_option = surfaces::wrap_pixels(
+                    &image_info,
+                    pixels.to_slice_mut(),
+                    Some(row_bytes),
+                    None,
+                );
+                match surface_option {
+                    None => OwnedPtr::null(),
+                    Some(borrows_surface) => {
+                        let surface = unsafe { borrows_surface.release() };
+                        OwnedPtr::new(surface)
+                    }
                 }
-            }
+            })
         })
-    })
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
@@ -45,22 +50,25 @@ pub fn skia_surface_new_default() -> OwnedPtr<Surface> {
 
 #[no_mangle]
 pub fn skia_surface_new_similar(
-    surface: BorrowedPtr<Surface>,
+    mut surface: BorrowedPtr<Surface>,
     ptr_image_info: BorrowedPtr<ImageInfo>,
 ) -> OwnedPtr<Surface> {
-    surface.with_not_null_return(OwnedPtr::null(), |surface| {
-        ptr_image_info.with_not_null_return(OwnedPtr::null(), |image_info| {
-            let surface_option = surface.new_surface(image_info);
-            match surface_option {
-                None => {
-                    if cfg!(debug_assertions) {
-                        eprintln!("[skia_surface_new_similar] could not create a surface width: {:?} height: {:?} color type {:?} alpha type {:?}", image_info.width(), image_info.height(), image_info.color_type(), image_info.alpha_type());
+    surface
+        .with_mut(|surface| {
+            ptr_image_info.with_ref_ok(|image_info| {
+                let surface_option = surface.new_surface(image_info);
+                match surface_option {
+                    None => {
+                        if cfg!(debug_assertions) {
+                            eprintln!("[skia_surface_new_similar] could not create a surface width: {:?} height: {:?} color type {:?} alpha type {:?}", image_info.width(), image_info.height(), image_info.color_type(), image_info.alpha_type());
+                        }
+                        OwnedPtr::null()
                     }
-                    OwnedPtr::null() },
-                Some(surface) => OwnedPtr::new(surface),
-            }
+                    Some(surface) => OwnedPtr::new(surface),
+                }
+            })
         })
-    })
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
@@ -98,8 +106,7 @@ pub fn skia_surface_get_height(surface: BorrowedPtr<Surface>) -> i32 {
 pub fn skia_surface_get_image_info(mut surface: BorrowedPtr<Surface>) -> OwnedPtr<ImageInfo> {
     surface
         .with_mut_ok(|surface| OwnedPtr::new(surface.image_info()))
-        .or_else(|_| Ok(OwnedPtr::new(ImageInfo::default())))
-        .into_raw()
+        .or_log(OwnedPtr::new(ImageInfo::default()))
 }
 
 #[no_mangle]
@@ -127,7 +134,7 @@ pub fn skia_surface_read_all_pixels(
 pub fn skia_surface_get_image_snapshot(mut surface: BorrowedPtr<Surface>) -> OwnedPtr<Image> {
     surface
         .with_mut_ok(|surface| OwnedPtr::new(surface.image_snapshot()))
-        .into_raw()
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
@@ -137,5 +144,5 @@ pub fn skia_surface_flush(mut _surface: BorrowedPtr<Surface>) {
 
 #[no_mangle]
 pub fn skia_surface_drop(mut ptr: OwnedPtr<Surface>) {
-    ptr.release();
+    drop(ptr);
 }

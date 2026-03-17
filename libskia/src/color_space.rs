@@ -1,10 +1,9 @@
-use crate::value_box_compat::*;
 use skia_safe::ColorSpace;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
 pub fn skia_color_space_new_srgb() -> OwnedPtr<ColorSpace> {
-    OwnedPtr::new(ColorSpace::new_srgb()).into_raw()
+    OwnedPtr::new(ColorSpace::new_srgb())
 }
 
 #[no_mangle]
@@ -16,7 +15,7 @@ pub fn skia_color_space_is_srgb(color_space: BorrowedPtr<ColorSpace>) -> bool {
 
 #[no_mangle]
 pub fn skia_color_space_drop(mut ptr: OwnedPtr<ColorSpace>) {
-    ptr.release();
+    drop(ptr);
 }
 
 #[cfg(test)]

@@ -1,4 +1,3 @@
-use crate::value_box_compat::*;
 use skia_safe::{scalar, IRect, Rect};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
@@ -8,7 +7,7 @@ use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
 pub fn skia_rectangle_f32_default() -> OwnedPtr<Rect> {
-    OwnedPtr::new(Rect::default()).into_raw()
+    OwnedPtr::new(Rect::default())
 }
 
 #[no_mangle]
@@ -56,7 +55,7 @@ pub fn skia_rectangle_f32_bottom(rectangle_ptr: BorrowedPtr<Rect>) -> scalar {
 
 #[no_mangle]
 pub fn skia_rectangle_f32_drop(mut ptr: OwnedPtr<Rect>) {
-    ptr.release();
+    drop(ptr);
 }
 
 ///
@@ -65,7 +64,7 @@ pub fn skia_rectangle_f32_drop(mut ptr: OwnedPtr<Rect>) {
 
 #[no_mangle]
 pub fn skia_rectangle_i32_default() -> OwnedPtr<IRect> {
-    OwnedPtr::new(IRect::default()).into_raw()
+    OwnedPtr::new(IRect::default())
 }
 
 #[no_mangle]
@@ -113,5 +112,5 @@ pub fn skia_rectangle_i32_bottom(rectangle_ptr: BorrowedPtr<IRect>) -> i32 {
 
 #[no_mangle]
 pub fn skia_rectangle_i32_drop(mut ptr: OwnedPtr<IRect>) {
-    ptr.release();
+    drop(ptr);
 }

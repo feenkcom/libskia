@@ -51,7 +51,6 @@ pub mod surface_props;
 pub mod svg;
 pub mod text;
 pub mod types;
-pub mod value_box_compat;
 
 #[cfg(feature = "phlow")]
 define_extensions!(SkiaExtensions);

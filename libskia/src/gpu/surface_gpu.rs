@@ -1,17 +1,16 @@
-use crate::value_box_compat::*;
 use skia_safe::gpu::Budgeted;
 use skia_safe::gpu::{BackendRenderTarget, BackendTexture, DirectContext, SurfaceOrigin};
 use skia_safe::{ColorType, ImageInfo, Surface};
-use value_box::{BorrowedPtr, OwnedPtr};
+use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
 pub fn skia_surface_from_render_target(
     backend_render_target_ptr: BorrowedPtr<BackendRenderTarget>,
-    context_ptr: BorrowedPtr<DirectContext>,
+    mut context_ptr: BorrowedPtr<DirectContext>,
     color_type: ColorType,
 ) -> OwnedPtr<Surface> {
-    backend_render_target_ptr.with_not_null_return(OwnedPtr::null(), |backend_render_target| {
-        context_ptr.with_not_null_return(OwnedPtr::null(), |context| {
+    backend_render_target_ptr.with_ref(|backend_render_target| {
+        context_ptr.with_mut_ok(|context| {
             let surface_option = Surface::from_backend_render_target(
             context,
             backend_render_target,
@@ -33,19 +32,20 @@ pub fn skia_surface_from_render_target(
         }
         })
     })
+    .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
 pub fn skia_surface_new_render_target(
     image_info: BorrowedPtr<ImageInfo>,
-    direct_context: BorrowedPtr<DirectContext>,
+    mut direct_context: BorrowedPtr<DirectContext>,
 ) -> OwnedPtr<Surface> {
-    image_info.with_not_null_return(OwnedPtr::null(), |image_info| {
-        direct_context.with_not_null_return(OwnedPtr::null(), |direct_context| {
+    image_info.with_ref(|image_info| {
+        direct_context.with_mut_ok(|direct_context| {
             let surface_option = Surface::new_render_target(
                 direct_context,
                 Budgeted::No,
-                &image_info,
+                image_info,
                 0,
                 SurfaceOrigin::BottomLeft,
                 None,
@@ -65,16 +65,17 @@ pub fn skia_surface_new_render_target(
         })
 
     })
+    .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
 pub fn skia_surface_from_backend_texture(
-    context_ptr: BorrowedPtr<DirectContext>,
+    mut context_ptr: BorrowedPtr<DirectContext>,
     backend_texture_ptr: BorrowedPtr<BackendTexture>,
     color_type: ColorType,
 ) -> OwnedPtr<Surface> {
-    backend_texture_ptr.with_not_null_return(OwnedPtr::null(), |backend_texture| {
-        context_ptr.with_not_null_return(OwnedPtr::null(), |context| {
+    backend_texture_ptr.with_ref(|backend_texture| {
+        context_ptr.with_mut_ok(|context| {
             let surface_option = Surface::from_backend_texture(
             context,
             backend_texture,
@@ -97,4 +98,5 @@ pub fn skia_surface_from_backend_texture(
         }
         })
     })
+    .or_log(OwnedPtr::null())
 }

@@ -1,11 +1,10 @@
-use crate::value_box_compat::*;
 use skia_safe::scalar;
 use skia_safe::textlayout::{PlaceholderAlignment, PlaceholderStyle};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
 pub fn skia_paragraph_placeholder_style_default() -> OwnedPtr<PlaceholderStyle> {
-    OwnedPtr::new(PlaceholderStyle::default()).into_raw()
+    OwnedPtr::new(PlaceholderStyle::default())
 }
 
 #[no_mangle]
@@ -58,5 +57,5 @@ pub fn skia_paragraph_placeholder_style_set_baseline_offset(
 
 #[no_mangle]
 pub fn skia_paragraph_placeholder_style_drop(mut placeholder_style: OwnedPtr<PlaceholderStyle>) {
-    placeholder_style.release();
+    drop(placeholder_style);
 }

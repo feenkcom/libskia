@@ -1,11 +1,10 @@
-use crate::value_box_compat::*;
 use skia_safe::{FontStyle, FontStyleSet, Typeface};
 use string_box::StringBox;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
 pub fn skia_font_style_set_default() -> OwnedPtr<FontStyleSet> {
-    OwnedPtr::new(FontStyleSet::default()).into_raw()
+    OwnedPtr::new(FontStyleSet::default())
 }
 
 #[no_mangle]
@@ -25,7 +24,7 @@ pub fn skia_font_style_get_style_at(
 ) -> OwnedPtr<FontStyle> {
     font_style_set_ptr
         .with_mut_ok(|set| OwnedPtr::new(set.style(index).0))
-        .into_raw()
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
@@ -38,36 +37,40 @@ pub fn skia_font_style_set_style_at(
 
 #[no_mangle]
 pub fn skia_font_style_set_name_at(
-    font_style_set_ptr: BorrowedPtr<FontStyleSet>,
+    mut font_style_set_ptr: BorrowedPtr<FontStyleSet>,
     index: usize,
     mut _name_ptr: BorrowedPtr<StringBox>,
 ) {
-    font_style_set_ptr.with_not_null(|set| {
-        _name_ptr.with_not_null(|name| {
-            name.set_string(
-                match set.style(index).1 {
-                    None => String::from(""),
-                    Some(string) => string,
-                }
-                .parse()
-                .unwrap(),
-            )
+    font_style_set_ptr
+        .with_mut_ok(|set| {
+            _name_ptr.with_mut_ok(|name| {
+                name.set_string(
+                    match set.style(index).1 {
+                        None => String::from(""),
+                        Some(string) => string,
+                    }
+                    .parse()
+                    .unwrap(),
+                )
+            })
         })
-    });
+        .log();
 }
 
 #[no_mangle]
 pub fn skia_font_style_set_new_typeface(
-    font_style_set_ptr: BorrowedPtr<FontStyleSet>,
+    mut font_style_set_ptr: BorrowedPtr<FontStyleSet>,
     index: usize,
 ) -> OwnedPtr<Typeface> {
-    font_style_set_ptr.with_not_null_return(OwnedPtr::null(), |set| match set.new_typeface(index) {
-        None => OwnedPtr::null(),
-        Some(typeface) => OwnedPtr::new(typeface),
-    })
+    font_style_set_ptr
+        .with_mut_ok(|set| match set.new_typeface(index) {
+            None => OwnedPtr::null(),
+            Some(typeface) => OwnedPtr::new(typeface),
+        })
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
 pub fn skia_font_style_set_drop(mut ptr: OwnedPtr<FontStyleSet>) {
-    ptr.release();
+    drop(ptr);
 }

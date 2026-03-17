@@ -3,7 +3,6 @@ use std::cell::RefCell;
 use std::ops::Range;
 use std::rc::Rc;
 
-use crate::value_box_compat::*;
 use array_box::ArrayBox;
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::textlayout::{
@@ -511,7 +510,7 @@ pub fn skia_paragraph_get_rects_for_placeholders(
             }
             OwnedPtr::new(ArrayBox::from_vector(points))
         })
-        .into_raw()
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
@@ -535,7 +534,7 @@ pub fn skia_paragraph_get_rects_for_glyph_range(
             }
             OwnedPtr::new(ArrayBox::from_vector(points))
         })
-        .into_raw()
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
@@ -559,23 +558,25 @@ pub fn skia_paragraph_get_rects_for_char_range(
             }
             OwnedPtr::new(ArrayBox::from_vector(points))
         })
-        .into_raw()
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
 pub fn skia_paragraph_print(paragraph_ptr: BorrowedPtr<ParagraphWithText>) {
-    paragraph_ptr.with_not_null(|paragraph_with_text| {
-        let paragraph = paragraph_with_text.paragraph.borrow();
-        let line_metrics = paragraph_with_text.get_line_metrics(&paragraph);
-        for (line, lm) in line_metrics.iter().enumerate() {
-            println!(
-                "line: {} width: {} end: {}",
-                line + 1,
-                lm.width,
-                lm.end_index
-            )
-        }
-    })
+    paragraph_ptr
+        .with_ref_ok(|paragraph_with_text| {
+            let paragraph = paragraph_with_text.paragraph.borrow();
+            let line_metrics = paragraph_with_text.get_line_metrics(&paragraph);
+            for (line, lm) in line_metrics.iter().enumerate() {
+                println!(
+                    "line: {} width: {} end: {}",
+                    line + 1,
+                    lm.width,
+                    lm.end_index
+                )
+            }
+        })
+        .log()
 }
 
 #[no_mangle]
@@ -584,10 +585,13 @@ pub fn skia_paragraph_get_glyph_position_at_coordinate(
     x: scalar,
     y: scalar,
 ) -> i32 {
-    paragraph_ptr.with_not_null_return(0, |paragraph| {
-        let position_with_affinity = paragraph.get_glyph_position_at_coordinate(Point::new(x, y));
-        position_with_affinity.position
-    })
+    paragraph_ptr
+        .with_ref_ok(|paragraph| {
+            let position_with_affinity =
+                paragraph.get_glyph_position_at_coordinate(Point::new(x, y));
+            position_with_affinity.position
+        })
+        .or_log(0)
 }
 
 #[no_mangle]
@@ -596,9 +600,9 @@ pub fn skia_paragraph_get_char_position_at_coordinate(
     x: scalar,
     y: scalar,
 ) -> usize {
-    paragraph_ptr.with_not_null_return(0, |paragraph| {
-        paragraph.get_char_position_at_coordinate(Point::new(x, y))
-    })
+    paragraph_ptr
+        .with_ref_ok(|paragraph| paragraph.get_char_position_at_coordinate(Point::new(x, y)))
+        .or_log(0)
 }
 
 #[no_mangle]
@@ -607,9 +611,11 @@ pub fn skia_paragraph_get_glyph_range_for_char_range(
     start: usize,
     end: usize,
 ) -> OwnedPtr<Range<usize>> {
-    paragraph_ptr.with_not_null_return(OwnedPtr::null(), |paragraph| {
-        OwnedPtr::new(paragraph.text.get_glyph_range_for_char_range(start..end))
-    })
+    paragraph_ptr
+        .with_ref_ok(|paragraph| {
+            OwnedPtr::new(paragraph.text.get_glyph_range_for_char_range(start..end))
+        })
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
@@ -675,5 +681,5 @@ pub fn skia_paragraph_get_line_index_at_coordinate(
 
 #[no_mangle]
 pub fn skia_paragraph_drop(mut ptr: OwnedPtr<ParagraphWithText>) {
-    ptr.release();
+    drop(ptr);
 }

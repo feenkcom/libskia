@@ -1,11 +1,10 @@
-use crate::value_box_compat::*;
 use skia_safe::paint::{Cap, Join, Style};
 use skia_safe::{scalar, BlendMode, Color, ImageFilter, Paint, PathEffect, Shader};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
 pub fn skia_paint_default() -> OwnedPtr<Paint> {
-    OwnedPtr::new(Paint::default()).into_raw()
+    OwnedPtr::new(Paint::default())
 }
 
 #[no_mangle]
@@ -106,7 +105,7 @@ pub fn skia_paint_get_alpha_f(paint_ptr: BorrowedPtr<Paint>) -> f32 {
 pub fn skia_paint_get_color(paint_ptr: BorrowedPtr<Paint>) -> OwnedPtr<Color> {
     paint_ptr
         .with_ref_ok(|paint| OwnedPtr::new(paint.color()))
-        .into_raw()
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
@@ -191,38 +190,45 @@ pub fn skia_paint_set_stroke_join(mut paint_ptr: BorrowedPtr<Paint>, stroke_join
 
 #[no_mangle]
 pub fn skia_paint_get_shader(paint_ptr: BorrowedPtr<Paint>) -> OwnedPtr<Shader> {
-    paint_ptr.with_not_null_return(OwnedPtr::null(), |paint| match paint.shader() {
-        None => OwnedPtr::null(),
-        Some(shader) => OwnedPtr::new(shader),
-    })
+    paint_ptr
+        .with_ref_ok(|paint| match paint.shader() {
+            None => OwnedPtr::null(),
+            Some(shader) => OwnedPtr::new(shader),
+        })
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
-pub fn skia_paint_set_shader(paint_ptr: BorrowedPtr<Paint>, shader_ptr: BorrowedPtr<Shader>) {
-    paint_ptr.with_not_null(|paint| {
-        let shader = shader_ptr.with_not_null_value_return(None, |shader| Some(shader));
-        paint.set_shader(shader);
-    });
+pub fn skia_paint_set_shader(mut paint_ptr: BorrowedPtr<Paint>, shader_ptr: BorrowedPtr<Shader>) {
+    paint_ptr
+        .with_mut_ok(|paint| {
+            let shader = shader_ptr.with_clone_ok(Some).unwrap_or(None);
+            paint.set_shader(shader);
+        })
+        .log();
 }
 
 #[no_mangle]
 pub fn skia_paint_set_image_filter(
-    paint_ptr: BorrowedPtr<Paint>,
+    mut paint_ptr: BorrowedPtr<Paint>,
     image_filter_ptr: BorrowedPtr<ImageFilter>,
 ) {
-    paint_ptr.with_not_null(|paint| {
-        let image_filter =
-            image_filter_ptr.with_not_null_value_return(None, |image_filter| Some(image_filter));
-        paint.set_image_filter(image_filter);
-    });
+    paint_ptr
+        .with_mut_ok(|paint| {
+            let image_filter = image_filter_ptr.with_clone_ok(Some).unwrap_or(None);
+            paint.set_image_filter(image_filter);
+        })
+        .log();
 }
 
 #[no_mangle]
 pub fn skia_paint_get_image_filter(paint_ptr: BorrowedPtr<Paint>) -> OwnedPtr<ImageFilter> {
-    paint_ptr.with_not_null_return(OwnedPtr::null(), |paint| match paint.image_filter() {
-        None => OwnedPtr::null(),
-        Some(image_filter) => OwnedPtr::new(image_filter),
-    })
+    paint_ptr
+        .with_ref_ok(|paint| match paint.image_filter() {
+            None => OwnedPtr::null(),
+            Some(image_filter) => OwnedPtr::new(image_filter),
+        })
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
@@ -234,22 +240,25 @@ pub fn skia_paint_has_image_filter(paint_ptr: BorrowedPtr<Paint>) -> bool {
 
 #[no_mangle]
 pub fn skia_paint_set_path_effect(
-    paint_ptr: BorrowedPtr<Paint>,
+    mut paint_ptr: BorrowedPtr<Paint>,
     path_effect_ptr: BorrowedPtr<PathEffect>,
 ) {
-    paint_ptr.with_not_null(|paint| {
-        let path_effect =
-            path_effect_ptr.with_not_null_value_return(None, |path_effect| Some(path_effect));
-        paint.set_path_effect(path_effect);
-    });
+    paint_ptr
+        .with_mut_ok(|paint| {
+            let path_effect = path_effect_ptr.with_clone_ok(Some).unwrap_or(None);
+            paint.set_path_effect(path_effect);
+        })
+        .log();
 }
 
 #[no_mangle]
 pub fn skia_paint_get_path_effect(paint_ptr: BorrowedPtr<Paint>) -> OwnedPtr<PathEffect> {
-    paint_ptr.with_not_null_return(OwnedPtr::null(), |paint| match paint.path_effect() {
-        None => OwnedPtr::null(),
-        Some(path_effect) => OwnedPtr::new(path_effect),
-    })
+    paint_ptr
+        .with_ref_ok(|paint| match paint.path_effect() {
+            None => OwnedPtr::null(),
+            Some(path_effect) => OwnedPtr::new(path_effect),
+        })
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
@@ -261,5 +270,5 @@ pub fn skia_paint_has_path_effect(paint_ptr: BorrowedPtr<Paint>) -> bool {
 
 #[no_mangle]
 pub fn skia_paint_drop(mut ptr: OwnedPtr<Paint>) {
-    ptr.release();
+    drop(ptr);
 }

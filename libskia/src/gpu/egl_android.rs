@@ -1,5 +1,4 @@
 use crate::gpu::{PlatformCompositor, PlatformContext};
-use crate::value_box_compat::*;
 use khronos_egl as egl;
 use skia_safe::gpu::gl::{Enum, FramebufferInfo, Interface, UInt};
 use skia_safe::gpu::Protected;
@@ -348,5 +347,4 @@ pub fn skia_android_egl_compositor_new_size(
     EglContext::new(native_window, width, height)
         .map(|context| OwnedPtr::new(PlatformCompositor::new(PlatformContext::Egl(context))))
         .map_err(|error| error.into())
-        .into_raw()
 }

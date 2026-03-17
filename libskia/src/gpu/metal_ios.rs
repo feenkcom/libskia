@@ -14,7 +14,6 @@ use objc::runtime::Object;
 use objc::runtime::Sel;
 use objc::*;
 
-use crate::value_box_compat::*;
 use core_graphics_types::geometry::CGSize;
 use foreign_types_shared::{ForeignType, ForeignTypeRef};
 use metal::{CommandQueue, Device, MTLPixelFormat, MetalDrawableRef, MetalLayer};
@@ -180,5 +179,4 @@ pub fn skia_metal_compositor_new_size(
     OwnedPtr::new(PlatformCompositor::new(PlatformContext::Metal(
         MetalContext::new(ns_view, Some(CGSize::new(width.into(), height.into()))),
     )))
-    .into_raw()
 }

@@ -1,11 +1,10 @@
-use crate::value_box_compat::*;
 use skia_safe::textlayout::TypefaceFontProvider;
 use skia_safe::Typeface;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
 pub fn skia_typeface_font_provider_new() -> OwnedPtr<TypefaceFontProvider> {
-    OwnedPtr::new(TypefaceFontProvider::new()).into_raw()
+    OwnedPtr::new(TypefaceFontProvider::new())
 }
 
 #[no_mangle]
@@ -25,5 +24,5 @@ pub fn skia_typeface_font_provider_register_typeface(
 
 #[no_mangle]
 pub fn skia_typeface_font_provider_drop(mut ptr: OwnedPtr<TypefaceFontProvider>) {
-    ptr.release();
+    drop(ptr);
 }

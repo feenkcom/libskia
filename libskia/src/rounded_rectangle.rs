@@ -1,11 +1,10 @@
-use crate::value_box_compat::*;
 use skia_safe::rrect::Type;
 use skia_safe::{scalar, RRect, Rect, Vector};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
 pub fn skia_rounded_rectangle_default() -> OwnedPtr<RRect> {
-    OwnedPtr::new(RRect::default()).into_raw()
+    OwnedPtr::new(RRect::default())
 }
 
 #[no_mangle]
@@ -31,7 +30,7 @@ pub fn skia_rounded_rectangle_new_radii(
         Vector::new(r_bottom_x, r_bottom_y),
     ];
 
-    OwnedPtr::new(RRect::new_rect_radii(rect, &radii)).into_raw()
+    OwnedPtr::new(RRect::new_rect_radii(rect, &radii))
 }
 
 #[no_mangle]
@@ -85,7 +84,7 @@ pub fn skia_rounded_rectangle_set_oval(
 
 #[no_mangle]
 pub fn skia_rounded_rectangle_drop(mut ptr: OwnedPtr<RRect>) {
-    ptr.release();
+    drop(ptr);
 }
 
 #[cfg(test)]
@@ -109,11 +108,11 @@ mod test {
         assert_eq!(skia_rounded_rectangle_width(r_rect), 50.0);
         assert_eq!(skia_rounded_rectangle_height(r_rect), 50.0);
 
-        rect.release();
+        drop(rect);
 
         assert_eq!(skia_rounded_rectangle_width(r_rect), 50.0);
         assert_eq!(skia_rounded_rectangle_height(r_rect), 50.0);
 
-        r_rect.release();
+        drop(r_rect);
     }
 }

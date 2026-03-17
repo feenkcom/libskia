@@ -1,4 +1,3 @@
-use crate::value_box_compat::*;
 use skia_safe::{PixelGeometry, SurfaceProps, SurfacePropsFlags};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
@@ -8,7 +7,6 @@ pub fn skia_surface_props_default() -> OwnedPtr<SurfaceProps> {
         SurfacePropsFlags::USE_DEVICE_INDEPENDENT_FONTS,
         PixelGeometry::RGBH,
     ))
-    .into_raw()
 }
 
 #[no_mangle]
@@ -17,7 +15,6 @@ pub fn skia_surface_props_new(flags: u32, pixel_geometry: PixelGeometry) -> Owne
         SurfacePropsFlags::from_bits_truncate(flags),
         pixel_geometry,
     ))
-    .into_raw()
 }
 
 #[no_mangle]
@@ -38,5 +35,5 @@ pub fn skia_surface_props_get_flags(surface_props: BorrowedPtr<SurfaceProps>) ->
 
 #[no_mangle]
 pub fn skia_surface_props_drop(mut ptr: OwnedPtr<SurfaceProps>) {
-    ptr.release();
+    drop(ptr);
 }

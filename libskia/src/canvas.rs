@@ -1,4 +1,3 @@
-use crate::value_box_compat::*;
 use array_box::ArrayBox;
 use float_cmp::ApproxEqUlps;
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
@@ -301,7 +300,7 @@ pub fn skia_canvas_draw_image(
     canvas_ptr.with_not_null(|canvas| {
         image_ptr
             .with_ref(|image| {
-                if paint_ptr.has_value() {
+                if !paint_ptr.is_null() {
                     paint_ptr.with_ref_ok(|paint| {
                         canvas.draw_image_with_sampling_options(
                             image,

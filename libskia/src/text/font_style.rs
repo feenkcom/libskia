@@ -1,11 +1,10 @@
-use crate::value_box_compat::*;
 use skia_safe::font_style::{Slant, Weight, Width};
 use skia_safe::FontStyle;
-use value_box::{BorrowedPtr, OwnedPtr};
+use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
 pub fn skia_font_style_default() -> OwnedPtr<FontStyle> {
-    OwnedPtr::new(FontStyle::default()).into_raw()
+    OwnedPtr::new(FontStyle::default())
 }
 
 #[no_mangle]
@@ -14,29 +13,33 @@ pub fn skia_font_style_new(
     width: FontStyleWidth,
     slant: Slant,
 ) -> OwnedPtr<FontStyle> {
-    OwnedPtr::new(FontStyle::new(Weight::from(weight), width.into(), slant)).into_raw()
+    OwnedPtr::new(FontStyle::new(Weight::from(weight), width.into(), slant))
 }
 
 #[no_mangle]
 pub fn skia_font_style_get_weight(font_style_ptr: BorrowedPtr<FontStyle>) -> i32 {
-    font_style_ptr.with_not_null_return(0, |font_style| *font_style.weight())
+    font_style_ptr
+        .with_clone_ok(|font_style| *font_style.weight())
+        .or_log(0)
 }
 
 #[no_mangle]
 pub fn skia_font_style_get_width(font_style_ptr: BorrowedPtr<FontStyle>) -> FontStyleWidth {
-    font_style_ptr.with_not_null_return(FontStyleWidth::Normal, |font_style| {
-        font_style.width().into()
-    })
+    font_style_ptr
+        .with_clone_ok(|font_style| font_style.width().into())
+        .or_log(FontStyleWidth::Normal)
 }
 
 #[no_mangle]
 pub fn skia_font_style_get_slant(font_style_ptr: BorrowedPtr<FontStyle>) -> Slant {
-    font_style_ptr.with_not_null_return(Slant::Upright, |font_style| font_style.slant())
+    font_style_ptr
+        .with_clone_ok(|font_style| font_style.slant())
+        .or_log(Slant::Upright)
 }
 
 #[no_mangle]
 pub fn skia_font_style_drop(mut ptr: OwnedPtr<FontStyle>) {
-    ptr.release();
+    drop(ptr);
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]

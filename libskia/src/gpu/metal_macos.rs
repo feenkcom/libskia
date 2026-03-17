@@ -1,6 +1,5 @@
 use std::ffi::c_void;
 
-use crate::value_box_compat::*;
 use cocoa::base::id as cocoa_id;
 use core_graphics_types::geometry::CGSize;
 use value_box::OwnedPtr;
@@ -19,5 +18,4 @@ pub fn skia_metal_compositor_new_size(
             Some(CGSize::new(width.into(), height.into())),
         ),
     )))
-    .into_raw()
 }

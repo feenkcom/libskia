@@ -1,4 +1,3 @@
-use crate::value_box_compat::*;
 use skia_safe::gpu::BackendRenderTarget;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
@@ -23,7 +22,7 @@ pub fn skia_backend_render_target_new_gl(
         },
     );
 
-    OwnedPtr::new(render_target).into_raw()
+    OwnedPtr::new(render_target)
 }
 
 #[cfg(feature = "metal")]
@@ -36,7 +35,7 @@ pub fn skia_backend_render_target_new_metal(
 
     let render_target = BackendRenderTarget::new_metal((width, height), &texture_info);
 
-    OwnedPtr::new(render_target).into_raw()
+    OwnedPtr::new(render_target)
 }
 
 #[no_mangle]
@@ -59,5 +58,5 @@ pub fn skia_backend_render_target_is_protected(
 
 #[no_mangle]
 pub fn skia_backend_render_target_drop(mut ptr: OwnedPtr<BackendRenderTarget>) {
-    ptr.release();
+    drop(ptr);
 }

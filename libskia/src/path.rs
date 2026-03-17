@@ -1,4 +1,3 @@
-use crate::value_box_compat::*;
 use array_box::ArrayBox;
 use skia_safe::path_utils::fill_path_with_paint;
 use skia_safe::{scalar, Paint, Path, PathFillType, Point, Rect, Vector};
@@ -6,7 +5,7 @@ use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
 pub fn skia_path_new() -> OwnedPtr<Path> {
-    OwnedPtr::new(Path::new()).into_raw()
+    OwnedPtr::new(Path::new())
 }
 
 #[no_mangle]
@@ -255,5 +254,5 @@ pub fn skia_path_serialize(path: BorrowedPtr<Path>, mut data: BorrowedPtr<ArrayB
 
 #[no_mangle]
 pub fn skia_path_drop(mut path: OwnedPtr<Path>) {
-    path.release();
+    drop(path);
 }

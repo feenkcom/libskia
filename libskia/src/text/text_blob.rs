@@ -1,7 +1,6 @@
-use crate::value_box_compat::*;
 use skia_safe::{Font, GlyphId, Point, TextBlob, TextBlobBuilder, TextEncoding};
 use string_box::StringBox;
-use value_box::{BorrowedPtr, OwnedPtr};
+use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
 pub fn skia_text_blob_default() -> OwnedPtr<TextBlob> {
@@ -21,7 +20,8 @@ pub fn skia_text_blob_from_text(
             TextBlob::from_text(text.as_str(), font).map(|blob| OwnedPtr::new(blob))
         })
     })
-    .into_raw()
+    .or_log(None)
+    .unwrap_or_default()
 }
 
 #[no_mangle]
@@ -40,10 +40,11 @@ pub fn skia_text_blob_from_glyphs(
 
         blob_builder.make().map(|blob| OwnedPtr::new(blob))
     })
-    .into_raw()
+    .or_log(None)
+    .unwrap_or_default()
 }
 
 #[no_mangle]
 pub fn skia_text_blob_drop(mut ptr: OwnedPtr<TextBlob>) {
-    ptr.release();
+    drop(ptr);
 }

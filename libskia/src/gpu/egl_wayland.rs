@@ -1,5 +1,4 @@
 use crate::gpu::{PlatformCompositor, PlatformContext};
-use crate::value_box_compat::*;
 use khronos_egl as egl;
 use skia_safe::gpu::gl::{Enum, FramebufferInfo, Interface, UInt};
 use skia_safe::gpu::{BackendRenderTarget, ContextOptions, DirectContext, SurfaceOrigin};
@@ -391,5 +390,4 @@ pub fn skia_wayland_egl_compositor_new_size(
     EglContext::new(wayland_display, wayland_surface, width, height)
         .map(|context| OwnedPtr::new(PlatformCompositor::new(PlatformContext::Egl(context))))
         .map_err(|error| error.into())
-        .into_raw()
 }

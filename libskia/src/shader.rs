@@ -1,11 +1,10 @@
-use crate::value_box_compat::*;
 use skia_safe::shaders::empty;
 use skia_safe::Shader;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
 pub fn skia_shader_create_empty() -> OwnedPtr<Shader> {
-    OwnedPtr::new(empty()).into_raw()
+    OwnedPtr::new(empty())
 }
 
 #[no_mangle]
@@ -24,5 +23,5 @@ pub fn skia_shader_is_a_image(shader_ptr: BorrowedPtr<Shader>) -> bool {
 
 #[no_mangle]
 pub fn skia_shader_drop(mut ptr: OwnedPtr<Shader>) {
-    ptr.release();
+    drop(ptr);
 }

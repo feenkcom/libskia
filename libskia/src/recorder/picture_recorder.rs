@@ -1,11 +1,10 @@
-use crate::value_box_compat::*;
 use reference_box::ReferenceBox;
 use skia_safe::{scalar, Canvas, Picture, PictureRecorder, Rect};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
 pub fn skia_picture_recorder_new() -> OwnedPtr<PictureRecorder> {
-    OwnedPtr::new(PictureRecorder::new()).into_raw()
+    OwnedPtr::new(PictureRecorder::new())
 }
 
 #[no_mangle]
@@ -40,5 +39,5 @@ pub fn skia_picture_recorder_finish_recording(
 
 #[no_mangle]
 pub fn skia_picture_recorder_drop(mut ptr: OwnedPtr<PictureRecorder>) {
-    ptr.release();
+    drop(ptr);
 }

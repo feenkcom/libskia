@@ -1,4 +1,3 @@
-use crate::value_box_compat::*;
 use skia_safe::font_style::{Slant, Weight, Width};
 use skia_safe::{FontMgr, FontStyle, Typeface};
 use string_box::StringBox;
@@ -25,38 +24,38 @@ pub fn skia_typeface_from_name(
                     .map(|typeface| OwnedPtr::new(typeface))
             })
         })
-        .into_raw()
+        .or_log(None)
+        .unwrap_or_default()
 }
 
 #[no_mangle]
 pub fn skia_typeface_clone(typeface: BorrowedPtr<Typeface>) -> OwnedPtr<Typeface> {
     typeface
         .with_clone_ok(|typeface| OwnedPtr::new(typeface))
-        .into_raw()
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
 pub fn skia_typeface_get_font_style(mut typeface: BorrowedPtr<Typeface>) -> OwnedPtr<FontStyle> {
     typeface
         .with_mut_ok(|typeface| OwnedPtr::new(typeface.font_style()))
-        .or_else(|_| {
-            Ok(OwnedPtr::new(FontStyle::new(
-                Weight::NORMAL,
-                Width::NORMAL,
-                Slant::Upright,
-            )))
-        })
-        .into_raw()
+        .or_log(OwnedPtr::new(FontStyle::new(
+            Weight::NORMAL,
+            Width::NORMAL,
+            Slant::Upright,
+        )))
 }
 
 #[no_mangle]
 pub fn skia_typeface_get_family_name(
-    typeface_ptr: BorrowedPtr<Typeface>,
+    mut typeface_ptr: BorrowedPtr<Typeface>,
     mut _ptr_string: BorrowedPtr<StringBox>,
 ) {
-    typeface_ptr.with_not_null(|typeface| {
-        _ptr_string.with_not_null(|string| string.set_string(typeface.family_name()))
-    });
+    typeface_ptr
+        .with_mut_ok(|typeface| {
+            _ptr_string.with_mut_ok(|string| string.set_string(typeface.family_name()))
+        })
+        .log();
 }
 
 #[no_mangle]
@@ -82,5 +81,5 @@ pub fn skia_typeface_is_fixed_pitch(typeface_ptr: BorrowedPtr<Typeface>) -> bool
 
 #[no_mangle]
 pub fn skia_typeface_drop(mut ptr: OwnedPtr<Typeface>) {
-    ptr.release();
+    drop(ptr);
 }

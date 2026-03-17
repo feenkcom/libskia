@@ -1,5 +1,4 @@
 use crate::paragraph::paragraph::{CharLength, ParagraphText, ParagraphWithText, TabSize};
-use crate::value_box_compat::*;
 use skia_safe::textlayout::{
     FontCollection, ParagraphBuilder, ParagraphStyle, PlaceholderStyle, TextStyle,
 };
@@ -71,28 +70,27 @@ pub fn skia_paragraph_builder_new(
                 ))
             })
         })
-        .into_raw()
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
 pub fn skia_paragraph_builder_build(
-    mut paragraph_builder_ptr: OwnedPtr<ParagraphBuilderWithText>,
+    paragraph_builder_ptr: OwnedPtr<ParagraphBuilderWithText>,
 ) -> OwnedPtr<ParagraphWithText> {
     paragraph_builder_ptr
-        .take_value()
-        .map(|builder| OwnedPtr::new(builder.build()))
-        .into_raw()
+        .with_value_ok(|builder| OwnedPtr::new(builder.build()))
+        .or_log(OwnedPtr::null())
 }
 
 /// Add a text to the paragraph by copying it
 #[no_mangle]
 pub fn skia_paragraph_builder_add_text(
     mut paragraph_builder: BorrowedPtr<ParagraphBuilderWithText>,
-    mut string: OwnedPtr<StringBox>,
+    string: OwnedPtr<StringBox>,
 ) {
     paragraph_builder
         .with_mut(|paragraph_builder| {
-            string.take_value().map(|string| {
+            string.with_value_ok(|string| {
                 paragraph_builder.add_text(string);
             })
         })
@@ -102,12 +100,12 @@ pub fn skia_paragraph_builder_add_text(
 #[no_mangle]
 pub fn skia_paragraph_builder_add_placeholder(
     mut paragraph_builder: BorrowedPtr<ParagraphBuilderWithText>,
-    mut placeholder: OwnedPtr<PlaceholderStyle>,
+    placeholder: OwnedPtr<PlaceholderStyle>,
     char_length: CharLength,
 ) {
     paragraph_builder
         .with_mut(|paragraph_builder| {
-            placeholder.take_value().map(|placeholder| {
+            placeholder.with_value_ok(|placeholder| {
                 paragraph_builder.add_placeholder(placeholder, char_length);
             })
         })
@@ -141,5 +139,5 @@ pub fn skia_paragraph_builder_pop_style(
 
 #[no_mangle]
 pub fn skia_paragraph_builder_drop(mut ptr: OwnedPtr<ParagraphBuilderWithText>) {
-    ptr.release();
+    drop(ptr);
 }

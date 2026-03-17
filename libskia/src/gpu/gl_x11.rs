@@ -1,4 +1,3 @@
-use crate::value_box_compat::*;
 use skia_safe::gpu::gl::{Enum, FramebufferInfo, Interface, UInt};
 use skia_safe::gpu::{BackendRenderTarget, ContextOptions, DirectContext, SurfaceOrigin};
 use skia_safe::{gpu, ColorType, ISize, Surface};
@@ -517,5 +516,4 @@ pub fn skia_xlib_gl_compositor_new_size(
         .and_then(|mut context| context.initialize_context().map(|_| context))
         .map(|context| OwnedPtr::new(PlatformCompositor::new(PlatformContext::XlibGl(context))))
         .map_err(|error| BoxerError::AnyError(Box::new(error).into()))
-        .into_raw()
 }

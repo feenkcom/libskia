@@ -1,10 +1,9 @@
-use crate::value_box_compat::*;
 use skia_safe::{scalar, FontMetrics};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
 pub fn skia_font_metrics_default() -> OwnedPtr<FontMetrics> {
-    OwnedPtr::new(FontMetrics::default()).into_raw()
+    OwnedPtr::new(FontMetrics::default())
 }
 
 #[no_mangle]
@@ -112,5 +111,5 @@ pub fn skia_font_metrics_get_strikeout_position(font_metrics: BorrowedPtr<FontMe
 
 #[no_mangle]
 pub fn skia_font_metrics_drop(mut ptr: OwnedPtr<FontMetrics>) {
-    ptr.release();
+    drop(ptr);
 }
