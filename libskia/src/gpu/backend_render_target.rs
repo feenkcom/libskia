@@ -11,14 +11,14 @@ pub fn skia_backend_render_target_new_gl(
     fboid: std::os::raw::c_uint,
     format: std::os::raw::c_uint,
 ) -> OwnedPtr<BackendRenderTarget> {
-    let render_target = gpu::backend_render_targets::make_gl(
+    let render_target = skia_safe::gpu::backend_render_targets::make_gl(
         (width, height),
         Some(sample_count),
         stencil_bits,
         skia_safe::gpu::gl::FramebufferInfo {
             fboid,
             format,
-            protected: Protected::No,
+            protected: skia_safe::gpu::Protected::No,
         },
     );
 

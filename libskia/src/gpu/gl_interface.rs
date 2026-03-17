@@ -10,7 +10,7 @@ pub fn skia_interface_new_native() -> OwnedPtr<Interface> {
             if cfg!(debug_assertions) {
                 eprintln!("[skia_context_new_gl] Unable to create native OpenGL interface");
             }
-            std::ptr::null_mut()
+            OwnedPtr::null()
         }
         Some(_interface) => OwnedPtr::new(_interface),
     }
@@ -22,8 +22,8 @@ pub fn skia_interface_new_load_with(
     callback: extern "C" fn(BorrowedPtr<StringBox>) -> *const c_void,
 ) -> OwnedPtr<Interface> {
     match Interface::new_load_with(|symbol| {
-        let boxer_string = OwnedPtr::new(StringBox::from_string(symbol.to_string()));
-        let func_ptr = callback(boxer_string);
+        let boxer_string = StringBox::from_string(symbol.to_string());
+        let func_ptr = callback(BorrowedPtr::from_ref(&boxer_string));
         drop(boxer_string);
         if cfg!(debug_assertions) {
             eprintln!(
@@ -37,7 +37,7 @@ pub fn skia_interface_new_load_with(
             if cfg!(debug_assertions) {
                 eprintln!("[skia_interface_new_load_with] Unable to load native OpenGL interface");
             }
-            std::ptr::null_mut()
+            OwnedPtr::null()
         }
         Some(_interface) => OwnedPtr::new(_interface),
     }

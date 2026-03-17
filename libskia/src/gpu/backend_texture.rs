@@ -7,16 +7,16 @@ pub fn skia_backend_texture_new_gl(
     width: i32,
     height: i32,
     mip_mapped: bool,
-    mut texture_info_ptr: BorrowedPtr<gpu::gl::TextureInfo>,
+    texture_info_ptr: BorrowedPtr<skia_safe::gpu::gl::TextureInfo>,
 ) -> OwnedPtr<BackendTexture> {
     texture_info_ptr
         .with_clone_ok(|texture_info| unsafe {
-            OwnedPtr::new(gpu::backend_textures::make_gl(
+            OwnedPtr::new(skia_safe::gpu::backend_textures::make_gl(
                 (width, height),
                 if mip_mapped {
-                    Mipmapped::Yes
+                    skia_safe::gpu::Mipmapped::Yes
                 } else {
-                    Mipmapped::No
+                    skia_safe::gpu::Mipmapped::No
                 },
                 texture_info,
                 "Backend texture",
@@ -29,10 +29,10 @@ pub fn skia_backend_texture_new_gl(
 #[no_mangle]
 pub fn skia_backend_texture_get_gl_texture_info(
     mut texture_ptr: BorrowedPtr<BackendTexture>,
-) -> OwnedPtr<gpu::gl::TextureInfo> {
+) -> OwnedPtr<skia_safe::gpu::gl::TextureInfo> {
     texture_ptr
         .with_mut_ok(|backend_texture| match backend_texture.gl_texture_info() {
-            None => std::ptr::null_mut(),
+            None => OwnedPtr::null(),
             Some(texture_info) => OwnedPtr::new(texture_info),
         })
         .or_log(OwnedPtr::null())
