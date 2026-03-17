@@ -174,7 +174,7 @@ fn fork_smoke_test(
 
                 let iter = StringIterator::new(&alphabet, max_len, state.start, state.end);
                 for bytes in iter {
-                    let string = unsafe { String::from_utf8_unchecked(bytes) };
+                    let string = String::from_utf8_unchecked(bytes);
                     smoke_test_string(&string, &font_collection, &style, current_state);
                     current_state.start += 1;
                 }
@@ -256,14 +256,12 @@ impl<'a> StringIterator<'a> {
         // find length bucket
         let mut length = 0usize;
         let mut count = 1u64;
-        let mut consumed = 0u64;
 
         // length 0
         if id == 0 {
             return vec![];
         }
         id -= 1; // skip empty string
-        consumed += 1;
 
         for l in 1..self.max_len {
             count *= k;
@@ -272,7 +270,6 @@ impl<'a> StringIterator<'a> {
                 break;
             }
             id -= count;
-            consumed += count;
         }
 
         // convert id to base-k with `length` digits

@@ -1,5 +1,4 @@
 use array_box::ArrayBox;
-use std::borrow::Borrow;
 
 use skia_safe::gradient_shader::{Flags, GradientShaderColors};
 use skia_safe::{scalar, Color, Matrix, Point, Shader, TileMode};

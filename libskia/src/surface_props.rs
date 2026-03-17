@@ -34,6 +34,6 @@ pub fn skia_surface_props_get_flags(surface_props: BorrowedPtr<SurfaceProps>) ->
 }
 
 #[no_mangle]
-pub fn skia_surface_props_drop(mut ptr: OwnedPtr<SurfaceProps>) {
+pub fn skia_surface_props_drop(ptr: OwnedPtr<SurfaceProps>) {
     drop(ptr);
 }

@@ -110,6 +110,6 @@ pub fn skia_font_metrics_get_strikeout_position(font_metrics: BorrowedPtr<FontMe
 }
 
 #[no_mangle]
-pub fn skia_font_metrics_drop(mut ptr: OwnedPtr<FontMetrics>) {
+pub fn skia_font_metrics_drop(ptr: OwnedPtr<FontMetrics>) {
     drop(ptr);
 }

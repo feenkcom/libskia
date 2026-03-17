@@ -47,6 +47,6 @@ pub fn skia_font_collection_set_default_font_manager(
 }
 
 #[no_mangle]
-pub fn skia_font_collection_drop(mut ptr: OwnedPtr<FontCollection>) {
+pub fn skia_font_collection_drop(ptr: OwnedPtr<FontCollection>) {
     drop(ptr);
 }

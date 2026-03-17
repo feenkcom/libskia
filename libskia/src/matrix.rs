@@ -46,6 +46,6 @@ pub fn skia_matrix_set_all(
 }
 
 #[no_mangle]
-pub fn skia_matrix_drop(mut ptr: OwnedPtr<Matrix>) {
+pub fn skia_matrix_drop(ptr: OwnedPtr<Matrix>) {
     drop(ptr);
 }

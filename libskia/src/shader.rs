@@ -22,6 +22,6 @@ pub fn skia_shader_is_a_image(shader_ptr: BorrowedPtr<Shader>) -> bool {
 }
 
 #[no_mangle]
-pub fn skia_shader_drop(mut ptr: OwnedPtr<Shader>) {
+pub fn skia_shader_drop(ptr: OwnedPtr<Shader>) {
     drop(ptr);
 }

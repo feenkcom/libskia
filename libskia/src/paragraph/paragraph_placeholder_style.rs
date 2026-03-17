@@ -56,6 +56,6 @@ pub fn skia_paragraph_placeholder_style_set_baseline_offset(
 }
 
 #[no_mangle]
-pub fn skia_paragraph_placeholder_style_drop(mut placeholder_style: OwnedPtr<PlaceholderStyle>) {
+pub fn skia_paragraph_placeholder_style_drop(placeholder_style: OwnedPtr<PlaceholderStyle>) {
     drop(placeholder_style);
 }

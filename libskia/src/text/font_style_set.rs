@@ -71,6 +71,6 @@ pub fn skia_font_style_set_new_typeface(
 }
 
 #[no_mangle]
-pub fn skia_font_style_set_drop(mut ptr: OwnedPtr<FontStyleSet>) {
+pub fn skia_font_style_set_drop(ptr: OwnedPtr<FontStyleSet>) {
     drop(ptr);
 }

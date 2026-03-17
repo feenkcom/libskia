@@ -110,6 +110,6 @@ pub fn skia_image_info_get_shift_per_pixel(image_info_ptr: BorrowedPtr<ImageInfo
 }
 
 #[no_mangle]
-pub fn skia_image_info_drop(mut ptr: OwnedPtr<ImageInfo>) {
+pub fn skia_image_info_drop(ptr: OwnedPtr<ImageInfo>) {
     drop(ptr);
 }

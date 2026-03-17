@@ -38,6 +38,6 @@ pub fn skia_picture_recorder_finish_recording(
 }
 
 #[no_mangle]
-pub fn skia_picture_recorder_drop(mut ptr: OwnedPtr<PictureRecorder>) {
+pub fn skia_picture_recorder_drop(ptr: OwnedPtr<PictureRecorder>) {
     drop(ptr);
 }

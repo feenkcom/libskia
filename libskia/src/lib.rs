@@ -1,4 +1,5 @@
 #![allow(incomplete_features)]
+#![allow(non_snake_case)]
 #![cfg_attr(feature = "phlow", feature(specialization))]
 
 #[macro_use]

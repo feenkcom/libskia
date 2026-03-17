@@ -57,6 +57,6 @@ pub fn skia_backend_render_target_is_protected(
 }
 
 #[no_mangle]
-pub fn skia_backend_render_target_drop(mut ptr: OwnedPtr<BackendRenderTarget>) {
+pub fn skia_backend_render_target_drop(ptr: OwnedPtr<BackendRenderTarget>) {
     drop(ptr);
 }

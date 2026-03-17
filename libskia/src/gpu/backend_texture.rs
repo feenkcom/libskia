@@ -81,6 +81,6 @@ pub fn skia_backend_texture_is_valid(texture_ptr: BorrowedPtr<BackendTexture>) -
 }
 
 #[no_mangle]
-pub fn skia_backend_texture_drop(mut ptr: OwnedPtr<BackendTexture>) {
+pub fn skia_backend_texture_drop(ptr: OwnedPtr<BackendTexture>) {
     drop(ptr);
 }

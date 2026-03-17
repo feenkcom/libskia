@@ -87,6 +87,6 @@ pub fn skia_paragraph_decoration_get_mode(ptr: BorrowedPtr<Decoration>) -> TextD
 }
 
 #[no_mangle]
-pub fn skia_paragraph_decoration_drop(mut ptr: OwnedPtr<Decoration>) {
+pub fn skia_paragraph_decoration_drop(ptr: OwnedPtr<Decoration>) {
     drop(ptr);
 }

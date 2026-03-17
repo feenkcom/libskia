@@ -138,6 +138,6 @@ pub fn skia_paragraph_builder_pop_style(
 }
 
 #[no_mangle]
-pub fn skia_paragraph_builder_drop(mut ptr: OwnedPtr<ParagraphBuilderWithText>) {
+pub fn skia_paragraph_builder_drop(ptr: OwnedPtr<ParagraphBuilderWithText>) {
     drop(ptr);
 }

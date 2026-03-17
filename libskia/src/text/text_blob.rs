@@ -45,6 +45,6 @@ pub fn skia_text_blob_from_glyphs(
 }
 
 #[no_mangle]
-pub fn skia_text_blob_drop(mut ptr: OwnedPtr<TextBlob>) {
+pub fn skia_text_blob_drop(ptr: OwnedPtr<TextBlob>) {
     drop(ptr);
 }

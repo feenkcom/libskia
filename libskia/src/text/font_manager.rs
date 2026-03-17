@@ -85,6 +85,6 @@ pub fn skia_font_manager_match_family_style(
 }
 
 #[no_mangle]
-pub fn skia_font_manager_drop(mut ptr: OwnedPtr<FontMgr>) {
+pub fn skia_font_manager_drop(ptr: OwnedPtr<FontMgr>) {
     drop(ptr);
 }

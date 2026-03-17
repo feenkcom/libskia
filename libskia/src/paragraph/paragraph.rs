@@ -680,6 +680,6 @@ pub fn skia_paragraph_get_line_index_at_coordinate(
 }
 
 #[no_mangle]
-pub fn skia_paragraph_drop(mut ptr: OwnedPtr<ParagraphWithText>) {
+pub fn skia_paragraph_drop(ptr: OwnedPtr<ParagraphWithText>) {
     drop(ptr);
 }

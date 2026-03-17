@@ -38,7 +38,7 @@ pub fn skia_font_style_get_slant(font_style_ptr: BorrowedPtr<FontStyle>) -> Slan
 }
 
 #[no_mangle]
-pub fn skia_font_style_drop(mut ptr: OwnedPtr<FontStyle>) {
+pub fn skia_font_style_drop(ptr: OwnedPtr<FontStyle>) {
     drop(ptr);
 }
 

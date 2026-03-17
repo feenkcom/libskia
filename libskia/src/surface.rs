@@ -143,6 +143,6 @@ pub fn skia_surface_flush(mut _surface: BorrowedPtr<Surface>) {
 }
 
 #[no_mangle]
-pub fn skia_surface_drop(mut ptr: OwnedPtr<Surface>) {
+pub fn skia_surface_drop(ptr: OwnedPtr<Surface>) {
     drop(ptr);
 }

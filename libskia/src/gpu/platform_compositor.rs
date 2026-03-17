@@ -250,6 +250,6 @@ pub fn skia_platform_compositor_disable_fps(mut compositor: BorrowedPtr<Platform
 }
 
 #[no_mangle]
-pub fn skia_platform_compositor_drop(mut compositor: OwnedPtr<PlatformCompositor>) {
+pub fn skia_platform_compositor_drop(compositor: OwnedPtr<PlatformCompositor>) {
     drop(compositor);
 }

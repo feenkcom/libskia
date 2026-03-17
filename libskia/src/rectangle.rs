@@ -54,7 +54,7 @@ pub fn skia_rectangle_f32_bottom(rectangle_ptr: BorrowedPtr<Rect>) -> scalar {
 }
 
 #[no_mangle]
-pub fn skia_rectangle_f32_drop(mut ptr: OwnedPtr<Rect>) {
+pub fn skia_rectangle_f32_drop(ptr: OwnedPtr<Rect>) {
     drop(ptr);
 }
 
@@ -111,6 +111,6 @@ pub fn skia_rectangle_i32_bottom(rectangle_ptr: BorrowedPtr<IRect>) -> i32 {
 }
 
 #[no_mangle]
-pub fn skia_rectangle_i32_drop(mut ptr: OwnedPtr<IRect>) {
+pub fn skia_rectangle_i32_drop(ptr: OwnedPtr<IRect>) {
     drop(ptr);
 }

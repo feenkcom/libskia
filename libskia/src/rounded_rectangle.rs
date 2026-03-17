@@ -83,7 +83,7 @@ pub fn skia_rounded_rectangle_set_oval(
 }
 
 #[no_mangle]
-pub fn skia_rounded_rectangle_drop(mut ptr: OwnedPtr<RRect>) {
+pub fn skia_rounded_rectangle_drop(ptr: OwnedPtr<RRect>) {
     drop(ptr);
 }
 

@@ -73,6 +73,6 @@ pub fn skia_context_flush(mut ptr: BorrowedPtr<DirectContext>) {
 }
 
 #[no_mangle]
-pub fn skia_context_drop(mut ptr: OwnedPtr<DirectContext>) {
+pub fn skia_context_drop(ptr: OwnedPtr<DirectContext>) {
     drop(ptr);
 }

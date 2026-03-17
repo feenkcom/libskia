@@ -97,6 +97,6 @@ pub fn skia_paragraph_style_get_max_lines(paragraph_ptr: BorrowedPtr<ParagraphSt
 }
 
 #[no_mangle]
-pub fn skia_paragraph_style_drop(mut ptr: OwnedPtr<ParagraphStyle>) {
+pub fn skia_paragraph_style_drop(ptr: OwnedPtr<ParagraphStyle>) {
     drop(ptr);
 }

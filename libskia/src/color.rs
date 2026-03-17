@@ -38,7 +38,7 @@ pub fn skia_color_get_alpha(color: BorrowedPtr<Color>) -> u8 {
 }
 
 #[no_mangle]
-pub fn skia_color_drop(mut color: OwnedPtr<Color>) {
+pub fn skia_color_drop(color: OwnedPtr<Color>) {
     drop(color);
 }
 
@@ -93,7 +93,7 @@ pub fn skia_color_array_at_put(
 }
 
 #[no_mangle]
-pub fn skia_color_array_drop(mut ptr: OwnedPtr<ArrayBox<Color>>) {
+pub fn skia_color_array_drop(ptr: OwnedPtr<ArrayBox<Color>>) {
     drop(ptr);
 }
 

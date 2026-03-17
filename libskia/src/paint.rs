@@ -269,6 +269,6 @@ pub fn skia_paint_has_path_effect(paint_ptr: BorrowedPtr<Paint>) -> bool {
 }
 
 #[no_mangle]
-pub fn skia_paint_drop(mut ptr: OwnedPtr<Paint>) {
+pub fn skia_paint_drop(ptr: OwnedPtr<Paint>) {
     drop(ptr);
 }

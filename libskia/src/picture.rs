@@ -60,6 +60,6 @@ pub fn skia_picture_serialize(
 }
 
 #[no_mangle]
-pub fn skia_picture_drop(mut ptr: OwnedPtr<Picture>) {
+pub fn skia_picture_drop(ptr: OwnedPtr<Picture>) {
     drop(ptr);
 }

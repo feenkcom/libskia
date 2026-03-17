@@ -139,6 +139,6 @@ pub fn skia_image_filter_drop_shadow_only(
 }
 
 #[no_mangle]
-pub fn skia_image_filter_drop(mut ptr: OwnedPtr<ImageFilter>) {
+pub fn skia_image_filter_drop(ptr: OwnedPtr<ImageFilter>) {
     drop(ptr);
 }

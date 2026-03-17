@@ -175,6 +175,6 @@ pub fn skia_paragraph_text_style_set_decoration(
 }
 
 #[no_mangle]
-pub fn skia_paragraph_text_style_drop(mut ptr: OwnedPtr<TextStyle>) {
+pub fn skia_paragraph_text_style_drop(ptr: OwnedPtr<TextStyle>) {
     drop(ptr);
 }

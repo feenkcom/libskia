@@ -26,6 +26,6 @@ pub fn skia_path_effect_corner(radius: scalar) -> OwnedPtr<PathEffect> {
 }
 
 #[no_mangle]
-pub fn skia_path_effect_drop(mut ptr: OwnedPtr<PathEffect>) {
+pub fn skia_path_effect_drop(ptr: OwnedPtr<PathEffect>) {
     drop(ptr);
 }

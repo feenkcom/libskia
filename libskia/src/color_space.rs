@@ -14,7 +14,7 @@ pub fn skia_color_space_is_srgb(color_space: BorrowedPtr<ColorSpace>) -> bool {
 }
 
 #[no_mangle]
-pub fn skia_color_space_drop(mut ptr: OwnedPtr<ColorSpace>) {
+pub fn skia_color_space_drop(ptr: OwnedPtr<ColorSpace>) {
     drop(ptr);
 }
 

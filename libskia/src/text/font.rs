@@ -187,6 +187,6 @@ pub fn skia_font_measure_text(
 }
 
 #[no_mangle]
-pub fn skia_font_drop(mut ptr: OwnedPtr<Font>) {
+pub fn skia_font_drop(ptr: OwnedPtr<Font>) {
     drop(ptr);
 }

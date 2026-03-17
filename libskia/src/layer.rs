@@ -39,7 +39,7 @@ pub fn skia_layer_rec_set_paint(
 }
 
 #[no_mangle]
-pub fn skia_layer_rec_drop(mut ptr: OwnedPtr<SaveLayerRecWrapper>) {
+pub fn skia_layer_rec_drop(ptr: OwnedPtr<SaveLayerRecWrapper>) {
     drop(ptr);
 }
 

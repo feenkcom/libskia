@@ -80,6 +80,6 @@ pub fn skia_typeface_is_fixed_pitch(typeface_ptr: BorrowedPtr<Typeface>) -> bool
 }
 
 #[no_mangle]
-pub fn skia_typeface_drop(mut ptr: OwnedPtr<Typeface>) {
+pub fn skia_typeface_drop(ptr: OwnedPtr<Typeface>) {
     drop(ptr);
 }

@@ -49,7 +49,7 @@ pub fn skia_canvas_render_svg(
 }
 
 #[no_mangle]
-pub fn skia_svg_dom_drop(mut ptr: OwnedPtr<Dom>) {
+pub fn skia_svg_dom_drop(ptr: OwnedPtr<Dom>) {
     drop(ptr);
 }
 
@@ -77,7 +77,7 @@ pub fn skia_svg_canvas_get_canvas(svg_canvas: BorrowedPtr<SvgCanvas>) -> *mut Re
 }
 
 #[no_mangle]
-pub fn skia_svg_canvas_end(mut svg_canvas: OwnedPtr<SvgCanvas>, mut data: BorrowedPtr<StringBox>) {
+pub fn skia_svg_canvas_end(svg_canvas: OwnedPtr<SvgCanvas>, mut data: BorrowedPtr<StringBox>) {
     svg_canvas
         .with_value_ok(|svg_canvas| {
             data.with_mut_ok(|data| {
@@ -90,6 +90,6 @@ pub fn skia_svg_canvas_end(mut svg_canvas: OwnedPtr<SvgCanvas>, mut data: Borrow
 }
 
 #[no_mangle]
-pub fn skia_svg_canvas_drop(mut svg_canvas: OwnedPtr<SvgCanvas>) {
+pub fn skia_svg_canvas_drop(svg_canvas: OwnedPtr<SvgCanvas>) {
     drop(svg_canvas);
 }

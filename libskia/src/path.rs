@@ -253,6 +253,6 @@ pub fn skia_path_serialize(path: BorrowedPtr<Path>, mut data: BorrowedPtr<ArrayB
 }
 
 #[no_mangle]
-pub fn skia_path_drop(mut path: OwnedPtr<Path>) {
+pub fn skia_path_drop(path: OwnedPtr<Path>) {
     drop(path);
 }

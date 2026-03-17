@@ -23,6 +23,6 @@ pub fn skia_typeface_font_provider_register_typeface(
 }
 
 #[no_mangle]
-pub fn skia_typeface_font_provider_drop(mut ptr: OwnedPtr<TypefaceFontProvider>) {
+pub fn skia_typeface_font_provider_drop(ptr: OwnedPtr<TypefaceFontProvider>) {
     drop(ptr);
 }
