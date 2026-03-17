@@ -1,12 +1,13 @@
 use std::error::Error;
 use std::sync::{Arc, Mutex};
 
+use crate::value_box_compat::*;
 use compositor::{Compositor, Layer};
 use compositor_skia::{Cache, SkiaCachelessCompositor, SkiaCompositor};
 use compositor_skia_platform::Platform;
 use fps_counter::FPSCounter;
 use skia_safe::{Color, Color4f, Font, FontMgr, FontStyle, ISize, Paint, Point, Surface};
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 lazy_static! {
     static ref FPS_FONT: Font = Font::new(
@@ -200,8 +201,8 @@ impl PlatformContext {
 
 #[no_mangle]
 pub fn skia_platform_compositor_submit_layer(
-    compositor: *mut ValueBox<PlatformCompositor>,
-    layer: *mut ValueBox<Arc<dyn Layer>>,
+    mut compositor: BorrowedPtr<PlatformCompositor>,
+    layer: BorrowedPtr<Arc<dyn Layer>>,
 ) {
     compositor
         .with_mut(|compositor| {
@@ -211,14 +212,14 @@ pub fn skia_platform_compositor_submit_layer(
 }
 
 #[no_mangle]
-pub fn skia_platform_compositor_draw(compositor: *mut ValueBox<PlatformCompositor>) {
+pub fn skia_platform_compositor_draw(mut compositor: BorrowedPtr<PlatformCompositor>) {
     compositor
         .with_mut(|compositor| compositor.draw().map_err(|error| error.into()))
         .log();
 }
 
 #[no_mangle]
-pub fn skia_platform_compositor_draw_cacheless(compositor: *mut ValueBox<PlatformCompositor>) {
+pub fn skia_platform_compositor_draw_cacheless(mut compositor: BorrowedPtr<PlatformCompositor>) {
     compositor
         .with_mut(|compositor| compositor.draw_cacheless().map_err(|error| error.into()))
         .log();
@@ -226,7 +227,7 @@ pub fn skia_platform_compositor_draw_cacheless(compositor: *mut ValueBox<Platfor
 
 #[no_mangle]
 pub fn skia_platform_compositor_resize(
-    compositor: *mut ValueBox<PlatformCompositor>,
+    mut compositor: BorrowedPtr<PlatformCompositor>,
     width: u32,
     height: u32,
 ) {
@@ -236,20 +237,20 @@ pub fn skia_platform_compositor_resize(
 }
 
 #[no_mangle]
-pub fn skia_platform_compositor_enable_fps(compositor: *mut ValueBox<PlatformCompositor>) {
+pub fn skia_platform_compositor_enable_fps(mut compositor: BorrowedPtr<PlatformCompositor>) {
     compositor
         .with_mut_ok(|compositor| compositor.enable_fps())
         .log();
 }
 
 #[no_mangle]
-pub fn skia_platform_compositor_disable_fps(compositor: *mut ValueBox<PlatformCompositor>) {
+pub fn skia_platform_compositor_disable_fps(mut compositor: BorrowedPtr<PlatformCompositor>) {
     compositor
         .with_mut_ok(|compositor| compositor.disable_fps())
         .log();
 }
 
 #[no_mangle]
-pub fn skia_platform_compositor_drop(compositor: *mut ValueBox<PlatformCompositor>) {
+pub fn skia_platform_compositor_drop(mut compositor: OwnedPtr<PlatformCompositor>) {
     compositor.release();
 }

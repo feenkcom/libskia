@@ -1,29 +1,30 @@
+use crate::value_box_compat::*;
 use array_box::ArrayBox;
 use skia_safe::{scalar, PathEffect};
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr};
 
 #[no_mangle]
 pub fn skia_path_effect_dash(
-    intervals_ptr: *mut ValueBox<ArrayBox<f32>>,
+    intervals_ptr: BorrowedPtr<ArrayBox<f32>>,
     phase: scalar,
-) -> *mut ValueBox<PathEffect> {
-    intervals_ptr.with_not_null_return(std::ptr::null_mut(), |intervals| {
+) -> OwnedPtr<PathEffect> {
+    intervals_ptr.with_not_null_return(OwnedPtr::null(), |intervals| {
         match PathEffect::dash(intervals.to_slice(), phase) {
-            None => std::ptr::null_mut(),
-            Some(effect) => ValueBox::new(effect).into_raw(),
+            None => OwnedPtr::null(),
+            Some(effect) => OwnedPtr::new(effect),
         }
     })
 }
 
 #[no_mangle]
-pub fn skia_path_effect_corner(radius: scalar) -> *mut ValueBox<PathEffect> {
+pub fn skia_path_effect_corner(radius: scalar) -> OwnedPtr<PathEffect> {
     match PathEffect::corner_path(radius) {
-        None => std::ptr::null_mut(),
-        Some(effect) => ValueBox::new(effect).into_raw(),
+        None => OwnedPtr::null(),
+        Some(effect) => OwnedPtr::new(effect),
     }
 }
 
 #[no_mangle]
-pub fn skia_path_effect_drop(ptr: *mut ValueBox<PathEffect>) {
+pub fn skia_path_effect_drop(mut ptr: OwnedPtr<PathEffect>) {
     ptr.release();
 }

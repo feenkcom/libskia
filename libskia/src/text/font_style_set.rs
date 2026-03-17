@@ -1,45 +1,46 @@
+use crate::value_box_compat::*;
 use skia_safe::{FontStyle, FontStyleSet, Typeface};
 use string_box::StringBox;
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
-pub fn skia_font_style_set_default() -> *mut ValueBox<FontStyleSet> {
-    ValueBox::new(FontStyleSet::default()).into_raw()
+pub fn skia_font_style_set_default() -> OwnedPtr<FontStyleSet> {
+    OwnedPtr::new(FontStyleSet::default()).into_raw()
 }
 
 #[no_mangle]
-pub fn skia_font_style_get_count(font_style_set_ptr: *mut ValueBox<FontStyleSet>) -> usize {
+pub fn skia_font_style_get_count(mut font_style_set_ptr: BorrowedPtr<FontStyleSet>) -> usize {
     font_style_set_ptr.with_mut_ok(|set| set.count()).or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_font_style_set_count(font_style_set_ptr: *mut ValueBox<FontStyleSet>) -> usize {
+pub fn skia_font_style_set_count(font_style_set_ptr: BorrowedPtr<FontStyleSet>) -> usize {
     skia_font_style_get_count(font_style_set_ptr)
 }
 
 #[no_mangle]
 pub fn skia_font_style_get_style_at(
-    font_style_set_ptr: *mut ValueBox<FontStyleSet>,
+    mut font_style_set_ptr: BorrowedPtr<FontStyleSet>,
     index: usize,
-) -> *mut ValueBox<FontStyle> {
+) -> OwnedPtr<FontStyle> {
     font_style_set_ptr
-        .with_mut_ok(|set| ValueBox::new(set.style(index).0))
+        .with_mut_ok(|set| OwnedPtr::new(set.style(index).0))
         .into_raw()
 }
 
 #[no_mangle]
 pub fn skia_font_style_set_style_at(
-    font_style_set_ptr: *mut ValueBox<FontStyleSet>,
+    font_style_set_ptr: BorrowedPtr<FontStyleSet>,
     index: usize,
-) -> *mut ValueBox<FontStyle> {
+) -> OwnedPtr<FontStyle> {
     skia_font_style_get_style_at(font_style_set_ptr, index)
 }
 
 #[no_mangle]
 pub fn skia_font_style_set_name_at(
-    font_style_set_ptr: *mut ValueBox<FontStyleSet>,
+    font_style_set_ptr: BorrowedPtr<FontStyleSet>,
     index: usize,
-    _name_ptr: *mut ValueBox<StringBox>,
+    mut _name_ptr: BorrowedPtr<StringBox>,
 ) {
     font_style_set_ptr.with_not_null(|set| {
         _name_ptr.with_not_null(|name| {
@@ -57,18 +58,16 @@ pub fn skia_font_style_set_name_at(
 
 #[no_mangle]
 pub fn skia_font_style_set_new_typeface(
-    font_style_set_ptr: *mut ValueBox<FontStyleSet>,
+    font_style_set_ptr: BorrowedPtr<FontStyleSet>,
     index: usize,
-) -> *mut ValueBox<Typeface> {
-    font_style_set_ptr.with_not_null_return(std::ptr::null_mut(), |set| {
-        match set.new_typeface(index) {
-            None => std::ptr::null_mut(),
-            Some(typeface) => ValueBox::new(typeface).into_raw(),
-        }
+) -> OwnedPtr<Typeface> {
+    font_style_set_ptr.with_not_null_return(OwnedPtr::null(), |set| match set.new_typeface(index) {
+        None => OwnedPtr::null(),
+        Some(typeface) => OwnedPtr::new(typeface),
     })
 }
 
 #[no_mangle]
-pub fn skia_font_style_set_drop(ptr: *mut ValueBox<FontStyleSet>) {
+pub fn skia_font_style_set_drop(mut ptr: OwnedPtr<FontStyleSet>) {
     ptr.release();
 }

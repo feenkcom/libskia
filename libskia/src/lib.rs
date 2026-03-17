@@ -8,9 +8,6 @@ extern crate log;
 #[cfg(feature = "phlow")]
 #[macro_use]
 extern crate phlow;
-#[macro_use]
-extern crate value_box;
-
 use std::os::raw::c_void;
 
 // re-export the ffi methods
@@ -54,6 +51,7 @@ pub mod surface_props;
 pub mod svg;
 pub mod text;
 pub mod types;
+pub mod value_box_compat;
 
 #[cfg(feature = "phlow")]
 define_extensions!(SkiaExtensions);

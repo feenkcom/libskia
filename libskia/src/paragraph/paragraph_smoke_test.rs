@@ -5,10 +5,10 @@ use std::hint::black_box;
 use std::num::NonZero;
 use std::{panic, ptr};
 
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
+use value_box::{BorrowedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
-pub extern "C" fn paragraph_smoke(style: *mut ValueBox<ParagraphStyle>) {
+pub extern "C" fn paragraph_smoke(style: BorrowedPtr<ParagraphStyle>) {
     style.with_ref_ok(|style| smoke_test_paragraph(style)).log();
 }
 

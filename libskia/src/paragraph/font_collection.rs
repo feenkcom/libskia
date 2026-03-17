@@ -1,15 +1,16 @@
+use crate::value_box_compat::*;
 use skia_safe::textlayout::{FontCollection, TypefaceFontProvider};
 use skia_safe::FontMgr;
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
-pub fn skia_font_collection_new() -> *mut ValueBox<FontCollection> {
-    ValueBox::new(FontCollection::new()).into_raw()
+pub fn skia_font_collection_new() -> OwnedPtr<FontCollection> {
+    OwnedPtr::new(FontCollection::new()).into_raw()
 }
 
 #[no_mangle]
 pub fn skia_font_collection_font_managers_count(
-    font_collection_ptr: *mut ValueBox<FontCollection>,
+    font_collection_ptr: BorrowedPtr<FontCollection>,
 ) -> usize {
     font_collection_ptr
         .with_ref_ok(|collection| collection.font_managers_count())
@@ -18,8 +19,8 @@ pub fn skia_font_collection_font_managers_count(
 
 #[no_mangle]
 pub fn skia_font_collection_set_asset_font_manager(
-    font_collection_ptr: *mut ValueBox<FontCollection>,
-    typeface_font_provider: *mut ValueBox<TypefaceFontProvider>,
+    mut font_collection_ptr: BorrowedPtr<FontCollection>,
+    typeface_font_provider: BorrowedPtr<TypefaceFontProvider>,
 ) {
     font_collection_ptr
         .with_mut(|font_collection| {
@@ -34,8 +35,8 @@ pub fn skia_font_collection_set_asset_font_manager(
 
 #[no_mangle]
 pub fn skia_font_collection_set_default_font_manager(
-    font_collection_ptr: *mut ValueBox<FontCollection>,
-    font_manager_ptr: *mut ValueBox<FontMgr>,
+    mut font_collection_ptr: BorrowedPtr<FontCollection>,
+    font_manager_ptr: BorrowedPtr<FontMgr>,
 ) {
     font_collection_ptr
         .with_mut(|font_collection| {
@@ -47,6 +48,6 @@ pub fn skia_font_collection_set_default_font_manager(
 }
 
 #[no_mangle]
-pub fn skia_font_collection_drop(ptr: *mut ValueBox<FontCollection>) {
+pub fn skia_font_collection_drop(mut ptr: OwnedPtr<FontCollection>) {
     ptr.release();
 }

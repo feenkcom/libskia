@@ -4,7 +4,7 @@ use skia_safe::{
     scalar, Canvas, Color, FilterMode, Image, MipmapMode, Paint, Point, RRect, Rect,
     SamplingOptions, Vector,
 };
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
+use value_box::{BorrowedPtr, ReturnBoxerResult};
 
 #[no_mangle]
 pub fn skia_canvas_fill_rectangle_with_color(
@@ -84,7 +84,7 @@ pub fn skia_canvas_fill_rounded_rectangle_with_color(
 #[no_mangle]
 pub fn skia_canvas_fill_image_without_paint(
     canvas: *mut ReferenceBox<Canvas>,
-    image: *mut ValueBox<Image>,
+    image: BorrowedPtr<Image>,
     x: scalar,
     y: scalar,
 ) {

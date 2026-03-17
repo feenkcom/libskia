@@ -1,15 +1,16 @@
+use crate::value_box_compat::*;
 use skia_safe::scalar;
 use skia_safe::textlayout::{PlaceholderAlignment, PlaceholderStyle};
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
-pub fn skia_paragraph_placeholder_style_default() -> *mut ValueBox<PlaceholderStyle> {
-    value_box!(PlaceholderStyle::default()).into_raw()
+pub fn skia_paragraph_placeholder_style_default() -> OwnedPtr<PlaceholderStyle> {
+    OwnedPtr::new(PlaceholderStyle::default()).into_raw()
 }
 
 #[no_mangle]
 pub fn skia_paragraph_placeholder_style_set_width(
-    placeholder_style: *mut ValueBox<PlaceholderStyle>,
+    mut placeholder_style: BorrowedPtr<PlaceholderStyle>,
     width: scalar,
 ) {
     placeholder_style
@@ -21,7 +22,7 @@ pub fn skia_paragraph_placeholder_style_set_width(
 
 #[no_mangle]
 pub fn skia_paragraph_placeholder_style_set_height(
-    placeholder_style: *mut ValueBox<PlaceholderStyle>,
+    mut placeholder_style: BorrowedPtr<PlaceholderStyle>,
     height: scalar,
 ) {
     placeholder_style
@@ -33,7 +34,7 @@ pub fn skia_paragraph_placeholder_style_set_height(
 
 #[no_mangle]
 pub fn skia_paragraph_placeholder_style_set_alignment(
-    placeholder_style: *mut ValueBox<PlaceholderStyle>,
+    mut placeholder_style: BorrowedPtr<PlaceholderStyle>,
     alignment: PlaceholderAlignment,
 ) {
     placeholder_style
@@ -45,7 +46,7 @@ pub fn skia_paragraph_placeholder_style_set_alignment(
 
 #[no_mangle]
 pub fn skia_paragraph_placeholder_style_set_baseline_offset(
-    placeholder_style: *mut ValueBox<PlaceholderStyle>,
+    mut placeholder_style: BorrowedPtr<PlaceholderStyle>,
     baseline_offset: scalar,
 ) {
     placeholder_style
@@ -56,6 +57,6 @@ pub fn skia_paragraph_placeholder_style_set_baseline_offset(
 }
 
 #[no_mangle]
-pub fn skia_paragraph_placeholder_style_drop(placeholder_style: *mut ValueBox<PlaceholderStyle>) {
+pub fn skia_paragraph_placeholder_style_drop(mut placeholder_style: OwnedPtr<PlaceholderStyle>) {
     placeholder_style.release();
 }

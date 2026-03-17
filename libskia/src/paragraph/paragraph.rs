@@ -3,6 +3,7 @@ use std::cell::RefCell;
 use std::ops::Range;
 use std::rc::Rc;
 
+use crate::value_box_compat::*;
 use array_box::ArrayBox;
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::textlayout::{
@@ -11,7 +12,7 @@ use skia_safe::textlayout::{
 };
 use skia_safe::{scalar, Canvas, Point, Rect};
 use string_box::StringBox;
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 pub type TabSize = usize;
 pub type CharLength = usize;
@@ -435,7 +436,7 @@ impl ParagraphWithText {
 }
 
 #[no_mangle]
-pub fn skia_paragraph_layout(paragraph_ptr: *mut ValueBox<ParagraphWithText>, width: scalar) {
+pub fn skia_paragraph_layout(mut paragraph_ptr: BorrowedPtr<ParagraphWithText>, width: scalar) {
     paragraph_ptr
         .with_mut_ok(|paragraph| {
             paragraph.layout(width);
@@ -445,7 +446,7 @@ pub fn skia_paragraph_layout(paragraph_ptr: *mut ValueBox<ParagraphWithText>, wi
 
 #[no_mangle]
 pub fn skia_paragraph_paint(
-    paragraph_ptr: *mut ValueBox<ParagraphWithText>,
+    paragraph_ptr: BorrowedPtr<ParagraphWithText>,
     canvas_ptr: *mut ReferenceBox<Canvas>,
     x: scalar,
     y: scalar,
@@ -460,35 +461,35 @@ pub fn skia_paragraph_paint(
 }
 
 #[no_mangle]
-pub fn skia_paragraph_get_height(paragraph_ptr: *mut ValueBox<ParagraphWithText>) -> scalar {
+pub fn skia_paragraph_get_height(paragraph_ptr: BorrowedPtr<ParagraphWithText>) -> scalar {
     paragraph_ptr
         .with_ref_ok(|paragraph| paragraph.height())
         .or_log(0.0)
 }
 
 #[no_mangle]
-pub fn skia_paragraph_get_max_width(paragraph_ptr: *mut ValueBox<ParagraphWithText>) -> scalar {
+pub fn skia_paragraph_get_max_width(paragraph_ptr: BorrowedPtr<ParagraphWithText>) -> scalar {
     paragraph_ptr
         .with_ref_ok(|paragraph| paragraph.max_width())
         .or_log(0.0)
 }
 
 #[no_mangle]
-pub fn skia_paragraph_get_longest_line(paragraph_ptr: *mut ValueBox<ParagraphWithText>) -> scalar {
+pub fn skia_paragraph_get_longest_line(paragraph_ptr: BorrowedPtr<ParagraphWithText>) -> scalar {
     paragraph_ptr
         .with_ref_ok(|paragraph| paragraph.longest_line())
         .or_log(0.0)
 }
 
 #[no_mangle]
-pub fn skia_paragraph_get_line_number(paragraph_ptr: *mut ValueBox<ParagraphWithText>) -> usize {
+pub fn skia_paragraph_get_line_number(paragraph_ptr: BorrowedPtr<ParagraphWithText>) -> usize {
     paragraph_ptr
         .with_ref_ok(|paragraph| paragraph.line_number())
         .or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_paragraph_get_char_count(paragraph_ptr: *mut ValueBox<ParagraphWithText>) -> usize {
+pub fn skia_paragraph_get_char_count(paragraph_ptr: BorrowedPtr<ParagraphWithText>) -> usize {
     paragraph_ptr
         .with_ref_ok(|paragraph| paragraph.char_count())
         .or_log(0)
@@ -496,8 +497,8 @@ pub fn skia_paragraph_get_char_count(paragraph_ptr: *mut ValueBox<ParagraphWithT
 
 #[no_mangle]
 pub fn skia_paragraph_get_rects_for_placeholders(
-    paragraph: *mut ValueBox<ParagraphWithText>,
-) -> *mut ValueBox<ArrayBox<f32>> {
+    paragraph: BorrowedPtr<ParagraphWithText>,
+) -> OwnedPtr<ArrayBox<f32>> {
     paragraph
         .with_ref_ok(|paragraph| {
             let rectangles = paragraph.get_rects_for_placeholders();
@@ -508,19 +509,19 @@ pub fn skia_paragraph_get_rects_for_placeholders(
                 points.push(text_box.rect.right);
                 points.push(text_box.rect.bottom);
             }
-            ValueBox::new(ArrayBox::from_vector(points))
+            OwnedPtr::new(ArrayBox::from_vector(points))
         })
         .into_raw()
 }
 
 #[no_mangle]
 pub fn skia_paragraph_get_rects_for_glyph_range(
-    paragraph: *mut ValueBox<ParagraphWithText>,
+    paragraph: BorrowedPtr<ParagraphWithText>,
     start: usize,
     end: usize,
     rect_height_style: RectHeightStyle,
     rect_width_style: RectWidthStyle,
-) -> *mut ValueBox<ArrayBox<f32>> {
+) -> OwnedPtr<ArrayBox<f32>> {
     paragraph
         .with_ref_ok(|paragraph| {
             let rectangles =
@@ -532,19 +533,19 @@ pub fn skia_paragraph_get_rects_for_glyph_range(
                 points.push(text_box.rect.right);
                 points.push(text_box.rect.bottom);
             }
-            ValueBox::new(ArrayBox::from_vector(points))
+            OwnedPtr::new(ArrayBox::from_vector(points))
         })
         .into_raw()
 }
 
 #[no_mangle]
 pub fn skia_paragraph_get_rects_for_char_range(
-    paragraph: *mut ValueBox<ParagraphWithText>,
+    paragraph: BorrowedPtr<ParagraphWithText>,
     start: usize,
     end: usize,
     rect_height_style: RectHeightStyle,
     rect_width_style: RectWidthStyle,
-) -> *mut ValueBox<ArrayBox<f32>> {
+) -> OwnedPtr<ArrayBox<f32>> {
     paragraph
         .with_ref_ok(|paragraph| {
             let rectangles =
@@ -556,13 +557,13 @@ pub fn skia_paragraph_get_rects_for_char_range(
                 points.push(text_box.rect.right);
                 points.push(text_box.rect.bottom);
             }
-            ValueBox::new(ArrayBox::from_vector(points))
+            OwnedPtr::new(ArrayBox::from_vector(points))
         })
         .into_raw()
 }
 
 #[no_mangle]
-pub fn skia_paragraph_print(paragraph_ptr: *mut ValueBox<ParagraphWithText>) {
+pub fn skia_paragraph_print(paragraph_ptr: BorrowedPtr<ParagraphWithText>) {
     paragraph_ptr.with_not_null(|paragraph_with_text| {
         let paragraph = paragraph_with_text.paragraph.borrow();
         let line_metrics = paragraph_with_text.get_line_metrics(&paragraph);
@@ -579,7 +580,7 @@ pub fn skia_paragraph_print(paragraph_ptr: *mut ValueBox<ParagraphWithText>) {
 
 #[no_mangle]
 pub fn skia_paragraph_get_glyph_position_at_coordinate(
-    paragraph_ptr: *mut ValueBox<ParagraphWithText>,
+    paragraph_ptr: BorrowedPtr<ParagraphWithText>,
     x: scalar,
     y: scalar,
 ) -> i32 {
@@ -591,7 +592,7 @@ pub fn skia_paragraph_get_glyph_position_at_coordinate(
 
 #[no_mangle]
 pub fn skia_paragraph_get_char_position_at_coordinate(
-    paragraph_ptr: *mut ValueBox<ParagraphWithText>,
+    paragraph_ptr: BorrowedPtr<ParagraphWithText>,
     x: scalar,
     y: scalar,
 ) -> usize {
@@ -602,18 +603,18 @@ pub fn skia_paragraph_get_char_position_at_coordinate(
 
 #[no_mangle]
 pub fn skia_paragraph_get_glyph_range_for_char_range(
-    paragraph_ptr: *mut ValueBox<ParagraphWithText>,
+    paragraph_ptr: BorrowedPtr<ParagraphWithText>,
     start: usize,
     end: usize,
-) -> *mut ValueBox<Range<usize>> {
-    paragraph_ptr.with_not_null_return(std::ptr::null_mut(), |paragraph| {
-        ValueBox::new(paragraph.text.get_glyph_range_for_char_range(start..end)).into_raw()
+) -> OwnedPtr<Range<usize>> {
+    paragraph_ptr.with_not_null_return(OwnedPtr::null(), |paragraph| {
+        OwnedPtr::new(paragraph.text.get_glyph_range_for_char_range(start..end))
     })
 }
 
 #[no_mangle]
 pub fn skia_paragraph_get_glyph_offset_for_char_offset(
-    paragraph: *mut ValueBox<ParagraphWithText>,
+    paragraph: BorrowedPtr<ParagraphWithText>,
     offset: usize,
 ) -> usize {
     paragraph
@@ -623,7 +624,7 @@ pub fn skia_paragraph_get_glyph_offset_for_char_offset(
 
 #[no_mangle]
 pub fn skia_paragraph_get_line_height(
-    paragraph: *mut ValueBox<ParagraphWithText>,
+    paragraph: BorrowedPtr<ParagraphWithText>,
     index: usize,
 ) -> scalar {
     paragraph
@@ -633,7 +634,7 @@ pub fn skia_paragraph_get_line_height(
 
 #[no_mangle]
 pub fn skia_paragraph_get_line_width(
-    paragraph: *mut ValueBox<ParagraphWithText>,
+    paragraph: BorrowedPtr<ParagraphWithText>,
     index: usize,
 ) -> scalar {
     paragraph
@@ -643,7 +644,7 @@ pub fn skia_paragraph_get_line_width(
 
 #[no_mangle]
 pub fn skia_paragraph_get_line_end_character_index(
-    paragraph: *mut ValueBox<ParagraphWithText>,
+    paragraph: BorrowedPtr<ParagraphWithText>,
     index: usize,
 ) -> usize {
     paragraph
@@ -653,7 +654,7 @@ pub fn skia_paragraph_get_line_end_character_index(
 
 #[no_mangle]
 pub fn skia_paragraph_get_line_index_for_char(
-    paragraph: *mut ValueBox<ParagraphWithText>,
+    paragraph: BorrowedPtr<ParagraphWithText>,
     index: usize,
 ) -> usize {
     paragraph
@@ -663,7 +664,7 @@ pub fn skia_paragraph_get_line_index_for_char(
 
 #[no_mangle]
 pub fn skia_paragraph_get_line_index_at_coordinate(
-    paragraph: *mut ValueBox<ParagraphWithText>,
+    paragraph: BorrowedPtr<ParagraphWithText>,
     x: scalar,
     y: scalar,
 ) -> usize {
@@ -673,6 +674,6 @@ pub fn skia_paragraph_get_line_index_at_coordinate(
 }
 
 #[no_mangle]
-pub fn skia_paragraph_drop(ptr: *mut ValueBox<ParagraphWithText>) {
+pub fn skia_paragraph_drop(mut ptr: OwnedPtr<ParagraphWithText>) {
     ptr.release();
 }

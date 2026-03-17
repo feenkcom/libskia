@@ -14,6 +14,7 @@ use objc::runtime::Object;
 use objc::runtime::Sel;
 use objc::*;
 
+use crate::value_box_compat::*;
 use core_graphics_types::geometry::CGSize;
 use foreign_types_shared::{ForeignType, ForeignTypeRef};
 use metal::{CommandQueue, Device, MTLPixelFormat, MetalDrawableRef, MetalLayer};
@@ -23,7 +24,7 @@ use skia_safe::{gpu, scalar, ColorType, ISize, Size, Surface};
 use std::fmt::{Debug, Formatter};
 use std::mem;
 use std::mem::transmute;
-use value_box::ValueBox;
+use value_box::OwnedPtr;
 
 #[allow(dead_code)]
 pub struct MetalContext {
@@ -175,8 +176,8 @@ pub fn skia_metal_compositor_new_size(
     ns_view: cocoa_id,
     width: u32,
     height: u32,
-) -> *mut ValueBox<PlatformCompositor> {
-    ValueBox::new(PlatformCompositor::new(PlatformContext::Metal(
+) -> OwnedPtr<PlatformCompositor> {
+    OwnedPtr::new(PlatformCompositor::new(PlatformContext::Metal(
         MetalContext::new(ns_view, Some(CGSize::new(width.into(), height.into()))),
     )))
     .into_raw()

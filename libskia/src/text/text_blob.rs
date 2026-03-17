@@ -1,23 +1,24 @@
+use crate::value_box_compat::*;
 use skia_safe::{Font, GlyphId, Point, TextBlob, TextBlobBuilder, TextEncoding};
 use string_box::StringBox;
-use value_box::{ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr};
 
 #[no_mangle]
-pub fn skia_text_blob_default() -> *mut ValueBox<TextBlob> {
+pub fn skia_text_blob_default() -> OwnedPtr<TextBlob> {
     TextBlob::from_str("Text", &Font::default())
-        .map(|blob| value_box!(blob).into_raw())
-        .unwrap_or_else(|| std::ptr::null_mut())
+        .map(OwnedPtr::new)
+        .unwrap_or_else(OwnedPtr::null)
 }
 
 #[no_mangle]
 pub fn skia_text_blob_from_text(
-    text: *mut ValueBox<StringBox>,
-    encoding: TextEncoding,
-    font: *mut ValueBox<Font>,
-) -> *mut ValueBox<TextBlob> {
+    text: BorrowedPtr<StringBox>,
+    _encoding: TextEncoding,
+    font: BorrowedPtr<Font>,
+) -> OwnedPtr<TextBlob> {
     text.with_ref(|text| {
         font.with_ref_ok(|font| {
-            TextBlob::from_text(text.as_str(), font).map(|blob| value_box!(blob))
+            TextBlob::from_text(text.as_str(), font).map(|blob| OwnedPtr::new(blob))
         })
     })
     .into_raw()
@@ -27,8 +28,8 @@ pub fn skia_text_blob_from_text(
 pub fn skia_text_blob_from_glyphs(
     glyphs: *mut GlyphId,
     glyphs_length: usize,
-    font: *mut ValueBox<Font>,
-) -> *mut ValueBox<TextBlob> {
+    font: BorrowedPtr<Font>,
+) -> OwnedPtr<TextBlob> {
     let glyphs = unsafe { std::slice::from_raw_parts(glyphs, glyphs_length) };
 
     font.with_ref_ok(|font| {
@@ -37,12 +38,12 @@ pub fn skia_text_blob_from_glyphs(
             blob_builder.alloc_run(font, glyphs_length, Point::new(0.0, 0.0), None);
         allocated_glyphs.copy_from_slice(glyphs);
 
-        blob_builder.make().map(|blob| value_box!(blob))
+        blob_builder.make().map(|blob| OwnedPtr::new(blob))
     })
     .into_raw()
 }
 
 #[no_mangle]
-pub fn skia_text_blob_drop(ptr: *mut ValueBox<TextBlob>) {
+pub fn skia_text_blob_drop(mut ptr: OwnedPtr<TextBlob>) {
     ptr.release();
 }

@@ -1,16 +1,17 @@
+use crate::value_box_compat::*;
 use skia_safe::gpu::Budgeted;
 use skia_safe::gpu::{BackendRenderTarget, BackendTexture, DirectContext, SurfaceOrigin};
 use skia_safe::{ColorType, ImageInfo, Surface};
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr};
 
 #[no_mangle]
 pub fn skia_surface_from_render_target(
-    backend_render_target_ptr: *mut ValueBox<BackendRenderTarget>,
-    context_ptr: *mut ValueBox<DirectContext>,
+    backend_render_target_ptr: BorrowedPtr<BackendRenderTarget>,
+    context_ptr: BorrowedPtr<DirectContext>,
     color_type: ColorType,
-) -> *mut ValueBox<Surface> {
-    backend_render_target_ptr.with_not_null_return(std::ptr::null_mut(),|backend_render_target| {
-        context_ptr.with_not_null_return(std::ptr::null_mut(), |context| {
+) -> OwnedPtr<Surface> {
+    backend_render_target_ptr.with_not_null_return(OwnedPtr::null(), |backend_render_target| {
+        context_ptr.with_not_null_return(OwnedPtr::null(), |context| {
             let surface_option = Surface::from_backend_render_target(
             context,
             backend_render_target,
@@ -25,9 +26,9 @@ pub fn skia_surface_from_render_target(
                     backend_render_target.width(),
                     backend_render_target.height(),
                     color_type);
-                std::ptr::null_mut() },
+                OwnedPtr::null() },
             Some(surface) => {
-                ValueBox::new(surface).into_raw()
+                OwnedPtr::new(surface)
             },
         }
         })
@@ -36,11 +37,11 @@ pub fn skia_surface_from_render_target(
 
 #[no_mangle]
 pub fn skia_surface_new_render_target(
-    image_info: *mut ValueBox<ImageInfo>,
-    direct_context: *mut ValueBox<DirectContext>,
-) -> *mut ValueBox<Surface> {
-    image_info.with_not_null_return(std::ptr::null_mut(), |image_info| {
-        direct_context.with_not_null_return(std::ptr::null_mut(), |direct_context| {
+    image_info: BorrowedPtr<ImageInfo>,
+    direct_context: BorrowedPtr<DirectContext>,
+) -> OwnedPtr<Surface> {
+    image_info.with_not_null_return(OwnedPtr::null(), |image_info| {
+        direct_context.with_not_null_return(OwnedPtr::null(), |direct_context| {
             let surface_option = Surface::new_render_target(
                 direct_context,
                 Budgeted::No,
@@ -56,9 +57,9 @@ pub fn skia_surface_new_render_target(
                     image_info.width(),
                     image_info.height(),
                     image_info.color_type());
-                std::ptr::null_mut() },
+                OwnedPtr::null() },
             Some(surface) => {
-                ValueBox::new(surface).into_raw()
+                OwnedPtr::new(surface)
             },
         }
         })
@@ -68,12 +69,12 @@ pub fn skia_surface_new_render_target(
 
 #[no_mangle]
 pub fn skia_surface_from_backend_texture(
-    context_ptr: *mut ValueBox<DirectContext>,
-    backend_texture_ptr: *mut ValueBox<BackendTexture>,
+    context_ptr: BorrowedPtr<DirectContext>,
+    backend_texture_ptr: BorrowedPtr<BackendTexture>,
     color_type: ColorType,
-) -> *mut ValueBox<Surface> {
-    backend_texture_ptr.with_not_null_return(std::ptr::null_mut(),|backend_texture| {
-        context_ptr.with_not_null_return(std::ptr::null_mut(), |context| {
+) -> OwnedPtr<Surface> {
+    backend_texture_ptr.with_not_null_return(OwnedPtr::null(), |backend_texture| {
+        context_ptr.with_not_null_return(OwnedPtr::null(), |context| {
             let surface_option = Surface::from_backend_texture(
             context,
             backend_texture,
@@ -89,9 +90,9 @@ pub fn skia_surface_from_backend_texture(
                     backend_texture.width(),
                     backend_texture.height(),
                     color_type);
-                std::ptr::null_mut() },
+                OwnedPtr::null() },
             Some(surface) => {
-                ValueBox::new(surface).into_raw()
+                OwnedPtr::new(surface)
             },
         }
         })

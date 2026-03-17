@@ -9,47 +9,47 @@ use skia_safe::{
     TextEncoding, TileMode,
 };
 use string_box::StringBox;
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
+use value_box::{BorrowedPtr, ReturnBoxerResult};
 
 use crate::text::font_style::FontStyleWidth;
 
 #[no_mangle]
-pub fn skia_enums_paint_style_to_string(enum_value: Style, string: *mut ValueBox<StringBox>) {
+pub fn skia_enums_paint_style_to_string(enum_value: Style, mut string: BorrowedPtr<StringBox>) {
     string
         .with_mut_ok(|string| string.set_string(format!("{:?}", enum_value)))
         .log();
 }
 
 #[no_mangle]
-pub fn skia_enums_blend_mode_to_string(enum_value: BlendMode, string: *mut ValueBox<StringBox>) {
+pub fn skia_enums_blend_mode_to_string(enum_value: BlendMode, mut string: BorrowedPtr<StringBox>) {
     string
         .with_mut_ok(|string| string.set_string(format!("{:?}", enum_value)))
         .log();
 }
 
 #[no_mangle]
-pub fn skia_enums_clip_op_to_string(enum_value: ClipOp, string: *mut ValueBox<StringBox>) {
+pub fn skia_enums_clip_op_to_string(enum_value: ClipOp, mut string: BorrowedPtr<StringBox>) {
     string
         .with_mut_ok(|string| string.set_string(format!("{:?}", enum_value)))
         .log();
 }
 
 #[no_mangle]
-pub fn skia_enums_point_mode_to_string(enum_value: PointMode, string: *mut ValueBox<StringBox>) {
+pub fn skia_enums_point_mode_to_string(enum_value: PointMode, mut string: BorrowedPtr<StringBox>) {
     string
         .with_mut_ok(|string| string.set_string(format!("{:?}", enum_value)))
         .log();
 }
 
 #[no_mangle]
-pub fn skia_enums_alpha_type_to_string(enum_value: AlphaType, string: *mut ValueBox<StringBox>) {
+pub fn skia_enums_alpha_type_to_string(enum_value: AlphaType, mut string: BorrowedPtr<StringBox>) {
     string
         .with_mut_ok(|string| string.set_string(format!("{:?}", enum_value)))
         .log();
 }
 
 #[no_mangle]
-pub fn skia_enums_color_type_to_string(enum_value: ColorType, string: *mut ValueBox<StringBox>) {
+pub fn skia_enums_color_type_to_string(enum_value: ColorType, mut string: BorrowedPtr<StringBox>) {
     string
         .with_mut_ok(|string| string.set_string(format!("{:?}", enum_value)))
         .log();
@@ -58,7 +58,7 @@ pub fn skia_enums_color_type_to_string(enum_value: ColorType, string: *mut Value
 #[no_mangle]
 pub fn skia_enums_pixel_geometry_to_string(
     enum_value: PixelGeometry,
-    string: *mut ValueBox<StringBox>,
+    mut string: BorrowedPtr<StringBox>,
 ) {
     string
         .with_mut_ok(|string| string.set_string(format!("{:?}", enum_value)))
@@ -66,21 +66,21 @@ pub fn skia_enums_pixel_geometry_to_string(
 }
 
 #[no_mangle]
-pub fn skia_enums_cap_style_to_string(enum_value: Cap, string: *mut ValueBox<StringBox>) {
+pub fn skia_enums_cap_style_to_string(enum_value: Cap, mut string: BorrowedPtr<StringBox>) {
     string
         .with_mut_ok(|string| string.set_string(format!("{:?}", enum_value)))
         .log();
 }
 
 #[no_mangle]
-pub fn skia_enums_join_style_to_string(enum_value: Join, string: *mut ValueBox<StringBox>) {
+pub fn skia_enums_join_style_to_string(enum_value: Join, mut string: BorrowedPtr<StringBox>) {
     string
         .with_mut_ok(|string| string.set_string(format!("{:?}", enum_value)))
         .log();
 }
 
 #[no_mangle]
-pub fn skia_enums_tile_mode_to_string(enum_value: TileMode, string: *mut ValueBox<StringBox>) {
+pub fn skia_enums_tile_mode_to_string(enum_value: TileMode, mut string: BorrowedPtr<StringBox>) {
     string
         .with_mut_ok(|string| string.set_string(format!("{:?}", enum_value)))
         .log();
@@ -89,7 +89,7 @@ pub fn skia_enums_tile_mode_to_string(enum_value: TileMode, string: *mut ValueBo
 #[no_mangle]
 pub fn skia_enums_path_fill_type_to_string(
     enum_value: PathFillType,
-    string: *mut ValueBox<StringBox>,
+    mut string: BorrowedPtr<StringBox>,
 ) {
     string
         .with_mut_ok(|string| string.set_string(format!("{:?}", enum_value)))
@@ -97,7 +97,10 @@ pub fn skia_enums_path_fill_type_to_string(
 }
 
 #[no_mangle]
-pub fn skia_enums_font_style_slant_to_string(enum_value: Slant, string: *mut ValueBox<StringBox>) {
+pub fn skia_enums_font_style_slant_to_string(
+    enum_value: Slant,
+    mut string: BorrowedPtr<StringBox>,
+) {
     string
         .with_mut_ok(|string| string.set_string(format!("{:?}", enum_value)))
         .log();
@@ -106,7 +109,7 @@ pub fn skia_enums_font_style_slant_to_string(enum_value: Slant, string: *mut Val
 #[no_mangle]
 pub fn skia_enums_font_style_width_to_string(
     enum_value: FontStyleWidth,
-    string: *mut ValueBox<StringBox>,
+    mut string: BorrowedPtr<StringBox>,
 ) {
     string
         .with_mut_ok(|string| string.set_string(format!("{:?}", enum_value)))
@@ -114,7 +117,7 @@ pub fn skia_enums_font_style_width_to_string(
 }
 
 #[no_mangle]
-pub fn skia_enums_font_edging_to_string(enum_value: Edging, string: *mut ValueBox<StringBox>) {
+pub fn skia_enums_font_edging_to_string(enum_value: Edging, mut string: BorrowedPtr<StringBox>) {
     string
         .with_mut_ok(|string| string.set_string(format!("{:?}", enum_value)))
         .log();
@@ -123,7 +126,7 @@ pub fn skia_enums_font_edging_to_string(enum_value: Edging, string: *mut ValueBo
 #[no_mangle]
 pub fn skia_enums_font_hinting_to_string(
     enum_value: FontHinting,
-    string: *mut ValueBox<StringBox>,
+    mut string: BorrowedPtr<StringBox>,
 ) {
     string
         .with_mut_ok(|string| string.set_string(format!("{:?}", enum_value)))
@@ -133,7 +136,7 @@ pub fn skia_enums_font_hinting_to_string(
 #[no_mangle]
 pub fn skia_enums_text_encoding_to_string(
     enum_value: TextEncoding,
-    string: *mut ValueBox<StringBox>,
+    mut string: BorrowedPtr<StringBox>,
 ) {
     string
         .with_mut_ok(|string| string.set_string(format!("{:?}", enum_value)))
@@ -143,7 +146,7 @@ pub fn skia_enums_text_encoding_to_string(
 #[no_mangle]
 pub fn skia_rounded_rectangle_type_to_string(
     enum_value: RRectType,
-    string: *mut ValueBox<StringBox>,
+    mut string: BorrowedPtr<StringBox>,
 ) {
     string
         .with_mut_ok(|string| string.set_string(format!("{:?}", enum_value)))
@@ -153,7 +156,7 @@ pub fn skia_rounded_rectangle_type_to_string(
 #[no_mangle]
 pub fn skia_rounded_rectangle_corner_to_string(
     enum_value: RRectCorner,
-    string: *mut ValueBox<StringBox>,
+    mut string: BorrowedPtr<StringBox>,
 ) {
     string
         .with_mut_ok(|string| string.set_string(format!("{:?}", enum_value)))
@@ -163,7 +166,7 @@ pub fn skia_rounded_rectangle_corner_to_string(
 #[no_mangle]
 pub fn skia_placeholder_alignment_to_string(
     enum_value: PlaceholderAlignment,
-    string: *mut ValueBox<StringBox>,
+    mut string: BorrowedPtr<StringBox>,
 ) {
     string
         .with_mut_ok(|string| string.set_string(format!("{:?}", enum_value)))

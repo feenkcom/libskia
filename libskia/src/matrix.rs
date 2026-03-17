@@ -1,16 +1,17 @@
+use crate::value_box_compat::*;
 use array_box::ArrayBox;
 use skia_safe::{scalar, Matrix};
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr};
 
 #[no_mangle]
-pub fn skia_matrix_new_identity() -> *mut ValueBox<Matrix> {
-    ValueBox::new(Matrix::new_identity()).into_raw()
+pub fn skia_matrix_new_identity() -> OwnedPtr<Matrix> {
+    OwnedPtr::new(Matrix::new_identity()).into_raw()
 }
 
 #[no_mangle]
 pub fn skia_matrix_get_all(
-    matrix_ptr: *mut ValueBox<Matrix>,
-    buffer_ptr: *mut ValueBox<ArrayBox<scalar>>,
+    matrix_ptr: BorrowedPtr<Matrix>,
+    buffer_ptr: BorrowedPtr<ArrayBox<scalar>>,
 ) {
     matrix_ptr.with_not_null(|matrix| {
         buffer_ptr.with_not_null(|buffer| {
@@ -23,7 +24,7 @@ pub fn skia_matrix_get_all(
 
 #[no_mangle]
 pub fn skia_matrix_set_all(
-    matrix_ptr: *mut ValueBox<Matrix>,
+    matrix_ptr: BorrowedPtr<Matrix>,
     scale_x: scalar,
     skew_x: scalar,
     trans_x: scalar,
@@ -42,6 +43,6 @@ pub fn skia_matrix_set_all(
 }
 
 #[no_mangle]
-pub fn skia_matrix_drop(ptr: *mut ValueBox<Matrix>) {
+pub fn skia_matrix_drop(mut ptr: OwnedPtr<Matrix>) {
     ptr.release();
 }

@@ -80,6 +80,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "be2a725ca901ef49bb56bd31373dbc809641a8347cf7784200e3c6d6da4d957a"
 
 [[package]]
+name = "array-box"
+version = "4.1.0"
+
+[[package]]
 name = "atty"
 version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -302,15 +306,15 @@ name = "compositor-ffi"
 version = "2.3.0"
 source = "git+https://github.com/feenkcom/compositor-rs#a999cb65d232e4b9dceffb1b2a061131a5f1a56e"
 dependencies = [
- "array-box",
+ "array-box 1.0.2",
  "cfg-if",
  "compositor",
  "compositor-texture",
  "phlow",
  "phlow-extensions",
  "reference-box",
- "string-box",
- "value-box",
+ "string-box 1.1.1",
+ "value-box 2.3.3",
 ]
 
 [[package]]
@@ -340,7 +344,7 @@ dependencies = [
  "compositor",
  "compositor-skia",
  "reference-box",
- "value-box",
+ "value-box 2.3.3",
 ]
 
 [[package]]
@@ -671,9 +675,7 @@ checksum = "42703706b716c37f96a77aea830392ad231f44c9e9a67872fa5548707e11b11c"
 
 [[package]]
 name = "geometry-box"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4f0019c82dbacfeadb3a27172a48d6c1ce60d3d944577150418f5b9b43c59db6"
+version = "4.1.0"
 
 [[package]]
 name = "getrandom"
@@ -1043,7 +1045,7 @@ name = "libskia"
 version = "0.5.0"
 dependencies = [
  "anyhow",
- "array-box",
+ "array-box 4.1.0",
  "byteorder",
  "cocoa",
  "compositor",
@@ -1073,11 +1075,11 @@ dependencies = [
  "phlow-ffi",
  "reference-box",
  "skia-safe",
- "string-box",
+ "string-box 4.1.0",
  "thiserror 1.0.69",
  "typename",
  "uikit-sys",
- "value-box",
+ "value-box 4.1.0",
  "value-box-ffi",
  "wayland-sys",
  "widestring",
@@ -1415,8 +1417,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7efcf7dbda333b53dd25b9959a5eeba56834f7be6856a79fed193ed1f06a14c9"
 dependencies = [
  "phlow",
- "string-box",
- "value-box",
+ "string-box 1.1.1",
+ "value-box 2.3.3",
 ]
 
 [[package]]
@@ -1826,6 +1828,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "string-box"
+version = "4.1.0"
+dependencies = [
+ "widestring",
+]
+
+[[package]]
 name = "strsim"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2170,7 +2179,6 @@ version = "2.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a46766ed9f0a78b82f789cab9b0287b7573ce6a8d2d249c29265e75217d80dc"
 dependencies = [
- "anyhow",
  "log",
  "phlow",
  "thiserror 1.0.69",
@@ -2178,19 +2186,25 @@ dependencies = [
 ]
 
 [[package]]
-name = "value-box-ffi"
-version = "1.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "256cde5c50339a64c3944d2f60313b6e29e7b5bea73dbfce4a15a4287fa2aacf"
+name = "value-box"
+version = "4.1.0"
 dependencies = [
- "array-box",
+ "anyhow",
+ "log",
+ "thiserror 2.0.18",
+ "user-error",
+]
+
+[[package]]
+name = "value-box-ffi"
+version = "4.1.0"
+dependencies = [
+ "array-box 4.1.0",
  "crossbeam",
  "geometry-box",
  "paste",
- "phlow",
- "phlow-extensions",
- "string-box",
- "value-box",
+ "string-box 4.1.0",
+ "value-box 4.1.0",
 ]
 
 [[package]]

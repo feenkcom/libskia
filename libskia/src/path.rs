@@ -1,21 +1,22 @@
+use crate::value_box_compat::*;
 use array_box::ArrayBox;
 use skia_safe::path_utils::fill_path_with_paint;
 use skia_safe::{scalar, Paint, Path, PathFillType, Point, Rect, Vector};
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
-pub fn skia_path_new() -> *mut ValueBox<Path> {
-    ValueBox::new(Path::new()).into_raw()
+pub fn skia_path_new() -> OwnedPtr<Path> {
+    OwnedPtr::new(Path::new()).into_raw()
 }
 
 #[no_mangle]
-pub fn skia_path_get_fill_type(path: *mut ValueBox<Path>) -> PathFillType {
+pub fn skia_path_get_fill_type(path: BorrowedPtr<Path>) -> PathFillType {
     path.with_ref_ok(|path| path.fill_type())
         .or_log(PathFillType::Winding)
 }
 
 #[no_mangle]
-pub fn skia_path_set_fill_type(path: *mut ValueBox<Path>, fill_type: PathFillType) {
+pub fn skia_path_set_fill_type(mut path: BorrowedPtr<Path>, fill_type: PathFillType) {
     path.with_mut_ok(|path| {
         path.set_fill_type(fill_type);
     })
@@ -23,7 +24,7 @@ pub fn skia_path_set_fill_type(path: *mut ValueBox<Path>, fill_type: PathFillTyp
 }
 
 #[no_mangle]
-pub fn skia_path_move_to(path: *mut ValueBox<Path>, x: scalar, y: scalar, is_absolute: bool) {
+pub fn skia_path_move_to(mut path: BorrowedPtr<Path>, x: scalar, y: scalar, is_absolute: bool) {
     path.with_mut_ok(|path| {
         if is_absolute {
             path.move_to(Point::new(x, y));
@@ -35,7 +36,7 @@ pub fn skia_path_move_to(path: *mut ValueBox<Path>, x: scalar, y: scalar, is_abs
 }
 
 #[no_mangle]
-pub fn skia_path_line_to(path: *mut ValueBox<Path>, x: scalar, y: scalar, is_absolute: bool) {
+pub fn skia_path_line_to(mut path: BorrowedPtr<Path>, x: scalar, y: scalar, is_absolute: bool) {
     path.with_mut_ok(|path| {
         if is_absolute {
             path.line_to(Point::new(x, y));
@@ -48,7 +49,7 @@ pub fn skia_path_line_to(path: *mut ValueBox<Path>, x: scalar, y: scalar, is_abs
 
 #[no_mangle]
 pub fn skia_path_quad_to(
-    path: *mut ValueBox<Path>,
+    mut path: BorrowedPtr<Path>,
     x1: scalar,
     y1: scalar,
     x2: scalar,
@@ -67,7 +68,7 @@ pub fn skia_path_quad_to(
 
 #[no_mangle]
 pub fn skia_path_conic_to(
-    path: *mut ValueBox<Path>,
+    mut path: BorrowedPtr<Path>,
     x1: scalar,
     y1: scalar,
     x2: scalar,
@@ -87,7 +88,7 @@ pub fn skia_path_conic_to(
 
 #[no_mangle]
 pub fn skia_path_cubic_to(
-    path: *mut ValueBox<Path>,
+    mut path: BorrowedPtr<Path>,
     x1: scalar,
     y1: scalar,
     x2: scalar,
@@ -112,7 +113,7 @@ pub fn skia_path_cubic_to(
 
 #[no_mangle]
 pub fn skia_path_arc_to(
-    path: *mut ValueBox<Path>,
+    mut path: BorrowedPtr<Path>,
     left: scalar,
     top: scalar,
     right: scalar,
@@ -143,7 +144,7 @@ pub fn skia_path_arc_to(
 }
 
 #[no_mangle]
-pub fn skia_path_close(path: *mut ValueBox<Path>) {
+pub fn skia_path_close(mut path: BorrowedPtr<Path>) {
     path.with_mut_ok(|path| {
         path.close();
     })
@@ -151,14 +152,14 @@ pub fn skia_path_close(path: *mut ValueBox<Path>) {
 }
 
 #[no_mangle]
-pub fn skia_path_count_points(path: *mut ValueBox<Path>) -> usize {
+pub fn skia_path_count_points(path: BorrowedPtr<Path>) -> usize {
     path.with_ref_ok(|path| path.count_points()).or_log(0)
 }
 
 #[no_mangle]
 pub fn skia_path_get_points(
-    path: *mut ValueBox<Path>,
-    points: *mut ValueBox<ArrayBox<f32>>,
+    path: BorrowedPtr<Path>,
+    mut points: BorrowedPtr<ArrayBox<f32>>,
 ) -> usize {
     path.with_ref(|path| {
         points.with_mut_ok(|points| {
@@ -178,7 +179,7 @@ pub fn skia_path_get_points(
 }
 
 #[no_mangle]
-pub fn skia_path_get_last_point(path: *mut ValueBox<Path>, point: *mut ValueBox<Point>) -> bool {
+pub fn skia_path_get_last_point(path: BorrowedPtr<Path>, mut point: BorrowedPtr<Point>) -> bool {
     path.with_ref(|path| {
         point.with_mut_ok(|point| match path.last_pt() {
             None => false,
@@ -193,9 +194,9 @@ pub fn skia_path_get_last_point(path: *mut ValueBox<Path>, point: *mut ValueBox<
 
 #[no_mangle]
 pub fn skia_path_get_stroke_bounds(
-    path: *mut ValueBox<Path>,
-    paint: *mut ValueBox<Paint>,
-    rect: *mut ValueBox<Rect>,
+    path: BorrowedPtr<Path>,
+    paint: BorrowedPtr<Paint>,
+    mut rect: BorrowedPtr<Rect>,
 ) {
     path.with_ref(|path| {
         paint.with_ref(|paint| {
@@ -217,17 +218,17 @@ pub fn skia_path_get_stroke_bounds(
 }
 
 #[no_mangle]
-pub fn skia_path_contains_point(path: *mut ValueBox<Path>, x: f32, y: f32) -> bool {
+pub fn skia_path_contains_point(path: BorrowedPtr<Path>, x: f32, y: f32) -> bool {
     path.with_ref_ok(|path| path.contains(Point::new(x, y)))
         .or_log(false)
 }
 
 #[no_mangle]
 pub fn skia_path_stroke_contains_point(
-    path: *mut ValueBox<Path>,
+    path: BorrowedPtr<Path>,
     x: f32,
     y: f32,
-    paint_ptr: *mut ValueBox<Paint>,
+    paint_ptr: BorrowedPtr<Paint>,
 ) -> bool {
     path.with_ref(|path| {
         paint_ptr.with_ref_ok(|paint| {
@@ -243,7 +244,7 @@ pub fn skia_path_stroke_contains_point(
 }
 
 #[no_mangle]
-pub fn skia_path_serialize(path: *mut ValueBox<Path>, data: *mut ValueBox<ArrayBox<u8>>) {
+pub fn skia_path_serialize(path: BorrowedPtr<Path>, mut data: BorrowedPtr<ArrayBox<u8>>) {
     path.with_ref(|path| {
         data.with_mut_ok(|data| {
             data.set_array(path.serialize().as_bytes());
@@ -253,6 +254,6 @@ pub fn skia_path_serialize(path: *mut ValueBox<Path>, data: *mut ValueBox<ArrayB
 }
 
 #[no_mangle]
-pub fn skia_path_drop(path: *mut ValueBox<Path>) {
+pub fn skia_path_drop(mut path: OwnedPtr<Path>) {
     path.release();
 }

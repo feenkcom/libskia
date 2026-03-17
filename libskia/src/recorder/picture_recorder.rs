@@ -1,15 +1,16 @@
+use crate::value_box_compat::*;
 use reference_box::ReferenceBox;
 use skia_safe::{scalar, Canvas, Picture, PictureRecorder, Rect};
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
-pub fn skia_picture_recorder_new() -> *mut ValueBox<PictureRecorder> {
-    ValueBox::new(PictureRecorder::new()).into_raw()
+pub fn skia_picture_recorder_new() -> OwnedPtr<PictureRecorder> {
+    OwnedPtr::new(PictureRecorder::new()).into_raw()
 }
 
 #[no_mangle]
 pub fn skia_picture_recorder_begin_recording(
-    picture_recorder_ptr: *mut ValueBox<PictureRecorder>,
+    mut picture_recorder_ptr: BorrowedPtr<PictureRecorder>,
     left: scalar,
     top: scalar,
     right: scalar,
@@ -25,19 +26,19 @@ pub fn skia_picture_recorder_begin_recording(
 
 #[no_mangle]
 pub fn skia_picture_recorder_finish_recording(
-    picture_recorder_ptr: *mut ValueBox<PictureRecorder>,
-) -> *mut ValueBox<Picture> {
+    mut picture_recorder_ptr: BorrowedPtr<PictureRecorder>,
+) -> OwnedPtr<Picture> {
     picture_recorder_ptr
         .with_mut_ok(
             |recorder| match recorder.finish_recording_as_picture(None) {
-                None => std::ptr::null_mut(),
-                Some(picture) => ValueBox::new(picture).into_raw(),
+                None => OwnedPtr::null(),
+                Some(picture) => OwnedPtr::new(picture),
             },
         )
-        .or_log(std::ptr::null_mut())
+        .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
-pub fn skia_picture_recorder_drop(ptr: *mut ValueBox<PictureRecorder>) {
+pub fn skia_picture_recorder_drop(mut ptr: OwnedPtr<PictureRecorder>) {
     ptr.release();
 }

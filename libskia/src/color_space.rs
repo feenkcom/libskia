@@ -1,20 +1,21 @@
+use crate::value_box_compat::*;
 use skia_safe::ColorSpace;
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
-pub fn skia_color_space_new_srgb() -> *mut ValueBox<ColorSpace> {
-    ValueBox::new(ColorSpace::new_srgb()).into_raw()
+pub fn skia_color_space_new_srgb() -> OwnedPtr<ColorSpace> {
+    OwnedPtr::new(ColorSpace::new_srgb()).into_raw()
 }
 
 #[no_mangle]
-pub fn skia_color_space_is_srgb(color_space: *mut ValueBox<ColorSpace>) -> bool {
+pub fn skia_color_space_is_srgb(color_space: BorrowedPtr<ColorSpace>) -> bool {
     color_space
         .with_ref_ok(|color_space| color_space.is_srgb())
         .or_log(false)
 }
 
 #[no_mangle]
-pub fn skia_color_space_drop(ptr: *mut ValueBox<ColorSpace>) {
+pub fn skia_color_space_drop(mut ptr: OwnedPtr<ColorSpace>) {
     ptr.release();
 }
 
@@ -32,7 +33,7 @@ mod test {
 
     #[test]
     fn color_space_is_srgb_for_null() {
-        let color_space: *mut ValueBox<ColorSpace> = std::ptr::null_mut();
+        let color_space: BorrowedPtr<ColorSpace> = std::ptr::null_mut();
         assert_eq!(color_space.is_null(), true);
         assert_eq!(skia_color_space_is_srgb(color_space), false);
         skia_color_space_drop(color_space);

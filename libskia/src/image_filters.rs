@@ -1,28 +1,29 @@
+use crate::value_box_compat::*;
 use skia_safe::image_filters::{blur, drop_shadow, drop_shadow_only, image, CropRect};
 use skia_safe::{scalar, Color, Image, ImageFilter, Rect, SamplingOptions, TileMode, Vector};
-use value_box::{ValueBox, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr};
 
 #[no_mangle]
 pub fn skia_image_filter_blur(
     sigma_x: scalar,
     sigma_y: scalar,
     tile_mode: TileMode,
-    input_ptr: *mut ValueBox<ImageFilter>,
-) -> *mut ValueBox<ImageFilter> {
+    input_ptr: BorrowedPtr<ImageFilter>,
+) -> OwnedPtr<ImageFilter> {
     let filter_option = input_ptr.with_value(
         || blur((sigma_x, sigma_y), Some(tile_mode), None, None),
         |input| blur((sigma_x, sigma_y), Some(tile_mode), Some(input), None),
     );
 
     match filter_option {
-        None => std::ptr::null_mut(),
-        Some(filter) => ValueBox::new(filter).into_raw(),
+        None => OwnedPtr::null(),
+        Some(filter) => OwnedPtr::new(filter),
     }
 }
 
 #[no_mangle]
 pub fn skia_image_filter_image(
-    image_ptr: *mut ValueBox<Image>,
+    image_ptr: BorrowedPtr<Image>,
     src_left: scalar,
     src_top: scalar,
     src_right: scalar,
@@ -31,7 +32,7 @@ pub fn skia_image_filter_image(
     dst_top: scalar,
     dst_right: scalar,
     dst_bottom: scalar,
-) -> *mut ValueBox<ImageFilter> {
+) -> OwnedPtr<ImageFilter> {
     let filter_option = image_ptr.with_not_null_value_return(None, |image_source| {
         image(
             image_source,
@@ -41,8 +42,8 @@ pub fn skia_image_filter_image(
         )
     });
     match filter_option {
-        None => std::ptr::null_mut(),
-        Some(filter) => ValueBox::new(filter).into_raw(),
+        None => OwnedPtr::null(),
+        Some(filter) => OwnedPtr::new(filter),
     }
 }
 
@@ -56,8 +57,8 @@ pub fn skia_image_filter_drop_shadow(
     g: u8,
     b: u8,
     a: u8,
-    input_ptr: *mut ValueBox<ImageFilter>,
-) -> *mut ValueBox<ImageFilter> {
+    input_ptr: BorrowedPtr<ImageFilter>,
+) -> OwnedPtr<ImageFilter> {
     let filter_option = input_ptr.with_value(
         || {
             drop_shadow(
@@ -82,8 +83,8 @@ pub fn skia_image_filter_drop_shadow(
     );
 
     match filter_option {
-        None => std::ptr::null_mut(),
-        Some(filter) => ValueBox::new(filter).into_raw(),
+        None => OwnedPtr::null(),
+        Some(filter) => OwnedPtr::new(filter),
     }
 }
 
@@ -97,8 +98,8 @@ pub fn skia_image_filter_drop_shadow_only(
     g: u8,
     b: u8,
     a: u8,
-    input_ptr: *mut ValueBox<ImageFilter>,
-) -> *mut ValueBox<ImageFilter> {
+    input_ptr: BorrowedPtr<ImageFilter>,
+) -> OwnedPtr<ImageFilter> {
     let filter_option = input_ptr.with_value(
         || {
             drop_shadow_only(
@@ -122,12 +123,12 @@ pub fn skia_image_filter_drop_shadow_only(
         },
     );
     match filter_option {
-        None => std::ptr::null_mut(),
-        Some(filter) => ValueBox::new(filter).into_raw(),
+        None => OwnedPtr::null(),
+        Some(filter) => OwnedPtr::new(filter),
     }
 }
 
 #[no_mangle]
-pub fn skia_image_filter_drop(ptr: *mut ValueBox<ImageFilter>) {
+pub fn skia_image_filter_drop(mut ptr: OwnedPtr<ImageFilter>) {
     ptr.release();
 }

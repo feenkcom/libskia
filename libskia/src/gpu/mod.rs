@@ -20,10 +20,10 @@ pub mod backend_texture;
 pub mod context;
 pub mod surface_gpu;
 
-#[cfg(target_os = "macos")]
+#[cfg(all(feature = "metal", target_os = "macos"))]
 pub mod metal_macos;
 
-#[cfg(target_os = "ios")]
+#[cfg(all(feature = "metal", target_os = "ios"))]
 pub mod metal_ios;
 
 #[cfg(target_os = "windows")]

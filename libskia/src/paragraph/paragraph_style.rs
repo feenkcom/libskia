@@ -1,18 +1,19 @@
+use crate::value_box_compat::*;
 use skia_safe::scalar;
 use skia_safe::textlayout::{ParagraphStyle, TextStyle};
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
-pub fn skia_paragraph_style_new() -> *mut ValueBox<ParagraphStyle> {
+pub fn skia_paragraph_style_new() -> OwnedPtr<ParagraphStyle> {
     let mut style = ParagraphStyle::new();
     style.set_apply_rounding_hack(false);
     style.set_replace_tab_characters(true);
-    ValueBox::new(style).into_raw()
+    OwnedPtr::new(style).into_raw()
 }
 
 #[no_mangle]
 pub fn skia_paragraph_style_get_apply_rounding_hack(
-    paragraph: *mut ValueBox<ParagraphStyle>,
+    mut paragraph: BorrowedPtr<ParagraphStyle>,
 ) -> bool {
     paragraph
         .with_mut_ok(|style| style.apply_rounding_hack())
@@ -21,7 +22,7 @@ pub fn skia_paragraph_style_get_apply_rounding_hack(
 
 #[no_mangle]
 pub fn skia_paragraph_style_set_apply_rounding_hack(
-    paragraph: *mut ValueBox<ParagraphStyle>,
+    mut paragraph: BorrowedPtr<ParagraphStyle>,
     apply_rounding_hack: bool,
 ) {
     paragraph
@@ -33,17 +34,17 @@ pub fn skia_paragraph_style_set_apply_rounding_hack(
 
 #[no_mangle]
 pub fn skia_paragraph_style_get_text_style(
-    paragraph_ptr: *mut ValueBox<ParagraphStyle>,
-) -> *mut ValueBox<TextStyle> {
+    paragraph_ptr: BorrowedPtr<ParagraphStyle>,
+) -> OwnedPtr<TextStyle> {
     paragraph_ptr
-        .with_ref_ok(|style| ValueBox::new(style.text_style().clone()))
+        .with_ref_ok(|style| OwnedPtr::new(style.text_style().clone()))
         .into_raw()
 }
 
 #[no_mangle]
 pub fn skia_paragraph_style_set_text_style(
-    paragraph_ptr: *mut ValueBox<ParagraphStyle>,
-    text_style_ptr: *mut ValueBox<TextStyle>,
+    mut paragraph_ptr: BorrowedPtr<ParagraphStyle>,
+    text_style_ptr: BorrowedPtr<TextStyle>,
 ) {
     paragraph_ptr
         .with_mut_ok(|style| {
@@ -55,7 +56,7 @@ pub fn skia_paragraph_style_set_text_style(
 }
 
 #[no_mangle]
-pub fn skia_paragraph_style_get_height(paragraph_ptr: *mut ValueBox<ParagraphStyle>) -> scalar {
+pub fn skia_paragraph_style_get_height(paragraph_ptr: BorrowedPtr<ParagraphStyle>) -> scalar {
     paragraph_ptr
         .with_ref_ok(|style| style.height())
         .or_log(0.0)
@@ -63,7 +64,7 @@ pub fn skia_paragraph_style_get_height(paragraph_ptr: *mut ValueBox<ParagraphSty
 
 #[no_mangle]
 pub fn skia_paragraph_style_set_height(
-    paragraph_ptr: *mut ValueBox<ParagraphStyle>,
+    mut paragraph_ptr: BorrowedPtr<ParagraphStyle>,
     height: scalar,
 ) {
     paragraph_ptr
@@ -75,7 +76,7 @@ pub fn skia_paragraph_style_set_height(
 
 #[no_mangle]
 pub fn skia_paragraph_style_set_max_lines(
-    paragraph_ptr: *mut ValueBox<ParagraphStyle>,
+    mut paragraph_ptr: BorrowedPtr<ParagraphStyle>,
     max_lines: usize,
 ) {
     paragraph_ptr
@@ -90,13 +91,13 @@ pub fn skia_paragraph_style_set_max_lines(
 }
 
 #[no_mangle]
-pub fn skia_paragraph_style_get_max_lines(paragraph_ptr: *mut ValueBox<ParagraphStyle>) -> usize {
+pub fn skia_paragraph_style_get_max_lines(paragraph_ptr: BorrowedPtr<ParagraphStyle>) -> usize {
     paragraph_ptr
         .with_ref_ok(|style| style.max_lines().unwrap_or(usize::MAX))
         .or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_paragraph_style_drop(ptr: *mut ValueBox<ParagraphStyle>) {
+pub fn skia_paragraph_style_drop(mut ptr: OwnedPtr<ParagraphStyle>) {
     ptr.release();
 }

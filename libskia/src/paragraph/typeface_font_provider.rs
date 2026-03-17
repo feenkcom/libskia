@@ -1,16 +1,17 @@
+use crate::value_box_compat::*;
 use skia_safe::textlayout::TypefaceFontProvider;
 use skia_safe::Typeface;
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
-pub fn skia_typeface_font_provider_new() -> *mut ValueBox<TypefaceFontProvider> {
-    ValueBox::new(TypefaceFontProvider::new()).into_raw()
+pub fn skia_typeface_font_provider_new() -> OwnedPtr<TypefaceFontProvider> {
+    OwnedPtr::new(TypefaceFontProvider::new()).into_raw()
 }
 
 #[no_mangle]
 pub fn skia_typeface_font_provider_register_typeface(
-    typeface_font_provider: *mut ValueBox<TypefaceFontProvider>,
-    typeface: *mut ValueBox<Typeface>,
+    mut typeface_font_provider: BorrowedPtr<TypefaceFontProvider>,
+    typeface: BorrowedPtr<Typeface>,
 ) -> usize {
     typeface_font_provider
         .with_mut(|typeface_font_provider| {
@@ -23,6 +24,6 @@ pub fn skia_typeface_font_provider_register_typeface(
 }
 
 #[no_mangle]
-pub fn skia_typeface_font_provider_drop(ptr: *mut ValueBox<TypefaceFontProvider>) {
+pub fn skia_typeface_font_provider_drop(mut ptr: OwnedPtr<TypefaceFontProvider>) {
     ptr.release();
 }

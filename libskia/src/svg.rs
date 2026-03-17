@@ -1,19 +1,20 @@
 use std::error::Error;
 use std::ops::Deref;
 
+use crate::value_box_compat::*;
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::svg::canvas::Flags as SvgCanvasFlags;
 use skia_safe::svg::Canvas as SvgCanvas;
 use skia_safe::svg::Dom;
 use skia_safe::{scalar, Canvas, FontMgr, Rect, Size, Vector};
 use string_box::StringBox;
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
 pub fn skia_svg_parse(
-    svg_string: *mut ValueBox<StringBox>,
-    font_mgr: *mut ValueBox<FontMgr>,
-) -> *mut ValueBox<Dom> {
+    svg_string: BorrowedPtr<StringBox>,
+    font_mgr: BorrowedPtr<FontMgr>,
+) -> OwnedPtr<Dom> {
     svg_string
         .with_ref(|svg_string| {
             font_mgr.with_clone(|font_mgr| {
@@ -21,12 +22,12 @@ pub fn skia_svg_parse(
                     .map_err(|error| (Box::new(error) as Box<dyn Error>).into())
             })
         })
-        .map(|dom| ValueBox::new(dom))
+        .map(|dom| OwnedPtr::new(dom))
         .into_raw()
 }
 
 #[no_mangle]
-pub fn skia_svg_set_container_size(dom: *mut ValueBox<Dom>, width: scalar, height: scalar) {
+pub fn skia_svg_set_container_size(mut dom: BorrowedPtr<Dom>, width: scalar, height: scalar) {
     dom.with_mut_ok(|dom| dom.set_container_size(Size::new(width, height)))
         .log();
 }
@@ -34,7 +35,7 @@ pub fn skia_svg_set_container_size(dom: *mut ValueBox<Dom>, width: scalar, heigh
 #[no_mangle]
 pub fn skia_canvas_render_svg(
     canvas: *mut ReferenceBox<Canvas>,
-    dom: *mut ValueBox<Dom>,
+    dom: BorrowedPtr<Dom>,
     x: scalar,
     y: scalar,
 ) {
@@ -49,7 +50,7 @@ pub fn skia_canvas_render_svg(
 }
 
 #[no_mangle]
-pub fn skia_svg_dom_drop(ptr: *mut ValueBox<Dom>) {
+pub fn skia_svg_dom_drop(mut ptr: OwnedPtr<Dom>) {
     ptr.release();
 }
 
@@ -60,16 +61,14 @@ pub fn skia_svg_canvas_new(
     width: scalar,
     height: scalar,
     flags: u32,
-) -> *mut ValueBox<SvgCanvas> {
+) -> OwnedPtr<SvgCanvas> {
     let svg_flags = SvgCanvasFlags::from_bits_truncate(flags);
     let canvas = SvgCanvas::new(Rect::from_xywh(left, top, width, height), Some(svg_flags));
-    ValueBox::new(canvas).into_raw()
+    OwnedPtr::new(canvas).into_raw()
 }
 
 #[no_mangle]
-pub fn skia_svg_canvas_get_canvas(
-    svg_canvas: *mut ValueBox<SvgCanvas>,
-) -> *mut ReferenceBox<Canvas> {
+pub fn skia_svg_canvas_get_canvas(svg_canvas: BorrowedPtr<SvgCanvas>) -> *mut ReferenceBox<Canvas> {
     svg_canvas
         .with_ref_ok(|svg_canvas| {
             let canvas = svg_canvas.deref();
@@ -79,7 +78,7 @@ pub fn skia_svg_canvas_get_canvas(
 }
 
 #[no_mangle]
-pub fn skia_svg_canvas_end(svg_canvas: *mut ValueBox<SvgCanvas>, data: *mut ValueBox<StringBox>) {
+pub fn skia_svg_canvas_end(mut svg_canvas: OwnedPtr<SvgCanvas>, mut data: BorrowedPtr<StringBox>) {
     svg_canvas
         .take_value()
         .map(|svg_canvas| {
@@ -93,6 +92,6 @@ pub fn skia_svg_canvas_end(svg_canvas: *mut ValueBox<SvgCanvas>, data: *mut Valu
 }
 
 #[no_mangle]
-pub fn skia_svg_canvas_drop(svg_canvas: *mut ValueBox<SvgCanvas>) {
+pub fn skia_svg_canvas_drop(mut svg_canvas: OwnedPtr<SvgCanvas>) {
     svg_canvas.release();
 }

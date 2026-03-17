@@ -1,18 +1,19 @@
+use crate::value_box_compat::*;
 use skia_safe::{scalar, IRect, Rect};
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 ///
 /// Rect
 ///
 
 #[no_mangle]
-pub fn skia_rectangle_f32_default() -> *mut ValueBox<Rect> {
-    ValueBox::new(Rect::default()).into_raw()
+pub fn skia_rectangle_f32_default() -> OwnedPtr<Rect> {
+    OwnedPtr::new(Rect::default()).into_raw()
 }
 
 #[no_mangle]
 pub fn skia_rectangle_f32_set_ltrb(
-    rectangle_ptr: *mut ValueBox<Rect>,
+    mut rectangle_ptr: BorrowedPtr<Rect>,
     left: scalar,
     top: scalar,
     right: scalar,
@@ -26,35 +27,35 @@ pub fn skia_rectangle_f32_set_ltrb(
 }
 
 #[no_mangle]
-pub fn skia_rectangle_f32_left(rectangle_ptr: *mut ValueBox<Rect>) -> scalar {
+pub fn skia_rectangle_f32_left(rectangle_ptr: BorrowedPtr<Rect>) -> scalar {
     rectangle_ptr
         .with_ref_ok(|rectangle| rectangle.left())
         .or_log(0.0)
 }
 
 #[no_mangle]
-pub fn skia_rectangle_f32_top(rectangle_ptr: *mut ValueBox<Rect>) -> scalar {
+pub fn skia_rectangle_f32_top(rectangle_ptr: BorrowedPtr<Rect>) -> scalar {
     rectangle_ptr
         .with_ref_ok(|rectangle| rectangle.top())
         .or_log(0.0)
 }
 
 #[no_mangle]
-pub fn skia_rectangle_f32_right(rectangle_ptr: *mut ValueBox<Rect>) -> scalar {
+pub fn skia_rectangle_f32_right(rectangle_ptr: BorrowedPtr<Rect>) -> scalar {
     rectangle_ptr
         .with_ref_ok(|rectangle| rectangle.right())
         .or_log(0.0)
 }
 
 #[no_mangle]
-pub fn skia_rectangle_f32_bottom(rectangle_ptr: *mut ValueBox<Rect>) -> scalar {
+pub fn skia_rectangle_f32_bottom(rectangle_ptr: BorrowedPtr<Rect>) -> scalar {
     rectangle_ptr
         .with_ref_ok(|rectangle| rectangle.bottom())
         .or_log(0.0)
 }
 
 #[no_mangle]
-pub fn skia_rectangle_f32_drop(ptr: *mut ValueBox<Rect>) {
+pub fn skia_rectangle_f32_drop(mut ptr: OwnedPtr<Rect>) {
     ptr.release();
 }
 
@@ -63,13 +64,13 @@ pub fn skia_rectangle_f32_drop(ptr: *mut ValueBox<Rect>) {
 ///
 
 #[no_mangle]
-pub fn skia_rectangle_i32_default() -> *mut ValueBox<IRect> {
-    ValueBox::new(IRect::default()).into_raw()
+pub fn skia_rectangle_i32_default() -> OwnedPtr<IRect> {
+    OwnedPtr::new(IRect::default()).into_raw()
 }
 
 #[no_mangle]
 pub fn skia_rectangle_i32_set_ltrb(
-    rectangle_ptr: *mut ValueBox<IRect>,
+    mut rectangle_ptr: BorrowedPtr<IRect>,
     left: i32,
     top: i32,
     right: i32,
@@ -83,34 +84,34 @@ pub fn skia_rectangle_i32_set_ltrb(
 }
 
 #[no_mangle]
-pub fn skia_rectangle_i32_left(rectangle_ptr: *mut ValueBox<IRect>) -> i32 {
+pub fn skia_rectangle_i32_left(rectangle_ptr: BorrowedPtr<IRect>) -> i32 {
     rectangle_ptr
         .with_ref_ok(|rectangle| rectangle.left())
         .or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_rectangle_i32_top(rectangle_ptr: *mut ValueBox<IRect>) -> i32 {
+pub fn skia_rectangle_i32_top(rectangle_ptr: BorrowedPtr<IRect>) -> i32 {
     rectangle_ptr
         .with_ref_ok(|rectangle| rectangle.top())
         .or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_rectangle_i32_right(rectangle_ptr: *mut ValueBox<IRect>) -> i32 {
+pub fn skia_rectangle_i32_right(rectangle_ptr: BorrowedPtr<IRect>) -> i32 {
     rectangle_ptr
         .with_ref_ok(|rectangle| rectangle.right())
         .or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_rectangle_i32_bottom(rectangle_ptr: *mut ValueBox<IRect>) -> i32 {
+pub fn skia_rectangle_i32_bottom(rectangle_ptr: BorrowedPtr<IRect>) -> i32 {
     rectangle_ptr
         .with_ref_ok(|rectangle| rectangle.bottom())
         .or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_rectangle_i32_drop(ptr: *mut ValueBox<IRect>) {
+pub fn skia_rectangle_i32_drop(mut ptr: OwnedPtr<IRect>) {
     ptr.release();
 }

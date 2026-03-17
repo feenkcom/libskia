@@ -1,45 +1,43 @@
+use crate::value_box_compat::*;
 use array_box::ArrayBox;
 use skia_safe::font::Edging;
 use skia_safe::{
     scalar, Font, FontHinting, FontMetrics, GlyphId, Paint, Rect, TextEncoding, Typeface,
 };
 use string_box::StringBox;
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
-pub fn skia_font_default() -> *mut ValueBox<Font> {
-    ValueBox::new(Font::default()).into_raw()
+pub fn skia_font_default() -> OwnedPtr<Font> {
+    OwnedPtr::new(Font::default()).into_raw()
 }
 
 #[no_mangle]
-pub fn skia_font_from_typeface(
-    typeface: *mut ValueBox<Typeface>,
-    size: scalar,
-) -> *mut ValueBox<Font> {
+pub fn skia_font_from_typeface(typeface: BorrowedPtr<Typeface>, size: scalar) -> OwnedPtr<Font> {
     typeface
-        .with_clone_ok(|typeface| ValueBox::new(Font::from_typeface(typeface, size)))
+        .with_clone_ok(|typeface| OwnedPtr::new(Font::from_typeface(typeface, size)))
         .into_raw()
 }
 
 #[no_mangle]
-pub fn skia_font_is_force_auto_hinting(font: *mut ValueBox<Font>) -> bool {
+pub fn skia_font_is_force_auto_hinting(font: BorrowedPtr<Font>) -> bool {
     font.with_ref_ok(|font| font.is_force_auto_hinting())
         .or_log(false)
 }
 
 #[no_mangle]
-pub fn skia_font_is_embedded_bitmaps(font: *mut ValueBox<Font>) -> bool {
+pub fn skia_font_is_embedded_bitmaps(font: BorrowedPtr<Font>) -> bool {
     font.with_ref_ok(|font| font.is_embedded_bitmaps())
         .or_log(false)
 }
 
 #[no_mangle]
-pub fn skia_font_is_subpixel(font: *mut ValueBox<Font>) -> bool {
+pub fn skia_font_is_subpixel(font: BorrowedPtr<Font>) -> bool {
     font.with_ref_ok(|font| font.is_subpixel()).or_log(false)
 }
 
 #[no_mangle]
-pub fn skia_font_set_subpixel(font: *mut ValueBox<Font>, is_subpixel: bool) {
+pub fn skia_font_set_subpixel(mut font: BorrowedPtr<Font>, is_subpixel: bool) {
     font.with_mut_ok(|font| {
         font.set_subpixel(is_subpixel);
     })
@@ -47,29 +45,29 @@ pub fn skia_font_set_subpixel(font: *mut ValueBox<Font>, is_subpixel: bool) {
 }
 
 #[no_mangle]
-pub fn skia_font_is_linear_metrics(font: *mut ValueBox<Font>) -> bool {
+pub fn skia_font_is_linear_metrics(font: BorrowedPtr<Font>) -> bool {
     font.with_ref_ok(|font| font.is_linear_metrics())
         .or_log(false)
 }
 
 #[no_mangle]
-pub fn skia_font_is_embolden(font: *mut ValueBox<Font>) -> bool {
+pub fn skia_font_is_embolden(font: BorrowedPtr<Font>) -> bool {
     font.with_ref_ok(|font| font.is_embolden()).or_log(false)
 }
 
 #[no_mangle]
-pub fn skia_font_is_baseline_snap(font: *mut ValueBox<Font>) -> bool {
+pub fn skia_font_is_baseline_snap(font: BorrowedPtr<Font>) -> bool {
     font.with_ref_ok(|font| font.is_baseline_snap())
         .or_log(false)
 }
 
 #[no_mangle]
-pub fn skia_font_get_edging(font: *mut ValueBox<Font>) -> Edging {
+pub fn skia_font_get_edging(font: BorrowedPtr<Font>) -> Edging {
     font.with_ref_ok(|font| font.edging()).or_log(Edging::Alias)
 }
 
 #[no_mangle]
-pub fn skia_font_set_edging(font: *mut ValueBox<Font>, font_edging: Edging) {
+pub fn skia_font_set_edging(mut font: BorrowedPtr<Font>, font_edging: Edging) {
     font.with_mut_ok(|font| {
         font.set_edging(font_edging);
     })
@@ -77,13 +75,13 @@ pub fn skia_font_set_edging(font: *mut ValueBox<Font>, font_edging: Edging) {
 }
 
 #[no_mangle]
-pub fn skia_font_get_hinting(font: *mut ValueBox<Font>) -> FontHinting {
+pub fn skia_font_get_hinting(font: BorrowedPtr<Font>) -> FontHinting {
     font.with_ref_ok(|font| font.hinting())
         .or_log(FontHinting::None)
 }
 
 #[no_mangle]
-pub fn skia_font_set_hinting(font: *mut ValueBox<Font>, font_hinting: FontHinting) {
+pub fn skia_font_set_hinting(mut font: BorrowedPtr<Font>, font_hinting: FontHinting) {
     font.with_mut_ok(|font| {
         font.set_hinting(font_hinting);
     })
@@ -91,45 +89,45 @@ pub fn skia_font_set_hinting(font: *mut ValueBox<Font>, font_hinting: FontHintin
 }
 
 #[no_mangle]
-pub fn skia_font_get_typeface_or_default(font: *mut ValueBox<Font>) -> *mut ValueBox<Typeface> {
-    font.with_ref_ok(|font| ValueBox::new(font.typeface()))
+pub fn skia_font_get_typeface_or_default(font: BorrowedPtr<Font>) -> OwnedPtr<Typeface> {
+    font.with_ref_ok(|font| OwnedPtr::new(font.typeface()))
         .into_raw()
 }
 
 #[no_mangle]
-pub fn skia_font_get_size(font: *mut ValueBox<Font>) -> scalar {
+pub fn skia_font_get_size(font: BorrowedPtr<Font>) -> scalar {
     font.with_ref_ok(|font| font.size()).or_log(0.0)
 }
 
 #[no_mangle]
-pub fn skia_font_get_scale_x(font: *mut ValueBox<Font>) -> scalar {
+pub fn skia_font_get_scale_x(font: BorrowedPtr<Font>) -> scalar {
     font.with_ref_ok(|font| font.scale_x()).or_log(0.0)
 }
 
 #[no_mangle]
-pub fn skia_font_get_skew_x(font: *mut ValueBox<Font>) -> scalar {
+pub fn skia_font_get_skew_x(font: BorrowedPtr<Font>) -> scalar {
     font.with_ref_ok(|font| font.skew_x()).or_log(0.0)
 }
 
 #[no_mangle]
-pub fn skia_font_get_spacing(font: *mut ValueBox<Font>) -> scalar {
+pub fn skia_font_get_spacing(font: BorrowedPtr<Font>) -> scalar {
     font.with_ref_ok(|font| font.spacing()).or_log(0.0)
 }
 
 #[no_mangle]
-pub fn skia_font_get_metrics(font: *mut ValueBox<Font>) -> *mut ValueBox<FontMetrics> {
-    font.with_ref_ok(|font| ValueBox::new(font.metrics().1))
+pub fn skia_font_get_metrics(font: BorrowedPtr<Font>) -> OwnedPtr<FontMetrics> {
+    font.with_ref_ok(|font| OwnedPtr::new(font.metrics().1))
         .into_raw()
 }
 
 #[no_mangle]
 pub fn skia_font_text_to_glyphs(
-    font: *mut ValueBox<Font>,
-    text_ptr: *mut ValueBox<StringBox>,
+    font: BorrowedPtr<Font>,
+    text_ptr: BorrowedPtr<StringBox>,
     _encoding: TextEncoding,
-    glyphs_ptr: *mut ValueBox<ArrayBox<GlyphId>>,
-    paint_ptr: *mut ValueBox<Paint>,
-    bounds_ptr: *mut ValueBox<Rect>,
+    mut glyphs_ptr: BorrowedPtr<ArrayBox<GlyphId>>,
+    paint_ptr: BorrowedPtr<Paint>,
+    mut bounds_ptr: BorrowedPtr<Rect>,
 ) -> scalar {
     font.with_ref(|font| {
         glyphs_ptr.with_mut(|glyphs| {
@@ -164,11 +162,11 @@ pub fn skia_font_text_to_glyphs(
 
 #[no_mangle]
 pub fn skia_font_measure_text(
-    font: *mut ValueBox<Font>,
-    text_ptr: *mut ValueBox<StringBox>,
+    font: BorrowedPtr<Font>,
+    text_ptr: BorrowedPtr<StringBox>,
     _encoding: TextEncoding,
-    paint_ptr: *mut ValueBox<Paint>,
-    bounds_ptr: *mut ValueBox<Rect>,
+    paint_ptr: BorrowedPtr<Paint>,
+    mut bounds_ptr: BorrowedPtr<Rect>,
 ) -> scalar {
     font.with_ref(|font| {
         text_ptr.with_ref(|text| {
@@ -190,6 +188,6 @@ pub fn skia_font_measure_text(
 }
 
 #[no_mangle]
-pub fn skia_font_drop(ptr: *mut ValueBox<Font>) {
+pub fn skia_font_drop(mut ptr: OwnedPtr<Font>) {
     ptr.release();
 }

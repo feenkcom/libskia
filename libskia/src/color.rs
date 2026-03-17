@@ -1,94 +1,92 @@
+use crate::value_box_compat::*;
 use array_box::ArrayBox;
 use skia_safe::Color;
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
-pub fn skia_color_default() -> *mut ValueBox<Color> {
-    ValueBox::new(Color::default()).into_raw()
+pub fn skia_color_default() -> OwnedPtr<Color> {
+    OwnedPtr::new(Color::default()).into_raw()
 }
 
 #[no_mangle]
-pub fn skia_color_create(r: u8, g: u8, b: u8, a: u8) -> *mut ValueBox<Color> {
-    ValueBox::new(Color::from_argb(a, r, g, b)).into_raw()
+pub fn skia_color_create(r: u8, g: u8, b: u8, a: u8) -> OwnedPtr<Color> {
+    OwnedPtr::new(Color::from_argb(a, r, g, b)).into_raw()
 }
 
 #[no_mangle]
-pub fn skia_color_create_argb(argb: u32) -> *mut ValueBox<Color> {
-    ValueBox::new(Color::new(argb)).into_raw()
+pub fn skia_color_create_argb(argb: u32) -> OwnedPtr<Color> {
+    OwnedPtr::new(Color::new(argb)).into_raw()
 }
 
 #[no_mangle]
-pub fn skia_color_get_red(color: *mut ValueBox<Color>) -> u8 {
+pub fn skia_color_get_red(color: BorrowedPtr<Color>) -> u8 {
     color.with_clone_ok(Color::r).or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_color_get_green(color: *mut ValueBox<Color>) -> u8 {
+pub fn skia_color_get_green(color: BorrowedPtr<Color>) -> u8 {
     color.with_clone_ok(Color::g).or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_color_get_blue(color: *mut ValueBox<Color>) -> u8 {
+pub fn skia_color_get_blue(color: BorrowedPtr<Color>) -> u8 {
     color.with_clone_ok(Color::b).or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_color_get_alpha(color: *mut ValueBox<Color>) -> u8 {
+pub fn skia_color_get_alpha(color: BorrowedPtr<Color>) -> u8 {
     color.with_clone_ok(Color::a).or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_color_drop(color: *mut ValueBox<Color>) {
+pub fn skia_color_drop(mut color: OwnedPtr<Color>) {
     color.release();
 }
 
 #[no_mangle]
-pub fn skia_color_array_default() -> *mut ValueBox<ArrayBox<Color>> {
-    ValueBox::new(ArrayBox::new()).into_raw()
+pub fn skia_color_array_default() -> OwnedPtr<ArrayBox<Color>> {
+    OwnedPtr::new(ArrayBox::new()).into_raw()
 }
 
 #[no_mangle]
 pub fn skia_color_array_create_with(
-    color: *mut ValueBox<Color>,
+    color: BorrowedPtr<Color>,
     amount: usize,
-) -> *mut ValueBox<ArrayBox<Color>> {
+) -> OwnedPtr<ArrayBox<Color>> {
     color
-        .with_clone_ok(|color| ValueBox::new(ArrayBox::from_vector(vec![color; amount])))
+        .with_clone_ok(|color| OwnedPtr::new(ArrayBox::from_vector(vec![color; amount])))
         .into_raw()
 }
 
 #[no_mangle]
-pub fn skia_color_array_get_length(array: *mut ValueBox<ArrayBox<Color>>) -> usize {
+pub fn skia_color_array_get_length(array: BorrowedPtr<ArrayBox<Color>>) -> usize {
     array.with_ref_ok(|array| array.length).or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_color_array_get_capacity(array: *mut ValueBox<ArrayBox<Color>>) -> usize {
+pub fn skia_color_array_get_capacity(array: BorrowedPtr<ArrayBox<Color>>) -> usize {
     array.with_ref_ok(|array| array.capacity).or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_color_array_get_data(array: *mut ValueBox<ArrayBox<Color>>) -> *mut Color {
+pub fn skia_color_array_get_data(array: BorrowedPtr<ArrayBox<Color>>) -> *mut Color {
     array
         .with_ref_ok(|array| array.data)
         .or_log(std::ptr::null_mut())
 }
 
 #[no_mangle]
-pub fn skia_color_array_at(
-    array: *mut ValueBox<ArrayBox<Color>>,
-    index: usize,
-) -> *mut ValueBox<Color> {
+pub fn skia_color_array_at(array: BorrowedPtr<ArrayBox<Color>>, index: usize) -> OwnedPtr<Color> {
     array
-        .with_ref_ok(|array| ValueBox::new(array.at(index)))
+        .with_ref_ok(|array| OwnedPtr::new(array.at(index)))
         .into_raw()
 }
 
 #[no_mangle]
 pub fn skia_color_array_at_put(
-    array: *mut ValueBox<ArrayBox<Color>>,
+    mut array: BorrowedPtr<ArrayBox<Color>>,
     index: usize,
-    color: *mut ValueBox<Color>,
+    color: BorrowedPtr<Color>,
 ) {
     color
         .with_ref(|color| array.with_mut_ok(|array| array.at_put(index, color.clone())))
@@ -96,7 +94,7 @@ pub fn skia_color_array_at_put(
 }
 
 #[no_mangle]
-pub fn skia_color_array_drop(ptr: *mut ValueBox<ArrayBox<Color>>) {
+pub fn skia_color_array_drop(mut ptr: OwnedPtr<ArrayBox<Color>>) {
     ptr.release();
 }
 

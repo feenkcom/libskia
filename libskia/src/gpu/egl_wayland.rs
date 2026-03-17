@@ -1,11 +1,12 @@
 use crate::gpu::{PlatformCompositor, PlatformContext};
+use crate::value_box_compat::*;
 use khronos_egl as egl;
 use skia_safe::gpu::gl::{Enum, FramebufferInfo, Interface, UInt};
 use skia_safe::gpu::{BackendRenderTarget, ContextOptions, DirectContext, SurfaceOrigin};
 use skia_safe::{gpu, ColorType, ISize, Surface};
 use std::error::Error;
 use std::ffi::{c_int, c_void};
-use value_box::{ValueBox, ValueBoxIntoRaw};
+use value_box::{BorrowedPtr, OwnedPtr};
 
 use wayland_sys::{egl::*, ffi_dispatch};
 
@@ -386,9 +387,9 @@ pub fn skia_wayland_egl_compositor_new_size(
     wayland_surface: *mut c_void,
     width: i32,
     height: i32,
-) -> *mut ValueBox<PlatformCompositor> {
+) -> OwnedPtr<PlatformCompositor> {
     EglContext::new(wayland_display, wayland_surface, width, height)
-        .map(|context| ValueBox::new(PlatformCompositor::new(PlatformContext::Egl(context))))
+        .map(|context| OwnedPtr::new(PlatformCompositor::new(PlatformContext::Egl(context))))
         .map_err(|error| error.into())
         .into_raw()
 }

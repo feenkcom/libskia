@@ -2,17 +2,17 @@ extern crate typename;
 
 use string_box::StringBox;
 use typename::TypeName;
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
+use value_box::{BorrowedPtr, ReturnBoxerResult};
 
 #[no_mangle]
-pub fn skia_scalar_name(string: *mut ValueBox<StringBox>) {
+pub fn skia_scalar_name(mut string: BorrowedPtr<StringBox>) {
     string
         .with_mut_ok(|string| string.set_string(skia_safe::scalar::type_name()))
         .log();
 }
 
 #[no_mangle]
-pub fn skia_glyph_id_name(string: *mut ValueBox<StringBox>) {
+pub fn skia_glyph_id_name(mut string: BorrowedPtr<StringBox>) {
     string
         .with_mut_ok(|string| string.set_string(skia_safe::GlyphId::type_name()))
         .log();
@@ -20,7 +20,7 @@ pub fn skia_glyph_id_name(string: *mut ValueBox<StringBox>) {
 
 #[test]
 fn scalar_name() {
-    let string_ptr = ValueBox::new(StringBox::new()).into_raw();
+    let string_ptr = OwnedPtr::new(StringBox::new()).into_raw();
     skia_scalar_name(string_ptr);
     string_ptr
         .with_ref_ok(|string| {
@@ -31,7 +31,7 @@ fn scalar_name() {
 
 #[test]
 fn glyph_id_name() {
-    let string_ptr = ValueBox::new(StringBox::new()).into_raw();
+    let string_ptr = OwnedPtr::new(StringBox::new()).into_raw();
     skia_glyph_id_name(string_ptr);
     string_ptr
         .with_ref_ok(|string| {

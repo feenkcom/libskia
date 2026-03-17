@@ -1,7 +1,7 @@
 use float_cmp::{ApproxEq, F32Margin};
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::{scalar, Canvas, ClipOp, IRect, Path, QuickReject, RRect, Rect, Vector};
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
+use value_box::{BorrowedPtr, ReturnBoxerResult};
 
 #[no_mangle]
 pub fn skia_canvas_clip_rect(
@@ -32,7 +32,7 @@ pub fn skia_canvas_clip_rect(
 #[no_mangle]
 pub fn skia_canvas_clip_path(
     canvas: *mut ReferenceBox<Canvas>,
-    path: *mut ValueBox<Path>,
+    path: BorrowedPtr<Path>,
     offset_x: scalar,
     offset_y: scalar,
     clip_op: ClipOp,
@@ -141,7 +141,10 @@ pub fn skia_canvas_clip_oval(
 }
 
 #[no_mangle]
-pub fn skia_canvas_local_clip_bounds(canvas: *mut ReferenceBox<Canvas>, rect: *mut ValueBox<Rect>) {
+pub fn skia_canvas_local_clip_bounds(
+    canvas: *mut ReferenceBox<Canvas>,
+    mut rect: BorrowedPtr<Rect>,
+) {
     rect.with_mut_ok(|rect| {
         canvas.with_not_null(|canvas| match canvas.local_clip_bounds() {
             None => {}
@@ -159,7 +162,7 @@ pub fn skia_canvas_local_clip_bounds(canvas: *mut ReferenceBox<Canvas>, rect: *m
 #[no_mangle]
 pub fn skia_canvas_device_clip_bounds(
     canvas: *mut ReferenceBox<Canvas>,
-    rect: *mut ValueBox<IRect>,
+    mut rect: BorrowedPtr<IRect>,
 ) {
     rect.with_mut_ok(|rect| {
         canvas.with_not_null(|canvas| match canvas.device_clip_bounds() {
@@ -191,7 +194,7 @@ pub fn skia_canvas_quick_reject_rectangle(
 #[no_mangle]
 pub fn skia_canvas_quick_reject_path(
     canvas: *mut ReferenceBox<Canvas>,
-    path: *mut ValueBox<Path>,
+    path: BorrowedPtr<Path>,
 ) -> bool {
     path.with_ref_ok(|path| {
         canvas.with_not_null_return(false, |canvas| canvas.quick_reject(path.as_ref()))

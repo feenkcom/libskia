@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io::Read;
 use std::io::Write;
 
+use crate::value_box_compat::*;
 use array_box::ArrayBox;
 use skia_safe::gpu::{BackendTexture, SurfaceOrigin};
 use skia_safe::image::CachingHint;
@@ -10,79 +11,79 @@ use skia_safe::{
     Paint, Surface, M44,
 };
 use string_box::StringBox;
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxIntoRaw, ValueBoxPointer};
+use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
 pub fn skia_image_from_pixels(
-    pixels_ptr: *mut ValueBox<ArrayBox<u8>>,
+    pixels_ptr: BorrowedPtr<ArrayBox<u8>>,
     width: i32,
     height: i32,
     row_bytes: usize,
     color_type: ColorType,
-) -> *mut ValueBox<Image> {
+) -> OwnedPtr<Image> {
     let image_info = ImageInfo::new(
         ISize::new(width, height),
         color_type,
         AlphaType::Unpremul,
         None,
     );
-    pixels_ptr.with_not_null_return(std::ptr::null_mut(), |array| {
+    pixels_ptr.with_not_null_return(OwnedPtr::null(), |array| {
         match Image::from_raster_data(&image_info, Data::new_copy(array.to_slice()), row_bytes) {
            None => {
                if cfg!(debug_assertions) {
                    eprintln!("[skia_image_from_pixels] Could not create image from bitmap with width: {:?} height: {:?} bytes per row: {:?} color type: {:?}", width, height, row_bytes, color_type);
                };
-               std::ptr::null_mut()
+               OwnedPtr::null()
            },
-           Some(image) => { ValueBox::new(image).into_raw() }
+           Some(image) => OwnedPtr::new(image),
        }
     })
 }
 
 #[no_mangle]
-pub fn skia_image_from_file(boxer_string_ptr: *mut ValueBox<StringBox>) -> *mut ValueBox<Image> {
-    boxer_string_ptr.with_not_null_return(std::ptr::null_mut(), |boxer_string| {
+pub fn skia_image_from_file(boxer_string_ptr: BorrowedPtr<StringBox>) -> OwnedPtr<Image> {
+    boxer_string_ptr.with_not_null_return(OwnedPtr::null(), |boxer_string| {
         let file_name = boxer_string.to_string();
         let file = File::open(file_name);
         if file.is_err() {
-            return std::ptr::null_mut();
+            return OwnedPtr::null();
         }
         let mut file = file.unwrap();
         let mut buffer = vec![];
         if file.read_to_end(&mut buffer).is_err() {
-            return std::ptr::null_mut();
+            return OwnedPtr::null();
         }
 
         let data = Data::new_copy(&buffer);
         let my_image = Image::from_encoded(data);
         if my_image.is_none() {
-            return std::ptr::null_mut();
+            return OwnedPtr::null();
         }
         let my_image = my_image.unwrap();
 
-        ValueBox::new(my_image).into_raw()
+        OwnedPtr::new(my_image)
     })
 }
 
 #[no_mangle]
 pub fn skia_image_from_buffer(
-    buffer_ptr: *mut ValueBox<ArrayBox<u8>>,
+    buffer_ptr: BorrowedPtr<ArrayBox<u8>>,
     start: usize,
     end: usize,
-) -> *mut ValueBox<Image> {
-    buffer_ptr.with_not_null_return(std::ptr::null_mut(), |buffer| {
+) -> OwnedPtr<Image> {
+    buffer_ptr.with_not_null_return(OwnedPtr::null(), |buffer| {
         let data = Data::new_copy(&buffer.to_slice()[start..end]);
         match Image::from_encoded(data) {
-            None => std::ptr::null_mut(),
-            Some(image) => ValueBox::new(image).into_raw(),
+            None => OwnedPtr::null(),
+            Some(image) => OwnedPtr::new(image),
         }
     })
 }
 
 #[no_mangle]
 pub fn skia_image_to_file(
-    image_ptr: *mut ValueBox<Image>,
-    name_boxer_string_ptr: *mut ValueBox<StringBox>,
+    image_ptr: BorrowedPtr<Image>,
+    name_boxer_string_ptr: BorrowedPtr<StringBox>,
     encoding: EncodedImageFormat,
     quality: u32,
 ) -> i32 {
@@ -112,12 +113,12 @@ pub fn skia_image_to_file(
 
 #[no_mangle]
 pub fn skia_scale_image(
-    image_ptr: *mut ValueBox<Image>,
+    image_ptr: BorrowedPtr<Image>,
     new_x: i32,
     new_y: i32,
     keep_aspect_ratio: bool,
-) -> *mut ValueBox<Image> {
-    image_ptr.with_not_null_return(std::ptr::null_mut(), |image| {
+) -> OwnedPtr<Image> {
+    image_ptr.with_not_null_return(OwnedPtr::null(), |image| {
         let mut resize_x = (new_x as f32) / (image.width() as f32);
         let mut resize_y = (new_y as f32) / (image.height() as f32);
         let mut actual_x = new_x;
@@ -133,7 +134,7 @@ pub fn skia_scale_image(
         let dimensions = ISize::new(actual_x, actual_y);
         let surface = Surface::new_raster_n32_premul(dimensions);
         if surface.is_none() {
-            return std::ptr::null_mut();
+            return OwnedPtr::null();
         }
         let mut surface = surface.unwrap();
         let mut paint = Paint::default();
@@ -146,89 +147,87 @@ pub fn skia_scale_image(
             .draw_image(image, IPoint::new(0, 0), Some(&paint));
         let out_image = surface.image_snapshot();
 
-        ValueBox::new(out_image).into_raw()
+        OwnedPtr::new(out_image)
     })
 }
 
 #[no_mangle]
-pub fn skia_image_get_image_info(image_ptr: *mut ValueBox<Image>) -> *mut ValueBox<ImageInfo> {
+pub fn skia_image_get_image_info(image_ptr: BorrowedPtr<Image>) -> OwnedPtr<ImageInfo> {
     image_ptr
-        .with_ref_ok(|image| ValueBox::new(image.image_info().clone()))
-        .unwrap_or_else(|_| ValueBox::new(ImageInfo::default()))
+        .with_ref_ok(|image| OwnedPtr::new(image.image_info().clone()))
+        .unwrap_or_else(|_| OwnedPtr::new(ImageInfo::default()))
         .into_raw()
 }
 
 #[no_mangle]
-pub fn skia_image_get_width(image_ptr: *mut ValueBox<Image>) -> i32 {
+pub fn skia_image_get_width(image_ptr: BorrowedPtr<Image>) -> i32 {
     image_ptr.with_ref_ok(|image| image.width()).or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_image_get_height(image_ptr: *mut ValueBox<Image>) -> i32 {
+pub fn skia_image_get_height(image_ptr: BorrowedPtr<Image>) -> i32 {
     image_ptr.with_ref_ok(|image| image.height()).or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_image_get_unique_id(image_ptr: *mut ValueBox<Image>) -> u32 {
+pub fn skia_image_get_unique_id(image_ptr: BorrowedPtr<Image>) -> u32 {
     image_ptr.with_ref_ok(|image| image.unique_id()).or_log(0)
 }
 
 #[no_mangle]
-pub fn skia_image_get_alpha_type(image_ptr: *mut ValueBox<Image>) -> AlphaType {
+pub fn skia_image_get_alpha_type(image_ptr: BorrowedPtr<Image>) -> AlphaType {
     image_ptr
         .with_ref_ok(|image| image.alpha_type())
         .or_log(AlphaType::Unknown)
 }
 
 #[no_mangle]
-pub fn skia_image_get_color_type(image_ptr: *mut ValueBox<Image>) -> ColorType {
+pub fn skia_image_get_color_type(image_ptr: BorrowedPtr<Image>) -> ColorType {
     image_ptr
         .with_ref_ok(|image| image.color_type())
         .or_log(ColorType::Unknown)
 }
 
 #[no_mangle]
-pub fn skia_image_get_color_space(image: *mut ValueBox<Image>) -> *mut ValueBox<ColorSpace> {
+pub fn skia_image_get_color_space(image: BorrowedPtr<Image>) -> OwnedPtr<ColorSpace> {
     image
-        .with_ref_ok(|image| image.color_space().map(|space| ValueBox::new(space)))
+        .with_ref_ok(|image| image.color_space().map(|space| OwnedPtr::new(space)))
         .into_raw()
 }
 
 #[no_mangle]
-pub fn skia_image_is_alpha_only(image: *mut ValueBox<Image>) -> bool {
+pub fn skia_image_is_alpha_only(image: BorrowedPtr<Image>) -> bool {
     image
         .with_ref_ok(|image| image.is_alpha_only())
         .unwrap_or(false)
 }
 
 #[no_mangle]
-pub fn skia_image_is_opaque(image: *mut ValueBox<Image>) -> bool {
+pub fn skia_image_is_opaque(image: BorrowedPtr<Image>) -> bool {
     image
         .with_ref_ok(|image| image.is_opaque())
         .unwrap_or(false)
 }
 
 #[no_mangle]
-pub fn skia_image_is_texture_backend(image: *mut ValueBox<Image>) -> bool {
+pub fn skia_image_is_texture_backend(image: BorrowedPtr<Image>) -> bool {
     image
         .with_ref_ok(|image| image.is_texture_backed())
         .unwrap_or(false)
 }
 
 #[no_mangle]
-pub fn skia_image_get_backend_texture(
-    image_ptr: *mut ValueBox<Image>,
-) -> *mut ValueBox<BackendTexture> {
-    image_ptr.with_not_null_return(std::ptr::null_mut(), |image| {
+pub fn skia_image_get_backend_texture(image_ptr: BorrowedPtr<Image>) -> OwnedPtr<BackendTexture> {
+    image_ptr.with_not_null_return(OwnedPtr::null(), |image| {
         match image.backend_texture(true) {
-            None => std::ptr::null_mut(),
-            Some(result) => ValueBox::new(result.0).into_raw(),
+            None => OwnedPtr::null(),
+            Some(result) => OwnedPtr::new(result.0),
         }
     })
 }
 
 #[no_mangle]
-pub fn skia_image_get_backend_texture_origin(image_ptr: *mut ValueBox<Image>) -> SurfaceOrigin {
+pub fn skia_image_get_backend_texture_origin(image_ptr: BorrowedPtr<Image>) -> SurfaceOrigin {
     image_ptr.with_not_null_return(SurfaceOrigin::BottomLeft, |image| {
         match image.backend_texture(true) {
             None => SurfaceOrigin::TopLeft,
@@ -239,8 +238,8 @@ pub fn skia_image_get_backend_texture_origin(image_ptr: *mut ValueBox<Image>) ->
 
 #[no_mangle]
 pub fn skia_image_read_all_pixels(
-    surface_ptr: *mut ValueBox<Image>,
-    pixels_ptr: *mut ValueBox<ArrayBox<u8>>,
+    surface_ptr: BorrowedPtr<Image>,
+    pixels_ptr: BorrowedPtr<ArrayBox<u8>>,
 ) -> bool {
     surface_ptr.with_not_null_return(false, |surface| {
         pixels_ptr.with_not_null_return(false, |pixels| {
@@ -248,7 +247,7 @@ pub fn skia_image_read_all_pixels(
             let row_bytes = image_info.min_row_bytes();
             surface.read_pixels(
                 &image_info,
-                pixels.to_slice(),
+                pixels.to_slice_mut(),
                 row_bytes,
                 IPoint::new(0, 0),
                 CachingHint::Disallow,
@@ -258,6 +257,6 @@ pub fn skia_image_read_all_pixels(
 }
 
 #[no_mangle]
-pub fn skia_image_drop(ptr: *mut ValueBox<Image>) {
+pub fn skia_image_drop(mut ptr: OwnedPtr<Image>) {
     ptr.release();
 }

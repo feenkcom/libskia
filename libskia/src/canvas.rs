@@ -1,3 +1,4 @@
+use crate::value_box_compat::*;
 use array_box::ArrayBox;
 use float_cmp::ApproxEqUlps;
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
@@ -7,7 +8,7 @@ use skia_safe::{
     scalar, BlendMode, Canvas, Color, FilterMode, Image, Matrix, MipmapMode, Paint, Path, Point,
     Point3, RRect, Rect, SamplingOptions, TextBlob, Vector, M44,
 };
-use value_box::{ReturnBoxerResult, ValueBox, ValueBoxPointer};
+use value_box::{BorrowedPtr, ReturnBoxerResult};
 
 use crate::layer::SaveLayerRecWrapper;
 
@@ -35,7 +36,7 @@ pub fn skia_canvas_draw_color(
 #[no_mangle]
 pub fn skia_canvas_draw_paint(
     canvas_ptr: *mut ReferenceBox<Canvas>,
-    paint_ptr: *mut ValueBox<Paint>,
+    paint_ptr: BorrowedPtr<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr
@@ -50,8 +51,8 @@ pub fn skia_canvas_draw_paint(
 pub fn skia_canvas_draw_points(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     point_mode: PointMode,
-    points_ptr: *mut ValueBox<ArrayBox<Point>>,
-    paint_ptr: *mut ValueBox<Paint>,
+    points_ptr: BorrowedPtr<ArrayBox<Point>>,
+    paint_ptr: BorrowedPtr<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr
@@ -69,7 +70,7 @@ pub fn skia_canvas_draw_point(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     x: scalar,
     y: scalar,
-    paint_ptr: *mut ValueBox<Paint>,
+    paint_ptr: BorrowedPtr<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr
@@ -87,7 +88,7 @@ pub fn skia_canvas_draw_line(
     from_y: scalar,
     to_x: scalar,
     to_y: scalar,
-    paint_ptr: *mut ValueBox<Paint>,
+    paint_ptr: BorrowedPtr<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr
@@ -105,7 +106,7 @@ pub fn skia_canvas_draw_rectangle(
     top: scalar,
     right: scalar,
     bottom: scalar,
-    paint_ptr: *mut ValueBox<Paint>,
+    paint_ptr: BorrowedPtr<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr
@@ -123,7 +124,7 @@ pub fn skia_canvas_draw_oval(
     top: scalar,
     right: scalar,
     bottom: scalar,
-    paint_ptr: *mut ValueBox<Paint>,
+    paint_ptr: BorrowedPtr<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr
@@ -140,7 +141,7 @@ pub fn skia_canvas_draw_circle(
     center_x: scalar,
     center_y: scalar,
     radius: scalar,
-    paint_ptr: *mut ValueBox<Paint>,
+    paint_ptr: BorrowedPtr<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr
@@ -154,8 +155,8 @@ pub fn skia_canvas_draw_circle(
 #[no_mangle]
 pub fn skia_canvas_draw_rrect(
     canvas_ptr: *mut ReferenceBox<Canvas>,
-    rrect_ptr: *mut ValueBox<RRect>,
-    paint_ptr: *mut ValueBox<Paint>,
+    rrect_ptr: BorrowedPtr<RRect>,
+    paint_ptr: BorrowedPtr<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
         rrect_ptr
@@ -179,7 +180,7 @@ pub fn skia_canvas_draw_rounded_rectangle(
     r_top_right: scalar,
     r_bottom_right: scalar,
     r_bottom_left: scalar,
-    paint_ptr: *mut ValueBox<Paint>,
+    paint_ptr: BorrowedPtr<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr
@@ -218,8 +219,8 @@ pub fn skia_canvas_draw_rounded_rectangle(
 #[no_mangle]
 pub fn skia_canvas_draw_path(
     canvas_ptr: *mut ReferenceBox<Canvas>,
-    path_ptr: *mut ValueBox<Path>,
-    paint_ptr: *mut ValueBox<Paint>,
+    path_ptr: BorrowedPtr<Path>,
+    paint_ptr: BorrowedPtr<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr
@@ -235,10 +236,10 @@ pub fn skia_canvas_draw_path(
 #[no_mangle]
 pub fn skia_canvas_draw_text_blob(
     canvas_ptr: *mut ReferenceBox<Canvas>,
-    text_blob_ptr: *mut ValueBox<TextBlob>,
+    text_blob_ptr: BorrowedPtr<TextBlob>,
     x: scalar,
     y: scalar,
-    paint_ptr: *mut ValueBox<Paint>,
+    paint_ptr: BorrowedPtr<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
         paint_ptr
@@ -255,12 +256,12 @@ pub fn skia_canvas_draw_text_blob(
 #[no_mangle]
 pub fn skia_canvas_draw_shadow(
     canvas_ptr: *mut ReferenceBox<Canvas>,
-    path_ptr: *mut ValueBox<Path>,
-    z_plane_ptr: *mut ValueBox<Point3>,
-    light_pos_ptr: *mut ValueBox<Point3>,
+    path_ptr: BorrowedPtr<Path>,
+    z_plane_ptr: BorrowedPtr<Point3>,
+    light_pos_ptr: BorrowedPtr<Point3>,
     light_radius: scalar,
-    ambient_color_ptr: *mut ValueBox<Color>,
-    spot_color_ptr: *mut ValueBox<Color>,
+    ambient_color_ptr: BorrowedPtr<Color>,
+    spot_color_ptr: BorrowedPtr<Color>,
     _bit_flags: u32,
 ) {
     canvas_ptr.with_not_null(|canvas| {
@@ -292,10 +293,10 @@ pub fn skia_canvas_draw_shadow(
 #[no_mangle]
 pub fn skia_canvas_draw_image(
     canvas_ptr: *mut ReferenceBox<Canvas>,
-    image_ptr: *mut ValueBox<Image>, // may be null
+    image_ptr: BorrowedPtr<Image>, // may be null
     x: scalar,
     y: scalar,
-    paint_ptr: *mut ValueBox<Paint>,
+    paint_ptr: BorrowedPtr<Paint>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
         image_ptr
@@ -359,7 +360,7 @@ pub fn skia_canvas_skew(canvas_ptr: *mut ReferenceBox<Canvas>, sx: scalar, sy: s
 #[no_mangle]
 pub fn skia_canvas_concat_matrix(
     canvas_ptr: *mut ReferenceBox<Canvas>,
-    matrix_ptr: *mut ValueBox<Matrix>,
+    matrix_ptr: BorrowedPtr<Matrix>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
         matrix_ptr
@@ -373,7 +374,7 @@ pub fn skia_canvas_concat_matrix(
 #[no_mangle]
 pub fn skia_canvas_set_matrix(
     canvas_ptr: *mut ReferenceBox<Canvas>,
-    matrix_ptr: *mut ValueBox<Matrix>,
+    matrix_ptr: BorrowedPtr<Matrix>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
         matrix_ptr
@@ -387,7 +388,7 @@ pub fn skia_canvas_set_matrix(
 #[no_mangle]
 pub fn skia_canvas_get_matrix(
     canvas_ptr: *mut ReferenceBox<Canvas>,
-    matrix_ptr: *mut ValueBox<Matrix>,
+    mut matrix_ptr: BorrowedPtr<Matrix>,
 ) {
     canvas_ptr.with_not_null(|canvas| {
         matrix_ptr
@@ -441,7 +442,7 @@ pub fn skia_canvas_restore_to_count(canvas_ptr: *mut ReferenceBox<Canvas>, count
 #[no_mangle]
 pub fn skia_canvas_save_layer(
     canvas_ptr: *mut ReferenceBox<Canvas>,
-    _save_layer_ptr: *mut ValueBox<SaveLayerRecWrapper>,
+    mut _save_layer_ptr: BorrowedPtr<SaveLayerRecWrapper>,
 ) -> usize {
     canvas_ptr.with_not_null_return(0, |canvas| {
         _save_layer_ptr
