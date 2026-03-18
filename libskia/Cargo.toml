@@ -23,9 +23,6 @@ compositor-skia = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-ffi = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-skia-ffi = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-skia-platform = { git = "https://github.com/feenkcom/compositor-rs" }
-phlow = { version = "1", features = [ "phlow-derive" ], optional = true }
-phlow-extensions = { version = "1", optional = true }
-phlow-ffi = { version = "1", optional = true }
 #compositor = { path = "../../compositor-rs/compositor" }
 #compositor-skia = { path = "../../compositor-rs/compositor-skia" }
 #compositor-ffi = { path = "../../compositor-rs/compositor-ffi" }
@@ -95,7 +92,6 @@ skia_windows = [ "d3d", "gl", "vulkan", "pdf", "windows", "mozangle", "composito
 skia_mac = ["metal", "pdf", "webp", "compositor-skia/metal" ]
 skia_linux = ["x11", "wayland", "egl", "skia-safe/embed-freetype" ]
 skia_android = [ "egl" ]
-phlow = [ "compositor/phlow", "compositor-ffi/phlow", "compositor-skia/phlow", "dep:phlow", "dep:phlow", "phlow-extensions", "phlow-ffi" ]
 
 [lib]
 name = "Skia"

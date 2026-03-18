@@ -296,8 +296,6 @@ dependencies = [
  "metal",
  "ordered-float",
  "parking_lot",
- "phlow",
- "phlow-extensions",
  "rstar",
 ]
 
@@ -310,8 +308,6 @@ dependencies = [
  "cfg-if",
  "compositor",
  "compositor-texture",
- "phlow",
- "phlow-extensions",
  "reference-box",
  "string-box 1.1.1",
  "value-box 2.3.3",
@@ -331,8 +327,6 @@ dependencies = [
  "fps_counter",
  "lazy_static",
  "log",
- "phlow",
- "phlow-extensions",
  "skia-safe",
 ]
 
@@ -1058,9 +1052,6 @@ dependencies = [
  "metal",
  "mozangle",
  "objc2",
- "phlow",
- "phlow-extensions",
- "phlow-ffi",
  "skia-safe",
  "string-box 4.1.0",
  "typename",
@@ -1369,49 +1360,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
 
 [[package]]
-name = "phlow"
-version = "1.7.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "62628d81edd809195035f48978a8ce8f369f0074d83e72073f61cedd27a5ff1f"
-dependencies = [
- "log",
- "parking_lot",
- "phlow-derive",
-]
-
-[[package]]
-name = "phlow-derive"
-version = "1.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0d2fa48138b4180373b54c7ac2dedde6806bc098c66b294b3c99d5f53048780f"
-dependencies = [
- "proc-macro2",
- "quote",
- "rust-format",
- "syn 2.0.117",
-]
-
-[[package]]
-name = "phlow-extensions"
-version = "1.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "06ff3caea61bdc15fc8fb7c8466e8f1abb86d1be6081933021c1a65dc016fe43"
-dependencies = [
- "phlow",
-]
-
-[[package]]
-name = "phlow-ffi"
-version = "1.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7efcf7dbda333b53dd25b9959a5eeba56834f7be6856a79fed193ed1f06a14c9"
-dependencies = [
- "phlow",
- "string-box 1.1.1",
- "value-box 2.3.3",
-]
-
-[[package]]
 name = "pkg-config"
 version = "0.3.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1576,15 +1524,6 @@ dependencies = [
  "heapless",
  "num-traits",
  "smallvec",
-]
-
-[[package]]
-name = "rust-format"
-version = "0.3.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "60e7c00b6c3bf5e38a880eec01d7e829d12ca682079f8238a464def3c4b31627"
-dependencies = [
- "proc-macro2",
 ]
 
 [[package]]
@@ -2170,7 +2109,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a46766ed9f0a78b82f789cab9b0287b7573ce6a8d2d249c29265e75217d80dc"
 dependencies = [
  "log",
- "phlow",
  "thiserror 1.0.69",
  "user-error",
 ]

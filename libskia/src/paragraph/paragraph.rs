@@ -202,10 +202,7 @@ impl ParagraphWithText {
         match self.get_placeholder_at_coordinate(coordinate) {
             None => coordinate,
             Some((_placeholder, rect, placeholder_affinity)) => {
-                let local_affinity = match global_affinity {
-                    None => placeholder_affinity,
-                    Some(affinity) => affinity,
-                };
+                let local_affinity = global_affinity.unwrap_or_else(|| placeholder_affinity);
 
                 let new_coordinate = match local_affinity {
                     Affinity::Upstream => Point::new(rect.right + 1.0, coordinate.y),

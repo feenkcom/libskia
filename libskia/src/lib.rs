@@ -1,23 +1,14 @@
-#![allow(incomplete_features)]
 #![allow(non_snake_case)]
-#![cfg_attr(feature = "phlow", feature(specialization))]
 
 #[macro_use]
 extern crate lazy_static;
 #[macro_use]
 extern crate log;
-#[cfg(feature = "phlow")]
-#[macro_use]
-extern crate phlow;
 use std::os::raw::c_void;
 
 // re-export the ffi methods
 pub use compositor_ffi::*;
 pub use compositor_skia_ffi::*;
-#[cfg(feature = "phlow")]
-pub use phlow_extensions::CoreExtensions;
-#[cfg(feature = "phlow")]
-pub use phlow_ffi::*;
 pub use value_box_ffi::*;
 
 pub mod canvas;
@@ -28,8 +19,6 @@ pub mod canvas_optimized;
 pub mod color;
 pub mod color_space;
 pub mod enums;
-#[cfg(feature = "phlow")]
-mod extensions;
 pub mod gpu;
 pub mod gradient;
 pub mod image;
@@ -52,11 +41,6 @@ pub mod surface_props;
 pub mod svg;
 pub mod text;
 pub mod types;
-
-#[cfg(feature = "phlow")]
-define_extensions!(SkiaExtensions);
-#[cfg(feature = "phlow")]
-import_extensions!(SkiaExtensions, CoreExtensions);
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_test() -> bool {
