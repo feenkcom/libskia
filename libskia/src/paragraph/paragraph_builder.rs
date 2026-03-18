@@ -54,7 +54,7 @@ impl ParagraphBuilderWithText {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_builder_new(
     paragraph_style: BorrowedPtr<ParagraphStyle>,
     font_collection: BorrowedPtr<FontCollection>,
@@ -73,7 +73,7 @@ pub fn skia_paragraph_builder_new(
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_builder_build(
     paragraph_builder_ptr: OwnedPtr<ParagraphBuilderWithText>,
 ) -> OwnedPtr<ParagraphWithText> {
@@ -83,7 +83,7 @@ pub fn skia_paragraph_builder_build(
 }
 
 /// Add a text to the paragraph by copying it
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_builder_add_text(
     mut paragraph_builder: BorrowedPtr<ParagraphBuilderWithText>,
     string: OwnedPtr<StringBox>,
@@ -97,7 +97,7 @@ pub fn skia_paragraph_builder_add_text(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_builder_add_placeholder(
     mut paragraph_builder: BorrowedPtr<ParagraphBuilderWithText>,
     placeholder: BorrowedPtr<PlaceholderStyle>,
@@ -112,7 +112,7 @@ pub fn skia_paragraph_builder_add_placeholder(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_builder_push_style(
     mut paragraph_builder: BorrowedPtr<ParagraphBuilderWithText>,
     style: BorrowedPtr<TextStyle>,
@@ -126,7 +126,7 @@ pub fn skia_paragraph_builder_push_style(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_builder_pop_style(
     mut paragraph_builder: BorrowedPtr<ParagraphBuilderWithText>,
 ) {
@@ -137,7 +137,7 @@ pub fn skia_paragraph_builder_pop_style(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_builder_drop(ptr: OwnedPtr<ParagraphBuilderWithText>) {
     drop(ptr);
 }

@@ -58,22 +58,22 @@ define_extensions!(SkiaExtensions);
 #[cfg(feature = "phlow")]
 import_extensions!(SkiaExtensions, CoreExtensions);
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_test() -> bool {
     true
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_icu_init() {
     warn!("no need to setup icu")
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_init_env_logger() {
     env_logger::init();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_null_ptr() -> *mut c_void {
     std::ptr::null_mut()
 }

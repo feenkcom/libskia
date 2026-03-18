@@ -1,9 +1,9 @@
 use skia_safe::gpu::Budgeted;
 use skia_safe::gpu::{BackendRenderTarget, BackendTexture, DirectContext, SurfaceOrigin};
-use skia_safe::{gpu, ColorType, ImageInfo, Surface};
+use skia_safe::{ColorType, ImageInfo, Surface, gpu};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_surface_from_render_target(
     backend_render_target_ptr: BorrowedPtr<BackendRenderTarget>,
     mut context_ptr: BorrowedPtr<DirectContext>,
@@ -35,7 +35,7 @@ pub fn skia_surface_from_render_target(
     .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_surface_new_render_target(
     image_info: BorrowedPtr<ImageInfo>,
     mut direct_context: BorrowedPtr<DirectContext>,
@@ -69,7 +69,7 @@ pub fn skia_surface_new_render_target(
     .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_surface_from_backend_texture(
     mut context_ptr: BorrowedPtr<DirectContext>,
     backend_texture_ptr: BorrowedPtr<BackendTexture>,

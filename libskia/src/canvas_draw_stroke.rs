@@ -1,9 +1,9 @@
 use float_cmp::ApproxEqUlps;
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::paint::Style;
-use skia_safe::{scalar, Canvas, Color, Paint, RRect, Rect, Vector};
+use skia_safe::{Canvas, Color, Paint, RRect, Rect, Vector, scalar};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_stroke_rectangle_with_color(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     left: scalar,
@@ -30,7 +30,7 @@ pub fn skia_canvas_stroke_rectangle_with_color(
 }
 
 /// I fill a rounded rectangle (each corner radius is different) with a given color
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_stroke_rounded_rectangle_with_color(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     left: scalar,

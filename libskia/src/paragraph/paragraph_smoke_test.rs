@@ -1,5 +1,5 @@
-use skia_safe::textlayout::{FontCollection, ParagraphBuilder, ParagraphStyle};
 use skia_safe::FontMgr;
+use skia_safe::textlayout::{FontCollection, ParagraphBuilder, ParagraphStyle};
 use std::collections::HashMap;
 use std::hint::black_box;
 use std::num::NonZero;

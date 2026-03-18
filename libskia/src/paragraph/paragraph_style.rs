@@ -2,7 +2,7 @@ use skia_safe::scalar;
 use skia_safe::textlayout::{ParagraphStyle, TextStyle};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_style_new() -> OwnedPtr<ParagraphStyle> {
     let mut style = ParagraphStyle::new();
     style.set_apply_rounding_hack(false);
@@ -10,7 +10,7 @@ pub fn skia_paragraph_style_new() -> OwnedPtr<ParagraphStyle> {
     OwnedPtr::new(style)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_style_get_apply_rounding_hack(
     mut paragraph: BorrowedPtr<ParagraphStyle>,
 ) -> bool {
@@ -19,7 +19,7 @@ pub fn skia_paragraph_style_get_apply_rounding_hack(
         .or_log(false)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_style_set_apply_rounding_hack(
     mut paragraph: BorrowedPtr<ParagraphStyle>,
     apply_rounding_hack: bool,
@@ -31,7 +31,7 @@ pub fn skia_paragraph_style_set_apply_rounding_hack(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_style_get_text_style(
     paragraph_ptr: BorrowedPtr<ParagraphStyle>,
 ) -> OwnedPtr<TextStyle> {
@@ -40,7 +40,7 @@ pub fn skia_paragraph_style_get_text_style(
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_style_set_text_style(
     mut paragraph_ptr: BorrowedPtr<ParagraphStyle>,
     text_style_ptr: BorrowedPtr<TextStyle>,
@@ -54,14 +54,14 @@ pub fn skia_paragraph_style_set_text_style(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_style_get_height(paragraph_ptr: BorrowedPtr<ParagraphStyle>) -> scalar {
     paragraph_ptr
         .with_ref_ok(|style| style.height())
         .or_log(0.0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_style_set_height(
     mut paragraph_ptr: BorrowedPtr<ParagraphStyle>,
     height: scalar,
@@ -73,7 +73,7 @@ pub fn skia_paragraph_style_set_height(
         .log()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_style_set_max_lines(
     mut paragraph_ptr: BorrowedPtr<ParagraphStyle>,
     max_lines: usize,
@@ -89,14 +89,14 @@ pub fn skia_paragraph_style_set_max_lines(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_style_get_max_lines(paragraph_ptr: BorrowedPtr<ParagraphStyle>) -> usize {
     paragraph_ptr
         .with_ref_ok(|style| style.max_lines().unwrap_or(usize::MAX))
         .or_log(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_style_drop(ptr: OwnedPtr<ParagraphStyle>) {
     drop(ptr);
 }

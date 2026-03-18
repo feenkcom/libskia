@@ -9,7 +9,7 @@ use skia_safe::textlayout::{
     Affinity, LineMetrics, Paragraph, PlaceholderStyle, PositionWithAffinity, RectHeightStyle,
     RectWidthStyle, TextBox,
 };
-use skia_safe::{scalar, Canvas, Point, Rect};
+use skia_safe::{Canvas, Point, Rect, scalar};
 use string_box::StringBox;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
@@ -197,8 +197,7 @@ impl ParagraphWithText {
 
         trace!(
             "[get_coordinate_outside_placeholder] at point {:?} with global affinity {:?}",
-            coordinate,
-            global_affinity
+            coordinate, global_affinity
         );
 
         match self.get_placeholder_at_coordinate(coordinate) {
@@ -278,7 +277,10 @@ impl ParagraphWithText {
                     rect.rect,
                     affinity,
                 ));
-                trace!("[get_placeholder_at_coordinate] Found placeholder at {:?} index {:?} with affinity {:?}", point, placeholder_index, affinity);
+                trace!(
+                    "[get_placeholder_at_coordinate] Found placeholder at {:?} index {:?} with affinity {:?}",
+                    point, placeholder_index, affinity
+                );
                 return result;
             }
             placeholder_index = placeholder_index + 1;
@@ -434,7 +436,7 @@ impl ParagraphWithText {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_layout(mut paragraph_ptr: BorrowedPtr<ParagraphWithText>, width: scalar) {
     paragraph_ptr
         .with_mut_ok(|paragraph| {
@@ -443,7 +445,7 @@ pub fn skia_paragraph_layout(mut paragraph_ptr: BorrowedPtr<ParagraphWithText>, 
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_paint(
     paragraph_ptr: BorrowedPtr<ParagraphWithText>,
     canvas_ptr: *mut ReferenceBox<Canvas>,
@@ -459,42 +461,42 @@ pub fn skia_paragraph_paint(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_get_height(paragraph_ptr: BorrowedPtr<ParagraphWithText>) -> scalar {
     paragraph_ptr
         .with_ref_ok(|paragraph| paragraph.height())
         .or_log(0.0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_get_max_width(paragraph_ptr: BorrowedPtr<ParagraphWithText>) -> scalar {
     paragraph_ptr
         .with_ref_ok(|paragraph| paragraph.max_width())
         .or_log(0.0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_get_longest_line(paragraph_ptr: BorrowedPtr<ParagraphWithText>) -> scalar {
     paragraph_ptr
         .with_ref_ok(|paragraph| paragraph.longest_line())
         .or_log(0.0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_get_line_number(paragraph_ptr: BorrowedPtr<ParagraphWithText>) -> usize {
     paragraph_ptr
         .with_ref_ok(|paragraph| paragraph.line_number())
         .or_log(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_get_char_count(paragraph_ptr: BorrowedPtr<ParagraphWithText>) -> usize {
     paragraph_ptr
         .with_ref_ok(|paragraph| paragraph.char_count())
         .or_log(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_get_rects_for_placeholders(
     paragraph: BorrowedPtr<ParagraphWithText>,
 ) -> OwnedPtr<ArrayBox<f32>> {
@@ -513,7 +515,7 @@ pub fn skia_paragraph_get_rects_for_placeholders(
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_get_rects_for_glyph_range(
     paragraph: BorrowedPtr<ParagraphWithText>,
     start: usize,
@@ -537,7 +539,7 @@ pub fn skia_paragraph_get_rects_for_glyph_range(
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_get_rects_for_char_range(
     paragraph: BorrowedPtr<ParagraphWithText>,
     start: usize,
@@ -561,7 +563,7 @@ pub fn skia_paragraph_get_rects_for_char_range(
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_print(paragraph_ptr: BorrowedPtr<ParagraphWithText>) {
     paragraph_ptr
         .with_ref_ok(|paragraph_with_text| {
@@ -579,7 +581,7 @@ pub fn skia_paragraph_print(paragraph_ptr: BorrowedPtr<ParagraphWithText>) {
         .log()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_get_glyph_position_at_coordinate(
     paragraph_ptr: BorrowedPtr<ParagraphWithText>,
     x: scalar,
@@ -594,7 +596,7 @@ pub fn skia_paragraph_get_glyph_position_at_coordinate(
         .or_log(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_get_char_position_at_coordinate(
     paragraph_ptr: BorrowedPtr<ParagraphWithText>,
     x: scalar,
@@ -605,7 +607,7 @@ pub fn skia_paragraph_get_char_position_at_coordinate(
         .or_log(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_get_glyph_range_for_char_range(
     paragraph_ptr: BorrowedPtr<ParagraphWithText>,
     start: usize,
@@ -618,7 +620,7 @@ pub fn skia_paragraph_get_glyph_range_for_char_range(
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_get_glyph_offset_for_char_offset(
     paragraph: BorrowedPtr<ParagraphWithText>,
     offset: usize,
@@ -628,7 +630,7 @@ pub fn skia_paragraph_get_glyph_offset_for_char_offset(
         .or_log(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_get_line_height(
     paragraph: BorrowedPtr<ParagraphWithText>,
     index: usize,
@@ -638,7 +640,7 @@ pub fn skia_paragraph_get_line_height(
         .or_log(0.0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_get_line_width(
     paragraph: BorrowedPtr<ParagraphWithText>,
     index: usize,
@@ -648,7 +650,7 @@ pub fn skia_paragraph_get_line_width(
         .or_log(0.0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_get_line_end_character_index(
     paragraph: BorrowedPtr<ParagraphWithText>,
     index: usize,
@@ -658,7 +660,7 @@ pub fn skia_paragraph_get_line_end_character_index(
         .or_log(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_get_line_index_for_char(
     paragraph: BorrowedPtr<ParagraphWithText>,
     index: usize,
@@ -668,7 +670,7 @@ pub fn skia_paragraph_get_line_index_for_char(
         .or_log(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_get_line_index_at_coordinate(
     paragraph: BorrowedPtr<ParagraphWithText>,
     x: scalar,
@@ -679,7 +681,7 @@ pub fn skia_paragraph_get_line_index_at_coordinate(
         .or_log(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_drop(ptr: OwnedPtr<ParagraphWithText>) {
     drop(ptr);
 }

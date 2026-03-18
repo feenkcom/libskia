@@ -1,13 +1,13 @@
 use skia_safe::rrect::Type;
-use skia_safe::{scalar, RRect, Rect, Vector};
+use skia_safe::{RRect, Rect, Vector, scalar};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_rounded_rectangle_default() -> OwnedPtr<RRect> {
     OwnedPtr::new(RRect::default())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_rounded_rectangle_new_radii(
     left: scalar,
     top: scalar,
@@ -33,28 +33,28 @@ pub fn skia_rounded_rectangle_new_radii(
     OwnedPtr::new(RRect::new_rect_radii(rect, &radii))
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_rounded_rectangle_get_type(rounded_rectangle_ptr: BorrowedPtr<RRect>) -> Type {
     rounded_rectangle_ptr
         .with_ref_ok(|rounded_rectangle| rounded_rectangle.get_type())
         .or_log(Type::Empty)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_rounded_rectangle_width(rounded_rectangle_ptr: BorrowedPtr<RRect>) -> scalar {
     rounded_rectangle_ptr
         .with_ref_ok(|rounded_rectangle| rounded_rectangle.width())
         .or_log(0.0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_rounded_rectangle_height(rounded_rectangle_ptr: BorrowedPtr<RRect>) -> scalar {
     rounded_rectangle_ptr
         .with_ref_ok(|rounded_rectangle| rounded_rectangle.height())
         .or_log(0.0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_rounded_rectangle_set_rect(
     mut rounded_rectangle_ptr: BorrowedPtr<RRect>,
     rectangle_ptr: BorrowedPtr<Rect>,
@@ -68,7 +68,7 @@ pub fn skia_rounded_rectangle_set_rect(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_rounded_rectangle_set_oval(
     mut rounded_rectangle_ptr: BorrowedPtr<RRect>,
     oval_ptr: BorrowedPtr<Rect>,
@@ -82,7 +82,7 @@ pub fn skia_rounded_rectangle_set_oval(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_rounded_rectangle_drop(ptr: OwnedPtr<RRect>) {
     drop(ptr);
 }

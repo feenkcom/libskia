@@ -2,22 +2,22 @@ use skia_safe::{FontStyle, FontStyleSet, Typeface};
 use string_box::StringBox;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_style_set_default() -> OwnedPtr<FontStyleSet> {
     OwnedPtr::new(FontStyleSet::default())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_style_get_count(mut font_style_set_ptr: BorrowedPtr<FontStyleSet>) -> usize {
     font_style_set_ptr.with_mut_ok(|set| set.count()).or_log(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_style_set_count(font_style_set_ptr: BorrowedPtr<FontStyleSet>) -> usize {
     skia_font_style_get_count(font_style_set_ptr)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_style_get_style_at(
     mut font_style_set_ptr: BorrowedPtr<FontStyleSet>,
     index: usize,
@@ -27,7 +27,7 @@ pub fn skia_font_style_get_style_at(
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_style_set_style_at(
     font_style_set_ptr: BorrowedPtr<FontStyleSet>,
     index: usize,
@@ -35,7 +35,7 @@ pub fn skia_font_style_set_style_at(
     skia_font_style_get_style_at(font_style_set_ptr, index)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_style_set_name_at(
     mut font_style_set_ptr: BorrowedPtr<FontStyleSet>,
     index: usize,
@@ -57,7 +57,7 @@ pub fn skia_font_style_set_name_at(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_style_set_new_typeface(
     mut font_style_set_ptr: BorrowedPtr<FontStyleSet>,
     index: usize,
@@ -70,7 +70,7 @@ pub fn skia_font_style_set_new_typeface(
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_style_set_drop(ptr: OwnedPtr<FontStyleSet>) {
     drop(ptr);
 }

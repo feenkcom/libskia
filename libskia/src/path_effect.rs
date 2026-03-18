@@ -1,8 +1,8 @@
 use array_box::ArrayBox;
-use skia_safe::{scalar, PathEffect};
+use skia_safe::{PathEffect, scalar};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_path_effect_dash(
     intervals_ptr: BorrowedPtr<ArrayBox<f32>>,
     phase: scalar,
@@ -17,7 +17,7 @@ pub fn skia_path_effect_dash(
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_path_effect_corner(radius: scalar) -> OwnedPtr<PathEffect> {
     match PathEffect::corner_path(radius) {
         None => OwnedPtr::null(),
@@ -25,7 +25,7 @@ pub fn skia_path_effect_corner(radius: scalar) -> OwnedPtr<PathEffect> {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_path_effect_drop(ptr: OwnedPtr<PathEffect>) {
     drop(ptr);
 }

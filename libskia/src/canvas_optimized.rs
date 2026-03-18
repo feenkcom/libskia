@@ -1,9 +1,9 @@
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
-use skia_safe::{scalar, Canvas, Color, Paint, Point, TextBlob};
+use skia_safe::{Canvas, Color, Paint, Point, TextBlob, scalar};
 use value_box::{BorrowedPtr, ReturnBoxerResult};
 
 /// Fill a given text blob with a color and disabled antialias
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_draw_text_blob_with_color(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     text_blob_ptr: BorrowedPtr<TextBlob>,
@@ -31,7 +31,7 @@ pub fn skia_canvas_draw_text_blob_with_color(
 }
 
 /// Fill a given text blob with a color and disabled antialias
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_draw_text_blob_with_black_color(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     text_blob_ptr: BorrowedPtr<TextBlob>,

@@ -6,7 +6,7 @@ use value_box::OwnedPtr;
 
 use crate::gpu::platform_compositor::{PlatformCompositor, PlatformContext};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_metal_compositor_new_size(
     ns_view: *mut c_void,
     width: u32,

@@ -3,7 +3,7 @@ use windows::Win32::Foundation::HWND;
 
 use crate::gpu::platform_compositor::{PlatformCompositor, PlatformContext};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_d3d_compositor_new_size(
     window: HWND,
     width: u32,

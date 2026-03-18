@@ -1,21 +1,21 @@
 use skia_safe::textlayout::{Decoration, TextStyle};
-use skia_safe::{scalar, Color, FontStyle, Paint};
+use skia_safe::{Color, FontStyle, Paint, scalar};
 use string_box::StringBox;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_text_style_new() -> OwnedPtr<TextStyle> {
     OwnedPtr::new(TextStyle::new())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_text_style_get_font_size(text_style: BorrowedPtr<TextStyle>) -> scalar {
     text_style
         .with_ref_ok(|style| style.font_size())
         .or_log(0.0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_text_style_set_font_size(
     mut text_style: BorrowedPtr<TextStyle>,
     font_size: scalar,
@@ -27,14 +27,14 @@ pub fn skia_paragraph_text_style_set_font_size(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_text_style_get_word_spacing(text_style: BorrowedPtr<TextStyle>) -> scalar {
     text_style
         .with_ref_ok(|style| style.word_spacing())
         .or_log(0.0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_text_style_set_word_spacing(
     mut text_style: BorrowedPtr<TextStyle>,
     word_spacing: scalar,
@@ -46,14 +46,14 @@ pub fn skia_paragraph_text_style_set_word_spacing(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_text_style_get_letter_spacing(text_style: BorrowedPtr<TextStyle>) -> scalar {
     text_style
         .with_clone_ok(|style| style.letter_spacing())
         .or_log(0.0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_text_style_set_letter_spacing(
     mut text_style: BorrowedPtr<TextStyle>,
     letter_spacing: scalar,
@@ -65,14 +65,14 @@ pub fn skia_paragraph_text_style_set_letter_spacing(
         .log()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_text_style_get_color(text_style: BorrowedPtr<TextStyle>) -> OwnedPtr<Color> {
     text_style
         .with_clone_ok(|style| OwnedPtr::new(style.color()))
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_text_style_set_color(
     mut text_style: BorrowedPtr<TextStyle>,
     color_ptr: BorrowedPtr<Color>,
@@ -86,7 +86,7 @@ pub fn skia_paragraph_text_style_set_color(
         .log()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_text_style_get_foreground(
     text_style: BorrowedPtr<TextStyle>,
 ) -> OwnedPtr<Paint> {
@@ -95,7 +95,7 @@ pub fn skia_paragraph_text_style_get_foreground(
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_text_style_set_foreground(
     mut text_style: BorrowedPtr<TextStyle>,
     paint: BorrowedPtr<Paint>,
@@ -109,7 +109,7 @@ pub fn skia_paragraph_text_style_set_foreground(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_text_style_get_background(
     text_style: BorrowedPtr<TextStyle>,
 ) -> OwnedPtr<Paint> {
@@ -118,7 +118,7 @@ pub fn skia_paragraph_text_style_get_background(
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_text_style_set_background(
     mut text_style: BorrowedPtr<TextStyle>,
     paint: BorrowedPtr<Paint>,
@@ -132,7 +132,7 @@ pub fn skia_paragraph_text_style_set_background(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_text_style_set_font_style(
     mut text_style: BorrowedPtr<TextStyle>,
     font_style_ptr: BorrowedPtr<FontStyle>,
@@ -146,7 +146,7 @@ pub fn skia_paragraph_text_style_set_font_style(
         .log()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_text_style_set_font_family(
     mut text_style: BorrowedPtr<TextStyle>,
     mut font_family_ptr: BorrowedPtr<StringBox>,
@@ -160,7 +160,7 @@ pub fn skia_paragraph_text_style_set_font_family(
         .log()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_text_style_set_decoration(
     mut text_style: BorrowedPtr<TextStyle>,
     decoration_ptr: BorrowedPtr<Decoration>,
@@ -174,7 +174,7 @@ pub fn skia_paragraph_text_style_set_decoration(
         .log()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_paragraph_text_style_drop(ptr: OwnedPtr<TextStyle>) {
     drop(ptr);
 }

@@ -6,13 +6,13 @@ use array_box::ArrayBox;
 use skia_safe::gpu::{BackendTexture, SurfaceOrigin};
 use skia_safe::image::CachingHint;
 use skia_safe::{
-    gpu, images, surfaces, AlphaType, ColorSpace, ColorType, Data, EncodedImageFormat, IPoint,
-    ISize, Image, ImageInfo, Paint, M44,
+    AlphaType, ColorSpace, ColorType, Data, EncodedImageFormat, IPoint, ISize, Image, ImageInfo,
+    M44, Paint, gpu, images, surfaces,
 };
 use string_box::StringBox;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_from_pixels(
     pixels_ptr: BorrowedPtr<ArrayBox<u8>>,
     width: i32,
@@ -41,7 +41,7 @@ pub fn skia_image_from_pixels(
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_from_file(boxer_string_ptr: BorrowedPtr<StringBox>) -> OwnedPtr<Image> {
     boxer_string_ptr
         .with_ref_ok(|boxer_string| {
@@ -68,7 +68,7 @@ pub fn skia_image_from_file(boxer_string_ptr: BorrowedPtr<StringBox>) -> OwnedPt
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_from_buffer(
     buffer_ptr: BorrowedPtr<ArrayBox<u8>>,
     start: usize,
@@ -85,7 +85,7 @@ pub fn skia_image_from_buffer(
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_to_file(
     image_ptr: BorrowedPtr<Image>,
     name_boxer_string_ptr: BorrowedPtr<StringBox>,
@@ -118,7 +118,7 @@ pub fn skia_image_to_file(
         .or_log(-1)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_scale_image(
     image_ptr: BorrowedPtr<Image>,
     new_x: i32,
@@ -160,43 +160,43 @@ pub fn skia_scale_image(
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_get_image_info(image_ptr: BorrowedPtr<Image>) -> OwnedPtr<ImageInfo> {
     image_ptr
         .with_ref_ok(|image| OwnedPtr::new(image.image_info().clone()))
         .unwrap_or_else(|_| OwnedPtr::new(ImageInfo::default()))
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_get_width(image_ptr: BorrowedPtr<Image>) -> i32 {
     image_ptr.with_ref_ok(|image| image.width()).or_log(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_get_height(image_ptr: BorrowedPtr<Image>) -> i32 {
     image_ptr.with_ref_ok(|image| image.height()).or_log(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_get_unique_id(image_ptr: BorrowedPtr<Image>) -> u32 {
     image_ptr.with_ref_ok(|image| image.unique_id()).or_log(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_get_alpha_type(image_ptr: BorrowedPtr<Image>) -> AlphaType {
     image_ptr
         .with_ref_ok(|image| image.alpha_type())
         .or_log(AlphaType::Unknown)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_get_color_type(image_ptr: BorrowedPtr<Image>) -> ColorType {
     image_ptr
         .with_ref_ok(|image| image.color_type())
         .or_log(ColorType::Unknown)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_get_color_space(image: BorrowedPtr<Image>) -> OwnedPtr<ColorSpace> {
     image
         .with_ref_ok(|image| image.color_space().map(|space| OwnedPtr::new(space)))
@@ -204,28 +204,28 @@ pub fn skia_image_get_color_space(image: BorrowedPtr<Image>) -> OwnedPtr<ColorSp
         .unwrap_or_default()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_is_alpha_only(image: BorrowedPtr<Image>) -> bool {
     image
         .with_ref_ok(|image| image.is_alpha_only())
         .unwrap_or(false)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_is_opaque(image: BorrowedPtr<Image>) -> bool {
     image
         .with_ref_ok(|image| image.is_opaque())
         .unwrap_or(false)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_is_texture_backend(image: BorrowedPtr<Image>) -> bool {
     image
         .with_ref_ok(|image| image.is_texture_backed())
         .unwrap_or(false)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_get_backend_texture(image_ptr: BorrowedPtr<Image>) -> OwnedPtr<BackendTexture> {
     image_ptr
         .with_ref_ok(
@@ -237,7 +237,7 @@ pub fn skia_image_get_backend_texture(image_ptr: BorrowedPtr<Image>) -> OwnedPtr
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_get_backend_texture_origin(image_ptr: BorrowedPtr<Image>) -> SurfaceOrigin {
     image_ptr
         .with_ref_ok(
@@ -249,7 +249,7 @@ pub fn skia_image_get_backend_texture_origin(image_ptr: BorrowedPtr<Image>) -> S
         .or_log(SurfaceOrigin::BottomLeft)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_read_all_pixels(
     surface_ptr: BorrowedPtr<Image>,
     mut pixels_ptr: BorrowedPtr<ArrayBox<u8>>,
@@ -271,7 +271,7 @@ pub fn skia_image_read_all_pixels(
         .or_log(false)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_drop(ptr: OwnedPtr<Image>) {
     drop(ptr);
 }

@@ -2,7 +2,7 @@ use skia_safe::gpu::BackendRenderTarget;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[cfg(feature = "gl")]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_backend_render_target_new_gl(
     width: i32,
     height: i32,
@@ -26,7 +26,7 @@ pub fn skia_backend_render_target_new_gl(
 }
 
 #[cfg(feature = "metal")]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_backend_render_target_new_metal(
     width: i32,
     height: i32,
@@ -39,7 +39,7 @@ pub fn skia_backend_render_target_new_metal(
     OwnedPtr::new(render_target)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_backend_render_target_is_valid(
     backend_render_target_ptr: BorrowedPtr<BackendRenderTarget>,
 ) -> bool {
@@ -48,7 +48,7 @@ pub fn skia_backend_render_target_is_valid(
         .or_log(false)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_backend_render_target_is_protected(
     backend_render_target_ptr: BorrowedPtr<BackendRenderTarget>,
 ) -> bool {
@@ -57,7 +57,7 @@ pub fn skia_backend_render_target_is_protected(
         .or_log(false)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_backend_render_target_drop(ptr: OwnedPtr<BackendRenderTarget>) {
     drop(ptr);
 }

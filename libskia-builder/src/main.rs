@@ -1,5 +1,5 @@
 use libskia_builder::latest_libskia;
-use shared_library_builder::{build, LibraryTarget};
+use shared_library_builder::{LibraryTarget, build};
 use std::error::Error;
 use std::path::PathBuf;
 

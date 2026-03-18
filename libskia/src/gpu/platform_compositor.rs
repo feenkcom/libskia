@@ -198,7 +198,7 @@ impl PlatformContext {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_platform_compositor_submit_layer(
     mut compositor: BorrowedPtr<PlatformCompositor>,
     layer: BorrowedPtr<Arc<dyn Layer>>,
@@ -210,21 +210,21 @@ pub fn skia_platform_compositor_submit_layer(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_platform_compositor_draw(mut compositor: BorrowedPtr<PlatformCompositor>) {
     compositor
         .with_mut(|compositor| compositor.draw().map_err(|error| error.into()))
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_platform_compositor_draw_cacheless(mut compositor: BorrowedPtr<PlatformCompositor>) {
     compositor
         .with_mut(|compositor| compositor.draw_cacheless().map_err(|error| error.into()))
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_platform_compositor_resize(
     mut compositor: BorrowedPtr<PlatformCompositor>,
     width: u32,
@@ -235,21 +235,21 @@ pub fn skia_platform_compositor_resize(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_platform_compositor_enable_fps(mut compositor: BorrowedPtr<PlatformCompositor>) {
     compositor
         .with_mut_ok(|compositor| compositor.enable_fps())
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_platform_compositor_disable_fps(mut compositor: BorrowedPtr<PlatformCompositor>) {
     compositor
         .with_mut_ok(|compositor| compositor.disable_fps())
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_platform_compositor_drop(compositor: OwnedPtr<PlatformCompositor>) {
     drop(compositor);
 }

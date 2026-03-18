@@ -2,23 +2,23 @@ use array_box::ArrayBox;
 use float_cmp::ApproxEqUlps;
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::canvas::{PointMode, SaveLayerRec};
-use skia_safe::utils::shadow_utils::{draw_shadow, ShadowFlags};
+use skia_safe::utils::shadow_utils::{ShadowFlags, draw_shadow};
 use skia_safe::{
-    scalar, BlendMode, Canvas, Color, FilterMode, Image, Matrix, MipmapMode, Paint, Path, Point,
-    Point3, RRect, Rect, SamplingOptions, TextBlob, Vector, M44,
+    BlendMode, Canvas, Color, FilterMode, Image, M44, Matrix, MipmapMode, Paint, Path, Point,
+    Point3, RRect, Rect, SamplingOptions, TextBlob, Vector, scalar,
 };
 use value_box::{BorrowedPtr, ReturnBoxerResult};
 
 use crate::layer::SaveLayerRecWrapper;
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_clear(canvas_ptr: *mut ReferenceBox<Canvas>, r: u8, g: u8, b: u8, a: u8) {
     canvas_ptr.with_not_null(|canvas| {
         canvas.clear(Color::from_argb(a, r, g, b));
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_draw_color(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     r: u8,
@@ -32,7 +32,7 @@ pub fn skia_canvas_draw_color(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_draw_paint(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     paint_ptr: BorrowedPtr<Paint>,
@@ -46,7 +46,7 @@ pub fn skia_canvas_draw_paint(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_draw_points(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     point_mode: PointMode,
@@ -64,7 +64,7 @@ pub fn skia_canvas_draw_points(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_draw_point(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     x: scalar,
@@ -80,7 +80,7 @@ pub fn skia_canvas_draw_point(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_draw_line(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     from_x: scalar,
@@ -98,7 +98,7 @@ pub fn skia_canvas_draw_line(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_draw_rectangle(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     left: scalar,
@@ -116,7 +116,7 @@ pub fn skia_canvas_draw_rectangle(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_draw_oval(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     left: scalar,
@@ -134,7 +134,7 @@ pub fn skia_canvas_draw_oval(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_draw_circle(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     center_x: scalar,
@@ -151,7 +151,7 @@ pub fn skia_canvas_draw_circle(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_draw_rrect(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     rrect_ptr: BorrowedPtr<RRect>,
@@ -168,7 +168,7 @@ pub fn skia_canvas_draw_rrect(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_draw_rounded_rectangle(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     left: scalar,
@@ -215,7 +215,7 @@ pub fn skia_canvas_draw_rounded_rectangle(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_draw_path(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     path_ptr: BorrowedPtr<Path>,
@@ -232,7 +232,7 @@ pub fn skia_canvas_draw_path(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_draw_text_blob(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     text_blob_ptr: BorrowedPtr<TextBlob>,
@@ -252,7 +252,7 @@ pub fn skia_canvas_draw_text_blob(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_draw_shadow(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     path_ptr: BorrowedPtr<Path>,
@@ -289,7 +289,7 @@ pub fn skia_canvas_draw_shadow(
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_draw_image(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     image_ptr: BorrowedPtr<Image>, // may be null
@@ -323,21 +323,21 @@ pub fn skia_canvas_draw_image(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_translate(canvas_ptr: *mut ReferenceBox<Canvas>, x: scalar, y: scalar) {
     canvas_ptr.with_not_null(|canvas| {
         canvas.translate(Vector::new(x, y));
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_scale(canvas_ptr: *mut ReferenceBox<Canvas>, sx: scalar, sy: scalar) {
     canvas_ptr.with_not_null(|canvas| {
         canvas.scale((sx, sy));
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_rotate(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     degrees: scalar,
@@ -349,14 +349,14 @@ pub fn skia_canvas_rotate(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_skew(canvas_ptr: *mut ReferenceBox<Canvas>, sx: scalar, sy: scalar) {
     canvas_ptr.with_not_null(|canvas| {
         canvas.skew((sx, sy));
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_concat_matrix(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     matrix_ptr: BorrowedPtr<Matrix>,
@@ -370,7 +370,7 @@ pub fn skia_canvas_concat_matrix(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_set_matrix(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     matrix_ptr: BorrowedPtr<Matrix>,
@@ -384,7 +384,7 @@ pub fn skia_canvas_set_matrix(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_get_matrix(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     mut matrix_ptr: BorrowedPtr<Matrix>,
@@ -401,44 +401,44 @@ pub fn skia_canvas_get_matrix(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_reset_matrix(canvas_ptr: *mut ReferenceBox<Canvas>) {
     canvas_ptr.with_not_null(|canvas| {
         canvas.reset_matrix();
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 #[deprecated(since = "0.38.0", note = "Replace usage with DirectContext::flush()")]
 pub fn skia_canvas_flush(_canvas_ptr: *mut ReferenceBox<Canvas>) {
     eprintln!("skia_canvas_flush is deprecated. Use DirectContext::flush() instead")
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_save(canvas_ptr: *mut ReferenceBox<Canvas>) -> usize {
     canvas_ptr.with_not_null_return(0, |canvas| canvas.save())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_save_count(canvas_ptr: *mut ReferenceBox<Canvas>) -> usize {
     canvas_ptr.with_not_null_return(0, |canvas| canvas.save_count())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_restore(canvas_ptr: *mut ReferenceBox<Canvas>) {
     canvas_ptr.with_not_null(|canvas| {
         canvas.restore();
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_restore_to_count(canvas_ptr: *mut ReferenceBox<Canvas>, count: usize) {
     canvas_ptr.with_not_null(|canvas| {
         canvas.restore_to_count(count);
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_save_layer(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     mut _save_layer_ptr: BorrowedPtr<SaveLayerRecWrapper>,
@@ -459,7 +459,7 @@ pub fn skia_canvas_save_layer(
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_drop(_ptr: &mut *mut ReferenceBox<Canvas>) {
     (*_ptr).drop();
     *_ptr = std::ptr::null_mut();

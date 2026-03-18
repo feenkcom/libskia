@@ -5,19 +5,19 @@ use skia_safe::{FontMgr, FontStyle, FontStyleSet, Typeface};
 use string_box::StringBox;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_manager_default() -> OwnedPtr<FontMgr> {
     OwnedPtr::new(FontMgr::default())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_manager_count_families(font_manager_ptr: BorrowedPtr<FontMgr>) -> usize {
     font_manager_ptr
         .with_clone_ok(|font_manager| font_manager.count_families())
         .or_log(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_manager_get_family_name_at(
     mut font_manager_ptr: BorrowedPtr<FontMgr>,
     mut name_ptr: BorrowedPtr<StringBox>,
@@ -32,7 +32,7 @@ pub fn skia_font_manager_get_family_name_at(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_manager_new_typeface_from_data(
     font_manager_ptr: BorrowedPtr<FontMgr>,
     data_ptr: BorrowedPtr<ArrayBox<u8>>,
@@ -49,7 +49,7 @@ pub fn skia_font_manager_new_typeface_from_data(
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_manager_match_family(
     font_manager_ptr: BorrowedPtr<FontMgr>,
     name_ptr: BorrowedPtr<StringBox>,
@@ -61,7 +61,7 @@ pub fn skia_font_manager_match_family(
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_manager_match_family_style(
     font_manager_ptr: BorrowedPtr<FontMgr>,
     name_ptr: BorrowedPtr<StringBox>,
@@ -84,7 +84,7 @@ pub fn skia_font_manager_match_family_style(
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_manager_drop(ptr: OwnedPtr<FontMgr>) {
     drop(ptr);
 }

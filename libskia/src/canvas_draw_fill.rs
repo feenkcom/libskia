@@ -1,12 +1,12 @@
 use float_cmp::ApproxEqUlps;
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::{
-    scalar, Canvas, Color, FilterMode, Image, MipmapMode, Paint, Point, RRect, Rect,
-    SamplingOptions, Vector,
+    Canvas, Color, FilterMode, Image, MipmapMode, Paint, Point, RRect, Rect, SamplingOptions,
+    Vector, scalar,
 };
 use value_box::{BorrowedPtr, ReturnBoxerResult};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_fill_rectangle_with_color(
     canvas: *mut ReferenceBox<Canvas>,
     left: scalar,
@@ -30,7 +30,7 @@ pub fn skia_canvas_fill_rectangle_with_color(
 }
 
 /// I fill a rounded rectangle (each corner radius is different) with a given color
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_fill_rounded_rectangle_with_color(
     canvas: *mut ReferenceBox<Canvas>,
     left: scalar,
@@ -81,7 +81,7 @@ pub fn skia_canvas_fill_rounded_rectangle_with_color(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_fill_image_without_paint(
     canvas: *mut ReferenceBox<Canvas>,
     image: BorrowedPtr<Image>,

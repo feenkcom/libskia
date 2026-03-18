@@ -1,8 +1,8 @@
 use crate::gpu::platform_compositor::{PlatformCompositor, PlatformContext};
 
 use uikit_sys::{
-    id as uikit_id, CGPoint as UIPoint, CGRect as UIRect, CGSize as UISize, IUIView, UIView,
-    UIView_UIViewHierarchy,
+    CGPoint as UIPoint, CGRect as UIRect, CGSize as UISize, IUIView, UIView,
+    UIView_UIViewHierarchy, id as uikit_id,
 };
 
 use core_graphics_types::geometry::CGSize;
@@ -11,8 +11,8 @@ use metal::{CommandQueue, Device, MTLPixelFormat, MetalDrawableRef, MetalLayer};
 use objc2::runtime::{AnyClass, AnyObject, ClassBuilder, Sel};
 use objc2::{class, msg_send, sel};
 use skia_safe::gpu::mtl::BackendContext;
-use skia_safe::gpu::{mtl, BackendRenderTarget, DirectContext, SurfaceOrigin};
-use skia_safe::{gpu, scalar, ColorType, ISize, Size, Surface};
+use skia_safe::gpu::{BackendRenderTarget, DirectContext, SurfaceOrigin, mtl};
+use skia_safe::{ColorType, ISize, Size, Surface, gpu, scalar};
 use std::fmt::{Debug, Formatter};
 use std::mem::transmute;
 use std::sync::OnceLock;
@@ -164,7 +164,7 @@ fn metal_view_class() -> &'static AnyClass {
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_metal_compositor_new_size(
     ns_view: *mut AnyObject,
     width: u32,

@@ -2,7 +2,7 @@ use skia_safe::gpu::{BackendAPI, BackendTexture};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[cfg(feature = "gl")]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_backend_texture_new_gl(
     width: i32,
     height: i32,
@@ -26,7 +26,7 @@ pub fn skia_backend_texture_new_gl(
 }
 
 #[cfg(feature = "gl")]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_backend_texture_get_gl_texture_info(
     mut texture_ptr: BorrowedPtr<BackendTexture>,
 ) -> OwnedPtr<skia_safe::gpu::gl::TextureInfo> {
@@ -38,47 +38,47 @@ pub fn skia_backend_texture_get_gl_texture_info(
         .or_log(OwnedPtr::null())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_backend_texture_get_width(texture_ptr: BorrowedPtr<BackendTexture>) -> i32 {
     texture_ptr
         .with_clone_ok(|backend_texture| backend_texture.width())
         .or_log(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_backend_texture_get_height(texture_ptr: BorrowedPtr<BackendTexture>) -> i32 {
     texture_ptr
         .with_clone_ok(|backend_texture| backend_texture.height())
         .or_log(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_backend_texture_has_mip_maps(texture_ptr: BorrowedPtr<BackendTexture>) -> bool {
     texture_ptr
         .with_clone_ok(|backend_texture| backend_texture.has_mipmaps())
         .or_log(false)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_backend_texture_get_backend(texture_ptr: BorrowedPtr<BackendTexture>) -> BackendAPI {
     texture_ptr
         .with_clone_ok(|backend_texture| backend_texture.backend())
         .or_log(BackendAPI::Mock)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_backend_texture_is_protected(texture_ptr: BorrowedPtr<BackendTexture>) -> bool {
     texture_ptr
         .with_clone_ok(|backend_texture| backend_texture.is_protected())
         .or_log(false)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_backend_texture_is_valid(texture_ptr: BorrowedPtr<BackendTexture>) -> bool {
     texture_ptr.with_clone_ok(|_| true).or_log(false)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_backend_texture_drop(ptr: OwnedPtr<BackendTexture>) {
     drop(ptr);
 }

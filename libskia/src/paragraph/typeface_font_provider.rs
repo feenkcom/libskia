@@ -1,13 +1,13 @@
-use skia_safe::textlayout::TypefaceFontProvider;
 use skia_safe::Typeface;
+use skia_safe::textlayout::TypefaceFontProvider;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_typeface_font_provider_new() -> OwnedPtr<TypefaceFontProvider> {
     OwnedPtr::new(TypefaceFontProvider::new())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_typeface_font_provider_register_typeface(
     mut typeface_font_provider: BorrowedPtr<TypefaceFontProvider>,
     typeface: BorrowedPtr<Typeface>,
@@ -22,7 +22,7 @@ pub fn skia_typeface_font_provider_register_typeface(
         .or_log(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_typeface_font_provider_drop(ptr: OwnedPtr<TypefaceFontProvider>) {
     drop(ptr);
 }

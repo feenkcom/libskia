@@ -3,7 +3,7 @@ use std::ffi::c_void;
 use string_box::StringBox;
 use value_box::{BorrowedPtr, OwnedPtr};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_interface_new_native() -> OwnedPtr<Interface> {
     match Interface::new_native() {
         None => {
@@ -17,7 +17,7 @@ pub fn skia_interface_new_native() -> OwnedPtr<Interface> {
 }
 
 #[cfg(feature = "gl")]
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_interface_new_load_with(
     callback: extern "C" fn(BorrowedPtr<StringBox>) -> *const c_void,
 ) -> OwnedPtr<Interface> {
@@ -43,7 +43,7 @@ pub fn skia_interface_new_load_with(
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_interface_drop(mut ptr: OwnedPtr<Interface>) {
     drop(ptr);
 }

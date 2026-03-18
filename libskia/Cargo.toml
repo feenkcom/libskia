@@ -2,7 +2,7 @@
 name = "libskia"
 version = "0.6.0"
 authors = ["feenk gmbh <contact@feenk.com>"]
-edition = "2021"
+edition.workspace = true
 
 [dependencies]
 skia-safe = "0.90"

@@ -8,6 +8,9 @@ members = [
 
 exclude = [ "target" ]
 
+[workspace.package]
+edition = "2024"
+
 [profile.dev]
 opt-level = 0
 debug = true

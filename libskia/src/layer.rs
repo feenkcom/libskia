@@ -1,4 +1,4 @@
-use skia_safe::{scalar, Paint, Rect};
+use skia_safe::{Paint, Rect, scalar};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[derive(Default)]
@@ -8,12 +8,12 @@ pub struct SaveLayerRecWrapper {
     pub paint: Option<Paint>,
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_layer_rec_default() -> OwnedPtr<SaveLayerRecWrapper> {
     OwnedPtr::new(SaveLayerRecWrapper::default())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_layer_rec_set_bounds(
     mut save_layer_ptr: BorrowedPtr<SaveLayerRecWrapper>,
     left: scalar,
@@ -28,7 +28,7 @@ pub fn skia_layer_rec_set_bounds(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_layer_rec_set_paint(
     mut save_layer_ptr: BorrowedPtr<SaveLayerRecWrapper>,
     paint_ptr: OwnedPtr<Paint>,
@@ -38,7 +38,7 @@ pub fn skia_layer_rec_set_paint(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_layer_rec_drop(ptr: OwnedPtr<SaveLayerRecWrapper>) {
     drop(ptr);
 }

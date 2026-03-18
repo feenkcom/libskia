@@ -1,8 +1,8 @@
-use skia_safe::image_filters::{blur, drop_shadow, drop_shadow_only, image, CropRect};
-use skia_safe::{scalar, Color, Image, ImageFilter, Rect, SamplingOptions, TileMode, Vector};
+use skia_safe::image_filters::{CropRect, blur, drop_shadow, drop_shadow_only, image};
+use skia_safe::{Color, Image, ImageFilter, Rect, SamplingOptions, TileMode, Vector, scalar};
 use value_box::{BorrowedPtr, OwnedPtr};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_filter_blur(
     sigma_x: scalar,
     sigma_y: scalar,
@@ -29,7 +29,7 @@ pub fn skia_image_filter_blur(
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_filter_image(
     image_ptr: BorrowedPtr<Image>,
     src_left: scalar,
@@ -57,7 +57,7 @@ pub fn skia_image_filter_image(
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_filter_drop_shadow(
     delta_x: scalar,
     delta_y: scalar,
@@ -98,7 +98,7 @@ pub fn skia_image_filter_drop_shadow(
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_filter_drop_shadow_only(
     delta_x: scalar,
     delta_y: scalar,
@@ -138,7 +138,7 @@ pub fn skia_image_filter_drop_shadow_only(
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_image_filter_drop(ptr: OwnedPtr<ImageFilter>) {
     drop(ptr);
 }

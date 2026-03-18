@@ -1,13 +1,13 @@
 use array_box::ArrayBox;
-use skia_safe::{scalar, Matrix};
+use skia_safe::{Matrix, scalar};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_matrix_new_identity() -> OwnedPtr<Matrix> {
     OwnedPtr::new(Matrix::new_identity())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_matrix_get_all(
     matrix_ptr: BorrowedPtr<Matrix>,
     mut buffer_ptr: BorrowedPtr<ArrayBox<scalar>>,
@@ -23,7 +23,7 @@ pub fn skia_matrix_get_all(
         .log()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_matrix_set_all(
     mut matrix_ptr: BorrowedPtr<Matrix>,
     scale_x: scalar,
@@ -45,7 +45,7 @@ pub fn skia_matrix_set_all(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_matrix_drop(ptr: OwnedPtr<Matrix>) {
     drop(ptr);
 }

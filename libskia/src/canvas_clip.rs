@@ -1,9 +1,9 @@
 use float_cmp::{ApproxEq, F32Margin};
 use reference_box::{ReferenceBox, ReferenceBoxPointer};
-use skia_safe::{scalar, Canvas, ClipOp, IRect, Path, QuickReject, RRect, Rect, Vector};
+use skia_safe::{Canvas, ClipOp, IRect, Path, QuickReject, RRect, Rect, Vector, scalar};
 use value_box::{BorrowedPtr, ReturnBoxerResult};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_clip_rect(
     canvas: *mut ReferenceBox<Canvas>,
     left: scalar,
@@ -29,7 +29,7 @@ pub fn skia_canvas_clip_rect(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_clip_path(
     canvas: *mut ReferenceBox<Canvas>,
     path: BorrowedPtr<Path>,
@@ -57,7 +57,7 @@ pub fn skia_canvas_clip_path(
 }
 
 /// I clip the canvas with a rounded rectangle using Intersect operation and anti-alias
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_clip_rounded_rectangle(
     canvas: *mut ReferenceBox<Canvas>,
     left: scalar,
@@ -93,7 +93,7 @@ pub fn skia_canvas_clip_rounded_rectangle(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_clip_circle(
     canvas: *mut ReferenceBox<Canvas>,
     center_x: scalar,
@@ -116,7 +116,7 @@ pub fn skia_canvas_clip_circle(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_clip_oval(
     canvas: *mut ReferenceBox<Canvas>,
     left: scalar,
@@ -140,7 +140,7 @@ pub fn skia_canvas_clip_oval(
     });
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_local_clip_bounds(
     canvas: *mut ReferenceBox<Canvas>,
     mut rect: BorrowedPtr<Rect>,
@@ -159,7 +159,7 @@ pub fn skia_canvas_local_clip_bounds(
     .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_device_clip_bounds(
     canvas: *mut ReferenceBox<Canvas>,
     mut rect: BorrowedPtr<IRect>,
@@ -178,7 +178,7 @@ pub fn skia_canvas_device_clip_bounds(
     .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_quick_reject_rectangle(
     canvas: *mut ReferenceBox<Canvas>,
     left: scalar,
@@ -191,7 +191,7 @@ pub fn skia_canvas_quick_reject_rectangle(
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_canvas_quick_reject_path(
     canvas: *mut ReferenceBox<Canvas>,
     path: BorrowedPtr<Path>,

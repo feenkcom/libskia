@@ -1,13 +1,13 @@
-use skia_safe::textlayout::{FontCollection, TypefaceFontProvider};
 use skia_safe::FontMgr;
+use skia_safe::textlayout::{FontCollection, TypefaceFontProvider};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_collection_new() -> OwnedPtr<FontCollection> {
     OwnedPtr::new(FontCollection::new())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_collection_font_managers_count(
     font_collection_ptr: BorrowedPtr<FontCollection>,
 ) -> usize {
@@ -16,7 +16,7 @@ pub fn skia_font_collection_font_managers_count(
         .or_log(0)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_collection_set_asset_font_manager(
     mut font_collection_ptr: BorrowedPtr<FontCollection>,
     typeface_font_provider: BorrowedPtr<TypefaceFontProvider>,
@@ -32,7 +32,7 @@ pub fn skia_font_collection_set_asset_font_manager(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_collection_set_default_font_manager(
     mut font_collection_ptr: BorrowedPtr<FontCollection>,
     font_manager_ptr: BorrowedPtr<FontMgr>,
@@ -46,7 +46,7 @@ pub fn skia_font_collection_set_default_font_manager(
         .log();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_font_collection_drop(ptr: OwnedPtr<FontCollection>) {
     drop(ptr);
 }

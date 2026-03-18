@@ -2,14 +2,14 @@ use skia_safe::{Font, GlyphId, Point, TextBlob, TextBlobBuilder, TextEncoding};
 use string_box::StringBox;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_text_blob_default() -> OwnedPtr<TextBlob> {
     TextBlob::from_str("Text", &Font::default())
         .map(OwnedPtr::new)
         .unwrap_or_else(OwnedPtr::null)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_text_blob_from_text(
     text: BorrowedPtr<StringBox>,
     _encoding: TextEncoding,
@@ -24,7 +24,7 @@ pub fn skia_text_blob_from_text(
     .unwrap_or_default()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_text_blob_from_glyphs(
     glyphs: *mut GlyphId,
     glyphs_length: usize,
@@ -44,7 +44,7 @@ pub fn skia_text_blob_from_glyphs(
     .unwrap_or_default()
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub fn skia_text_blob_drop(ptr: OwnedPtr<TextBlob>) {
     drop(ptr);
 }
