@@ -96,22 +96,22 @@ pub extern "C" fn skia_color_array_at_put(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_color_array_drop(ptr: OwnedPtr<ArrayBox<Color>>) {
-    drop(ptr);
+pub extern "C" fn skia_color_array_drop(array: OwnedPtr<ArrayBox<Color>>) {
+    drop(array);
 }
 
 #[test]
 pub fn test_skia_color_array() {
     let mut color = skia_color_default();
-    let mut array_ptr = skia_color_array_create_with(color, 5);
+    let mut array = skia_color_array_create_with(color, 5);
 
     assert_eq!(!color.is_null(), true);
-    assert_eq!(!array_ptr.is_null(), true);
+    assert_eq!(!array.is_null(), true);
 
-    skia_color_array_drop(array_ptr);
+    skia_color_array_drop(array);
 
     assert_eq!(!color.is_null(), true);
-    assert_eq!(!array_ptr.is_null(), false);
+    assert_eq!(!array.is_null(), false);
 
     skia_color_drop(color);
     assert_eq!(!color.is_null(), false);

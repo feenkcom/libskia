@@ -14,8 +14,8 @@ pub extern "C" fn skia_color_space_is_srgb(color_space: BorrowedPtr<ColorSpace>)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_color_space_drop(ptr: OwnedPtr<ColorSpace>) {
-    drop(ptr);
+pub extern "C" fn skia_color_space_drop(color_space: OwnedPtr<ColorSpace>) {
+    drop(color_space);
 }
 
 #[cfg(test)]

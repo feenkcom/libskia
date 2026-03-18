@@ -54,8 +54,8 @@ pub extern "C" fn skia_canvas_render_svg(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_svg_dom_drop(ptr: OwnedPtr<Dom>) {
-    drop(ptr);
+pub extern "C" fn skia_svg_dom_drop(dom: OwnedPtr<Dom>) {
+    drop(dom);
 }
 
 #[unsafe(no_mangle)]

@@ -1,4 +1,6 @@
-use skia_safe::image_filters::{CropRect, blur, drop_shadow, drop_shadow_only, image};
+use skia_safe::image_filters::{
+    CropRect, blur, drop_shadow, drop_shadow_only, image as image_filter,
+};
 use skia_safe::{Color, Image, ImageFilter, Rect, SamplingOptions, TileMode, Vector, scalar};
 use value_box::{BorrowedPtr, OwnedPtr};
 
@@ -7,9 +9,9 @@ pub extern "C" fn skia_image_filter_blur(
     sigma_x: scalar,
     sigma_y: scalar,
     tile_mode: TileMode,
-    input_ptr: BorrowedPtr<ImageFilter>,
+    input: BorrowedPtr<ImageFilter>,
 ) -> OwnedPtr<ImageFilter> {
-    let filter_option = input_ptr
+    let filter_option = input
         .with_option_ref(|value| {
             Ok(match value {
                 Some(input) => blur(
@@ -31,7 +33,7 @@ pub extern "C" fn skia_image_filter_blur(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_image_filter_image(
-    image_ptr: BorrowedPtr<Image>,
+    image: BorrowedPtr<Image>,
     src_left: scalar,
     src_top: scalar,
     src_right: scalar,
@@ -41,9 +43,9 @@ pub extern "C" fn skia_image_filter_image(
     dst_right: scalar,
     dst_bottom: scalar,
 ) -> OwnedPtr<ImageFilter> {
-    let filter_option = image_ptr
+    let filter_option = image
         .with_clone_ok(|image_source| {
-            image(
+            image_filter(
                 image_source,
                 Rect::new(src_left, src_top, src_right, src_bottom).as_ref(),
                 Rect::new(dst_left, dst_top, dst_right, dst_bottom).as_ref(),
@@ -67,9 +69,9 @@ pub extern "C" fn skia_image_filter_drop_shadow(
     g: u8,
     b: u8,
     a: u8,
-    input_ptr: BorrowedPtr<ImageFilter>,
+    input: BorrowedPtr<ImageFilter>,
 ) -> OwnedPtr<ImageFilter> {
-    let filter_option = input_ptr
+    let filter_option = input
         .with_option_ref(|value| {
             Ok(match value {
                 Some(input) => drop_shadow(
@@ -108,9 +110,9 @@ pub extern "C" fn skia_image_filter_drop_shadow_only(
     g: u8,
     b: u8,
     a: u8,
-    input_ptr: BorrowedPtr<ImageFilter>,
+    input: BorrowedPtr<ImageFilter>,
 ) -> OwnedPtr<ImageFilter> {
-    let filter_option = input_ptr
+    let filter_option = input
         .with_option_ref(|value| {
             Ok(match value {
                 Some(input) => drop_shadow_only(
@@ -139,6 +141,6 @@ pub extern "C" fn skia_image_filter_drop_shadow_only(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_filter_drop(ptr: OwnedPtr<ImageFilter>) {
-    drop(ptr);
+pub extern "C" fn skia_image_filter_drop(image_filter: OwnedPtr<ImageFilter>) {
+    drop(image_filter);
 }

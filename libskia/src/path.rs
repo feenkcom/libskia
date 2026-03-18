@@ -240,10 +240,10 @@ pub extern "C" fn skia_path_stroke_contains_point(
     path: BorrowedPtr<Path>,
     x: f32,
     y: f32,
-    paint_ptr: BorrowedPtr<Paint>,
+    paint: BorrowedPtr<Paint>,
 ) -> bool {
     path.with_ref(|path| {
-        paint_ptr.with_ref_ok(|paint| {
+        paint.with_ref_ok(|paint| {
             let mut fill_path: Path = Path::new();
             if fill_path_with_paint(path, paint, &mut fill_path, None, None) {
                 fill_path.contains(Point::new(x, y))

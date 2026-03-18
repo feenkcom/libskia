@@ -6,20 +6,20 @@ use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_gradient_linear_create(
-    from_point_ptr: BorrowedPtr<Point>,
-    to_point_ptr: BorrowedPtr<Point>,
-    colors_ptr: BorrowedPtr<ArrayBox<Color>>,
-    positions_ptr: BorrowedPtr<ArrayBox<scalar>>,
+    from_point: BorrowedPtr<Point>,
+    to_point: BorrowedPtr<Point>,
+    colors: BorrowedPtr<ArrayBox<Color>>,
+    positions: BorrowedPtr<ArrayBox<scalar>>,
     mode: TileMode,
     bit_flags: u32,
-    matrix_ptr: BorrowedPtr<Matrix>,
+    matrix: BorrowedPtr<Matrix>,
 ) -> OwnedPtr<Shader> {
-    from_point_ptr
+    from_point
         .with_clone(|from_point| {
-            to_point_ptr.with_clone(|to_point| {
-                colors_ptr.with_ref(|colors| {
-                    positions_ptr.with_ref(|positions| {
-                        matrix_ptr.with_ref_ok(|matrix| {
+            to_point.with_clone(|to_point| {
+                colors.with_ref(|colors| {
+                    positions.with_ref(|positions| {
+                        matrix.with_ref_ok(|matrix| {
                             match Shader::linear_gradient(
                                 (from_point, to_point),
                                 GradientShaderColors::Colors(colors.to_slice()),
@@ -41,19 +41,19 @@ pub extern "C" fn skia_gradient_linear_create(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_gradient_radial_create(
-    center_ptr: BorrowedPtr<Point>,
+    center: BorrowedPtr<Point>,
     radius: scalar,
-    colors_ptr: BorrowedPtr<ArrayBox<Color>>,
-    positions_ptr: BorrowedPtr<ArrayBox<scalar>>,
+    colors: BorrowedPtr<ArrayBox<Color>>,
+    positions: BorrowedPtr<ArrayBox<scalar>>,
     mode: TileMode,
     bit_flags: u32,
-    matrix_ptr: BorrowedPtr<Matrix>,
+    matrix: BorrowedPtr<Matrix>,
 ) -> OwnedPtr<Shader> {
-    center_ptr
+    center
         .with_clone(|center| {
-            colors_ptr.with_ref(|colors| {
-                positions_ptr.with_ref(|positions| {
-                    matrix_ptr.with_ref_ok(|matrix| {
+            colors.with_ref(|colors| {
+                positions.with_ref(|positions| {
+                    matrix.with_ref_ok(|matrix| {
                         match Shader::radial_gradient(
                             center,
                             radius,
@@ -75,22 +75,22 @@ pub extern "C" fn skia_gradient_radial_create(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_gradient_two_point_conical_create(
-    start_ptr: BorrowedPtr<Point>,
+    start: BorrowedPtr<Point>,
     start_radius: scalar,
-    end_ptr: BorrowedPtr<Point>,
+    end: BorrowedPtr<Point>,
     end_radius: scalar,
-    colors_ptr: BorrowedPtr<ArrayBox<Color>>,
-    positions_ptr: BorrowedPtr<ArrayBox<scalar>>,
+    colors: BorrowedPtr<ArrayBox<Color>>,
+    positions: BorrowedPtr<ArrayBox<scalar>>,
     mode: TileMode,
     bit_flags: u32,
-    matrix_ptr: BorrowedPtr<Matrix>,
+    matrix: BorrowedPtr<Matrix>,
 ) -> OwnedPtr<Shader> {
-    start_ptr
+    start
         .with_clone(|start| {
-            end_ptr.with_clone(|end| {
-                colors_ptr.with_ref(|colors| {
-                    positions_ptr.with_ref(|positions| {
-                        matrix_ptr.with_ref_ok(|matrix| {
+            end.with_clone(|end| {
+                colors.with_ref(|colors| {
+                    positions.with_ref(|positions| {
+                        matrix.with_ref_ok(|matrix| {
                             match Shader::two_point_conical_gradient(
                                 start,
                                 start_radius,
@@ -115,20 +115,20 @@ pub extern "C" fn skia_gradient_two_point_conical_create(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_gradient_sweep_create(
-    center_ptr: BorrowedPtr<Point>,
+    center: BorrowedPtr<Point>,
     start_angle: scalar,
     end_angle: scalar,
-    colors_ptr: BorrowedPtr<ArrayBox<Color>>,
-    positions_ptr: BorrowedPtr<ArrayBox<scalar>>,
+    colors: BorrowedPtr<ArrayBox<Color>>,
+    positions: BorrowedPtr<ArrayBox<scalar>>,
     mode: TileMode,
     bit_flags: u32,
-    matrix_ptr: BorrowedPtr<Matrix>,
+    matrix: BorrowedPtr<Matrix>,
 ) -> OwnedPtr<Shader> {
-    center_ptr
+    center
         .with_clone(|center| {
-            colors_ptr.with_ref(|colors| {
-                positions_ptr.with_ref(|positions| {
-                    matrix_ptr.with_ref_ok(|matrix| {
+            colors.with_ref(|colors| {
+                positions.with_ref(|positions| {
+                    matrix.with_ref_ok(|matrix| {
                         match Shader::sweep_gradient(
                             center,
                             GradientShaderColors::Colors(colors.to_slice()),

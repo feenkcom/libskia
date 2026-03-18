@@ -4,10 +4,10 @@ use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_path_effect_dash(
-    intervals_ptr: BorrowedPtr<ArrayBox<f32>>,
+    intervals: BorrowedPtr<ArrayBox<f32>>,
     phase: scalar,
 ) -> OwnedPtr<PathEffect> {
-    intervals_ptr
+    intervals
         .with_ref_ok(
             |intervals| match PathEffect::dash(intervals.to_slice(), phase) {
                 None => OwnedPtr::null(),
@@ -26,6 +26,6 @@ pub extern "C" fn skia_path_effect_corner(radius: scalar) -> OwnedPtr<PathEffect
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_path_effect_drop(ptr: OwnedPtr<PathEffect>) {
-    drop(ptr);
+pub extern "C" fn skia_path_effect_drop(path_effect: OwnedPtr<PathEffect>) {
+    drop(path_effect);
 }

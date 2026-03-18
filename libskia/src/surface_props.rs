@@ -37,6 +37,6 @@ pub extern "C" fn skia_surface_props_get_flags(surface_props: BorrowedPtr<Surfac
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_surface_props_drop(ptr: OwnedPtr<SurfaceProps>) {
-    drop(ptr);
+pub extern "C" fn skia_surface_props_drop(surface_props: OwnedPtr<SurfaceProps>) {
+    drop(surface_props);
 }

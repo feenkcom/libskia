@@ -4,8 +4,8 @@ use value_box::{BorrowedPtr, ReturnBoxerResult};
 /// Fill a given text blob with a color and disabled antialias
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_draw_text_blob_with_color(
-    canvas_ptr: BorrowedPtr<Canvas>,
-    text_blob_ptr: BorrowedPtr<TextBlob>,
+    canvas: BorrowedPtr<Canvas>,
+    text_blob: BorrowedPtr<TextBlob>,
     x: scalar,
     y: scalar,
     r: u8,
@@ -14,9 +14,9 @@ pub extern "C" fn skia_canvas_draw_text_blob_with_color(
     a: u8,
     antialias: bool,
 ) {
-    canvas_ptr
+    canvas
         .with_ref_ok(|canvas| {
-            text_blob_ptr
+            text_blob
                 .with_ref_ok(|text_blob| {
                     canvas.draw_text_blob(
                         text_blob,
@@ -34,15 +34,15 @@ pub extern "C" fn skia_canvas_draw_text_blob_with_color(
 /// Fill a given text blob with a color and disabled antialias
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_draw_text_blob_with_black_color(
-    canvas_ptr: BorrowedPtr<Canvas>,
-    text_blob_ptr: BorrowedPtr<TextBlob>,
+    canvas: BorrowedPtr<Canvas>,
+    text_blob: BorrowedPtr<TextBlob>,
     x: scalar,
     y: scalar,
     antialias: bool,
 ) {
-    canvas_ptr
+    canvas
         .with_ref_ok(|canvas| {
-            text_blob_ptr
+            text_blob
                 .with_ref_ok(|text_blob| {
                     canvas.draw_text_blob(
                         text_blob,

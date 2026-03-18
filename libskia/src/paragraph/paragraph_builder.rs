@@ -138,6 +138,8 @@ pub extern "C" fn skia_paragraph_builder_pop_style(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paragraph_builder_drop(ptr: OwnedPtr<ParagraphBuilderWithText>) {
-    drop(ptr);
+pub extern "C" fn skia_paragraph_builder_drop(
+    paragraph_builder: OwnedPtr<ParagraphBuilderWithText>,
+) {
+    drop(paragraph_builder);
 }

@@ -125,21 +125,22 @@ pub extern "C" fn skia_font_get_metrics(font: BorrowedPtr<Font>) -> OwnedPtr<Fon
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_font_text_to_glyphs(
     font: BorrowedPtr<Font>,
-    text_ptr: BorrowedPtr<StringBox>,
-    _encoding: TextEncoding,
-    mut glyphs_ptr: BorrowedPtr<ArrayBox<GlyphId>>,
-    paint_ptr: BorrowedPtr<Paint>,
-    mut bounds_ptr: BorrowedPtr<Rect>,
+    text: BorrowedPtr<StringBox>,
+    encoding: TextEncoding,
+    mut glyphs: BorrowedPtr<ArrayBox<GlyphId>>,
+    paint: BorrowedPtr<Paint>,
+    mut bounds: BorrowedPtr<Rect>,
 ) -> scalar {
+    let _ = encoding;
     font.with_ref(|font| {
-        glyphs_ptr.with_mut(|glyphs| {
-            text_ptr.with_ref_ok(|text| {
+        glyphs.with_mut(|glyphs| {
+            text.with_ref_ok(|text| {
                 let mut advance = 0.0;
                 let glyphs_vec = font.text_to_glyphs_vec(text.as_str());
                 if glyphs_vec.len() > 0 {
-                    paint_ptr
+                    paint
                         .with_ref(|paint| {
-                            bounds_ptr.with_mut_ok(|bounds| {
+                            bounds.with_mut_ok(|bounds| {
                                 // this is faster than computing ourselves
                                 let (text_advance, text_bounds) =
                                     font.measure_text(text.as_str(), Some(paint));
@@ -165,15 +166,16 @@ pub extern "C" fn skia_font_text_to_glyphs(
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_font_measure_text(
     font: BorrowedPtr<Font>,
-    text_ptr: BorrowedPtr<StringBox>,
-    _encoding: TextEncoding,
-    paint_ptr: BorrowedPtr<Paint>,
-    mut bounds_ptr: BorrowedPtr<Rect>,
+    text: BorrowedPtr<StringBox>,
+    encoding: TextEncoding,
+    paint: BorrowedPtr<Paint>,
+    mut bounds: BorrowedPtr<Rect>,
 ) -> scalar {
+    let _ = encoding;
     font.with_ref(|font| {
-        text_ptr.with_ref(|text| {
-            paint_ptr.with_ref(|paint| {
-                bounds_ptr.with_mut_ok(|bounds| {
+        text.with_ref(|text| {
+            paint.with_ref(|paint| {
+                bounds.with_mut_ok(|bounds| {
                     let metrics = font.measure_text(text.as_str(), Some(paint));
                     bounds.set_ltrb(
                         metrics.1.left,
@@ -190,6 +192,6 @@ pub extern "C" fn skia_font_measure_text(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_font_drop(ptr: OwnedPtr<Font>) {
-    drop(ptr);
+pub extern "C" fn skia_font_drop(font: OwnedPtr<Font>) {
+    drop(font);
 }

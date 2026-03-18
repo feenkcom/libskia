@@ -11,8 +11,8 @@ use value_box::{BorrowedPtr, ReturnBoxerResult};
 use crate::layer::SaveLayerRecWrapper;
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_canvas_clear(canvas_ptr: BorrowedPtr<Canvas>, r: u8, g: u8, b: u8, a: u8) {
-    canvas_ptr
+pub extern "C" fn skia_canvas_clear(canvas: BorrowedPtr<Canvas>, r: u8, g: u8, b: u8, a: u8) {
+    canvas
         .with_ref_ok(|canvas| {
             canvas.clear(Color::from_argb(a, r, g, b));
         })
@@ -21,14 +21,14 @@ pub extern "C" fn skia_canvas_clear(canvas_ptr: BorrowedPtr<Canvas>, r: u8, g: u
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_draw_color(
-    canvas_ptr: BorrowedPtr<Canvas>,
+    canvas: BorrowedPtr<Canvas>,
     r: u8,
     g: u8,
     b: u8,
     a: u8,
     blend_mode: BlendMode,
 ) {
-    canvas_ptr
+    canvas
         .with_ref_ok(|canvas| {
             canvas.draw_color(Color::from_argb(a, r, g, b), blend_mode);
         })
@@ -36,13 +36,10 @@ pub extern "C" fn skia_canvas_draw_color(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_canvas_draw_paint(
-    canvas_ptr: BorrowedPtr<Canvas>,
-    paint_ptr: BorrowedPtr<Paint>,
-) {
-    canvas_ptr
+pub extern "C" fn skia_canvas_draw_paint(canvas: BorrowedPtr<Canvas>, paint: BorrowedPtr<Paint>) {
+    canvas
         .with_ref_ok(|canvas| {
-            paint_ptr
+            paint
                 .with_ref_ok(|paint| {
                     canvas.draw_paint(paint);
                 })
@@ -53,16 +50,16 @@ pub extern "C" fn skia_canvas_draw_paint(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_draw_points(
-    canvas_ptr: BorrowedPtr<Canvas>,
+    canvas: BorrowedPtr<Canvas>,
     point_mode: PointMode,
-    points_ptr: BorrowedPtr<ArrayBox<Point>>,
-    paint_ptr: BorrowedPtr<Paint>,
+    points: BorrowedPtr<ArrayBox<Point>>,
+    paint: BorrowedPtr<Paint>,
 ) {
-    canvas_ptr
+    canvas
         .with_ref_ok(|canvas| {
-            paint_ptr
+            paint
                 .with_ref(|paint| {
-                    points_ptr.with_ref_ok(|points| {
+                    points.with_ref_ok(|points| {
                         canvas.draw_points(point_mode, points.to_slice(), paint);
                     })
                 })
@@ -73,14 +70,14 @@ pub extern "C" fn skia_canvas_draw_points(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_draw_point(
-    canvas_ptr: BorrowedPtr<Canvas>,
+    canvas: BorrowedPtr<Canvas>,
     x: scalar,
     y: scalar,
-    paint_ptr: BorrowedPtr<Paint>,
+    paint: BorrowedPtr<Paint>,
 ) {
-    canvas_ptr
+    canvas
         .with_ref_ok(|canvas| {
-            paint_ptr
+            paint
                 .with_ref_ok(|paint| {
                     canvas.draw_point(Point::new(x, y), paint);
                 })
@@ -91,16 +88,16 @@ pub extern "C" fn skia_canvas_draw_point(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_draw_line(
-    canvas_ptr: BorrowedPtr<Canvas>,
+    canvas: BorrowedPtr<Canvas>,
     from_x: scalar,
     from_y: scalar,
     to_x: scalar,
     to_y: scalar,
-    paint_ptr: BorrowedPtr<Paint>,
+    paint: BorrowedPtr<Paint>,
 ) {
-    canvas_ptr
+    canvas
         .with_ref_ok(|canvas| {
-            paint_ptr
+            paint
                 .with_ref_ok(|paint| {
                     canvas.draw_line(Point::new(from_x, from_y), Point::new(to_x, to_y), paint);
                 })
@@ -111,16 +108,16 @@ pub extern "C" fn skia_canvas_draw_line(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_draw_rectangle(
-    canvas_ptr: BorrowedPtr<Canvas>,
+    canvas: BorrowedPtr<Canvas>,
     left: scalar,
     top: scalar,
     right: scalar,
     bottom: scalar,
-    paint_ptr: BorrowedPtr<Paint>,
+    paint: BorrowedPtr<Paint>,
 ) {
-    canvas_ptr
+    canvas
         .with_ref_ok(|canvas| {
-            paint_ptr
+            paint
                 .with_ref_ok(|paint| {
                     canvas.draw_rect(Rect::new(left, top, right, bottom), paint);
                 })
@@ -131,16 +128,16 @@ pub extern "C" fn skia_canvas_draw_rectangle(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_draw_oval(
-    canvas_ptr: BorrowedPtr<Canvas>,
+    canvas: BorrowedPtr<Canvas>,
     left: scalar,
     top: scalar,
     right: scalar,
     bottom: scalar,
-    paint_ptr: BorrowedPtr<Paint>,
+    paint: BorrowedPtr<Paint>,
 ) {
-    canvas_ptr
+    canvas
         .with_ref_ok(|canvas| {
-            paint_ptr
+            paint
                 .with_ref_ok(|paint| {
                     canvas.draw_oval(Rect::new(left, top, right, bottom), paint);
                 })
@@ -151,15 +148,15 @@ pub extern "C" fn skia_canvas_draw_oval(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_draw_circle(
-    canvas_ptr: BorrowedPtr<Canvas>,
+    canvas: BorrowedPtr<Canvas>,
     center_x: scalar,
     center_y: scalar,
     radius: scalar,
-    paint_ptr: BorrowedPtr<Paint>,
+    paint: BorrowedPtr<Paint>,
 ) {
-    canvas_ptr
+    canvas
         .with_ref_ok(|canvas| {
-            paint_ptr
+            paint
                 .with_ref_ok(|paint| {
                     canvas.draw_circle(Point::new(center_x, center_y), radius, paint);
                 })
@@ -170,15 +167,15 @@ pub extern "C" fn skia_canvas_draw_circle(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_draw_rrect(
-    canvas_ptr: BorrowedPtr<Canvas>,
-    rrect_ptr: BorrowedPtr<RRect>,
-    paint_ptr: BorrowedPtr<Paint>,
+    canvas: BorrowedPtr<Canvas>,
+    rrect: BorrowedPtr<RRect>,
+    paint: BorrowedPtr<Paint>,
 ) {
-    canvas_ptr
+    canvas
         .with_ref_ok(|canvas| {
-            rrect_ptr
+            rrect
                 .with_ref(|rrect| {
-                    paint_ptr.with_ref_ok(|paint| {
+                    paint.with_ref_ok(|paint| {
                         canvas.draw_rrect(rrect, paint);
                     })
                 })
@@ -189,7 +186,7 @@ pub extern "C" fn skia_canvas_draw_rrect(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_draw_rounded_rectangle(
-    canvas_ptr: BorrowedPtr<Canvas>,
+    canvas: BorrowedPtr<Canvas>,
     left: scalar,
     top: scalar,
     right: scalar,
@@ -198,11 +195,11 @@ pub extern "C" fn skia_canvas_draw_rounded_rectangle(
     r_top_right: scalar,
     r_bottom_right: scalar,
     r_bottom_left: scalar,
-    paint_ptr: BorrowedPtr<Paint>,
+    paint: BorrowedPtr<Paint>,
 ) {
-    canvas_ptr
+    canvas
         .with_ref_ok(|canvas| {
-            paint_ptr
+            paint
                 .with_ref_ok(|paint| {
                     // if all radii are same we can use a simpler optimized drawing method
                     if r_top_left.approx_eq_ulps(&r_top_right, 2)
@@ -238,15 +235,15 @@ pub extern "C" fn skia_canvas_draw_rounded_rectangle(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_draw_path(
-    canvas_ptr: BorrowedPtr<Canvas>,
-    path_ptr: BorrowedPtr<Path>,
-    paint_ptr: BorrowedPtr<Paint>,
+    canvas: BorrowedPtr<Canvas>,
+    path: BorrowedPtr<Path>,
+    paint: BorrowedPtr<Paint>,
 ) {
-    canvas_ptr
+    canvas
         .with_ref_ok(|canvas| {
-            paint_ptr
+            paint
                 .with_ref(|paint| {
-                    path_ptr.with_ref_ok(|path| {
+                    path.with_ref_ok(|path| {
                         canvas.draw_path(path, paint);
                     })
                 })
@@ -257,18 +254,18 @@ pub extern "C" fn skia_canvas_draw_path(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_draw_text_blob(
-    canvas_ptr: BorrowedPtr<Canvas>,
-    text_blob_ptr: BorrowedPtr<TextBlob>,
+    canvas: BorrowedPtr<Canvas>,
+    text_blob: BorrowedPtr<TextBlob>,
     x: scalar,
     y: scalar,
-    paint_ptr: BorrowedPtr<Paint>,
+    paint: BorrowedPtr<Paint>,
 ) {
-    canvas_ptr
+    canvas
         .with_ref_ok(|canvas| {
-            paint_ptr
+            paint
                 .with_ref(|paint| {
                     // text blob can be nil if it was created from an empty string
-                    text_blob_ptr.with_ref_ok(|text_blob| {
+                    text_blob.with_ref_ok(|text_blob| {
                         canvas.draw_text_blob(text_blob, Point::new(x, y), paint);
                     })
                 })
@@ -279,57 +276,57 @@ pub extern "C" fn skia_canvas_draw_text_blob(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_draw_shadow(
-    canvas_ptr: BorrowedPtr<Canvas>,
-    path_ptr: BorrowedPtr<Path>,
-    z_plane_ptr: BorrowedPtr<Point3>,
-    light_pos_ptr: BorrowedPtr<Point3>,
+    canvas: BorrowedPtr<Canvas>,
+    path: BorrowedPtr<Path>,
+    z_plane: BorrowedPtr<Point3>,
+    light_pos: BorrowedPtr<Point3>,
     light_radius: scalar,
-    ambient_color_ptr: BorrowedPtr<Color>,
-    spot_color_ptr: BorrowedPtr<Color>,
-    _bit_flags: u32,
+    ambient_color: BorrowedPtr<Color>,
+    spot_color: BorrowedPtr<Color>,
+    bit_flags: u32,
 ) {
-    canvas_ptr
+    let _ = bit_flags;
+    canvas
         .with_ref_ok(|canvas| {
-            path_ptr
-                .with_ref(|path| {
-                    z_plane_ptr.with_clone(|z_plane| {
-                        light_pos_ptr.with_clone(|light_pos| {
-                            ambient_color_ptr.with_clone(|ambient_color| {
-                                spot_color_ptr.with_clone_ok(|spot_color| {
-                                    draw_shadow(
-                                        canvas,
-                                        path,
-                                        z_plane,
-                                        light_pos,
-                                        light_radius,
-                                        ambient_color,
-                                        spot_color,
-                                        ShadowFlags::ALL, /*from_bits_truncate(bit_flags)*/
-                                    );
-                                })
+            path.with_ref(|path| {
+                z_plane.with_clone(|z_plane| {
+                    light_pos.with_clone(|light_pos| {
+                        ambient_color.with_clone(|ambient_color| {
+                            spot_color.with_clone_ok(|spot_color| {
+                                draw_shadow(
+                                    canvas,
+                                    path,
+                                    z_plane,
+                                    light_pos,
+                                    light_radius,
+                                    ambient_color,
+                                    spot_color,
+                                    ShadowFlags::ALL, /*from_bits_truncate(bit_flags)*/
+                                );
                             })
                         })
                     })
                 })
-                .log();
+            })
+            .log();
         })
         .log();
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_draw_image(
-    canvas_ptr: BorrowedPtr<Canvas>,
-    image_ptr: BorrowedPtr<Image>, // may be null
+    canvas: BorrowedPtr<Canvas>,
+    image: BorrowedPtr<Image>, // may be null
     x: scalar,
     y: scalar,
-    paint_ptr: BorrowedPtr<Paint>,
+    paint: BorrowedPtr<Paint>,
 ) {
-    canvas_ptr
+    canvas
         .with_ref_ok(|canvas| {
-            image_ptr
+            image
                 .with_ref(|image| {
-                    if !paint_ptr.is_null() {
-                        paint_ptr.with_ref_ok(|paint| {
+                    if !paint.is_null() {
+                        paint.with_ref_ok(|paint| {
                             canvas.draw_image_with_sampling_options(
                                 image,
                                 Point::new(x, y),
@@ -353,8 +350,8 @@ pub extern "C" fn skia_canvas_draw_image(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_canvas_translate(canvas_ptr: BorrowedPtr<Canvas>, x: scalar, y: scalar) {
-    canvas_ptr
+pub extern "C" fn skia_canvas_translate(canvas: BorrowedPtr<Canvas>, x: scalar, y: scalar) {
+    canvas
         .with_ref_ok(|canvas| {
             canvas.translate(Vector::new(x, y));
         })
@@ -362,8 +359,8 @@ pub extern "C" fn skia_canvas_translate(canvas_ptr: BorrowedPtr<Canvas>, x: scal
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_canvas_scale(canvas_ptr: BorrowedPtr<Canvas>, sx: scalar, sy: scalar) {
-    canvas_ptr
+pub extern "C" fn skia_canvas_scale(canvas: BorrowedPtr<Canvas>, sx: scalar, sy: scalar) {
+    canvas
         .with_ref_ok(|canvas| {
             canvas.scale((sx, sy));
         })
@@ -372,12 +369,12 @@ pub extern "C" fn skia_canvas_scale(canvas_ptr: BorrowedPtr<Canvas>, sx: scalar,
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_rotate(
-    canvas_ptr: BorrowedPtr<Canvas>,
+    canvas: BorrowedPtr<Canvas>,
     degrees: scalar,
     x: scalar,
     y: scalar,
 ) {
-    canvas_ptr
+    canvas
         .with_ref_ok(|canvas| {
             canvas.rotate(degrees, Some(Point::new(x, y)));
         })
@@ -385,8 +382,8 @@ pub extern "C" fn skia_canvas_rotate(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_canvas_skew(canvas_ptr: BorrowedPtr<Canvas>, sx: scalar, sy: scalar) {
-    canvas_ptr
+pub extern "C" fn skia_canvas_skew(canvas: BorrowedPtr<Canvas>, sx: scalar, sy: scalar) {
+    canvas
         .with_ref_ok(|canvas| {
             canvas.skew((sx, sy));
         })
@@ -395,12 +392,12 @@ pub extern "C" fn skia_canvas_skew(canvas_ptr: BorrowedPtr<Canvas>, sx: scalar, 
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_concat_matrix(
-    canvas_ptr: BorrowedPtr<Canvas>,
-    matrix_ptr: BorrowedPtr<Matrix>,
+    canvas: BorrowedPtr<Canvas>,
+    matrix: BorrowedPtr<Matrix>,
 ) {
-    canvas_ptr
+    canvas
         .with_ref_ok(|canvas| {
-            matrix_ptr
+            matrix
                 .with_ref_ok(|matrix| {
                     canvas.concat(matrix);
                 })
@@ -410,13 +407,10 @@ pub extern "C" fn skia_canvas_concat_matrix(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_canvas_set_matrix(
-    canvas_ptr: BorrowedPtr<Canvas>,
-    matrix_ptr: BorrowedPtr<Matrix>,
-) {
-    canvas_ptr
+pub extern "C" fn skia_canvas_set_matrix(canvas: BorrowedPtr<Canvas>, matrix: BorrowedPtr<Matrix>) {
+    canvas
         .with_ref_ok(|canvas| {
-            matrix_ptr
+            matrix
                 .with_ref_ok(|matrix| {
                     canvas.set_matrix(&M44::from(matrix));
                 })
@@ -427,12 +421,12 @@ pub extern "C" fn skia_canvas_set_matrix(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_get_matrix(
-    canvas_ptr: BorrowedPtr<Canvas>,
-    mut matrix_ptr: BorrowedPtr<Matrix>,
+    canvas: BorrowedPtr<Canvas>,
+    mut matrix: BorrowedPtr<Matrix>,
 ) {
-    canvas_ptr
+    canvas
         .with_ref_ok(|canvas| {
-            matrix_ptr
+            matrix
                 .with_mut_ok(|matrix| {
                     let m = canvas.local_to_device_as_3x3();
                     let mut buffer: [scalar; 9] = [0.0; 9];
@@ -445,8 +439,8 @@ pub extern "C" fn skia_canvas_get_matrix(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_canvas_reset_matrix(canvas_ptr: BorrowedPtr<Canvas>) {
-    canvas_ptr
+pub extern "C" fn skia_canvas_reset_matrix(canvas: BorrowedPtr<Canvas>) {
+    canvas
         .with_ref_ok(|canvas| {
             canvas.reset_matrix();
         })
@@ -455,25 +449,24 @@ pub extern "C" fn skia_canvas_reset_matrix(canvas_ptr: BorrowedPtr<Canvas>) {
 
 #[unsafe(no_mangle)]
 #[deprecated(since = "0.38.0", note = "Replace usage with DirectContext::flush()")]
-pub fn skia_canvas_flush(_canvas_ptr: BorrowedPtr<Canvas>) {
+pub fn skia_canvas_flush(canvas: BorrowedPtr<Canvas>) {
+    let _ = canvas;
     eprintln!("skia_canvas_flush is deprecated. Use DirectContext::flush() instead")
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_canvas_save(canvas_ptr: BorrowedPtr<Canvas>) -> usize {
-    canvas_ptr.with_ref_ok(|canvas| canvas.save()).or_log(0)
+pub extern "C" fn skia_canvas_save(canvas: BorrowedPtr<Canvas>) -> usize {
+    canvas.with_ref_ok(|canvas| canvas.save()).or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_canvas_save_count(canvas_ptr: BorrowedPtr<Canvas>) -> usize {
-    canvas_ptr
-        .with_ref_ok(|canvas| canvas.save_count())
-        .or_log(0)
+pub extern "C" fn skia_canvas_save_count(canvas: BorrowedPtr<Canvas>) -> usize {
+    canvas.with_ref_ok(|canvas| canvas.save_count()).or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_canvas_restore(canvas_ptr: BorrowedPtr<Canvas>) {
-    canvas_ptr
+pub extern "C" fn skia_canvas_restore(canvas: BorrowedPtr<Canvas>) {
+    canvas
         .with_ref_ok(|canvas| {
             canvas.restore();
         })
@@ -481,8 +474,8 @@ pub extern "C" fn skia_canvas_restore(canvas_ptr: BorrowedPtr<Canvas>) {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_canvas_restore_to_count(canvas_ptr: BorrowedPtr<Canvas>, count: usize) {
-    canvas_ptr
+pub extern "C" fn skia_canvas_restore_to_count(canvas: BorrowedPtr<Canvas>, count: usize) {
+    canvas
         .with_ref_ok(|canvas| {
             canvas.restore_to_count(count);
         })
@@ -491,12 +484,12 @@ pub extern "C" fn skia_canvas_restore_to_count(canvas_ptr: BorrowedPtr<Canvas>, 
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_save_layer(
-    canvas_ptr: BorrowedPtr<Canvas>,
-    mut _save_layer_ptr: BorrowedPtr<SaveLayerRecWrapper>,
+    canvas: BorrowedPtr<Canvas>,
+    save_layer: BorrowedPtr<SaveLayerRecWrapper>,
 ) -> usize {
-    canvas_ptr
+    canvas
         .with_ref_ok(|canvas| {
-            _save_layer_ptr
+            save_layer
                 .with_ref_ok(|save_rec| {
                     let mut rec: SaveLayerRec = SaveLayerRec::default();
                     if save_rec.bounds.is_some() {
@@ -513,4 +506,6 @@ pub extern "C" fn skia_canvas_save_layer(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_canvas_drop(_ptr: BorrowedPtr<Canvas>) {}
+pub extern "C" fn skia_canvas_drop(canvas: BorrowedPtr<Canvas>) {
+    let _ = canvas;
+}

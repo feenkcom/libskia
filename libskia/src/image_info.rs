@@ -27,9 +27,9 @@ pub extern "C" fn skia_image_info_new_with_color_space(
     height: i32,
     color_type: ColorType,
     alpha_type: AlphaType,
-    color_space_ptr: BorrowedPtr<ColorSpace>,
+    color_space: BorrowedPtr<ColorSpace>,
 ) -> OwnedPtr<ImageInfo> {
-    color_space_ptr
+    color_space
         .with_clone_ok(|color_space| {
             OwnedPtr::new(ImageInfo::new(
                 ISize::new(width, height),
@@ -51,73 +51,65 @@ pub extern "C" fn skia_image_info_new_s32(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_info_min_row_bytes(image_info_ptr: BorrowedPtr<ImageInfo>) -> usize {
-    image_info_ptr
+pub extern "C" fn skia_image_info_min_row_bytes(image_info: BorrowedPtr<ImageInfo>) -> usize {
+    image_info
         .with_clone_ok(|image_info| image_info.min_row_bytes())
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_image_info_compute_byte_size(
-    image_info_ptr: BorrowedPtr<ImageInfo>,
+    image_info: BorrowedPtr<ImageInfo>,
     row_bytes: usize,
 ) -> usize {
-    image_info_ptr
+    image_info
         .with_clone_ok(|image_info| image_info.compute_byte_size(row_bytes))
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_info_get_width(image_info_ptr: BorrowedPtr<ImageInfo>) -> i32 {
-    image_info_ptr
+pub extern "C" fn skia_image_info_get_width(image_info: BorrowedPtr<ImageInfo>) -> i32 {
+    image_info
         .with_clone_ok(|image_info| image_info.width())
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_info_get_height(image_info_ptr: BorrowedPtr<ImageInfo>) -> i32 {
-    image_info_ptr
+pub extern "C" fn skia_image_info_get_height(image_info: BorrowedPtr<ImageInfo>) -> i32 {
+    image_info
         .with_clone_ok(|image_info| image_info.height())
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_info_get_color_type(
-    image_info_ptr: BorrowedPtr<ImageInfo>,
-) -> ColorType {
-    image_info_ptr
+pub extern "C" fn skia_image_info_get_color_type(image_info: BorrowedPtr<ImageInfo>) -> ColorType {
+    image_info
         .with_clone_ok(|image_info| image_info.color_type())
         .or_log(ColorType::Unknown)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_info_get_alpha_type(
-    image_info_ptr: BorrowedPtr<ImageInfo>,
-) -> AlphaType {
-    image_info_ptr
+pub extern "C" fn skia_image_info_get_alpha_type(image_info: BorrowedPtr<ImageInfo>) -> AlphaType {
+    image_info
         .with_clone_ok(|image_info| image_info.alpha_type())
         .or_log(AlphaType::Unknown)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_info_get_bytes_per_pixel(
-    image_info_ptr: BorrowedPtr<ImageInfo>,
-) -> usize {
-    image_info_ptr
+pub extern "C" fn skia_image_info_get_bytes_per_pixel(image_info: BorrowedPtr<ImageInfo>) -> usize {
+    image_info
         .with_clone_ok(|image_info| image_info.bytes_per_pixel())
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_info_get_shift_per_pixel(
-    image_info_ptr: BorrowedPtr<ImageInfo>,
-) -> usize {
-    image_info_ptr
+pub extern "C" fn skia_image_info_get_shift_per_pixel(image_info: BorrowedPtr<ImageInfo>) -> usize {
+    image_info
         .with_clone_ok(|image_info| image_info.shift_per_pixel())
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_info_drop(ptr: OwnedPtr<ImageInfo>) {
-    drop(ptr);
+pub extern "C" fn skia_image_info_drop(image_info: OwnedPtr<ImageInfo>) {
+    drop(image_info);
 }

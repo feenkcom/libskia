@@ -34,40 +34,34 @@ pub extern "C" fn skia_rounded_rectangle_new_radii(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_rounded_rectangle_get_type(
-    rounded_rectangle_ptr: BorrowedPtr<RRect>,
-) -> Type {
-    rounded_rectangle_ptr
+pub extern "C" fn skia_rounded_rectangle_get_type(rounded_rectangle: BorrowedPtr<RRect>) -> Type {
+    rounded_rectangle
         .with_ref_ok(|rounded_rectangle| rounded_rectangle.get_type())
         .or_log(Type::Empty)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_rounded_rectangle_width(
-    rounded_rectangle_ptr: BorrowedPtr<RRect>,
-) -> scalar {
-    rounded_rectangle_ptr
+pub extern "C" fn skia_rounded_rectangle_width(rounded_rectangle: BorrowedPtr<RRect>) -> scalar {
+    rounded_rectangle
         .with_ref_ok(|rounded_rectangle| rounded_rectangle.width())
         .or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_rounded_rectangle_height(
-    rounded_rectangle_ptr: BorrowedPtr<RRect>,
-) -> scalar {
-    rounded_rectangle_ptr
+pub extern "C" fn skia_rounded_rectangle_height(rounded_rectangle: BorrowedPtr<RRect>) -> scalar {
+    rounded_rectangle
         .with_ref_ok(|rounded_rectangle| rounded_rectangle.height())
         .or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_rounded_rectangle_set_rect(
-    mut rounded_rectangle_ptr: BorrowedPtr<RRect>,
-    rectangle_ptr: BorrowedPtr<Rect>,
+    mut rounded_rectangle: BorrowedPtr<RRect>,
+    rectangle: BorrowedPtr<Rect>,
 ) {
-    rounded_rectangle_ptr
+    rounded_rectangle
         .with_mut(|rounded_rectangle| {
-            rectangle_ptr.with_ref_ok(|rectangle| {
+            rectangle.with_ref_ok(|rectangle| {
                 rounded_rectangle.set_rect(rectangle);
             })
         })
@@ -76,12 +70,12 @@ pub extern "C" fn skia_rounded_rectangle_set_rect(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_rounded_rectangle_set_oval(
-    mut rounded_rectangle_ptr: BorrowedPtr<RRect>,
-    oval_ptr: BorrowedPtr<Rect>,
+    mut rounded_rectangle: BorrowedPtr<RRect>,
+    oval: BorrowedPtr<Rect>,
 ) {
-    rounded_rectangle_ptr
+    rounded_rectangle
         .with_mut(|rounded_rectangle| {
-            oval_ptr.with_ref_ok(|oval| {
+            oval.with_ref_ok(|oval| {
                 rounded_rectangle.set_oval(oval);
             })
         })
@@ -89,8 +83,8 @@ pub extern "C" fn skia_rounded_rectangle_set_oval(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_rounded_rectangle_drop(ptr: OwnedPtr<RRect>) {
-    drop(ptr);
+pub extern "C" fn skia_rounded_rectangle_drop(rounded_rectangle: OwnedPtr<RRect>) {
+    drop(rounded_rectangle);
 }
 
 #[cfg(test)]

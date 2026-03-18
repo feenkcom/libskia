@@ -9,12 +9,12 @@ pub extern "C" fn skia_matrix_new_identity() -> OwnedPtr<Matrix> {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_matrix_get_all(
-    matrix_ptr: BorrowedPtr<Matrix>,
-    mut buffer_ptr: BorrowedPtr<ArrayBox<scalar>>,
+    matrix: BorrowedPtr<Matrix>,
+    mut buffer: BorrowedPtr<ArrayBox<scalar>>,
 ) {
-    matrix_ptr
+    matrix
         .with_ref(|matrix| {
-            buffer_ptr.with_mut_ok(|buffer| {
+            buffer.with_mut_ok(|buffer| {
                 let mut members: [scalar; 9] = [0.0; 9];
                 matrix.get_9(&mut members);
                 buffer.set_array(&members);
@@ -25,7 +25,7 @@ pub extern "C" fn skia_matrix_get_all(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_matrix_set_all(
-    mut matrix_ptr: BorrowedPtr<Matrix>,
+    mut matrix: BorrowedPtr<Matrix>,
     scale_x: scalar,
     skew_x: scalar,
     trans_x: scalar,
@@ -36,7 +36,7 @@ pub extern "C" fn skia_matrix_set_all(
     persp_1: scalar,
     persp_2: scalar,
 ) {
-    matrix_ptr
+    matrix
         .with_mut_ok(|matrix| {
             matrix.set_all(
                 scale_x, skew_x, trans_x, skew_y, scale_y, trans_y, persp_0, persp_1, persp_2,
@@ -46,6 +46,6 @@ pub extern "C" fn skia_matrix_set_all(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_matrix_drop(ptr: OwnedPtr<Matrix>) {
-    drop(ptr);
+pub extern "C" fn skia_matrix_drop(matrix: OwnedPtr<Matrix>) {
+    drop(matrix);
 }

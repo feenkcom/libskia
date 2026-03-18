@@ -124,6 +124,6 @@ pub extern "C" fn skia_font_metrics_get_strikeout_position(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_font_metrics_drop(ptr: OwnedPtr<FontMetrics>) {
-    drop(ptr);
+pub extern "C" fn skia_font_metrics_drop(font_metrics: OwnedPtr<FontMetrics>) {
+    drop(font_metrics);
 }

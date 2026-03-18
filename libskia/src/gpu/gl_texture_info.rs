@@ -34,23 +34,24 @@ pub extern "C" fn skia_texture_info_get_format(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_texture_info_set_format(
-    mut _ptr: BorrowedPtr<TextureInfo>,
+    mut texture_info: BorrowedPtr<TextureInfo>,
     format: std::os::raw::c_uint,
 ) {
-    _ptr.with_mut_ok(|texture_info| texture_info.format = format)
+    texture_info
+        .with_mut_ok(|texture_info| texture_info.format = format)
         .log();
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_texture_info_get_id(
-    mut texture_info_ptr: BorrowedPtr<TextureInfo>,
+    mut texture_info: BorrowedPtr<TextureInfo>,
 ) -> std::os::raw::c_uint {
-    texture_info_ptr
+    texture_info
         .with_mut_ok(|texture_info| texture_info.id)
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_texture_info_drop(mut ptr: OwnedPtr<TextureInfo>) {
-    drop(ptr);
+pub extern "C" fn skia_texture_info_drop(mut texture_info: OwnedPtr<TextureInfo>) {
+    drop(texture_info);
 }

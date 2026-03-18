@@ -4,13 +4,13 @@ use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_surface_new_raster_direct(
-    image_info_ptr: BorrowedPtr<ImageInfo>,
-    mut pixels_ptr: BorrowedPtr<ArrayBox<u8>>,
+    image_info: BorrowedPtr<ImageInfo>,
+    mut pixels: BorrowedPtr<ArrayBox<u8>>,
     row_bytes: usize,
 ) -> OwnedPtr<Surface> {
-    image_info_ptr
+    image_info
         .with_clone(|image_info| {
-            pixels_ptr.with_mut_ok(|pixels| {
+            pixels.with_mut_ok(|pixels| {
                 let surface_option = surfaces::wrap_pixels(
                     &image_info,
                     pixels.to_slice_mut(),
@@ -50,11 +50,11 @@ pub extern "C" fn skia_surface_new_default() -> OwnedPtr<Surface> {
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_surface_new_similar(
     mut surface: BorrowedPtr<Surface>,
-    ptr_image_info: BorrowedPtr<ImageInfo>,
+    image_info: BorrowedPtr<ImageInfo>,
 ) -> OwnedPtr<Surface> {
     surface
         .with_mut(|surface| {
-            ptr_image_info.with_ref_ok(|image_info| {
+            image_info.with_ref_ok(|image_info| {
                 let surface_option = surface.new_surface(image_info);
                 match surface_option {
                     None => {
@@ -119,11 +119,11 @@ pub extern "C" fn skia_surface_get_image_info(
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_surface_read_all_pixels(
     mut surface: BorrowedPtr<Surface>,
-    mut pixels_ptr: BorrowedPtr<ArrayBox<u8>>,
+    mut pixels: BorrowedPtr<ArrayBox<u8>>,
 ) -> bool {
     surface
         .with_mut(|surface| {
-            pixels_ptr.with_mut_ok(|pixels| {
+            pixels.with_mut_ok(|pixels| {
                 let image_info = surface.image_info();
                 let row_bytes = image_info.min_row_bytes();
                 surface.read_pixels(
@@ -147,11 +147,12 @@ pub extern "C" fn skia_surface_get_image_snapshot(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_surface_flush(mut _surface: BorrowedPtr<Surface>) {
+pub extern "C" fn skia_surface_flush(mut surface: BorrowedPtr<Surface>) {
+    let _ = &mut surface;
     warn!("[skia_surface_flush] surface flush is deprecated. Use DirectContext instead")
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_surface_drop(ptr: OwnedPtr<Surface>) {
-    drop(ptr);
+pub extern "C" fn skia_surface_drop(surface: OwnedPtr<Surface>) {
+    drop(surface);
 }

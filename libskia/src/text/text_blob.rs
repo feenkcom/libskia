@@ -45,6 +45,6 @@ pub extern "C" fn skia_text_blob_from_glyphs(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_text_blob_drop(ptr: OwnedPtr<TextBlob>) {
-    drop(ptr);
+pub extern "C" fn skia_text_blob_drop(text_blob: OwnedPtr<TextBlob>) {
+    drop(text_blob);
 }

@@ -5,9 +5,9 @@ use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 #[cfg(feature = "gl")]
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_context_new_gl(
-    interface_ptr: BorrowedPtr<skia_safe::gpu::gl::Interface>,
+    interface: BorrowedPtr<skia_safe::gpu::gl::Interface>,
 ) -> OwnedPtr<DirectContext> {
-    interface_ptr
+    interface
         .with_clone_ok(|interface| match DirectContext::new_gl(interface, None) {
             None => {
                 if cfg!(debug_assertions) {
@@ -15,7 +15,7 @@ pub extern "C" fn skia_context_new_gl(
                 }
                 OwnedPtr::null()
             }
-            Some(_context) => OwnedPtr::new(_context),
+            Some(context) => OwnedPtr::new(context),
         })
         .or_log(OwnedPtr::null())
 }
@@ -48,33 +48,34 @@ pub extern "C" fn skia_context_get_max_surface_sample_count_for_color_type(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_context_is_color_type_supported_as_image(
-    context_ptr: BorrowedPtr<DirectContext>,
+    context: BorrowedPtr<DirectContext>,
     color_type: ColorType,
 ) -> bool {
-    context_ptr
+    context
         .with_clone_ok(|context| context.color_type_supported_as_image(color_type))
         .or_log(false)
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_context_is_color_type_supported_as_surface(
-    context_ptr: BorrowedPtr<DirectContext>,
+    context: BorrowedPtr<DirectContext>,
     color_type: ColorType,
 ) -> bool {
-    context_ptr
+    context
         .with_clone_ok(|context| context.color_type_supported_as_surface(color_type))
         .or_log(false)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_context_flush(mut ptr: BorrowedPtr<DirectContext>) {
-    ptr.with_mut_ok(|context| {
-        context.flush_and_submit();
-    })
-    .log();
+pub extern "C" fn skia_context_flush(mut context: BorrowedPtr<DirectContext>) {
+    context
+        .with_mut_ok(|context| {
+            context.flush_and_submit();
+        })
+        .log();
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_context_drop(ptr: OwnedPtr<DirectContext>) {
-    drop(ptr);
+pub extern "C" fn skia_context_drop(context: OwnedPtr<DirectContext>) {
+    drop(context);
 }

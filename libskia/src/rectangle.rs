@@ -12,13 +12,13 @@ pub extern "C" fn skia_rectangle_f32_default() -> OwnedPtr<Rect> {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_rectangle_f32_set_ltrb(
-    mut rectangle_ptr: BorrowedPtr<Rect>,
+    mut rectangle: BorrowedPtr<Rect>,
     left: scalar,
     top: scalar,
     right: scalar,
     bottom: scalar,
 ) {
-    rectangle_ptr
+    rectangle
         .with_mut_ok(|rectangle| {
             rectangle.set_ltrb(left, top, right, bottom);
         })
@@ -26,36 +26,36 @@ pub extern "C" fn skia_rectangle_f32_set_ltrb(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_rectangle_f32_left(rectangle_ptr: BorrowedPtr<Rect>) -> scalar {
-    rectangle_ptr
+pub extern "C" fn skia_rectangle_f32_left(rectangle: BorrowedPtr<Rect>) -> scalar {
+    rectangle
         .with_ref_ok(|rectangle| rectangle.left())
         .or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_rectangle_f32_top(rectangle_ptr: BorrowedPtr<Rect>) -> scalar {
-    rectangle_ptr
+pub extern "C" fn skia_rectangle_f32_top(rectangle: BorrowedPtr<Rect>) -> scalar {
+    rectangle
         .with_ref_ok(|rectangle| rectangle.top())
         .or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_rectangle_f32_right(rectangle_ptr: BorrowedPtr<Rect>) -> scalar {
-    rectangle_ptr
+pub extern "C" fn skia_rectangle_f32_right(rectangle: BorrowedPtr<Rect>) -> scalar {
+    rectangle
         .with_ref_ok(|rectangle| rectangle.right())
         .or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_rectangle_f32_bottom(rectangle_ptr: BorrowedPtr<Rect>) -> scalar {
-    rectangle_ptr
+pub extern "C" fn skia_rectangle_f32_bottom(rectangle: BorrowedPtr<Rect>) -> scalar {
+    rectangle
         .with_ref_ok(|rectangle| rectangle.bottom())
         .or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_rectangle_f32_drop(ptr: OwnedPtr<Rect>) {
-    drop(ptr);
+pub extern "C" fn skia_rectangle_f32_drop(rectangle: OwnedPtr<Rect>) {
+    drop(rectangle);
 }
 
 ///
@@ -69,13 +69,13 @@ pub extern "C" fn skia_rectangle_i32_default() -> OwnedPtr<IRect> {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_rectangle_i32_set_ltrb(
-    mut rectangle_ptr: BorrowedPtr<IRect>,
+    mut rectangle: BorrowedPtr<IRect>,
     left: i32,
     top: i32,
     right: i32,
     bottom: i32,
 ) {
-    rectangle_ptr
+    rectangle
         .with_mut_ok(|rectangle| {
             rectangle.set_ltrb(left, top, right, bottom);
         })
@@ -83,34 +83,32 @@ pub extern "C" fn skia_rectangle_i32_set_ltrb(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_rectangle_i32_left(rectangle_ptr: BorrowedPtr<IRect>) -> i32 {
-    rectangle_ptr
+pub extern "C" fn skia_rectangle_i32_left(rectangle: BorrowedPtr<IRect>) -> i32 {
+    rectangle
         .with_ref_ok(|rectangle| rectangle.left())
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_rectangle_i32_top(rectangle_ptr: BorrowedPtr<IRect>) -> i32 {
-    rectangle_ptr
-        .with_ref_ok(|rectangle| rectangle.top())
-        .or_log(0)
+pub extern "C" fn skia_rectangle_i32_top(rectangle: BorrowedPtr<IRect>) -> i32 {
+    rectangle.with_ref_ok(|rectangle| rectangle.top()).or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_rectangle_i32_right(rectangle_ptr: BorrowedPtr<IRect>) -> i32 {
-    rectangle_ptr
+pub extern "C" fn skia_rectangle_i32_right(rectangle: BorrowedPtr<IRect>) -> i32 {
+    rectangle
         .with_ref_ok(|rectangle| rectangle.right())
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_rectangle_i32_bottom(rectangle_ptr: BorrowedPtr<IRect>) -> i32 {
-    rectangle_ptr
+pub extern "C" fn skia_rectangle_i32_bottom(rectangle: BorrowedPtr<IRect>) -> i32 {
+    rectangle
         .with_ref_ok(|rectangle| rectangle.bottom())
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_rectangle_i32_drop(ptr: OwnedPtr<IRect>) {
-    drop(ptr);
+pub extern "C" fn skia_rectangle_i32_drop(irect: OwnedPtr<IRect>) {
+    drop(irect);
 }

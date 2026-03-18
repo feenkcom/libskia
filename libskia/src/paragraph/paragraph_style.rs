@@ -33,21 +33,21 @@ pub extern "C" fn skia_paragraph_style_set_apply_rounding_hack(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_paragraph_style_get_text_style(
-    paragraph_ptr: BorrowedPtr<ParagraphStyle>,
+    paragraph: BorrowedPtr<ParagraphStyle>,
 ) -> OwnedPtr<TextStyle> {
-    paragraph_ptr
+    paragraph
         .with_ref_ok(|style| OwnedPtr::new(style.text_style().clone()))
         .or_log(OwnedPtr::null())
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_paragraph_style_set_text_style(
-    mut paragraph_ptr: BorrowedPtr<ParagraphStyle>,
-    text_style_ptr: BorrowedPtr<TextStyle>,
+    mut paragraph: BorrowedPtr<ParagraphStyle>,
+    text_style: BorrowedPtr<TextStyle>,
 ) {
-    paragraph_ptr
+    paragraph
         .with_mut_ok(|style| {
-            text_style_ptr.with_ref_ok(|text_style| {
+            text_style.with_ref_ok(|text_style| {
                 style.set_text_style(text_style);
             })
         })
@@ -56,19 +56,17 @@ pub extern "C" fn skia_paragraph_style_set_text_style(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_paragraph_style_get_height(
-    paragraph_ptr: BorrowedPtr<ParagraphStyle>,
+    paragraph: BorrowedPtr<ParagraphStyle>,
 ) -> scalar {
-    paragraph_ptr
-        .with_ref_ok(|style| style.height())
-        .or_log(0.0)
+    paragraph.with_ref_ok(|style| style.height()).or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_paragraph_style_set_height(
-    mut paragraph_ptr: BorrowedPtr<ParagraphStyle>,
+    mut paragraph: BorrowedPtr<ParagraphStyle>,
     height: scalar,
 ) {
-    paragraph_ptr
+    paragraph
         .with_mut_ok(|style| {
             style.set_height(height);
         })
@@ -77,10 +75,10 @@ pub extern "C" fn skia_paragraph_style_set_height(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_paragraph_style_set_max_lines(
-    mut paragraph_ptr: BorrowedPtr<ParagraphStyle>,
+    mut paragraph: BorrowedPtr<ParagraphStyle>,
     max_lines: usize,
 ) {
-    paragraph_ptr
+    paragraph
         .with_mut_ok(|style| {
             style.set_max_lines(if max_lines == usize::MAX {
                 None
@@ -93,14 +91,14 @@ pub extern "C" fn skia_paragraph_style_set_max_lines(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_paragraph_style_get_max_lines(
-    paragraph_ptr: BorrowedPtr<ParagraphStyle>,
+    paragraph: BorrowedPtr<ParagraphStyle>,
 ) -> usize {
-    paragraph_ptr
+    paragraph
         .with_ref_ok(|style| style.max_lines().unwrap_or(usize::MAX))
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paragraph_style_drop(ptr: OwnedPtr<ParagraphStyle>) {
-    drop(ptr);
+pub extern "C" fn skia_paragraph_style_drop(paragraph_style: OwnedPtr<ParagraphStyle>) {
+    drop(paragraph_style);
 }

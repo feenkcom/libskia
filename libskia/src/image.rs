@@ -14,7 +14,7 @@ use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_image_from_pixels(
-    pixels_ptr: BorrowedPtr<ArrayBox<u8>>,
+    pixels: BorrowedPtr<ArrayBox<u8>>,
     width: i32,
     height: i32,
     row_bytes: usize,
@@ -26,7 +26,7 @@ pub extern "C" fn skia_image_from_pixels(
         AlphaType::Unpremul,
         None,
     );
-    pixels_ptr
+    pixels
         .with_ref_ok(|array| {
             match images::raster_from_data(&image_info, Data::new_copy(array.to_slice()), row_bytes) {
                 None => {
@@ -42,10 +42,8 @@ pub extern "C" fn skia_image_from_pixels(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_from_file(
-    boxer_string_ptr: BorrowedPtr<StringBox>,
-) -> OwnedPtr<Image> {
-    boxer_string_ptr
+pub extern "C" fn skia_image_from_file(boxer_string: BorrowedPtr<StringBox>) -> OwnedPtr<Image> {
+    boxer_string
         .with_ref_ok(|boxer_string| {
             let file_name = boxer_string.to_string();
             let file = File::open(file_name);
@@ -72,11 +70,11 @@ pub extern "C" fn skia_image_from_file(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_image_from_buffer(
-    buffer_ptr: BorrowedPtr<ArrayBox<u8>>,
+    buffer: BorrowedPtr<ArrayBox<u8>>,
     start: usize,
     end: usize,
 ) -> OwnedPtr<Image> {
-    buffer_ptr
+    buffer
         .with_ref_ok(|buffer| {
             let data = Data::new_copy(&buffer.to_slice()[start..end]);
             match Image::from_encoded(data) {
@@ -89,14 +87,14 @@ pub extern "C" fn skia_image_from_buffer(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_image_to_file(
-    image_ptr: BorrowedPtr<Image>,
-    name_boxer_string_ptr: BorrowedPtr<StringBox>,
+    image: BorrowedPtr<Image>,
+    name_boxer_string: BorrowedPtr<StringBox>,
     encoding: EncodedImageFormat,
     quality: u32,
 ) -> i32 {
-    image_ptr
+    image
         .with_ref(|image| {
-            name_boxer_string_ptr.with_ref_ok(|name_boxer_string| {
+            name_boxer_string.with_ref_ok(|name_boxer_string| {
                 let file_name = name_boxer_string.to_string();
 
                 let encoded = image.encode(None, encoding, quality);
@@ -122,12 +120,12 @@ pub extern "C" fn skia_image_to_file(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_scale_image(
-    image_ptr: BorrowedPtr<Image>,
+    image: BorrowedPtr<Image>,
     new_x: i32,
     new_y: i32,
     keep_aspect_ratio: bool,
 ) -> OwnedPtr<Image> {
-    image_ptr
+    image
         .with_ref_ok(|image| {
             let mut resize_x = (new_x as f32) / (image.width() as f32);
             let mut resize_y = (new_y as f32) / (image.height() as f32);
@@ -163,37 +161,37 @@ pub extern "C" fn skia_scale_image(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_get_image_info(image_ptr: BorrowedPtr<Image>) -> OwnedPtr<ImageInfo> {
-    image_ptr
+pub extern "C" fn skia_image_get_image_info(image: BorrowedPtr<Image>) -> OwnedPtr<ImageInfo> {
+    image
         .with_ref_ok(|image| OwnedPtr::new(image.image_info().clone()))
         .unwrap_or_else(|_| OwnedPtr::new(ImageInfo::default()))
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_get_width(image_ptr: BorrowedPtr<Image>) -> i32 {
-    image_ptr.with_ref_ok(|image| image.width()).or_log(0)
+pub extern "C" fn skia_image_get_width(image: BorrowedPtr<Image>) -> i32 {
+    image.with_ref_ok(|image| image.width()).or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_get_height(image_ptr: BorrowedPtr<Image>) -> i32 {
-    image_ptr.with_ref_ok(|image| image.height()).or_log(0)
+pub extern "C" fn skia_image_get_height(image: BorrowedPtr<Image>) -> i32 {
+    image.with_ref_ok(|image| image.height()).or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_get_unique_id(image_ptr: BorrowedPtr<Image>) -> u32 {
-    image_ptr.with_ref_ok(|image| image.unique_id()).or_log(0)
+pub extern "C" fn skia_image_get_unique_id(image: BorrowedPtr<Image>) -> u32 {
+    image.with_ref_ok(|image| image.unique_id()).or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_get_alpha_type(image_ptr: BorrowedPtr<Image>) -> AlphaType {
-    image_ptr
+pub extern "C" fn skia_image_get_alpha_type(image: BorrowedPtr<Image>) -> AlphaType {
+    image
         .with_ref_ok(|image| image.alpha_type())
         .or_log(AlphaType::Unknown)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_get_color_type(image_ptr: BorrowedPtr<Image>) -> ColorType {
-    image_ptr
+pub extern "C" fn skia_image_get_color_type(image: BorrowedPtr<Image>) -> ColorType {
+    image
         .with_ref_ok(|image| image.color_type())
         .or_log(ColorType::Unknown)
 }
@@ -229,9 +227,9 @@ pub extern "C" fn skia_image_is_texture_backend(image: BorrowedPtr<Image>) -> bo
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_image_get_backend_texture(
-    image_ptr: BorrowedPtr<Image>,
+    image: BorrowedPtr<Image>,
 ) -> OwnedPtr<BackendTexture> {
-    image_ptr
+    image
         .with_ref_ok(
             |image| match gpu::images::get_backend_texture_from_image(image, true) {
                 None => OwnedPtr::null(),
@@ -243,9 +241,9 @@ pub extern "C" fn skia_image_get_backend_texture(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_image_get_backend_texture_origin(
-    image_ptr: BorrowedPtr<Image>,
+    image: BorrowedPtr<Image>,
 ) -> SurfaceOrigin {
-    image_ptr
+    image
         .with_ref_ok(
             |image| match gpu::images::get_backend_texture_from_image(image, true) {
                 None => SurfaceOrigin::TopLeft,
@@ -257,12 +255,12 @@ pub extern "C" fn skia_image_get_backend_texture_origin(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_image_read_all_pixels(
-    surface_ptr: BorrowedPtr<Image>,
-    mut pixels_ptr: BorrowedPtr<ArrayBox<u8>>,
+    surface: BorrowedPtr<Image>,
+    mut pixels: BorrowedPtr<ArrayBox<u8>>,
 ) -> bool {
-    surface_ptr
+    surface
         .with_ref(|surface| {
-            pixels_ptr.with_mut_ok(|pixels| {
+            pixels.with_mut_ok(|pixels| {
                 let image_info = surface.image_info();
                 let row_bytes = image_info.min_row_bytes();
                 surface.read_pixels(
@@ -278,6 +276,6 @@ pub extern "C" fn skia_image_read_all_pixels(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_drop(ptr: OwnedPtr<Image>) {
-    drop(ptr);
+pub extern "C" fn skia_image_drop(image: OwnedPtr<Image>) {
+    drop(image);
 }

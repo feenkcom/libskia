@@ -15,13 +15,13 @@ pub extern "C" fn skia_layer_rec_default() -> OwnedPtr<SaveLayerRecWrapper> {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_layer_rec_set_bounds(
-    mut save_layer_ptr: BorrowedPtr<SaveLayerRecWrapper>,
+    mut save_layer: BorrowedPtr<SaveLayerRecWrapper>,
     left: scalar,
     top: scalar,
     right: scalar,
     bottom: scalar,
 ) {
-    save_layer_ptr
+    save_layer
         .with_mut_ok(|rec| {
             rec.bounds = Some(Rect::new(left, top, right, bottom));
         })
@@ -30,17 +30,17 @@ pub extern "C" fn skia_layer_rec_set_bounds(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_layer_rec_set_paint(
-    mut save_layer_ptr: BorrowedPtr<SaveLayerRecWrapper>,
-    paint_ptr: OwnedPtr<Paint>,
+    mut save_layer: BorrowedPtr<SaveLayerRecWrapper>,
+    paint: OwnedPtr<Paint>,
 ) {
-    save_layer_ptr
-        .with_mut(|rec| paint_ptr.with_value_ok(|paint| rec.paint = Some(paint)))
+    save_layer
+        .with_mut(|rec| paint.with_value_ok(|paint| rec.paint = Some(paint)))
         .log();
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_layer_rec_drop(ptr: OwnedPtr<SaveLayerRecWrapper>) {
-    drop(ptr);
+pub extern "C" fn skia_layer_rec_drop(save_layer_rec: OwnedPtr<SaveLayerRecWrapper>) {
+    drop(save_layer_rec);
 }
 
 #[cfg(test)]
@@ -49,7 +49,7 @@ pub mod test {
 
     #[test]
     fn default_layer() {
-        let mut layer_ptr = skia_layer_rec_default();
-        skia_layer_rec_drop(layer_ptr);
+        let mut layer = skia_layer_rec_default();
+        skia_layer_rec_drop(layer);
     }
 }

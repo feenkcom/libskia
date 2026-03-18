@@ -83,11 +83,11 @@ pub extern "C" fn skia_paragraph_text_style_get_color(
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_paragraph_text_style_set_color(
     mut text_style: BorrowedPtr<TextStyle>,
-    color_ptr: BorrowedPtr<Color>,
+    color: BorrowedPtr<Color>,
 ) {
     text_style
         .with_mut_ok(|style| {
-            color_ptr.with_clone_ok(|color| {
+            color.with_clone_ok(|color| {
                 style.set_color(color);
             })
         })
@@ -143,11 +143,11 @@ pub extern "C" fn skia_paragraph_text_style_set_background(
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_paragraph_text_style_set_font_style(
     mut text_style: BorrowedPtr<TextStyle>,
-    font_style_ptr: BorrowedPtr<FontStyle>,
+    font_style: BorrowedPtr<FontStyle>,
 ) {
     text_style
         .with_mut_ok(|text_style| {
-            font_style_ptr.with_clone_ok(|font_style| {
+            font_style.with_clone_ok(|font_style| {
                 text_style.set_font_style(font_style);
             })
         })
@@ -157,11 +157,11 @@ pub extern "C" fn skia_paragraph_text_style_set_font_style(
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_paragraph_text_style_set_font_family(
     mut text_style: BorrowedPtr<TextStyle>,
-    mut font_family_ptr: BorrowedPtr<StringBox>,
+    mut font_family: BorrowedPtr<StringBox>,
 ) {
     text_style
         .with_mut_ok(|text_style| {
-            font_family_ptr.with_mut_ok(|font_family| {
+            font_family.with_mut_ok(|font_family| {
                 text_style.set_font_families(&[font_family.as_str()]);
             })
         })
@@ -171,11 +171,11 @@ pub extern "C" fn skia_paragraph_text_style_set_font_family(
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_paragraph_text_style_set_decoration(
     mut text_style: BorrowedPtr<TextStyle>,
-    decoration_ptr: BorrowedPtr<Decoration>,
+    decoration: BorrowedPtr<Decoration>,
 ) {
     text_style
         .with_mut_ok(|text_style| {
-            decoration_ptr.with_ref_ok(|decoration| {
+            decoration.with_ref_ok(|decoration| {
                 text_style.set_decoration(decoration);
             })
         })
@@ -183,6 +183,6 @@ pub extern "C" fn skia_paragraph_text_style_set_decoration(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paragraph_text_style_drop(ptr: OwnedPtr<TextStyle>) {
-    drop(ptr);
+pub extern "C" fn skia_paragraph_text_style_drop(text_style: OwnedPtr<TextStyle>) {
+    drop(text_style);
 }

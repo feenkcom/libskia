@@ -5,12 +5,12 @@ use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_surface_from_render_target(
-    backend_render_target_ptr: BorrowedPtr<BackendRenderTarget>,
-    mut context_ptr: BorrowedPtr<DirectContext>,
+    backend_render_target: BorrowedPtr<BackendRenderTarget>,
+    mut context: BorrowedPtr<DirectContext>,
     color_type: ColorType,
 ) -> OwnedPtr<Surface> {
-    backend_render_target_ptr.with_ref(|backend_render_target| {
-        context_ptr.with_mut_ok(|context| {
+    backend_render_target.with_ref(|backend_render_target| {
+        context.with_mut_ok(|context| {
             let surface_option = gpu::surfaces::wrap_backend_render_target(
             context,
             backend_render_target,
@@ -71,12 +71,12 @@ pub extern "C" fn skia_surface_new_render_target(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_surface_from_backend_texture(
-    mut context_ptr: BorrowedPtr<DirectContext>,
-    backend_texture_ptr: BorrowedPtr<BackendTexture>,
+    mut context: BorrowedPtr<DirectContext>,
+    backend_texture: BorrowedPtr<BackendTexture>,
     color_type: ColorType,
 ) -> OwnedPtr<Surface> {
-    backend_texture_ptr.with_ref(|backend_texture| {
-        context_ptr.with_mut_ok(|context| {
+    backend_texture.with_ref(|backend_texture| {
+        context.with_mut_ok(|context| {
             let surface_option = gpu::surfaces::wrap_backend_texture(
             context,
             backend_texture,

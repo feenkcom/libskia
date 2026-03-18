@@ -41,23 +41,23 @@ pub extern "C" fn skia_backend_render_target_new_metal(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_backend_render_target_is_valid(
-    backend_render_target_ptr: BorrowedPtr<BackendRenderTarget>,
+    backend_render_target: BorrowedPtr<BackendRenderTarget>,
 ) -> bool {
-    backend_render_target_ptr
-        .with_ref_ok(|_| true)
-        .or_log(false)
+    backend_render_target.with_ref_ok(|_| true).or_log(false)
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_backend_render_target_is_protected(
-    backend_render_target_ptr: BorrowedPtr<BackendRenderTarget>,
+    backend_render_target: BorrowedPtr<BackendRenderTarget>,
 ) -> bool {
-    backend_render_target_ptr
+    backend_render_target
         .with_ref_ok(|backend_render_target| backend_render_target.is_protected())
         .or_log(false)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_backend_render_target_drop(ptr: OwnedPtr<BackendRenderTarget>) {
-    drop(ptr);
+pub extern "C" fn skia_backend_render_target_drop(
+    backend_render_target: OwnedPtr<BackendRenderTarget>,
+) {
+    drop(backend_render_target);
 }

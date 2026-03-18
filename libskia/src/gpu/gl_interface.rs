@@ -12,7 +12,7 @@ pub extern "C" fn skia_interface_new_native() -> OwnedPtr<Interface> {
             }
             OwnedPtr::null()
         }
-        Some(_interface) => OwnedPtr::new(_interface),
+        Some(interface) => OwnedPtr::new(interface),
     }
 }
 
@@ -23,15 +23,15 @@ pub extern "C" fn skia_interface_new_load_with(
 ) -> OwnedPtr<Interface> {
     match Interface::new_load_with(|symbol| {
         let boxer_string = StringBox::from_string(symbol.to_string());
-        let func_ptr = callback(BorrowedPtr::from_ref(&boxer_string));
+        let function = callback(BorrowedPtr::from_ref(&boxer_string));
         drop(boxer_string);
         if cfg!(debug_assertions) {
             eprintln!(
                 "[skia_interface_new_load_with] GL func: {:?}; address: {:?}",
-                symbol, func_ptr
+                symbol, function
             );
         }
-        func_ptr
+        function
     }) {
         None => {
             if cfg!(debug_assertions) {
@@ -39,11 +39,11 @@ pub extern "C" fn skia_interface_new_load_with(
             }
             OwnedPtr::null()
         }
-        Some(_interface) => OwnedPtr::new(_interface),
+        Some(interface) => OwnedPtr::new(interface),
     }
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_interface_drop(mut ptr: OwnedPtr<Interface>) {
-    drop(ptr);
+pub extern "C" fn skia_interface_drop(mut interface: OwnedPtr<Interface>) {
+    drop(interface);
 }

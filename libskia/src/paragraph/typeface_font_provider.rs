@@ -23,6 +23,8 @@ pub extern "C" fn skia_typeface_font_provider_register_typeface(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_typeface_font_provider_drop(ptr: OwnedPtr<TypefaceFontProvider>) {
-    drop(ptr);
+pub extern "C" fn skia_typeface_font_provider_drop(
+    typeface_font_provider: OwnedPtr<TypefaceFontProvider>,
+) {
+    drop(typeface_font_provider);
 }

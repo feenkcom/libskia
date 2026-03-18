@@ -17,31 +17,29 @@ pub extern "C" fn skia_font_style_new(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_font_style_get_weight(font_style_ptr: BorrowedPtr<FontStyle>) -> i32 {
-    font_style_ptr
+pub extern "C" fn skia_font_style_get_weight(font_style: BorrowedPtr<FontStyle>) -> i32 {
+    font_style
         .with_clone_ok(|font_style| *font_style.weight())
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_font_style_get_width(
-    font_style_ptr: BorrowedPtr<FontStyle>,
-) -> FontStyleWidth {
-    font_style_ptr
+pub extern "C" fn skia_font_style_get_width(font_style: BorrowedPtr<FontStyle>) -> FontStyleWidth {
+    font_style
         .with_clone_ok(|font_style| font_style.width().into())
         .or_log(FontStyleWidth::Normal)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_font_style_get_slant(font_style_ptr: BorrowedPtr<FontStyle>) -> Slant {
-    font_style_ptr
+pub extern "C" fn skia_font_style_get_slant(font_style: BorrowedPtr<FontStyle>) -> Slant {
+    font_style
         .with_clone_ok(|font_style| font_style.slant())
         .or_log(Slant::Upright)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_font_style_drop(ptr: OwnedPtr<FontStyle>) {
-    drop(ptr);
+pub extern "C" fn skia_font_style_drop(font_style: OwnedPtr<FontStyle>) {
+    drop(font_style);
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]

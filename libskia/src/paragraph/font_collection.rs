@@ -47,6 +47,6 @@ pub extern "C" fn skia_font_collection_set_default_font_manager(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_font_collection_drop(ptr: OwnedPtr<FontCollection>) {
-    drop(ptr);
+pub extern "C" fn skia_font_collection_drop(font_collection: OwnedPtr<FontCollection>) {
+    drop(font_collection);
 }

@@ -13,12 +13,12 @@ pub extern "C" fn skia_typeface_default() -> OwnedPtr<Typeface> {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_typeface_from_name(
-    family_name_ptr: BorrowedPtr<StringBox>,
-    font_style_ptr: BorrowedPtr<FontStyle>,
+    family_name: BorrowedPtr<StringBox>,
+    font_style: BorrowedPtr<FontStyle>,
 ) -> OwnedPtr<Typeface> {
-    family_name_ptr
+    family_name
         .with_ref(|family_name| {
-            font_style_ptr.with_clone_ok(|font_style| {
+            font_style.with_clone_ok(|font_style| {
                 FontMgr::new()
                     .legacy_make_typeface(Some(family_name.as_str()), font_style)
                     .map(|typeface| OwnedPtr::new(typeface))
@@ -50,38 +50,38 @@ pub extern "C" fn skia_typeface_get_font_style(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_typeface_get_family_name(
-    mut typeface_ptr: BorrowedPtr<Typeface>,
-    mut _ptr_string: BorrowedPtr<StringBox>,
+    mut typeface: BorrowedPtr<Typeface>,
+    mut string: BorrowedPtr<StringBox>,
 ) {
-    typeface_ptr
+    typeface
         .with_mut_ok(|typeface| {
-            _ptr_string.with_mut_ok(|string| string.set_string(typeface.family_name()))
+            string.with_mut_ok(|string| string.set_string(typeface.family_name()))
         })
         .log();
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_typeface_is_bold(typeface_ptr: BorrowedPtr<Typeface>) -> bool {
-    typeface_ptr
+pub extern "C" fn skia_typeface_is_bold(typeface: BorrowedPtr<Typeface>) -> bool {
+    typeface
         .with_ref_ok(|typeface| typeface.is_bold())
         .or_log(false)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_typeface_is_italic(typeface_ptr: BorrowedPtr<Typeface>) -> bool {
-    typeface_ptr
+pub extern "C" fn skia_typeface_is_italic(typeface: BorrowedPtr<Typeface>) -> bool {
+    typeface
         .with_ref_ok(|typeface| typeface.is_italic())
         .or_log(false)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_typeface_is_fixed_pitch(typeface_ptr: BorrowedPtr<Typeface>) -> bool {
-    typeface_ptr
+pub extern "C" fn skia_typeface_is_fixed_pitch(typeface: BorrowedPtr<Typeface>) -> bool {
+    typeface
         .with_ref_ok(|typeface| typeface.is_fixed_pitch())
         .or_log(false)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_typeface_drop(ptr: OwnedPtr<Typeface>) {
-    drop(ptr);
+pub extern "C" fn skia_typeface_drop(typeface: OwnedPtr<Typeface>) {
+    drop(typeface);
 }

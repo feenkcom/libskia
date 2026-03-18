@@ -3,43 +3,41 @@ use skia_safe::{Canvas, Picture, Rect};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_picture_cull_rect(picture_ptr: BorrowedPtr<Picture>) -> OwnedPtr<Rect> {
-    picture_ptr
+pub extern "C" fn skia_picture_cull_rect(picture: BorrowedPtr<Picture>) -> OwnedPtr<Rect> {
+    picture
         .with_clone_ok(|picture| OwnedPtr::new(picture.cull_rect()))
         .or_log(OwnedPtr::null())
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_picture_is_empty(picture_ptr: BorrowedPtr<Picture>) -> bool {
-    picture_ptr
+pub extern "C" fn skia_picture_is_empty(picture: BorrowedPtr<Picture>) -> bool {
+    picture
         .with_clone_ok(|picture| picture.cull_rect().is_empty())
         .or_log(true)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_picture_unique_id(picture_ptr: BorrowedPtr<Picture>) -> u32 {
-    picture_ptr
+pub extern "C" fn skia_picture_unique_id(picture: BorrowedPtr<Picture>) -> u32 {
+    picture
         .with_clone_ok(|picture| picture.unique_id())
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_picture_approximate_op_count(
-    mut _ptr_picture: BorrowedPtr<Picture>,
-) -> usize {
-    _ptr_picture
+pub extern "C" fn skia_picture_approximate_op_count(mut picture: BorrowedPtr<Picture>) -> usize {
+    picture
         .with_mut_ok(|picture| picture.approximate_op_count())
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_picture_playback(
-    mut _ptr_picture: BorrowedPtr<Picture>,
-    _ptr_canvas: BorrowedPtr<Canvas>,
+    mut picture: BorrowedPtr<Picture>,
+    canvas: BorrowedPtr<Canvas>,
 ) {
-    _ptr_canvas
+    canvas
         .with_ref_ok(|canvas| {
-            _ptr_picture
+            picture
                 .with_mut_ok(|picture| {
                     picture.playback(canvas);
                 })
@@ -50,12 +48,12 @@ pub extern "C" fn skia_picture_playback(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_picture_serialize(
-    mut picture_ptr: BorrowedPtr<Picture>,
-    mut data_ptr: BorrowedPtr<ArrayBox<u8>>,
+    mut picture: BorrowedPtr<Picture>,
+    mut data: BorrowedPtr<ArrayBox<u8>>,
 ) {
-    picture_ptr
+    picture
         .with_mut_ok(|picture| {
-            data_ptr.with_mut_ok(|data| {
+            data.with_mut_ok(|data| {
                 data.set_array(picture.serialize().as_bytes());
             })
         })
@@ -63,6 +61,6 @@ pub extern "C" fn skia_picture_serialize(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_picture_drop(ptr: OwnedPtr<Picture>) {
-    drop(ptr);
+pub extern "C" fn skia_picture_drop(picture: OwnedPtr<Picture>) {
+    drop(picture);
 }
