@@ -4,19 +4,19 @@ use string_box::StringBox;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_text_style_new() -> OwnedPtr<TextStyle> {
+pub extern "C" fn skia_paragraph_text_style_new() -> OwnedPtr<TextStyle> {
     OwnedPtr::new(TextStyle::new())
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_text_style_get_font_size(text_style: BorrowedPtr<TextStyle>) -> scalar {
+pub extern "C" fn skia_paragraph_text_style_get_font_size(text_style: BorrowedPtr<TextStyle>) -> scalar {
     text_style
         .with_ref_ok(|style| style.font_size())
         .or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_text_style_set_font_size(
+pub extern "C" fn skia_paragraph_text_style_set_font_size(
     mut text_style: BorrowedPtr<TextStyle>,
     font_size: scalar,
 ) {
@@ -28,14 +28,14 @@ pub fn skia_paragraph_text_style_set_font_size(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_text_style_get_word_spacing(text_style: BorrowedPtr<TextStyle>) -> scalar {
+pub extern "C" fn skia_paragraph_text_style_get_word_spacing(text_style: BorrowedPtr<TextStyle>) -> scalar {
     text_style
         .with_ref_ok(|style| style.word_spacing())
         .or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_text_style_set_word_spacing(
+pub extern "C" fn skia_paragraph_text_style_set_word_spacing(
     mut text_style: BorrowedPtr<TextStyle>,
     word_spacing: scalar,
 ) {
@@ -47,14 +47,14 @@ pub fn skia_paragraph_text_style_set_word_spacing(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_text_style_get_letter_spacing(text_style: BorrowedPtr<TextStyle>) -> scalar {
+pub extern "C" fn skia_paragraph_text_style_get_letter_spacing(text_style: BorrowedPtr<TextStyle>) -> scalar {
     text_style
         .with_clone_ok(|style| style.letter_spacing())
         .or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_text_style_set_letter_spacing(
+pub extern "C" fn skia_paragraph_text_style_set_letter_spacing(
     mut text_style: BorrowedPtr<TextStyle>,
     letter_spacing: scalar,
 ) {
@@ -66,14 +66,14 @@ pub fn skia_paragraph_text_style_set_letter_spacing(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_text_style_get_color(text_style: BorrowedPtr<TextStyle>) -> OwnedPtr<Color> {
+pub extern "C" fn skia_paragraph_text_style_get_color(text_style: BorrowedPtr<TextStyle>) -> OwnedPtr<Color> {
     text_style
         .with_clone_ok(|style| OwnedPtr::new(style.color()))
         .or_log(OwnedPtr::null())
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_text_style_set_color(
+pub extern "C" fn skia_paragraph_text_style_set_color(
     mut text_style: BorrowedPtr<TextStyle>,
     color_ptr: BorrowedPtr<Color>,
 ) {
@@ -87,7 +87,7 @@ pub fn skia_paragraph_text_style_set_color(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_text_style_get_foreground(
+pub extern "C" fn skia_paragraph_text_style_get_foreground(
     text_style: BorrowedPtr<TextStyle>,
 ) -> OwnedPtr<Paint> {
     text_style
@@ -96,7 +96,7 @@ pub fn skia_paragraph_text_style_get_foreground(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_text_style_set_foreground(
+pub extern "C" fn skia_paragraph_text_style_set_foreground(
     mut text_style: BorrowedPtr<TextStyle>,
     paint: BorrowedPtr<Paint>,
 ) {
@@ -110,7 +110,7 @@ pub fn skia_paragraph_text_style_set_foreground(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_text_style_get_background(
+pub extern "C" fn skia_paragraph_text_style_get_background(
     text_style: BorrowedPtr<TextStyle>,
 ) -> OwnedPtr<Paint> {
     text_style
@@ -119,7 +119,7 @@ pub fn skia_paragraph_text_style_get_background(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_text_style_set_background(
+pub extern "C" fn skia_paragraph_text_style_set_background(
     mut text_style: BorrowedPtr<TextStyle>,
     paint: BorrowedPtr<Paint>,
 ) {
@@ -133,7 +133,7 @@ pub fn skia_paragraph_text_style_set_background(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_text_style_set_font_style(
+pub extern "C" fn skia_paragraph_text_style_set_font_style(
     mut text_style: BorrowedPtr<TextStyle>,
     font_style_ptr: BorrowedPtr<FontStyle>,
 ) {
@@ -147,7 +147,7 @@ pub fn skia_paragraph_text_style_set_font_style(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_text_style_set_font_family(
+pub extern "C" fn skia_paragraph_text_style_set_font_family(
     mut text_style: BorrowedPtr<TextStyle>,
     mut font_family_ptr: BorrowedPtr<StringBox>,
 ) {
@@ -161,7 +161,7 @@ pub fn skia_paragraph_text_style_set_font_family(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_text_style_set_decoration(
+pub extern "C" fn skia_paragraph_text_style_set_decoration(
     mut text_style: BorrowedPtr<TextStyle>,
     decoration_ptr: BorrowedPtr<Decoration>,
 ) {
@@ -175,6 +175,6 @@ pub fn skia_paragraph_text_style_set_decoration(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_text_style_drop(ptr: OwnedPtr<TextStyle>) {
+pub extern "C" fn skia_paragraph_text_style_drop(ptr: OwnedPtr<TextStyle>) {
     drop(ptr);
 }

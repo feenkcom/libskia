@@ -4,7 +4,7 @@ use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[cfg(feature = "gl")]
 #[unsafe(no_mangle)]
-pub fn skia_context_new_gl(
+pub extern "C" fn skia_context_new_gl(
     interface_ptr: BorrowedPtr<skia_safe::gpu::gl::Interface>,
 ) -> OwnedPtr<DirectContext> {
     interface_ptr
@@ -21,21 +21,21 @@ pub fn skia_context_new_gl(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_context_get_max_texture_size(context: BorrowedPtr<DirectContext>) -> i32 {
+pub extern "C" fn skia_context_get_max_texture_size(context: BorrowedPtr<DirectContext>) -> i32 {
     context
         .with_ref_ok(|context| context.max_texture_size())
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_context_get_max_render_target_size(context: BorrowedPtr<DirectContext>) -> i32 {
+pub extern "C" fn skia_context_get_max_render_target_size(context: BorrowedPtr<DirectContext>) -> i32 {
     context
         .with_ref_ok(|context| context.max_render_target_size())
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_context_get_max_surface_sample_count_for_color_type(
+pub extern "C" fn skia_context_get_max_surface_sample_count_for_color_type(
     context: BorrowedPtr<DirectContext>,
     color_type: ColorType,
 ) -> usize {
@@ -45,7 +45,7 @@ pub fn skia_context_get_max_surface_sample_count_for_color_type(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_context_is_color_type_supported_as_image(
+pub extern "C" fn skia_context_is_color_type_supported_as_image(
     context_ptr: BorrowedPtr<DirectContext>,
     color_type: ColorType,
 ) -> bool {
@@ -55,7 +55,7 @@ pub fn skia_context_is_color_type_supported_as_image(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_context_is_color_type_supported_as_surface(
+pub extern "C" fn skia_context_is_color_type_supported_as_surface(
     context_ptr: BorrowedPtr<DirectContext>,
     color_type: ColorType,
 ) -> bool {
@@ -65,7 +65,7 @@ pub fn skia_context_is_color_type_supported_as_surface(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_context_flush(mut ptr: BorrowedPtr<DirectContext>) {
+pub extern "C" fn skia_context_flush(mut ptr: BorrowedPtr<DirectContext>) {
     ptr.with_mut_ok(|context| {
         context.flush_and_submit();
     })
@@ -73,6 +73,6 @@ pub fn skia_context_flush(mut ptr: BorrowedPtr<DirectContext>) {
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_context_drop(ptr: OwnedPtr<DirectContext>) {
+pub extern "C" fn skia_context_drop(ptr: OwnedPtr<DirectContext>) {
     drop(ptr);
 }

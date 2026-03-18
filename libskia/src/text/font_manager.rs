@@ -6,19 +6,19 @@ use string_box::StringBox;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
-pub fn skia_font_manager_default() -> OwnedPtr<FontMgr> {
+pub extern "C" fn skia_font_manager_default() -> OwnedPtr<FontMgr> {
     OwnedPtr::new(FontMgr::default())
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_manager_count_families(font_manager_ptr: BorrowedPtr<FontMgr>) -> usize {
+pub extern "C" fn skia_font_manager_count_families(font_manager_ptr: BorrowedPtr<FontMgr>) -> usize {
     font_manager_ptr
         .with_clone_ok(|font_manager| font_manager.count_families())
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_manager_get_family_name_at(
+pub extern "C" fn skia_font_manager_get_family_name_at(
     mut font_manager_ptr: BorrowedPtr<FontMgr>,
     mut name_ptr: BorrowedPtr<StringBox>,
     index: usize,
@@ -33,7 +33,7 @@ pub fn skia_font_manager_get_family_name_at(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_manager_new_typeface_from_data(
+pub extern "C" fn skia_font_manager_new_typeface_from_data(
     font_manager_ptr: BorrowedPtr<FontMgr>,
     data_ptr: BorrowedPtr<ArrayBox<u8>>,
 ) -> OwnedPtr<Typeface> {
@@ -50,7 +50,7 @@ pub fn skia_font_manager_new_typeface_from_data(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_manager_match_family(
+pub extern "C" fn skia_font_manager_match_family(
     font_manager_ptr: BorrowedPtr<FontMgr>,
     name_ptr: BorrowedPtr<StringBox>,
 ) -> OwnedPtr<FontStyleSet> {
@@ -62,7 +62,7 @@ pub fn skia_font_manager_match_family(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_manager_match_family_style(
+pub extern "C" fn skia_font_manager_match_family_style(
     font_manager_ptr: BorrowedPtr<FontMgr>,
     name_ptr: BorrowedPtr<StringBox>,
     weight: i32,
@@ -85,6 +85,6 @@ pub fn skia_font_manager_match_family_style(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_manager_drop(ptr: OwnedPtr<FontMgr>) {
+pub extern "C" fn skia_font_manager_drop(ptr: OwnedPtr<FontMgr>) {
     drop(ptr);
 }

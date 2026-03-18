@@ -3,12 +3,12 @@ use skia_safe::textlayout::TypefaceFontProvider;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
-pub fn skia_typeface_font_provider_new() -> OwnedPtr<TypefaceFontProvider> {
+pub extern "C" fn skia_typeface_font_provider_new() -> OwnedPtr<TypefaceFontProvider> {
     OwnedPtr::new(TypefaceFontProvider::new())
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_typeface_font_provider_register_typeface(
+pub extern "C" fn skia_typeface_font_provider_register_typeface(
     mut typeface_font_provider: BorrowedPtr<TypefaceFontProvider>,
     typeface: BorrowedPtr<Typeface>,
 ) -> usize {
@@ -23,6 +23,6 @@ pub fn skia_typeface_font_provider_register_typeface(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_typeface_font_provider_drop(ptr: OwnedPtr<TypefaceFontProvider>) {
+pub extern "C" fn skia_typeface_font_provider_drop(ptr: OwnedPtr<TypefaceFontProvider>) {
     drop(ptr);
 }

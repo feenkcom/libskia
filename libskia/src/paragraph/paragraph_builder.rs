@@ -55,7 +55,7 @@ impl ParagraphBuilderWithText {
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_builder_new(
+pub extern "C" fn skia_paragraph_builder_new(
     paragraph_style: BorrowedPtr<ParagraphStyle>,
     font_collection: BorrowedPtr<FontCollection>,
     tab_size: TabSize,
@@ -74,7 +74,7 @@ pub fn skia_paragraph_builder_new(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_builder_build(
+pub extern "C" fn skia_paragraph_builder_build(
     paragraph_builder_ptr: OwnedPtr<ParagraphBuilderWithText>,
 ) -> OwnedPtr<ParagraphWithText> {
     paragraph_builder_ptr
@@ -84,7 +84,7 @@ pub fn skia_paragraph_builder_build(
 
 /// Add a text to the paragraph by copying it
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_builder_add_text(
+pub extern "C" fn skia_paragraph_builder_add_text(
     mut paragraph_builder: BorrowedPtr<ParagraphBuilderWithText>,
     string: OwnedPtr<StringBox>,
 ) {
@@ -98,7 +98,7 @@ pub fn skia_paragraph_builder_add_text(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_builder_add_placeholder(
+pub extern "C" fn skia_paragraph_builder_add_placeholder(
     mut paragraph_builder: BorrowedPtr<ParagraphBuilderWithText>,
     placeholder: BorrowedPtr<PlaceholderStyle>,
     char_length: CharLength,
@@ -113,7 +113,7 @@ pub fn skia_paragraph_builder_add_placeholder(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_builder_push_style(
+pub extern "C" fn skia_paragraph_builder_push_style(
     mut paragraph_builder: BorrowedPtr<ParagraphBuilderWithText>,
     style: BorrowedPtr<TextStyle>,
 ) {
@@ -127,7 +127,7 @@ pub fn skia_paragraph_builder_push_style(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_builder_pop_style(
+pub extern "C" fn skia_paragraph_builder_pop_style(
     mut paragraph_builder: BorrowedPtr<ParagraphBuilderWithText>,
 ) {
     paragraph_builder
@@ -138,6 +138,6 @@ pub fn skia_paragraph_builder_pop_style(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_builder_drop(ptr: OwnedPtr<ParagraphBuilderWithText>) {
+pub extern "C" fn skia_paragraph_builder_drop(ptr: OwnedPtr<ParagraphBuilderWithText>) {
     drop(ptr);
 }

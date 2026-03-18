@@ -9,12 +9,12 @@ pub struct SaveLayerRecWrapper {
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_layer_rec_default() -> OwnedPtr<SaveLayerRecWrapper> {
+pub extern "C" fn skia_layer_rec_default() -> OwnedPtr<SaveLayerRecWrapper> {
     OwnedPtr::new(SaveLayerRecWrapper::default())
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_layer_rec_set_bounds(
+pub extern "C" fn skia_layer_rec_set_bounds(
     mut save_layer_ptr: BorrowedPtr<SaveLayerRecWrapper>,
     left: scalar,
     top: scalar,
@@ -29,7 +29,7 @@ pub fn skia_layer_rec_set_bounds(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_layer_rec_set_paint(
+pub extern "C" fn skia_layer_rec_set_paint(
     mut save_layer_ptr: BorrowedPtr<SaveLayerRecWrapper>,
     paint_ptr: OwnedPtr<Paint>,
 ) {
@@ -39,7 +39,7 @@ pub fn skia_layer_rec_set_paint(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_layer_rec_drop(ptr: OwnedPtr<SaveLayerRecWrapper>) {
+pub extern "C" fn skia_layer_rec_drop(ptr: OwnedPtr<SaveLayerRecWrapper>) {
     drop(ptr);
 }
 

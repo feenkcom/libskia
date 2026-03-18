@@ -7,36 +7,36 @@ use string_box::StringBox;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
-pub fn skia_font_default() -> OwnedPtr<Font> {
+pub extern "C" fn skia_font_default() -> OwnedPtr<Font> {
     OwnedPtr::new(Font::default())
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_from_typeface(typeface: BorrowedPtr<Typeface>, size: scalar) -> OwnedPtr<Font> {
+pub extern "C" fn skia_font_from_typeface(typeface: BorrowedPtr<Typeface>, size: scalar) -> OwnedPtr<Font> {
     typeface
         .with_clone_ok(|typeface| OwnedPtr::new(Font::from_typeface(typeface, size)))
         .or_log(OwnedPtr::null())
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_is_force_auto_hinting(font: BorrowedPtr<Font>) -> bool {
+pub extern "C" fn skia_font_is_force_auto_hinting(font: BorrowedPtr<Font>) -> bool {
     font.with_ref_ok(|font| font.is_force_auto_hinting())
         .or_log(false)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_is_embedded_bitmaps(font: BorrowedPtr<Font>) -> bool {
+pub extern "C" fn skia_font_is_embedded_bitmaps(font: BorrowedPtr<Font>) -> bool {
     font.with_ref_ok(|font| font.is_embedded_bitmaps())
         .or_log(false)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_is_subpixel(font: BorrowedPtr<Font>) -> bool {
+pub extern "C" fn skia_font_is_subpixel(font: BorrowedPtr<Font>) -> bool {
     font.with_ref_ok(|font| font.is_subpixel()).or_log(false)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_set_subpixel(mut font: BorrowedPtr<Font>, is_subpixel: bool) {
+pub extern "C" fn skia_font_set_subpixel(mut font: BorrowedPtr<Font>, is_subpixel: bool) {
     font.with_mut_ok(|font| {
         font.set_subpixel(is_subpixel);
     })
@@ -44,29 +44,29 @@ pub fn skia_font_set_subpixel(mut font: BorrowedPtr<Font>, is_subpixel: bool) {
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_is_linear_metrics(font: BorrowedPtr<Font>) -> bool {
+pub extern "C" fn skia_font_is_linear_metrics(font: BorrowedPtr<Font>) -> bool {
     font.with_ref_ok(|font| font.is_linear_metrics())
         .or_log(false)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_is_embolden(font: BorrowedPtr<Font>) -> bool {
+pub extern "C" fn skia_font_is_embolden(font: BorrowedPtr<Font>) -> bool {
     font.with_ref_ok(|font| font.is_embolden()).or_log(false)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_is_baseline_snap(font: BorrowedPtr<Font>) -> bool {
+pub extern "C" fn skia_font_is_baseline_snap(font: BorrowedPtr<Font>) -> bool {
     font.with_ref_ok(|font| font.is_baseline_snap())
         .or_log(false)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_get_edging(font: BorrowedPtr<Font>) -> Edging {
+pub extern "C" fn skia_font_get_edging(font: BorrowedPtr<Font>) -> Edging {
     font.with_ref_ok(|font| font.edging()).or_log(Edging::Alias)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_set_edging(mut font: BorrowedPtr<Font>, font_edging: Edging) {
+pub extern "C" fn skia_font_set_edging(mut font: BorrowedPtr<Font>, font_edging: Edging) {
     font.with_mut_ok(|font| {
         font.set_edging(font_edging);
     })
@@ -74,13 +74,13 @@ pub fn skia_font_set_edging(mut font: BorrowedPtr<Font>, font_edging: Edging) {
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_get_hinting(font: BorrowedPtr<Font>) -> FontHinting {
+pub extern "C" fn skia_font_get_hinting(font: BorrowedPtr<Font>) -> FontHinting {
     font.with_ref_ok(|font| font.hinting())
         .or_log(FontHinting::None)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_set_hinting(mut font: BorrowedPtr<Font>, font_hinting: FontHinting) {
+pub extern "C" fn skia_font_set_hinting(mut font: BorrowedPtr<Font>, font_hinting: FontHinting) {
     font.with_mut_ok(|font| {
         font.set_hinting(font_hinting);
     })
@@ -88,39 +88,39 @@ pub fn skia_font_set_hinting(mut font: BorrowedPtr<Font>, font_hinting: FontHint
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_get_typeface_or_default(font: BorrowedPtr<Font>) -> OwnedPtr<Typeface> {
+pub extern "C" fn skia_font_get_typeface_or_default(font: BorrowedPtr<Font>) -> OwnedPtr<Typeface> {
     font.with_ref_ok(|font| OwnedPtr::new(font.typeface()))
         .or_log(OwnedPtr::null())
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_get_size(font: BorrowedPtr<Font>) -> scalar {
+pub extern "C" fn skia_font_get_size(font: BorrowedPtr<Font>) -> scalar {
     font.with_ref_ok(|font| font.size()).or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_get_scale_x(font: BorrowedPtr<Font>) -> scalar {
+pub extern "C" fn skia_font_get_scale_x(font: BorrowedPtr<Font>) -> scalar {
     font.with_ref_ok(|font| font.scale_x()).or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_get_skew_x(font: BorrowedPtr<Font>) -> scalar {
+pub extern "C" fn skia_font_get_skew_x(font: BorrowedPtr<Font>) -> scalar {
     font.with_ref_ok(|font| font.skew_x()).or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_get_spacing(font: BorrowedPtr<Font>) -> scalar {
+pub extern "C" fn skia_font_get_spacing(font: BorrowedPtr<Font>) -> scalar {
     font.with_ref_ok(|font| font.spacing()).or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_get_metrics(font: BorrowedPtr<Font>) -> OwnedPtr<FontMetrics> {
+pub extern "C" fn skia_font_get_metrics(font: BorrowedPtr<Font>) -> OwnedPtr<FontMetrics> {
     font.with_ref_ok(|font| OwnedPtr::new(font.metrics().1))
         .or_log(OwnedPtr::null())
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_text_to_glyphs(
+pub extern "C" fn skia_font_text_to_glyphs(
     font: BorrowedPtr<Font>,
     text_ptr: BorrowedPtr<StringBox>,
     _encoding: TextEncoding,
@@ -160,7 +160,7 @@ pub fn skia_font_text_to_glyphs(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_measure_text(
+pub extern "C" fn skia_font_measure_text(
     font: BorrowedPtr<Font>,
     text_ptr: BorrowedPtr<StringBox>,
     _encoding: TextEncoding,
@@ -187,6 +187,6 @@ pub fn skia_font_measure_text(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_drop(ptr: OwnedPtr<Font>) {
+pub extern "C" fn skia_font_drop(ptr: OwnedPtr<Font>) {
     drop(ptr);
 }

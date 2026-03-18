@@ -59,21 +59,21 @@ define_extensions!(SkiaExtensions);
 import_extensions!(SkiaExtensions, CoreExtensions);
 
 #[unsafe(no_mangle)]
-pub fn skia_test() -> bool {
+pub extern "C" fn skia_test() -> bool {
     true
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_icu_init() {
+pub extern "C" fn skia_icu_init() {
     warn!("no need to setup icu")
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_init_env_logger() {
+pub extern "C" fn skia_init_env_logger() {
     env_logger::init();
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_null_ptr() -> *mut c_void {
+pub extern "C" fn skia_null_ptr() -> *mut c_void {
     std::ptr::null_mut()
 }

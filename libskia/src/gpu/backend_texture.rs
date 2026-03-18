@@ -3,7 +3,7 @@ use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[cfg(feature = "gl")]
 #[unsafe(no_mangle)]
-pub fn skia_backend_texture_new_gl(
+pub extern "C" fn skia_backend_texture_new_gl(
     width: i32,
     height: i32,
     mip_mapped: bool,
@@ -27,7 +27,7 @@ pub fn skia_backend_texture_new_gl(
 
 #[cfg(feature = "gl")]
 #[unsafe(no_mangle)]
-pub fn skia_backend_texture_get_gl_texture_info(
+pub extern "C" fn skia_backend_texture_get_gl_texture_info(
     mut texture_ptr: BorrowedPtr<BackendTexture>,
 ) -> OwnedPtr<skia_safe::gpu::gl::TextureInfo> {
     texture_ptr
@@ -39,46 +39,46 @@ pub fn skia_backend_texture_get_gl_texture_info(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_backend_texture_get_width(texture_ptr: BorrowedPtr<BackendTexture>) -> i32 {
+pub extern "C" fn skia_backend_texture_get_width(texture_ptr: BorrowedPtr<BackendTexture>) -> i32 {
     texture_ptr
         .with_clone_ok(|backend_texture| backend_texture.width())
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_backend_texture_get_height(texture_ptr: BorrowedPtr<BackendTexture>) -> i32 {
+pub extern "C" fn skia_backend_texture_get_height(texture_ptr: BorrowedPtr<BackendTexture>) -> i32 {
     texture_ptr
         .with_clone_ok(|backend_texture| backend_texture.height())
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_backend_texture_has_mip_maps(texture_ptr: BorrowedPtr<BackendTexture>) -> bool {
+pub extern "C" fn skia_backend_texture_has_mip_maps(texture_ptr: BorrowedPtr<BackendTexture>) -> bool {
     texture_ptr
         .with_clone_ok(|backend_texture| backend_texture.has_mipmaps())
         .or_log(false)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_backend_texture_get_backend(texture_ptr: BorrowedPtr<BackendTexture>) -> BackendAPI {
+pub extern "C" fn skia_backend_texture_get_backend(texture_ptr: BorrowedPtr<BackendTexture>) -> BackendAPI {
     texture_ptr
         .with_clone_ok(|backend_texture| backend_texture.backend())
         .or_log(BackendAPI::Mock)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_backend_texture_is_protected(texture_ptr: BorrowedPtr<BackendTexture>) -> bool {
+pub extern "C" fn skia_backend_texture_is_protected(texture_ptr: BorrowedPtr<BackendTexture>) -> bool {
     texture_ptr
         .with_clone_ok(|backend_texture| backend_texture.is_protected())
         .or_log(false)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_backend_texture_is_valid(texture_ptr: BorrowedPtr<BackendTexture>) -> bool {
+pub extern "C" fn skia_backend_texture_is_valid(texture_ptr: BorrowedPtr<BackendTexture>) -> bool {
     texture_ptr.with_clone_ok(|_| true).or_log(false)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_backend_texture_drop(ptr: OwnedPtr<BackendTexture>) {
+pub extern "C" fn skia_backend_texture_drop(ptr: OwnedPtr<BackendTexture>) {
     drop(ptr);
 }

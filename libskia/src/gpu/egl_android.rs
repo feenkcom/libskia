@@ -339,7 +339,7 @@ impl AndroidWindowContext {
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_android_egl_compositor_new_size(
+pub extern "C" fn skia_android_egl_compositor_new_size(
     native_window: *mut c_void,
     width: i32,
     height: i32,

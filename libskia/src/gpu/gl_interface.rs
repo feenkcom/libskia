@@ -4,7 +4,7 @@ use string_box::StringBox;
 use value_box::{BorrowedPtr, OwnedPtr};
 
 #[unsafe(no_mangle)]
-pub fn skia_interface_new_native() -> OwnedPtr<Interface> {
+pub extern "C" fn skia_interface_new_native() -> OwnedPtr<Interface> {
     match Interface::new_native() {
         None => {
             if cfg!(debug_assertions) {
@@ -18,7 +18,7 @@ pub fn skia_interface_new_native() -> OwnedPtr<Interface> {
 
 #[cfg(feature = "gl")]
 #[unsafe(no_mangle)]
-pub fn skia_interface_new_load_with(
+pub extern "C" fn skia_interface_new_load_with(
     callback: extern "C" fn(BorrowedPtr<StringBox>) -> *const c_void,
 ) -> OwnedPtr<Interface> {
     match Interface::new_load_with(|symbol| {
@@ -44,6 +44,6 @@ pub fn skia_interface_new_load_with(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_interface_drop(mut ptr: OwnedPtr<Interface>) {
+pub extern "C" fn skia_interface_drop(mut ptr: OwnedPtr<Interface>) {
     drop(ptr);
 }

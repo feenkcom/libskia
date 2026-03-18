@@ -3,12 +3,12 @@ use skia_safe::{Canvas, Picture, PictureRecorder, Rect, scalar};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
-pub fn skia_picture_recorder_new() -> OwnedPtr<PictureRecorder> {
+pub extern "C" fn skia_picture_recorder_new() -> OwnedPtr<PictureRecorder> {
     OwnedPtr::new(PictureRecorder::new())
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_picture_recorder_begin_recording(
+pub extern "C" fn skia_picture_recorder_begin_recording(
     mut picture_recorder_ptr: BorrowedPtr<PictureRecorder>,
     left: scalar,
     top: scalar,
@@ -24,7 +24,7 @@ pub fn skia_picture_recorder_begin_recording(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_picture_recorder_finish_recording(
+pub extern "C" fn skia_picture_recorder_finish_recording(
     mut picture_recorder_ptr: BorrowedPtr<PictureRecorder>,
 ) -> OwnedPtr<Picture> {
     picture_recorder_ptr
@@ -38,6 +38,6 @@ pub fn skia_picture_recorder_finish_recording(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_picture_recorder_drop(ptr: OwnedPtr<PictureRecorder>) {
+pub extern "C" fn skia_picture_recorder_drop(ptr: OwnedPtr<PictureRecorder>) {
     drop(ptr);
 }

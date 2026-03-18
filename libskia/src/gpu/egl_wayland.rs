@@ -381,7 +381,7 @@ impl WaylandWindowContext {
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_wayland_egl_compositor_new_size(
+pub extern "C" fn skia_wayland_egl_compositor_new_size(
     wayland_display: *mut c_void,
     wayland_surface: *mut c_void,
     width: i32,

@@ -4,7 +4,7 @@ use skia_safe::paint::Style;
 use skia_safe::{Canvas, Color, Paint, RRect, Rect, Vector, scalar};
 
 #[unsafe(no_mangle)]
-pub fn skia_canvas_stroke_rectangle_with_color(
+pub extern "C" fn skia_canvas_stroke_rectangle_with_color(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     left: scalar,
     top: scalar,
@@ -31,7 +31,7 @@ pub fn skia_canvas_stroke_rectangle_with_color(
 
 /// I fill a rounded rectangle (each corner radius is different) with a given color
 #[unsafe(no_mangle)]
-pub fn skia_canvas_stroke_rounded_rectangle_with_color(
+pub extern "C" fn skia_canvas_stroke_rounded_rectangle_with_color(
     canvas_ptr: *mut ReferenceBox<Canvas>,
     left: scalar,
     top: scalar,

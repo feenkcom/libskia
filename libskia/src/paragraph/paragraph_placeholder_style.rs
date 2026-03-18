@@ -3,12 +3,12 @@ use skia_safe::textlayout::{PlaceholderAlignment, PlaceholderStyle};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_placeholder_style_default() -> OwnedPtr<PlaceholderStyle> {
+pub extern "C" fn skia_paragraph_placeholder_style_default() -> OwnedPtr<PlaceholderStyle> {
     OwnedPtr::new(PlaceholderStyle::default())
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_placeholder_style_set_width(
+pub extern "C" fn skia_paragraph_placeholder_style_set_width(
     mut placeholder_style: BorrowedPtr<PlaceholderStyle>,
     width: scalar,
 ) {
@@ -20,7 +20,7 @@ pub fn skia_paragraph_placeholder_style_set_width(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_placeholder_style_set_height(
+pub extern "C" fn skia_paragraph_placeholder_style_set_height(
     mut placeholder_style: BorrowedPtr<PlaceholderStyle>,
     height: scalar,
 ) {
@@ -32,7 +32,7 @@ pub fn skia_paragraph_placeholder_style_set_height(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_placeholder_style_set_alignment(
+pub extern "C" fn skia_paragraph_placeholder_style_set_alignment(
     mut placeholder_style: BorrowedPtr<PlaceholderStyle>,
     alignment: PlaceholderAlignment,
 ) {
@@ -44,7 +44,7 @@ pub fn skia_paragraph_placeholder_style_set_alignment(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_placeholder_style_set_baseline_offset(
+pub extern "C" fn skia_paragraph_placeholder_style_set_baseline_offset(
     mut placeholder_style: BorrowedPtr<PlaceholderStyle>,
     baseline_offset: scalar,
 ) {
@@ -56,6 +56,6 @@ pub fn skia_paragraph_placeholder_style_set_baseline_offset(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_placeholder_style_drop(placeholder_style: OwnedPtr<PlaceholderStyle>) {
+pub extern "C" fn skia_paragraph_placeholder_style_drop(placeholder_style: OwnedPtr<PlaceholderStyle>) {
     drop(placeholder_style);
 }

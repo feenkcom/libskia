@@ -7,7 +7,7 @@ use skia_safe::{
 use value_box::{BorrowedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
-pub fn skia_canvas_fill_rectangle_with_color(
+pub extern "C" fn skia_canvas_fill_rectangle_with_color(
     canvas: *mut ReferenceBox<Canvas>,
     left: scalar,
     top: scalar,
@@ -31,7 +31,7 @@ pub fn skia_canvas_fill_rectangle_with_color(
 
 /// I fill a rounded rectangle (each corner radius is different) with a given color
 #[unsafe(no_mangle)]
-pub fn skia_canvas_fill_rounded_rectangle_with_color(
+pub extern "C" fn skia_canvas_fill_rounded_rectangle_with_color(
     canvas: *mut ReferenceBox<Canvas>,
     left: scalar,
     top: scalar,
@@ -82,7 +82,7 @@ pub fn skia_canvas_fill_rounded_rectangle_with_color(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_canvas_fill_image_without_paint(
+pub extern "C" fn skia_canvas_fill_image_without_paint(
     canvas: *mut ReferenceBox<Canvas>,
     image: BorrowedPtr<Image>,
     x: scalar,

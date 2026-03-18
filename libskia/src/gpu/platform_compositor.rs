@@ -199,7 +199,7 @@ impl PlatformContext {
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_platform_compositor_submit_layer(
+pub extern "C" fn skia_platform_compositor_submit_layer(
     mut compositor: BorrowedPtr<PlatformCompositor>,
     layer: BorrowedPtr<Arc<dyn Layer>>,
 ) {
@@ -211,21 +211,21 @@ pub fn skia_platform_compositor_submit_layer(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_platform_compositor_draw(mut compositor: BorrowedPtr<PlatformCompositor>) {
+pub extern "C" fn skia_platform_compositor_draw(mut compositor: BorrowedPtr<PlatformCompositor>) {
     compositor
         .with_mut(|compositor| compositor.draw().map_err(|error| error.into()))
         .log();
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_platform_compositor_draw_cacheless(mut compositor: BorrowedPtr<PlatformCompositor>) {
+pub extern "C" fn skia_platform_compositor_draw_cacheless(mut compositor: BorrowedPtr<PlatformCompositor>) {
     compositor
         .with_mut(|compositor| compositor.draw_cacheless().map_err(|error| error.into()))
         .log();
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_platform_compositor_resize(
+pub extern "C" fn skia_platform_compositor_resize(
     mut compositor: BorrowedPtr<PlatformCompositor>,
     width: u32,
     height: u32,
@@ -236,20 +236,20 @@ pub fn skia_platform_compositor_resize(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_platform_compositor_enable_fps(mut compositor: BorrowedPtr<PlatformCompositor>) {
+pub extern "C" fn skia_platform_compositor_enable_fps(mut compositor: BorrowedPtr<PlatformCompositor>) {
     compositor
         .with_mut_ok(|compositor| compositor.enable_fps())
         .log();
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_platform_compositor_disable_fps(mut compositor: BorrowedPtr<PlatformCompositor>) {
+pub extern "C" fn skia_platform_compositor_disable_fps(mut compositor: BorrowedPtr<PlatformCompositor>) {
     compositor
         .with_mut_ok(|compositor| compositor.disable_fps())
         .log();
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_platform_compositor_drop(compositor: OwnedPtr<PlatformCompositor>) {
+pub extern "C" fn skia_platform_compositor_drop(compositor: OwnedPtr<PlatformCompositor>) {
     drop(compositor);
 }

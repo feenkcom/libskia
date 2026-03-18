@@ -4,7 +4,7 @@ use skia_safe::{AlphaType, Canvas, ColorType, IPoint, ISize, Image, ImageInfo, S
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
-pub fn skia_surface_new_raster_direct(
+pub extern "C" fn skia_surface_new_raster_direct(
     image_info_ptr: BorrowedPtr<ImageInfo>,
     mut pixels_ptr: BorrowedPtr<ArrayBox<u8>>,
     row_bytes: usize,
@@ -31,7 +31,7 @@ pub fn skia_surface_new_raster_direct(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_surface_new_raster_n32_premul(width: i32, height: i32) -> OwnedPtr<Surface> {
+pub extern "C" fn skia_surface_new_raster_n32_premul(width: i32, height: i32) -> OwnedPtr<Surface> {
     let surface_option = surfaces::raster_n32_premul(ISize::new(width, height));
     match surface_option {
         None => OwnedPtr::null(),
@@ -40,7 +40,7 @@ pub fn skia_surface_new_raster_n32_premul(width: i32, height: i32) -> OwnedPtr<S
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_surface_new_default() -> OwnedPtr<Surface> {
+pub extern "C" fn skia_surface_new_default() -> OwnedPtr<Surface> {
     let surface_option = surfaces::raster_n32_premul(ISize::new(600, 400));
     match surface_option {
         None => OwnedPtr::null(),
@@ -49,7 +49,7 @@ pub fn skia_surface_new_default() -> OwnedPtr<Surface> {
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_surface_new_similar(
+pub extern "C" fn skia_surface_new_similar(
     mut surface: BorrowedPtr<Surface>,
     ptr_image_info: BorrowedPtr<ImageInfo>,
 ) -> OwnedPtr<Surface> {
@@ -72,45 +72,45 @@ pub fn skia_surface_new_similar(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_surface_get_canvas(mut surface: BorrowedPtr<Surface>) -> *mut ReferenceBox<Canvas> {
+pub extern "C" fn skia_surface_get_canvas(mut surface: BorrowedPtr<Surface>) -> *mut ReferenceBox<Canvas> {
     surface
         .with_mut_ok(|surface| ReferenceBox::new(surface.canvas()).into_raw())
         .or_log(std::ptr::null_mut())
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_surface_get_width(surface: BorrowedPtr<Surface>) -> i32 {
+pub extern "C" fn skia_surface_get_width(surface: BorrowedPtr<Surface>) -> i32 {
     surface.with_ref_ok(|surface| surface.width()).or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_surface_get_color_type(mut surface: BorrowedPtr<Surface>) -> ColorType {
+pub extern "C" fn skia_surface_get_color_type(mut surface: BorrowedPtr<Surface>) -> ColorType {
     surface
         .with_mut_ok(|surface| surface.image_info().color_type())
         .or_log(ColorType::Unknown)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_surface_get_alpha_type(mut surface: BorrowedPtr<Surface>) -> AlphaType {
+pub extern "C" fn skia_surface_get_alpha_type(mut surface: BorrowedPtr<Surface>) -> AlphaType {
     surface
         .with_mut_ok(|surface| surface.image_info().alpha_type())
         .or_log(AlphaType::Unknown)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_surface_get_height(surface: BorrowedPtr<Surface>) -> i32 {
+pub extern "C" fn skia_surface_get_height(surface: BorrowedPtr<Surface>) -> i32 {
     surface.with_ref_ok(|surface| surface.height()).or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_surface_get_image_info(mut surface: BorrowedPtr<Surface>) -> OwnedPtr<ImageInfo> {
+pub extern "C" fn skia_surface_get_image_info(mut surface: BorrowedPtr<Surface>) -> OwnedPtr<ImageInfo> {
     surface
         .with_mut_ok(|surface| OwnedPtr::new(surface.image_info()))
         .or_log(OwnedPtr::new(ImageInfo::default()))
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_surface_read_all_pixels(
+pub extern "C" fn skia_surface_read_all_pixels(
     mut surface: BorrowedPtr<Surface>,
     mut pixels_ptr: BorrowedPtr<ArrayBox<u8>>,
 ) -> bool {
@@ -131,18 +131,18 @@ pub fn skia_surface_read_all_pixels(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_surface_get_image_snapshot(mut surface: BorrowedPtr<Surface>) -> OwnedPtr<Image> {
+pub extern "C" fn skia_surface_get_image_snapshot(mut surface: BorrowedPtr<Surface>) -> OwnedPtr<Image> {
     surface
         .with_mut_ok(|surface| OwnedPtr::new(surface.image_snapshot()))
         .or_log(OwnedPtr::null())
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_surface_flush(mut _surface: BorrowedPtr<Surface>) {
+pub extern "C" fn skia_surface_flush(mut _surface: BorrowedPtr<Surface>) {
     warn!("[skia_surface_flush] surface flush is deprecated. Use DirectContext instead")
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_surface_drop(ptr: OwnedPtr<Surface>) {
+pub extern "C" fn skia_surface_drop(ptr: OwnedPtr<Surface>) {
     drop(ptr);
 }

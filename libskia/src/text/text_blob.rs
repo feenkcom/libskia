@@ -3,14 +3,14 @@ use string_box::StringBox;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
-pub fn skia_text_blob_default() -> OwnedPtr<TextBlob> {
+pub extern "C" fn skia_text_blob_default() -> OwnedPtr<TextBlob> {
     TextBlob::from_str("Text", &Font::default())
         .map(OwnedPtr::new)
         .unwrap_or_else(OwnedPtr::null)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_text_blob_from_text(
+pub extern "C" fn skia_text_blob_from_text(
     text: BorrowedPtr<StringBox>,
     _encoding: TextEncoding,
     font: BorrowedPtr<Font>,
@@ -25,7 +25,7 @@ pub fn skia_text_blob_from_text(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_text_blob_from_glyphs(
+pub extern "C" fn skia_text_blob_from_glyphs(
     glyphs: *mut GlyphId,
     glyphs_length: usize,
     font: BorrowedPtr<Font>,
@@ -45,6 +45,6 @@ pub fn skia_text_blob_from_glyphs(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_text_blob_drop(ptr: OwnedPtr<TextBlob>) {
+pub extern "C" fn skia_text_blob_drop(ptr: OwnedPtr<TextBlob>) {
     drop(ptr);
 }

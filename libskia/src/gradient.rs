@@ -5,7 +5,7 @@ use skia_safe::{Color, Matrix, Point, Shader, TileMode, scalar};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
-pub fn skia_gradient_linear_create(
+pub extern "C" fn skia_gradient_linear_create(
     from_point_ptr: BorrowedPtr<Point>,
     to_point_ptr: BorrowedPtr<Point>,
     colors_ptr: BorrowedPtr<ArrayBox<Color>>,
@@ -40,7 +40,7 @@ pub fn skia_gradient_linear_create(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_gradient_radial_create(
+pub extern "C" fn skia_gradient_radial_create(
     center_ptr: BorrowedPtr<Point>,
     radius: scalar,
     colors_ptr: BorrowedPtr<ArrayBox<Color>>,
@@ -74,7 +74,7 @@ pub fn skia_gradient_radial_create(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_gradient_two_point_conical_create(
+pub extern "C" fn skia_gradient_two_point_conical_create(
     start_ptr: BorrowedPtr<Point>,
     start_radius: scalar,
     end_ptr: BorrowedPtr<Point>,
@@ -114,7 +114,7 @@ pub fn skia_gradient_two_point_conical_create(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_gradient_sweep_create(
+pub extern "C" fn skia_gradient_sweep_create(
     center_ptr: BorrowedPtr<Point>,
     start_angle: scalar,
     end_angle: scalar,

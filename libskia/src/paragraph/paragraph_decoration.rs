@@ -3,12 +3,12 @@ use skia_safe::{Color, scalar};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_decoration_default() -> OwnedPtr<Decoration> {
+pub extern "C" fn skia_paragraph_decoration_default() -> OwnedPtr<Decoration> {
     OwnedPtr::new(Decoration::default())
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_decoration_set_color(mut ptr: BorrowedPtr<Decoration>, argb: u32) {
+pub extern "C" fn skia_paragraph_decoration_set_color(mut ptr: BorrowedPtr<Decoration>, argb: u32) {
     ptr.with_mut_ok(|decoration| {
         decoration.color = Color::new(argb);
     })
@@ -16,13 +16,13 @@ pub fn skia_paragraph_decoration_set_color(mut ptr: BorrowedPtr<Decoration>, arg
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_decoration_get_color(ptr: BorrowedPtr<Decoration>) -> OwnedPtr<Color> {
+pub extern "C" fn skia_paragraph_decoration_get_color(ptr: BorrowedPtr<Decoration>) -> OwnedPtr<Color> {
     ptr.with_clone_ok(|decoration| OwnedPtr::new(decoration.color))
         .or_log(OwnedPtr::null())
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_decoration_set_thickness(
+pub extern "C" fn skia_paragraph_decoration_set_thickness(
     mut ptr: BorrowedPtr<Decoration>,
     thickness: scalar,
 ) {
@@ -33,13 +33,13 @@ pub fn skia_paragraph_decoration_set_thickness(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_decoration_get_thickness(ptr: BorrowedPtr<Decoration>) -> scalar {
+pub extern "C" fn skia_paragraph_decoration_get_thickness(ptr: BorrowedPtr<Decoration>) -> scalar {
     ptr.with_clone_ok(|decoration| decoration.thickness_multiplier)
         .or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_decoration_set_style(
+pub extern "C" fn skia_paragraph_decoration_set_style(
     mut ptr: BorrowedPtr<Decoration>,
     style: TextDecorationStyle,
 ) {
@@ -50,13 +50,13 @@ pub fn skia_paragraph_decoration_set_style(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_decoration_get_style(ptr: BorrowedPtr<Decoration>) -> TextDecorationStyle {
+pub extern "C" fn skia_paragraph_decoration_get_style(ptr: BorrowedPtr<Decoration>) -> TextDecorationStyle {
     ptr.with_clone_ok(|decoration| decoration.style)
         .or_log(TextDecorationStyle::Solid)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_decoration_set_type(mut ptr: BorrowedPtr<Decoration>, ty: u32) {
+pub extern "C" fn skia_paragraph_decoration_set_type(mut ptr: BorrowedPtr<Decoration>, ty: u32) {
     ptr.with_mut_ok(|decoration| {
         decoration.ty = TextDecoration::from_bits_retain(ty);
     })
@@ -64,13 +64,13 @@ pub fn skia_paragraph_decoration_set_type(mut ptr: BorrowedPtr<Decoration>, ty: 
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_decoration_get_type(ptr: BorrowedPtr<Decoration>) -> u32 {
+pub extern "C" fn skia_paragraph_decoration_get_type(ptr: BorrowedPtr<Decoration>) -> u32 {
     ptr.with_clone_ok(|decoration| decoration.ty.bits())
         .or_log(TextDecoration::NO_DECORATION.bits())
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_decoration_set_mode(
+pub extern "C" fn skia_paragraph_decoration_set_mode(
     mut ptr: BorrowedPtr<Decoration>,
     mode: TextDecorationMode,
 ) {
@@ -81,12 +81,12 @@ pub fn skia_paragraph_decoration_set_mode(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_decoration_get_mode(ptr: BorrowedPtr<Decoration>) -> TextDecorationMode {
+pub extern "C" fn skia_paragraph_decoration_get_mode(ptr: BorrowedPtr<Decoration>) -> TextDecorationMode {
     ptr.with_clone_ok(|decoration| decoration.mode)
         .or_log(TextDecorationMode::Gaps)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_paragraph_decoration_drop(ptr: OwnedPtr<Decoration>) {
+pub extern "C" fn skia_paragraph_decoration_drop(ptr: OwnedPtr<Decoration>) {
     drop(ptr);
 }

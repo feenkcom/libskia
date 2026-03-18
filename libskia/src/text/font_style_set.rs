@@ -3,22 +3,22 @@ use string_box::StringBox;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
-pub fn skia_font_style_set_default() -> OwnedPtr<FontStyleSet> {
+pub extern "C" fn skia_font_style_set_default() -> OwnedPtr<FontStyleSet> {
     OwnedPtr::new(FontStyleSet::default())
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_style_get_count(mut font_style_set_ptr: BorrowedPtr<FontStyleSet>) -> usize {
+pub extern "C" fn skia_font_style_get_count(mut font_style_set_ptr: BorrowedPtr<FontStyleSet>) -> usize {
     font_style_set_ptr.with_mut_ok(|set| set.count()).or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_style_set_count(font_style_set_ptr: BorrowedPtr<FontStyleSet>) -> usize {
+pub extern "C" fn skia_font_style_set_count(font_style_set_ptr: BorrowedPtr<FontStyleSet>) -> usize {
     skia_font_style_get_count(font_style_set_ptr)
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_style_get_style_at(
+pub extern "C" fn skia_font_style_get_style_at(
     mut font_style_set_ptr: BorrowedPtr<FontStyleSet>,
     index: usize,
 ) -> OwnedPtr<FontStyle> {
@@ -28,7 +28,7 @@ pub fn skia_font_style_get_style_at(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_style_set_style_at(
+pub extern "C" fn skia_font_style_set_style_at(
     font_style_set_ptr: BorrowedPtr<FontStyleSet>,
     index: usize,
 ) -> OwnedPtr<FontStyle> {
@@ -36,7 +36,7 @@ pub fn skia_font_style_set_style_at(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_style_set_name_at(
+pub extern "C" fn skia_font_style_set_name_at(
     mut font_style_set_ptr: BorrowedPtr<FontStyleSet>,
     index: usize,
     mut _name_ptr: BorrowedPtr<StringBox>,
@@ -58,7 +58,7 @@ pub fn skia_font_style_set_name_at(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_style_set_new_typeface(
+pub extern "C" fn skia_font_style_set_new_typeface(
     mut font_style_set_ptr: BorrowedPtr<FontStyleSet>,
     index: usize,
 ) -> OwnedPtr<Typeface> {
@@ -71,6 +71,6 @@ pub fn skia_font_style_set_new_typeface(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_font_style_set_drop(ptr: OwnedPtr<FontStyleSet>) {
+pub extern "C" fn skia_font_style_set_drop(ptr: OwnedPtr<FontStyleSet>) {
     drop(ptr);
 }

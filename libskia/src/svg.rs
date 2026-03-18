@@ -10,7 +10,7 @@ use string_box::StringBox;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
-pub fn skia_svg_parse(
+pub extern "C" fn skia_svg_parse(
     svg_string: BorrowedPtr<StringBox>,
     font_mgr: BorrowedPtr<FontMgr>,
 ) -> OwnedPtr<Dom> {
@@ -26,13 +26,13 @@ pub fn skia_svg_parse(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_svg_set_container_size(mut dom: BorrowedPtr<Dom>, width: scalar, height: scalar) {
+pub extern "C" fn skia_svg_set_container_size(mut dom: BorrowedPtr<Dom>, width: scalar, height: scalar) {
     dom.with_mut_ok(|dom| dom.set_container_size(Size::new(width, height)))
         .log();
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_canvas_render_svg(
+pub extern "C" fn skia_canvas_render_svg(
     canvas: *mut ReferenceBox<Canvas>,
     dom: BorrowedPtr<Dom>,
     x: scalar,
@@ -49,12 +49,12 @@ pub fn skia_canvas_render_svg(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_svg_dom_drop(ptr: OwnedPtr<Dom>) {
+pub extern "C" fn skia_svg_dom_drop(ptr: OwnedPtr<Dom>) {
     drop(ptr);
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_svg_canvas_new(
+pub extern "C" fn skia_svg_canvas_new(
     left: scalar,
     top: scalar,
     width: scalar,
@@ -67,7 +67,7 @@ pub fn skia_svg_canvas_new(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_svg_canvas_get_canvas(svg_canvas: BorrowedPtr<SvgCanvas>) -> *mut ReferenceBox<Canvas> {
+pub extern "C" fn skia_svg_canvas_get_canvas(svg_canvas: BorrowedPtr<SvgCanvas>) -> *mut ReferenceBox<Canvas> {
     svg_canvas
         .with_ref_ok(|svg_canvas| {
             let canvas = svg_canvas.deref();
@@ -77,7 +77,7 @@ pub fn skia_svg_canvas_get_canvas(svg_canvas: BorrowedPtr<SvgCanvas>) -> *mut Re
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_svg_canvas_end(svg_canvas: OwnedPtr<SvgCanvas>, mut data: BorrowedPtr<StringBox>) {
+pub extern "C" fn skia_svg_canvas_end(svg_canvas: OwnedPtr<SvgCanvas>, mut data: BorrowedPtr<StringBox>) {
     svg_canvas
         .with_value_ok(|svg_canvas| {
             data.with_mut_ok(|data| {
@@ -90,6 +90,6 @@ pub fn skia_svg_canvas_end(svg_canvas: OwnedPtr<SvgCanvas>, mut data: BorrowedPt
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_svg_canvas_drop(svg_canvas: OwnedPtr<SvgCanvas>) {
+pub extern "C" fn skia_svg_canvas_drop(svg_canvas: OwnedPtr<SvgCanvas>) {
     drop(svg_canvas);
 }

@@ -165,7 +165,7 @@ fn metal_view_class() -> &'static AnyClass {
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_metal_compositor_new_size(
+pub extern "C" fn skia_metal_compositor_new_size(
     ns_view: *mut AnyObject,
     width: u32,
     height: u32,

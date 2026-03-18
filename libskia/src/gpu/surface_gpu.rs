@@ -4,7 +4,7 @@ use skia_safe::{ColorType, ImageInfo, Surface, gpu};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
-pub fn skia_surface_from_render_target(
+pub extern "C" fn skia_surface_from_render_target(
     backend_render_target_ptr: BorrowedPtr<BackendRenderTarget>,
     mut context_ptr: BorrowedPtr<DirectContext>,
     color_type: ColorType,
@@ -36,7 +36,7 @@ pub fn skia_surface_from_render_target(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_surface_new_render_target(
+pub extern "C" fn skia_surface_new_render_target(
     image_info: BorrowedPtr<ImageInfo>,
     mut direct_context: BorrowedPtr<DirectContext>,
 ) -> OwnedPtr<Surface> {
@@ -70,7 +70,7 @@ pub fn skia_surface_new_render_target(
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_surface_from_backend_texture(
+pub extern "C" fn skia_surface_from_backend_texture(
     mut context_ptr: BorrowedPtr<DirectContext>,
     backend_texture_ptr: BorrowedPtr<BackendTexture>,
     color_type: ColorType,

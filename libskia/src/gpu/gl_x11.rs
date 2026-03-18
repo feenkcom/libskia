@@ -506,7 +506,7 @@ impl Drop for GlContext {
 }
 
 #[unsafe(no_mangle)]
-pub fn skia_xlib_gl_compositor_new_size(
+pub extern "C" fn skia_xlib_gl_compositor_new_size(
     display: *mut c_void,
     window: c_ulong,
     width: u32,
