@@ -5,10 +5,7 @@ use std::io::Write;
 use array_box::ArrayBox;
 use skia_safe::gpu::{BackendTexture, SurfaceOrigin};
 use skia_safe::image::CachingHint;
-use skia_safe::{
-    AlphaType, ColorSpace, ColorType, Data, EncodedImageFormat, IPoint, ISize, Image, ImageInfo,
-    Paint, Surface, M44,
-};
+use skia_safe::{gpu, images, surfaces, AlphaType, ColorSpace, ColorType, Data, EncodedImageFormat, IPoint, ISize, Image, ImageInfo, Paint, M44};
 use string_box::StringBox;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
@@ -28,7 +25,7 @@ pub fn skia_image_from_pixels(
     );
     pixels_ptr
         .with_ref_ok(|array| {
-            match Image::from_raster_data(&image_info, Data::new_copy(array.to_slice()), row_bytes) {
+            match images::raster_from_data(&image_info, Data::new_copy(array.to_slice()), row_bytes) {
                 None => {
                     if cfg!(debug_assertions) {
                         eprintln!("[skia_image_from_pixels] Could not create image from bitmap with width: {:?} height: {:?} bytes per row: {:?} color type: {:?}", width, height, row_bytes, color_type);
@@ -97,7 +94,7 @@ pub fn skia_image_to_file(
             name_boxer_string_ptr.with_ref_ok(|name_boxer_string| {
                 let file_name = name_boxer_string.to_string();
 
-                let encoded = image.encode_to_data_with_context(None, encoding, quality);
+                let encoded = image.encode(None, encoding, quality);
                 if encoded.is_none() {
                     return -2;
                 }
@@ -140,7 +137,7 @@ pub fn skia_scale_image(
             }
 
             let dimensions = ISize::new(actual_x, actual_y);
-            let surface = Surface::new_raster_n32_premul(dimensions);
+            let surface = surfaces::raster_n32_premul(dimensions);
             if surface.is_none() {
                 return OwnedPtr::null();
             }
@@ -228,7 +225,7 @@ pub fn skia_image_is_texture_backend(image: BorrowedPtr<Image>) -> bool {
 #[no_mangle]
 pub fn skia_image_get_backend_texture(image_ptr: BorrowedPtr<Image>) -> OwnedPtr<BackendTexture> {
     image_ptr
-        .with_ref_ok(|image| match image.backend_texture(true) {
+        .with_ref_ok(|image| match gpu::images::get_backend_texture_from_image(image, true) {
             None => OwnedPtr::null(),
             Some(result) => OwnedPtr::new(result.0),
         })
@@ -238,7 +235,7 @@ pub fn skia_image_get_backend_texture(image_ptr: BorrowedPtr<Image>) -> OwnedPtr
 #[no_mangle]
 pub fn skia_image_get_backend_texture_origin(image_ptr: BorrowedPtr<Image>) -> SurfaceOrigin {
     image_ptr
-        .with_ref_ok(|image| match image.backend_texture(true) {
+        .with_ref_ok(|image| match gpu::images::get_backend_texture_from_image(image, true) {
             None => SurfaceOrigin::TopLeft,
             Some(result) => result.1,
         })

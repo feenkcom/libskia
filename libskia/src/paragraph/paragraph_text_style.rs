@@ -103,7 +103,7 @@ pub fn skia_paragraph_text_style_set_foreground(
     paint
         .with_ref(|paint| {
             text_style.with_mut_ok(|text_style| {
-                text_style.set_foreground_color(&paint);
+                text_style.set_foreground_paint(&paint);
             })
         })
         .log();
@@ -126,7 +126,7 @@ pub fn skia_paragraph_text_style_set_background(
     paint
         .with_ref(|paint| {
             text_style.with_mut_ok(|text_style| {
-                text_style.set_background_color(paint);
+                text_style.set_background_paint(paint);
             })
         })
         .log();
@@ -163,12 +163,12 @@ pub fn skia_paragraph_text_style_set_font_family(
 #[no_mangle]
 pub fn skia_paragraph_text_style_set_decoration(
     mut text_style: BorrowedPtr<TextStyle>,
-    mut decoration_ptr: BorrowedPtr<Decoration>,
+    decoration_ptr: BorrowedPtr<Decoration>,
 ) {
     text_style
         .with_mut_ok(|text_style| {
-            decoration_ptr.with_mut_ok(|decoration| {
-                text_style.decoration_mut().clone_from(decoration);
+            decoration_ptr.with_ref_ok(|decoration| {
+                text_style.set_decoration(decoration);
             })
         })
         .log()

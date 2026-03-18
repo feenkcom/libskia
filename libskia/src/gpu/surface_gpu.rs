@@ -1,6 +1,6 @@
 use skia_safe::gpu::Budgeted;
 use skia_safe::gpu::{BackendRenderTarget, BackendTexture, DirectContext, SurfaceOrigin};
-use skia_safe::{ColorType, ImageInfo, Surface};
+use skia_safe::{gpu, ColorType, ImageInfo, Surface};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 #[no_mangle]
@@ -11,7 +11,7 @@ pub fn skia_surface_from_render_target(
 ) -> OwnedPtr<Surface> {
     backend_render_target_ptr.with_ref(|backend_render_target| {
         context_ptr.with_mut_ok(|context| {
-            let surface_option = Surface::from_backend_render_target(
+            let surface_option = gpu::surfaces::wrap_backend_render_target(
             context,
             backend_render_target,
             SurfaceOrigin::BottomLeft,
@@ -42,7 +42,7 @@ pub fn skia_surface_new_render_target(
 ) -> OwnedPtr<Surface> {
     image_info.with_ref(|image_info| {
         direct_context.with_mut_ok(|direct_context| {
-            let surface_option = Surface::new_render_target(
+            let surface_option = gpu::surfaces::render_target(
                 direct_context,
                 Budgeted::No,
                 image_info,
@@ -50,6 +50,7 @@ pub fn skia_surface_new_render_target(
                 SurfaceOrigin::BottomLeft,
                 None,
                 true,
+                None
         );
         match surface_option {
             None => {
@@ -76,7 +77,7 @@ pub fn skia_surface_from_backend_texture(
 ) -> OwnedPtr<Surface> {
     backend_texture_ptr.with_ref(|backend_texture| {
         context_ptr.with_mut_ok(|context| {
-            let surface_option = Surface::from_backend_texture(
+            let surface_option = gpu::surfaces::wrap_backend_texture(
             context,
             backend_texture,
             SurfaceOrigin::BottomLeft,

@@ -127,7 +127,7 @@ pub fn skia_paint_set_stroke_width(mut paint_ptr: BorrowedPtr<Paint>, width: sca
 #[no_mangle]
 pub fn skia_paint_get_blend_mode(paint_ptr: BorrowedPtr<Paint>) -> BlendMode {
     paint_ptr
-        .with_ref_ok(|paint| paint.blend_mode())
+        .with_ref_ok(|paint| paint.blend_mode_or(BlendMode::SrcOver))
         .or_log(BlendMode::Clear)
 }
 

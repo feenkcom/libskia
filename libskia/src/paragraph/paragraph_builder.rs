@@ -100,12 +100,12 @@ pub fn skia_paragraph_builder_add_text(
 #[no_mangle]
 pub fn skia_paragraph_builder_add_placeholder(
     mut paragraph_builder: BorrowedPtr<ParagraphBuilderWithText>,
-    placeholder: OwnedPtr<PlaceholderStyle>,
+    placeholder: BorrowedPtr<PlaceholderStyle>,
     char_length: CharLength,
 ) {
     paragraph_builder
         .with_mut(|paragraph_builder| {
-            placeholder.with_value_ok(|placeholder| {
+            placeholder.with_clone_ok(|placeholder| {
                 paragraph_builder.add_placeholder(placeholder, char_length);
             })
         })
