@@ -52,6 +52,6 @@ pub extern "C" fn skia_texture_info_get_id(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_texture_info_drop(mut texture_info: OwnedPtr<TextureInfo>) {
+pub extern "C" fn skia_texture_info_drop(texture_info: OwnedPtr<TextureInfo>) {
     drop(texture_info);
 }

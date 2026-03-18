@@ -44,6 +44,6 @@ pub extern "C" fn skia_interface_new_load_with(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_interface_drop(mut interface: OwnedPtr<Interface>) {
+pub extern "C" fn skia_interface_drop(interface: OwnedPtr<Interface>) {
     drop(interface);
 }

@@ -8,7 +8,7 @@ pub extern "C" fn skia_context_new_gl(
     interface: BorrowedPtr<skia_safe::gpu::gl::Interface>,
 ) -> OwnedPtr<DirectContext> {
     interface
-        .with_clone_ok(|interface| match DirectContext::new_gl(interface, None) {
+        .with_clone_ok(|interface| match skia_safe::gpu::direct_contexts::make_gl(interface, None) {
             None => {
                 if cfg!(debug_assertions) {
                     eprintln!("[skia_context_new_gl] Unable to create OpenGL context");
