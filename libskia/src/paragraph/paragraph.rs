@@ -4,6 +4,7 @@ use std::ops::Range;
 use std::rc::Rc;
 
 use array_box::ArrayBox;
+use log::{error, trace};
 use skia_safe::textlayout::{
     Affinity, LineMetrics, Paragraph, PlaceholderStyle, PositionWithAffinity, RectHeightStyle,
     RectWidthStyle, TextBox,

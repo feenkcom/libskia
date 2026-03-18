@@ -1,14 +1,11 @@
 #![allow(non_snake_case)]
 
-#[macro_use]
-extern crate lazy_static;
-#[macro_use]
-extern crate log;
 use std::os::raw::c_void;
 
 // re-export the ffi methods
 pub use compositor_ffi::*;
 pub use compositor_skia_ffi::*;
+use log::warn;
 pub use value_box_ffi::*;
 
 pub mod canvas;

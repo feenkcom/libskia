@@ -1,3 +1,4 @@
+use log::error;
 use skia_safe::gpu::Budgeted;
 use skia_safe::gpu::{BackendRenderTarget, BackendTexture, DirectContext, SurfaceOrigin};
 use skia_safe::{ColorType, ImageInfo, Surface, gpu};

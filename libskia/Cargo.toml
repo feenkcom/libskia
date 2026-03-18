@@ -13,11 +13,12 @@ log = "0.4"
 env_logger = "0.11"
 fps_counter = "3.0"
 lazy_static = "1.4"
-value-box = { version = "4.1", path = "../../value-box-rs/value-box", features = [ "anyhow" ] }
-array-box = { version = "4.1", path = "../../value-box-rs/array-box" }
-string-box = { version = "4.1", path = "../../value-box-rs/string-box" }
-geometry-box = { version = "4.1", path = "../../value-box-rs/geometry-box" }
-value-box-ffi = { version = "4.1", path = "../../value-box-rs/value-box-ffi", features = [ "array-box", "geometry-box", "string-box"] }
+# FFI helpers
+value-box = { version = "4.1", features = [ "anyhow" ] }
+array-box = { version = "4.1" }
+string-box = { version = "4.1" }
+value-box-ffi = { version = "4.1", features = [ "array-box", "geometry-box", "string-box"] }
+# Compositor
 compositor = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-skia = { git = "https://github.com/feenkcom/compositor-rs" }
 compositor-ffi = { git = "https://github.com/feenkcom/compositor-rs" }
@@ -28,7 +29,6 @@ compositor-skia-platform = { git = "https://github.com/feenkcom/compositor-rs" }
 #compositor-ffi = { path = "../../compositor-rs/compositor-ffi" }
 #compositor-skia-ffi = { path = "../../compositor-rs/compositor-skia-ffi" }
 #compositor-skia-platform = { path = "../../compositor-rs/compositor-skia-platform" }
-#value-box = { path = "../../value-box-rs/value-box" }
 
 [target.'cfg(any(target_os="macos", target_os="ios"))'.dependencies]
 metal = { version = "0.32", optional = true }

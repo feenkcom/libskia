@@ -5,6 +5,7 @@ use compositor::{Compositor, Layer};
 use compositor_skia::{Cache, SkiaCachelessCompositor, SkiaCompositor};
 use compositor_skia_platform::Platform;
 use fps_counter::FPSCounter;
+use lazy_static::lazy_static;
 use skia_safe::{Color, Color4f, Font, FontMgr, FontStyle, ISize, Paint, Point, Surface};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
