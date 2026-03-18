@@ -1,12 +1,13 @@
 use crate::gpu::{PlatformCompositor, PlatformContext};
 use khronos_egl as egl;
+use log::error;
 use skia_safe::gpu::Protected;
 use skia_safe::gpu::gl::{Enum, FramebufferInfo, Interface, UInt};
 use skia_safe::gpu::{BackendRenderTarget, ContextOptions, DirectContext, SurfaceOrigin};
 use skia_safe::{ColorType, ISize, Surface, gpu};
 use std::error::Error;
 use std::ffi::{c_int, c_void};
-use value_box::{BorrowedPtr, OwnedPtr};
+use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
 type GLenum = i32;
 type GLint = i32;
@@ -347,4 +348,5 @@ pub extern "C" fn skia_android_egl_compositor_new_size(
     EglContext::new(native_window, width, height)
         .map(|context| OwnedPtr::new(PlatformCompositor::new(PlatformContext::Egl(context))))
         .map_err(|error| error.into())
+        .or_log(OwnedPtr::null())
 }

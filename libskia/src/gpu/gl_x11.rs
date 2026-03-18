@@ -1,3 +1,5 @@
+use lazy_static::lazy_static;
+use log::{error, info};
 use skia_safe::gpu::gl::{Enum, FramebufferInfo, Interface, UInt};
 use skia_safe::gpu::{BackendRenderTarget, ContextOptions, DirectContext, SurfaceOrigin};
 use skia_safe::{ColorType, ISize, Surface, gpu};
@@ -7,7 +9,7 @@ use std::fmt::{Display, Formatter};
 use std::os::raw::{c_int, c_ulong};
 use std::ptr::{slice_from_raw_parts, slice_from_raw_parts_mut};
 use std::sync::Mutex;
-use value_box::{BorrowedPtr, BoxerError, OwnedPtr};
+use value_box::{BorrowedPtr, BoxerError, OwnedPtr, ReturnBoxerResult};
 
 use crate::gpu::{PlatformCompositor, PlatformContext};
 use x11::glx;
@@ -516,4 +518,5 @@ pub extern "C" fn skia_xlib_gl_compositor_new_size(
         .and_then(|mut context| context.initialize_context().map(|_| context))
         .map(|context| OwnedPtr::new(PlatformCompositor::new(PlatformContext::XlibGl(context))))
         .map_err(|error| BoxerError::AnyError(Box::new(error).into()))
+        .or_log(OwnedPtr::null())
 }

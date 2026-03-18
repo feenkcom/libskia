@@ -185,15 +185,15 @@ impl PlatformContext {
             #[cfg(target_os = "windows")]
             PlatformContext::Angle(context) => context
                 .resize_surface(size)
-                .unwrap_or_else(|error| error!("Failed to resize surface: {:?}", error)),
+                .unwrap_or_else(|error| log::error!("Failed to resize surface: {:?}", error)),
             #[cfg(feature = "x11")]
             PlatformContext::XlibGl(context) => context
                 .resize_surface(size)
-                .unwrap_or_else(|error| error!("Failed to resize surface: {:?}", error)),
+                .unwrap_or_else(|error| log::error!("Failed to resize surface: {:?}", error)),
             #[cfg(feature = "egl")]
             PlatformContext::Egl(context) => context
                 .resize_surface(size)
-                .unwrap_or_else(|error| error!("Failed to resize surface: {:?}", error)),
+                .unwrap_or_else(|error| log::error!("Failed to resize surface: {:?}", error)),
             PlatformContext::Unsupported => {}
         }
     }
