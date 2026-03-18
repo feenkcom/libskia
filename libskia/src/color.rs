@@ -75,7 +75,10 @@ pub extern "C" fn skia_color_array_get_data(array: BorrowedPtr<ArrayBox<Color>>)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_color_array_at(array: BorrowedPtr<ArrayBox<Color>>, index: usize) -> OwnedPtr<Color> {
+pub extern "C" fn skia_color_array_at(
+    array: BorrowedPtr<ArrayBox<Color>>,
+    index: usize,
+) -> OwnedPtr<Color> {
     array
         .with_ref_ok(|array| OwnedPtr::new(array.at(index)))
         .or_log(OwnedPtr::null())

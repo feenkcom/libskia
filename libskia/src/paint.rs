@@ -65,7 +65,13 @@ pub extern "C" fn skia_paint_set_style(mut paint_ptr: BorrowedPtr<Paint>, style:
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paint_set_rgba(mut paint_ptr: BorrowedPtr<Paint>, r: u8, g: u8, b: u8, a: u8) {
+pub extern "C" fn skia_paint_set_rgba(
+    mut paint_ptr: BorrowedPtr<Paint>,
+    r: u8,
+    g: u8,
+    b: u8,
+    a: u8,
+) {
     paint_ptr
         .with_mut_ok(|paint| {
             paint.set_argb(a, r, g, b);
@@ -132,7 +138,10 @@ pub extern "C" fn skia_paint_get_blend_mode(paint_ptr: BorrowedPtr<Paint>) -> Bl
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paint_set_blend_mode(mut paint_ptr: BorrowedPtr<Paint>, blend_mode: BlendMode) {
+pub extern "C" fn skia_paint_set_blend_mode(
+    mut paint_ptr: BorrowedPtr<Paint>,
+    blend_mode: BlendMode,
+) {
     paint_ptr
         .with_mut_ok(|paint| {
             paint.set_blend_mode(blend_mode);
@@ -148,7 +157,10 @@ pub extern "C" fn skia_paint_get_stroke_miter(paint_ptr: BorrowedPtr<Paint>) -> 
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paint_set_stroke_miter(mut paint_ptr: BorrowedPtr<Paint>, stroke_miter: scalar) {
+pub extern "C" fn skia_paint_set_stroke_miter(
+    mut paint_ptr: BorrowedPtr<Paint>,
+    stroke_miter: scalar,
+) {
     paint_ptr
         .with_mut_ok(|paint| {
             paint.set_stroke_miter(stroke_miter);
@@ -199,7 +211,10 @@ pub extern "C" fn skia_paint_get_shader(paint_ptr: BorrowedPtr<Paint>) -> OwnedP
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paint_set_shader(mut paint_ptr: BorrowedPtr<Paint>, shader_ptr: BorrowedPtr<Shader>) {
+pub extern "C" fn skia_paint_set_shader(
+    mut paint_ptr: BorrowedPtr<Paint>,
+    shader_ptr: BorrowedPtr<Shader>,
+) {
     paint_ptr
         .with_mut_ok(|paint| {
             let shader = shader_ptr.with_clone_ok(Some).unwrap_or(None);
@@ -222,7 +237,9 @@ pub extern "C" fn skia_paint_set_image_filter(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paint_get_image_filter(paint_ptr: BorrowedPtr<Paint>) -> OwnedPtr<ImageFilter> {
+pub extern "C" fn skia_paint_get_image_filter(
+    paint_ptr: BorrowedPtr<Paint>,
+) -> OwnedPtr<ImageFilter> {
     paint_ptr
         .with_ref_ok(|paint| match paint.image_filter() {
             None => OwnedPtr::null(),
@@ -252,7 +269,9 @@ pub extern "C" fn skia_paint_set_path_effect(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paint_get_path_effect(paint_ptr: BorrowedPtr<Paint>) -> OwnedPtr<PathEffect> {
+pub extern "C" fn skia_paint_get_path_effect(
+    paint_ptr: BorrowedPtr<Paint>,
+) -> OwnedPtr<PathEffect> {
     paint_ptr
         .with_ref_ok(|paint| match paint.path_effect() {
             None => OwnedPtr::null(),

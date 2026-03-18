@@ -53,21 +53,27 @@ pub extern "C" fn skia_backend_texture_get_height(texture_ptr: BorrowedPtr<Backe
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_backend_texture_has_mip_maps(texture_ptr: BorrowedPtr<BackendTexture>) -> bool {
+pub extern "C" fn skia_backend_texture_has_mip_maps(
+    texture_ptr: BorrowedPtr<BackendTexture>,
+) -> bool {
     texture_ptr
         .with_clone_ok(|backend_texture| backend_texture.has_mipmaps())
         .or_log(false)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_backend_texture_get_backend(texture_ptr: BorrowedPtr<BackendTexture>) -> BackendAPI {
+pub extern "C" fn skia_backend_texture_get_backend(
+    texture_ptr: BorrowedPtr<BackendTexture>,
+) -> BackendAPI {
     texture_ptr
         .with_clone_ok(|backend_texture| backend_texture.backend())
         .or_log(BackendAPI::Mock)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_backend_texture_is_protected(texture_ptr: BorrowedPtr<BackendTexture>) -> bool {
+pub extern "C" fn skia_backend_texture_is_protected(
+    texture_ptr: BorrowedPtr<BackendTexture>,
+) -> bool {
     texture_ptr
         .with_clone_ok(|backend_texture| backend_texture.is_protected())
         .or_log(false)

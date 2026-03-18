@@ -34,21 +34,27 @@ pub extern "C" fn skia_rounded_rectangle_new_radii(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_rounded_rectangle_get_type(rounded_rectangle_ptr: BorrowedPtr<RRect>) -> Type {
+pub extern "C" fn skia_rounded_rectangle_get_type(
+    rounded_rectangle_ptr: BorrowedPtr<RRect>,
+) -> Type {
     rounded_rectangle_ptr
         .with_ref_ok(|rounded_rectangle| rounded_rectangle.get_type())
         .or_log(Type::Empty)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_rounded_rectangle_width(rounded_rectangle_ptr: BorrowedPtr<RRect>) -> scalar {
+pub extern "C" fn skia_rounded_rectangle_width(
+    rounded_rectangle_ptr: BorrowedPtr<RRect>,
+) -> scalar {
     rounded_rectangle_ptr
         .with_ref_ok(|rounded_rectangle| rounded_rectangle.width())
         .or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_rounded_rectangle_height(rounded_rectangle_ptr: BorrowedPtr<RRect>) -> scalar {
+pub extern "C" fn skia_rounded_rectangle_height(
+    rounded_rectangle_ptr: BorrowedPtr<RRect>,
+) -> scalar {
     rounded_rectangle_ptr
         .with_ref_ok(|rounded_rectangle| rounded_rectangle.height())
         .or_log(0.0)

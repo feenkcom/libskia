@@ -1,5 +1,4 @@
 use array_box::ArrayBox;
-use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::{Canvas, Picture, Rect};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
@@ -25,7 +24,9 @@ pub extern "C" fn skia_picture_unique_id(picture_ptr: BorrowedPtr<Picture>) -> u
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_picture_approximate_op_count(mut _ptr_picture: BorrowedPtr<Picture>) -> usize {
+pub extern "C" fn skia_picture_approximate_op_count(
+    mut _ptr_picture: BorrowedPtr<Picture>,
+) -> usize {
     _ptr_picture
         .with_mut_ok(|picture| picture.approximate_op_count())
         .or_log(0)
@@ -34,15 +35,17 @@ pub extern "C" fn skia_picture_approximate_op_count(mut _ptr_picture: BorrowedPt
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_picture_playback(
     mut _ptr_picture: BorrowedPtr<Picture>,
-    _ptr_canvas: *mut ReferenceBox<Canvas>,
+    _ptr_canvas: BorrowedPtr<Canvas>,
 ) {
-    _ptr_canvas.with_not_null(|canvas| {
-        _ptr_picture
-            .with_mut_ok(|picture| {
-                picture.playback(canvas);
-            })
-            .log()
-    })
+    _ptr_canvas
+        .with_ref_ok(|canvas| {
+            _ptr_picture
+                .with_mut_ok(|picture| {
+                    picture.playback(canvas);
+                })
+                .log()
+        })
+        .log()
 }
 
 #[unsafe(no_mangle)]

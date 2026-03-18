@@ -40,14 +40,18 @@ pub extern "C" fn skia_font_metrics_get_leading(font_metrics: BorrowedPtr<FontMe
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_font_metrics_get_avg_char_width(font_metrics: BorrowedPtr<FontMetrics>) -> scalar {
+pub extern "C" fn skia_font_metrics_get_avg_char_width(
+    font_metrics: BorrowedPtr<FontMetrics>,
+) -> scalar {
     font_metrics
         .with_ref_ok(|metrics| metrics.avg_char_width)
         .or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_font_metrics_get_max_char_width(font_metrics: BorrowedPtr<FontMetrics>) -> scalar {
+pub extern "C" fn skia_font_metrics_get_max_char_width(
+    font_metrics: BorrowedPtr<FontMetrics>,
+) -> scalar {
     font_metrics
         .with_ref_ok(|metrics| metrics.max_char_width)
         .or_log(0.0)
@@ -75,35 +79,45 @@ pub extern "C" fn skia_font_metrics_get_x_height(font_metrics: BorrowedPtr<FontM
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_font_metrics_get_cap_height(font_metrics: BorrowedPtr<FontMetrics>) -> scalar {
+pub extern "C" fn skia_font_metrics_get_cap_height(
+    font_metrics: BorrowedPtr<FontMetrics>,
+) -> scalar {
     font_metrics
         .with_ref_ok(|metrics| metrics.cap_height)
         .or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_font_metrics_get_underline_thickness(font_metrics: BorrowedPtr<FontMetrics>) -> scalar {
+pub extern "C" fn skia_font_metrics_get_underline_thickness(
+    font_metrics: BorrowedPtr<FontMetrics>,
+) -> scalar {
     font_metrics
         .with_ref_ok(|metrics| metrics.underline_thickness().unwrap_or(0.0))
         .or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_font_metrics_get_underline_position(font_metrics: BorrowedPtr<FontMetrics>) -> scalar {
+pub extern "C" fn skia_font_metrics_get_underline_position(
+    font_metrics: BorrowedPtr<FontMetrics>,
+) -> scalar {
     font_metrics
         .with_ref_ok(|metrics| metrics.underline_position().unwrap_or(0.0))
         .or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_font_metrics_get_strikeout_thickness(font_metrics: BorrowedPtr<FontMetrics>) -> scalar {
+pub extern "C" fn skia_font_metrics_get_strikeout_thickness(
+    font_metrics: BorrowedPtr<FontMetrics>,
+) -> scalar {
     font_metrics
         .with_ref_ok(|metrics| metrics.strikeout_thickness().unwrap_or(0.0))
         .or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_font_metrics_get_strikeout_position(font_metrics: BorrowedPtr<FontMetrics>) -> scalar {
+pub extern "C" fn skia_font_metrics_get_strikeout_position(
+    font_metrics: BorrowedPtr<FontMetrics>,
+) -> scalar {
     font_metrics
         .with_ref_ok(|metrics| metrics.strikeout_position().unwrap_or(0.0))
         .or_log(0.0)

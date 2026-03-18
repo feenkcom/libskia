@@ -42,7 +42,9 @@ pub extern "C" fn skia_image_from_pixels(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_from_file(boxer_string_ptr: BorrowedPtr<StringBox>) -> OwnedPtr<Image> {
+pub extern "C" fn skia_image_from_file(
+    boxer_string_ptr: BorrowedPtr<StringBox>,
+) -> OwnedPtr<Image> {
     boxer_string_ptr
         .with_ref_ok(|boxer_string| {
             let file_name = boxer_string.to_string();
@@ -226,7 +228,9 @@ pub extern "C" fn skia_image_is_texture_backend(image: BorrowedPtr<Image>) -> bo
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_get_backend_texture(image_ptr: BorrowedPtr<Image>) -> OwnedPtr<BackendTexture> {
+pub extern "C" fn skia_image_get_backend_texture(
+    image_ptr: BorrowedPtr<Image>,
+) -> OwnedPtr<BackendTexture> {
     image_ptr
         .with_ref_ok(
             |image| match gpu::images::get_backend_texture_from_image(image, true) {
@@ -238,7 +242,9 @@ pub extern "C" fn skia_image_get_backend_texture(image_ptr: BorrowedPtr<Image>) 
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_image_get_backend_texture_origin(image_ptr: BorrowedPtr<Image>) -> SurfaceOrigin {
+pub extern "C" fn skia_image_get_backend_texture_origin(
+    image_ptr: BorrowedPtr<Image>,
+) -> SurfaceOrigin {
     image_ptr
         .with_ref_ok(
             |image| match gpu::images::get_backend_texture_from_image(image, true) {

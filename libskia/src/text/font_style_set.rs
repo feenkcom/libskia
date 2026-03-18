@@ -8,12 +8,16 @@ pub extern "C" fn skia_font_style_set_default() -> OwnedPtr<FontStyleSet> {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_font_style_get_count(mut font_style_set_ptr: BorrowedPtr<FontStyleSet>) -> usize {
+pub extern "C" fn skia_font_style_get_count(
+    mut font_style_set_ptr: BorrowedPtr<FontStyleSet>,
+) -> usize {
     font_style_set_ptr.with_mut_ok(|set| set.count()).or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_font_style_set_count(font_style_set_ptr: BorrowedPtr<FontStyleSet>) -> usize {
+pub extern "C" fn skia_font_style_set_count(
+    font_style_set_ptr: BorrowedPtr<FontStyleSet>,
+) -> usize {
     skia_font_style_get_count(font_style_set_ptr)
 }
 

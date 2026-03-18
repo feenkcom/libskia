@@ -1061,7 +1061,6 @@ dependencies = [
  "phlow",
  "phlow-extensions",
  "phlow-ffi",
- "reference-box",
  "skia-safe",
  "string-box 4.1.0",
  "typename",

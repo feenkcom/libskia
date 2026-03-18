@@ -11,7 +11,9 @@ pub extern "C" fn skia_font_manager_default() -> OwnedPtr<FontMgr> {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_font_manager_count_families(font_manager_ptr: BorrowedPtr<FontMgr>) -> usize {
+pub extern "C" fn skia_font_manager_count_families(
+    font_manager_ptr: BorrowedPtr<FontMgr>,
+) -> usize {
     font_manager_ptr
         .with_clone_ok(|font_manager| font_manager.count_families())
         .or_log(0)

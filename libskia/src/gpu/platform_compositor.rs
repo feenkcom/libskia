@@ -218,7 +218,9 @@ pub extern "C" fn skia_platform_compositor_draw(mut compositor: BorrowedPtr<Plat
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_platform_compositor_draw_cacheless(mut compositor: BorrowedPtr<PlatformCompositor>) {
+pub extern "C" fn skia_platform_compositor_draw_cacheless(
+    mut compositor: BorrowedPtr<PlatformCompositor>,
+) {
     compositor
         .with_mut(|compositor| compositor.draw_cacheless().map_err(|error| error.into()))
         .log();
@@ -236,14 +238,18 @@ pub extern "C" fn skia_platform_compositor_resize(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_platform_compositor_enable_fps(mut compositor: BorrowedPtr<PlatformCompositor>) {
+pub extern "C" fn skia_platform_compositor_enable_fps(
+    mut compositor: BorrowedPtr<PlatformCompositor>,
+) {
     compositor
         .with_mut_ok(|compositor| compositor.enable_fps())
         .log();
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_platform_compositor_disable_fps(mut compositor: BorrowedPtr<PlatformCompositor>) {
+pub extern "C" fn skia_platform_compositor_disable_fps(
+    mut compositor: BorrowedPtr<PlatformCompositor>,
+) {
     compositor
         .with_mut_ok(|compositor| compositor.disable_fps())
         .log();

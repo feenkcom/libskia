@@ -12,7 +12,10 @@ pub extern "C" fn skia_font_default() -> OwnedPtr<Font> {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_font_from_typeface(typeface: BorrowedPtr<Typeface>, size: scalar) -> OwnedPtr<Font> {
+pub extern "C" fn skia_font_from_typeface(
+    typeface: BorrowedPtr<Typeface>,
+    size: scalar,
+) -> OwnedPtr<Font> {
     typeface
         .with_clone_ok(|typeface| OwnedPtr::new(Font::from_typeface(typeface, size)))
         .or_log(OwnedPtr::null())

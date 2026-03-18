@@ -24,7 +24,9 @@ pub extern "C" fn skia_font_style_get_weight(font_style_ptr: BorrowedPtr<FontSty
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_font_style_get_width(font_style_ptr: BorrowedPtr<FontStyle>) -> FontStyleWidth {
+pub extern "C" fn skia_font_style_get_width(
+    font_style_ptr: BorrowedPtr<FontStyle>,
+) -> FontStyleWidth {
     font_style_ptr
         .with_clone_ok(|font_style| font_style.width().into())
         .or_log(FontStyleWidth::Normal)

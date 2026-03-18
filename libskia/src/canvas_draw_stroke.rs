@@ -1,11 +1,11 @@
 use float_cmp::ApproxEqUlps;
-use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::paint::Style;
 use skia_safe::{Canvas, Color, Paint, RRect, Rect, Vector, scalar};
+use value_box::{BorrowedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_stroke_rectangle_with_color(
-    canvas_ptr: *mut ReferenceBox<Canvas>,
+    canvas_ptr: BorrowedPtr<Canvas>,
     left: scalar,
     top: scalar,
     right: scalar,
@@ -17,22 +17,24 @@ pub extern "C" fn skia_canvas_stroke_rectangle_with_color(
     width: scalar,
     antialias: bool,
 ) {
-    canvas_ptr.with_not_null(|canvas| {
-        canvas.draw_rect(
-            Rect::new(left, top, right, bottom),
-            Paint::default()
-                .set_color(Color::from_argb(a, r, g, b))
-                .set_anti_alias(antialias)
-                .set_stroke_width(width)
-                .set_style(Style::Stroke),
-        );
-    });
+    canvas_ptr
+        .with_ref_ok(|canvas| {
+            canvas.draw_rect(
+                Rect::new(left, top, right, bottom),
+                Paint::default()
+                    .set_color(Color::from_argb(a, r, g, b))
+                    .set_anti_alias(antialias)
+                    .set_stroke_width(width)
+                    .set_style(Style::Stroke),
+            );
+        })
+        .log();
 }
 
 /// I fill a rounded rectangle (each corner radius is different) with a given color
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_stroke_rounded_rectangle_with_color(
-    canvas_ptr: *mut ReferenceBox<Canvas>,
+    canvas_ptr: BorrowedPtr<Canvas>,
     left: scalar,
     top: scalar,
     right: scalar,
@@ -48,40 +50,42 @@ pub extern "C" fn skia_canvas_stroke_rounded_rectangle_with_color(
     width: scalar,
     antialias: bool,
 ) {
-    canvas_ptr.with_not_null(|canvas| {
-        // if all radii are same we can use a simpler optimized drawing method
-        if r_top_left.approx_eq_ulps(&r_top_right, 2)
-            && r_top_right.approx_eq_ulps(&r_bottom_right, 2)
-            && r_bottom_right.approx_eq_ulps(&r_bottom_left, 2)
-            && r_bottom_left.approx_eq_ulps(&r_top_left, 2)
-        {
-            canvas.draw_round_rect(
-                Rect::new(left, top, right, bottom),
-                r_top_right,
-                r_top_right,
-                Paint::default()
-                    .set_color(Color::from_argb(a, r, g, b))
-                    .set_anti_alias(antialias)
-                    .set_stroke_width(width)
-                    .set_style(Style::Stroke),
-            );
-        } else {
-            canvas.draw_rrect(
-                RRect::new_rect_radii(
+    canvas_ptr
+        .with_ref_ok(|canvas| {
+            // if all radii are same we can use a simpler optimized drawing method
+            if r_top_left.approx_eq_ulps(&r_top_right, 2)
+                && r_top_right.approx_eq_ulps(&r_bottom_right, 2)
+                && r_bottom_right.approx_eq_ulps(&r_bottom_left, 2)
+                && r_bottom_left.approx_eq_ulps(&r_top_left, 2)
+            {
+                canvas.draw_round_rect(
                     Rect::new(left, top, right, bottom),
-                    &[
-                        Vector::new(r_top_left, r_top_left),
-                        Vector::new(r_top_right, r_top_right),
-                        Vector::new(r_bottom_right, r_bottom_right),
-                        Vector::new(r_bottom_left, r_bottom_left),
-                    ],
-                ),
-                Paint::default()
-                    .set_color(Color::from_argb(a, r, g, b))
-                    .set_anti_alias(antialias)
-                    .set_stroke_width(width)
-                    .set_style(Style::Stroke),
-            );
-        };
-    });
+                    r_top_right,
+                    r_top_right,
+                    Paint::default()
+                        .set_color(Color::from_argb(a, r, g, b))
+                        .set_anti_alias(antialias)
+                        .set_stroke_width(width)
+                        .set_style(Style::Stroke),
+                );
+            } else {
+                canvas.draw_rrect(
+                    RRect::new_rect_radii(
+                        Rect::new(left, top, right, bottom),
+                        &[
+                            Vector::new(r_top_left, r_top_left),
+                            Vector::new(r_top_right, r_top_right),
+                            Vector::new(r_bottom_right, r_bottom_right),
+                            Vector::new(r_bottom_left, r_bottom_left),
+                        ],
+                    ),
+                    Paint::default()
+                        .set_color(Color::from_argb(a, r, g, b))
+                        .set_anti_alias(antialias)
+                        .set_stroke_width(width)
+                        .set_style(Style::Stroke),
+                );
+            };
+        })
+        .log();
 }

@@ -10,7 +10,10 @@ pub extern "C" fn skia_surface_props_default() -> OwnedPtr<SurfaceProps> {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_surface_props_new(flags: u32, pixel_geometry: PixelGeometry) -> OwnedPtr<SurfaceProps> {
+pub extern "C" fn skia_surface_props_new(
+    flags: u32,
+    pixel_geometry: PixelGeometry,
+) -> OwnedPtr<SurfaceProps> {
     OwnedPtr::new(SurfaceProps::new(
         SurfacePropsFlags::from_bits_truncate(flags),
         pixel_geometry,

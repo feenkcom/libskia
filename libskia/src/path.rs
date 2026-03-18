@@ -23,7 +23,12 @@ pub extern "C" fn skia_path_set_fill_type(mut path: BorrowedPtr<Path>, fill_type
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_path_move_to(mut path: BorrowedPtr<Path>, x: scalar, y: scalar, is_absolute: bool) {
+pub extern "C" fn skia_path_move_to(
+    mut path: BorrowedPtr<Path>,
+    x: scalar,
+    y: scalar,
+    is_absolute: bool,
+) {
     path.with_mut_ok(|path| {
         if is_absolute {
             path.move_to(Point::new(x, y));
@@ -35,7 +40,12 @@ pub extern "C" fn skia_path_move_to(mut path: BorrowedPtr<Path>, x: scalar, y: s
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_path_line_to(mut path: BorrowedPtr<Path>, x: scalar, y: scalar, is_absolute: bool) {
+pub extern "C" fn skia_path_line_to(
+    mut path: BorrowedPtr<Path>,
+    x: scalar,
+    y: scalar,
+    is_absolute: bool,
+) {
     path.with_mut_ok(|path| {
         if is_absolute {
             path.line_to(Point::new(x, y));
@@ -178,7 +188,10 @@ pub extern "C" fn skia_path_get_points(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_path_get_last_point(path: BorrowedPtr<Path>, mut point: BorrowedPtr<Point>) -> bool {
+pub extern "C" fn skia_path_get_last_point(
+    path: BorrowedPtr<Path>,
+    mut point: BorrowedPtr<Point>,
+) -> bool {
     path.with_ref(|path| {
         point.with_mut_ok(|point| match path.last_pt() {
             None => false,
@@ -243,7 +256,10 @@ pub extern "C" fn skia_path_stroke_contains_point(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_path_serialize(path: BorrowedPtr<Path>, mut data: BorrowedPtr<ArrayBox<u8>>) {
+pub extern "C" fn skia_path_serialize(
+    path: BorrowedPtr<Path>,
+    mut data: BorrowedPtr<ArrayBox<u8>>,
+) {
     path.with_ref(|path| {
         data.with_mut_ok(|data| {
             data.set_array(path.serialize().as_bytes());

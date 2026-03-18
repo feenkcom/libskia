@@ -28,7 +28,9 @@ pub extern "C" fn skia_context_get_max_texture_size(context: BorrowedPtr<DirectC
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_context_get_max_render_target_size(context: BorrowedPtr<DirectContext>) -> i32 {
+pub extern "C" fn skia_context_get_max_render_target_size(
+    context: BorrowedPtr<DirectContext>,
+) -> i32 {
     context
         .with_ref_ok(|context| context.max_render_target_size())
         .or_log(0)

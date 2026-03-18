@@ -1,5 +1,4 @@
 use array_box::ArrayBox;
-use reference_box::ReferenceBox;
 use skia_safe::{AlphaType, Canvas, ColorType, IPoint, ISize, Image, ImageInfo, Surface, surfaces};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
@@ -71,11 +70,17 @@ pub extern "C" fn skia_surface_new_similar(
         .or_log(OwnedPtr::null())
 }
 
+/// # Safety
+///
+/// The returned [`BorrowedPtr<Canvas>`] is borrowed from `surface`. Its
+/// lifetime is bound to `Surface`, so it must not outlive the owning `Surface`.
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_surface_get_canvas(mut surface: BorrowedPtr<Surface>) -> *mut ReferenceBox<Canvas> {
+pub extern "C" fn skia_surface_get_canvas(
+    mut surface: BorrowedPtr<Surface>,
+) -> BorrowedPtr<Canvas> {
     surface
-        .with_mut_ok(|surface| ReferenceBox::new(surface.canvas()).into_raw())
-        .or_log(std::ptr::null_mut())
+        .with_mut_ok(|surface| BorrowedPtr::from_ref(surface.canvas()))
+        .or_log(BorrowedPtr::null())
 }
 
 #[unsafe(no_mangle)]
@@ -103,7 +108,9 @@ pub extern "C" fn skia_surface_get_height(surface: BorrowedPtr<Surface>) -> i32 
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_surface_get_image_info(mut surface: BorrowedPtr<Surface>) -> OwnedPtr<ImageInfo> {
+pub extern "C" fn skia_surface_get_image_info(
+    mut surface: BorrowedPtr<Surface>,
+) -> OwnedPtr<ImageInfo> {
     surface
         .with_mut_ok(|surface| OwnedPtr::new(surface.image_info()))
         .or_log(OwnedPtr::new(ImageInfo::default()))
@@ -131,7 +138,9 @@ pub extern "C" fn skia_surface_read_all_pixels(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_surface_get_image_snapshot(mut surface: BorrowedPtr<Surface>) -> OwnedPtr<Image> {
+pub extern "C" fn skia_surface_get_image_snapshot(
+    mut surface: BorrowedPtr<Surface>,
+) -> OwnedPtr<Image> {
     surface
         .with_mut_ok(|surface| OwnedPtr::new(surface.image_snapshot()))
         .or_log(OwnedPtr::null())

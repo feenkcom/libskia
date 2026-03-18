@@ -36,7 +36,9 @@ pub extern "C" fn skia_typeface_clone(typeface: BorrowedPtr<Typeface>) -> OwnedP
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_typeface_get_font_style(mut typeface: BorrowedPtr<Typeface>) -> OwnedPtr<FontStyle> {
+pub extern "C" fn skia_typeface_get_font_style(
+    mut typeface: BorrowedPtr<Typeface>,
+) -> OwnedPtr<FontStyle> {
     typeface
         .with_mut_ok(|typeface| OwnedPtr::new(typeface.font_style()))
         .or_log(OwnedPtr::new(FontStyle::new(

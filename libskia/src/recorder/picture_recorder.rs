@@ -1,4 +1,3 @@
-use reference_box::ReferenceBox;
 use skia_safe::{Canvas, Picture, PictureRecorder, Rect, scalar};
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
@@ -7,6 +6,11 @@ pub extern "C" fn skia_picture_recorder_new() -> OwnedPtr<PictureRecorder> {
     OwnedPtr::new(PictureRecorder::new())
 }
 
+/// # Safety
+///
+/// The returned [`BorrowedPtr<Canvas>`] is borrowed from `picture_recorder_ptr`
+/// and must not outlive that `PictureRecorder` or be used after recording is
+/// finished.
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_picture_recorder_begin_recording(
     mut picture_recorder_ptr: BorrowedPtr<PictureRecorder>,
@@ -14,13 +18,14 @@ pub extern "C" fn skia_picture_recorder_begin_recording(
     top: scalar,
     right: scalar,
     bottom: scalar,
-) -> *mut ReferenceBox<Canvas> {
+) -> BorrowedPtr<Canvas> {
     picture_recorder_ptr
         .with_mut_ok(|recorder| {
-            ReferenceBox::new(recorder.begin_recording(Rect::new(left, top, right, bottom), false))
-                .into_raw()
+            BorrowedPtr::from_ref(
+                recorder.begin_recording(Rect::new(left, top, right, bottom), false),
+            )
         })
-        .or_log(std::ptr::null_mut())
+        .or_log(BorrowedPtr::null())
 }
 
 #[unsafe(no_mangle)]

@@ -16,7 +16,9 @@ pub extern "C" fn skia_paragraph_decoration_set_color(mut ptr: BorrowedPtr<Decor
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paragraph_decoration_get_color(ptr: BorrowedPtr<Decoration>) -> OwnedPtr<Color> {
+pub extern "C" fn skia_paragraph_decoration_get_color(
+    ptr: BorrowedPtr<Decoration>,
+) -> OwnedPtr<Color> {
     ptr.with_clone_ok(|decoration| OwnedPtr::new(decoration.color))
         .or_log(OwnedPtr::null())
 }
@@ -50,7 +52,9 @@ pub extern "C" fn skia_paragraph_decoration_set_style(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paragraph_decoration_get_style(ptr: BorrowedPtr<Decoration>) -> TextDecorationStyle {
+pub extern "C" fn skia_paragraph_decoration_get_style(
+    ptr: BorrowedPtr<Decoration>,
+) -> TextDecorationStyle {
     ptr.with_clone_ok(|decoration| decoration.style)
         .or_log(TextDecorationStyle::Solid)
 }
@@ -81,7 +85,9 @@ pub extern "C" fn skia_paragraph_decoration_set_mode(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paragraph_decoration_get_mode(ptr: BorrowedPtr<Decoration>) -> TextDecorationMode {
+pub extern "C" fn skia_paragraph_decoration_get_mode(
+    ptr: BorrowedPtr<Decoration>,
+) -> TextDecorationMode {
     ptr.with_clone_ok(|decoration| decoration.mode)
         .or_log(TextDecorationMode::Gaps)
 }

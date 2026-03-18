@@ -14,7 +14,6 @@ env_logger = "0.11"
 fps_counter = "3.0"
 lazy_static = "1.4"
 value-box = { version = "4.1", path = "../../value-box-rs/value-box", features = [ "anyhow" ] }
-reference-box = "1.1"
 array-box = { version = "4.1", path = "../../value-box-rs/array-box" }
 string-box = { version = "4.1", path = "../../value-box-rs/string-box" }
 geometry-box = { version = "4.1", path = "../../value-box-rs/geometry-box" }

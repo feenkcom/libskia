@@ -9,7 +9,9 @@ pub extern "C" fn skia_paragraph_text_style_new() -> OwnedPtr<TextStyle> {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paragraph_text_style_get_font_size(text_style: BorrowedPtr<TextStyle>) -> scalar {
+pub extern "C" fn skia_paragraph_text_style_get_font_size(
+    text_style: BorrowedPtr<TextStyle>,
+) -> scalar {
     text_style
         .with_ref_ok(|style| style.font_size())
         .or_log(0.0)
@@ -28,7 +30,9 @@ pub extern "C" fn skia_paragraph_text_style_set_font_size(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paragraph_text_style_get_word_spacing(text_style: BorrowedPtr<TextStyle>) -> scalar {
+pub extern "C" fn skia_paragraph_text_style_get_word_spacing(
+    text_style: BorrowedPtr<TextStyle>,
+) -> scalar {
     text_style
         .with_ref_ok(|style| style.word_spacing())
         .or_log(0.0)
@@ -47,7 +51,9 @@ pub extern "C" fn skia_paragraph_text_style_set_word_spacing(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paragraph_text_style_get_letter_spacing(text_style: BorrowedPtr<TextStyle>) -> scalar {
+pub extern "C" fn skia_paragraph_text_style_get_letter_spacing(
+    text_style: BorrowedPtr<TextStyle>,
+) -> scalar {
     text_style
         .with_clone_ok(|style| style.letter_spacing())
         .or_log(0.0)
@@ -66,7 +72,9 @@ pub extern "C" fn skia_paragraph_text_style_set_letter_spacing(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paragraph_text_style_get_color(text_style: BorrowedPtr<TextStyle>) -> OwnedPtr<Color> {
+pub extern "C" fn skia_paragraph_text_style_get_color(
+    text_style: BorrowedPtr<TextStyle>,
+) -> OwnedPtr<Color> {
     text_style
         .with_clone_ok(|style| OwnedPtr::new(style.color()))
         .or_log(OwnedPtr::null())

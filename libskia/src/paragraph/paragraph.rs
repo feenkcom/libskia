@@ -4,7 +4,6 @@ use std::ops::Range;
 use std::rc::Rc;
 
 use array_box::ArrayBox;
-use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::textlayout::{
     Affinity, LineMetrics, Paragraph, PlaceholderStyle, PositionWithAffinity, RectHeightStyle,
     RectWidthStyle, TextBox,
@@ -437,7 +436,10 @@ impl ParagraphWithText {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paragraph_layout(mut paragraph_ptr: BorrowedPtr<ParagraphWithText>, width: scalar) {
+pub extern "C" fn skia_paragraph_layout(
+    mut paragraph_ptr: BorrowedPtr<ParagraphWithText>,
+    width: scalar,
+) {
     paragraph_ptr
         .with_mut_ok(|paragraph| {
             paragraph.layout(width);
@@ -448,49 +450,61 @@ pub extern "C" fn skia_paragraph_layout(mut paragraph_ptr: BorrowedPtr<Paragraph
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_paragraph_paint(
     paragraph_ptr: BorrowedPtr<ParagraphWithText>,
-    canvas_ptr: *mut ReferenceBox<Canvas>,
+    canvas_ptr: BorrowedPtr<Canvas>,
     x: scalar,
     y: scalar,
 ) {
     paragraph_ptr
         .with_ref_ok(|paragraph| {
-            canvas_ptr.with_not_null(|canvas| {
-                paragraph.paint(canvas, Point::new(x, y));
-            })
+            canvas_ptr
+                .with_ref_ok(|canvas| {
+                    paragraph.paint(canvas, Point::new(x, y));
+                })
+                .log()
         })
         .log();
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paragraph_get_height(paragraph_ptr: BorrowedPtr<ParagraphWithText>) -> scalar {
+pub extern "C" fn skia_paragraph_get_height(
+    paragraph_ptr: BorrowedPtr<ParagraphWithText>,
+) -> scalar {
     paragraph_ptr
         .with_ref_ok(|paragraph| paragraph.height())
         .or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paragraph_get_max_width(paragraph_ptr: BorrowedPtr<ParagraphWithText>) -> scalar {
+pub extern "C" fn skia_paragraph_get_max_width(
+    paragraph_ptr: BorrowedPtr<ParagraphWithText>,
+) -> scalar {
     paragraph_ptr
         .with_ref_ok(|paragraph| paragraph.max_width())
         .or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paragraph_get_longest_line(paragraph_ptr: BorrowedPtr<ParagraphWithText>) -> scalar {
+pub extern "C" fn skia_paragraph_get_longest_line(
+    paragraph_ptr: BorrowedPtr<ParagraphWithText>,
+) -> scalar {
     paragraph_ptr
         .with_ref_ok(|paragraph| paragraph.longest_line())
         .or_log(0.0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paragraph_get_line_number(paragraph_ptr: BorrowedPtr<ParagraphWithText>) -> usize {
+pub extern "C" fn skia_paragraph_get_line_number(
+    paragraph_ptr: BorrowedPtr<ParagraphWithText>,
+) -> usize {
     paragraph_ptr
         .with_ref_ok(|paragraph| paragraph.line_number())
         .or_log(0)
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paragraph_get_char_count(paragraph_ptr: BorrowedPtr<ParagraphWithText>) -> usize {
+pub extern "C" fn skia_paragraph_get_char_count(
+    paragraph_ptr: BorrowedPtr<ParagraphWithText>,
+) -> usize {
     paragraph_ptr
         .with_ref_ok(|paragraph| paragraph.char_count())
         .or_log(0)

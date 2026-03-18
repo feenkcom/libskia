@@ -56,6 +56,8 @@ pub extern "C" fn skia_paragraph_placeholder_style_set_baseline_offset(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paragraph_placeholder_style_drop(placeholder_style: OwnedPtr<PlaceholderStyle>) {
+pub extern "C" fn skia_paragraph_placeholder_style_drop(
+    placeholder_style: OwnedPtr<PlaceholderStyle>,
+) {
     drop(placeholder_style);
 }

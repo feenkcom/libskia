@@ -1,5 +1,4 @@
 use float_cmp::ApproxEqUlps;
-use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::{
     Canvas, Color, FilterMode, Image, MipmapMode, Paint, Point, RRect, Rect, SamplingOptions,
     Vector, scalar,
@@ -8,7 +7,7 @@ use value_box::{BorrowedPtr, ReturnBoxerResult};
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_fill_rectangle_with_color(
-    canvas: *mut ReferenceBox<Canvas>,
+    canvas: BorrowedPtr<Canvas>,
     left: scalar,
     top: scalar,
     right: scalar,
@@ -19,20 +18,22 @@ pub extern "C" fn skia_canvas_fill_rectangle_with_color(
     a: u8,
     antialias: bool,
 ) {
-    canvas.with_not_null(|canvas| {
-        canvas.draw_rect(
-            Rect::new(left, top, right, bottom),
-            Paint::default()
-                .set_color(Color::from_argb(a, r, g, b))
-                .set_anti_alias(antialias),
-        );
-    });
+    canvas
+        .with_ref_ok(|canvas| {
+            canvas.draw_rect(
+                Rect::new(left, top, right, bottom),
+                Paint::default()
+                    .set_color(Color::from_argb(a, r, g, b))
+                    .set_anti_alias(antialias),
+            );
+        })
+        .log();
 }
 
 /// I fill a rounded rectangle (each corner radius is different) with a given color
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_fill_rounded_rectangle_with_color(
-    canvas: *mut ReferenceBox<Canvas>,
+    canvas: BorrowedPtr<Canvas>,
     left: scalar,
     top: scalar,
     right: scalar,
@@ -47,57 +48,61 @@ pub extern "C" fn skia_canvas_fill_rounded_rectangle_with_color(
     a: u8,
     antialias: bool,
 ) {
-    canvas.with_not_null(|canvas| {
-        // if all radii are same we can use a simpler optimized drawing method
-        if r_top_left.approx_eq_ulps(&r_top_right, 2)
-            && r_top_right.approx_eq_ulps(&r_bottom_right, 2)
-            && r_bottom_right.approx_eq_ulps(&r_bottom_left, 2)
-            && r_bottom_left.approx_eq_ulps(&r_top_left, 2)
-        {
-            canvas.draw_round_rect(
-                Rect::new(left, top, right, bottom),
-                r_top_right,
-                r_top_right,
-                Paint::default()
-                    .set_color(Color::from_argb(a, r, g, b))
-                    .set_anti_alias(antialias),
-            );
-        } else {
-            canvas.draw_rrect(
-                RRect::new_rect_radii(
+    canvas
+        .with_ref_ok(|canvas| {
+            // if all radii are same we can use a simpler optimized drawing method
+            if r_top_left.approx_eq_ulps(&r_top_right, 2)
+                && r_top_right.approx_eq_ulps(&r_bottom_right, 2)
+                && r_bottom_right.approx_eq_ulps(&r_bottom_left, 2)
+                && r_bottom_left.approx_eq_ulps(&r_top_left, 2)
+            {
+                canvas.draw_round_rect(
                     Rect::new(left, top, right, bottom),
-                    &[
-                        Vector::new(r_top_left, r_top_left),
-                        Vector::new(r_top_right, r_top_right),
-                        Vector::new(r_bottom_right, r_bottom_right),
-                        Vector::new(r_bottom_left, r_bottom_left),
-                    ],
-                ),
-                Paint::default()
-                    .set_color(Color::from_argb(a, r, g, b))
-                    .set_anti_alias(antialias),
-            );
-        };
-    });
+                    r_top_right,
+                    r_top_right,
+                    Paint::default()
+                        .set_color(Color::from_argb(a, r, g, b))
+                        .set_anti_alias(antialias),
+                );
+            } else {
+                canvas.draw_rrect(
+                    RRect::new_rect_radii(
+                        Rect::new(left, top, right, bottom),
+                        &[
+                            Vector::new(r_top_left, r_top_left),
+                            Vector::new(r_top_right, r_top_right),
+                            Vector::new(r_bottom_right, r_bottom_right),
+                            Vector::new(r_bottom_left, r_bottom_left),
+                        ],
+                    ),
+                    Paint::default()
+                        .set_color(Color::from_argb(a, r, g, b))
+                        .set_anti_alias(antialias),
+                );
+            };
+        })
+        .log();
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_fill_image_without_paint(
-    canvas: *mut ReferenceBox<Canvas>,
+    canvas: BorrowedPtr<Canvas>,
     image: BorrowedPtr<Image>,
     x: scalar,
     y: scalar,
 ) {
     image
         .with_ref_ok(|image| {
-            canvas.with_not_null(|canvas| {
-                canvas.draw_image_with_sampling_options(
-                    image,
-                    Point::new(x, y),
-                    SamplingOptions::new(FilterMode::Linear, MipmapMode::Linear),
-                    None,
-                );
-            })
+            canvas
+                .with_ref_ok(|canvas| {
+                    canvas.draw_image_with_sampling_options(
+                        image,
+                        Point::new(x, y),
+                        SamplingOptions::new(FilterMode::Linear, MipmapMode::Linear),
+                        None,
+                    );
+                })
+                .log()
         })
         .log();
 }

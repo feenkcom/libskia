@@ -1,7 +1,6 @@
 use std::error::Error;
 use std::ops::Deref;
 
-use reference_box::{ReferenceBox, ReferenceBoxPointer};
 use skia_safe::svg::Canvas as SvgCanvas;
 use skia_safe::svg::Dom;
 use skia_safe::svg::canvas::Flags as SvgCanvasFlags;
@@ -26,26 +25,32 @@ pub extern "C" fn skia_svg_parse(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_svg_set_container_size(mut dom: BorrowedPtr<Dom>, width: scalar, height: scalar) {
+pub extern "C" fn skia_svg_set_container_size(
+    mut dom: BorrowedPtr<Dom>,
+    width: scalar,
+    height: scalar,
+) {
     dom.with_mut_ok(|dom| dom.set_container_size(Size::new(width, height)))
         .log();
 }
 
 #[unsafe(no_mangle)]
 pub extern "C" fn skia_canvas_render_svg(
-    canvas: *mut ReferenceBox<Canvas>,
+    canvas: BorrowedPtr<Canvas>,
     dom: BorrowedPtr<Dom>,
     x: scalar,
     y: scalar,
 ) {
-    canvas.with_not_null(|canvas| {
-        dom.with_ref_ok(|dom| {
-            canvas.translate(Vector::new(x, y));
-            dom.render(canvas);
-            canvas.translate(Vector::new(-x, -y));
+    canvas
+        .with_ref_ok(|canvas| {
+            dom.with_ref_ok(|dom| {
+                canvas.translate(Vector::new(x, y));
+                dom.render(canvas);
+                canvas.translate(Vector::new(-x, -y));
+            })
+            .log();
         })
         .log();
-    });
 }
 
 #[unsafe(no_mangle)]
@@ -66,18 +71,24 @@ pub extern "C" fn skia_svg_canvas_new(
     OwnedPtr::new(canvas)
 }
 
+/// # Safety
+///
+/// The returned [`BorrowedPtr<Canvas>`] is borrowed from `svg_canvas` and must
+/// not outlive that `SvgCanvas`.
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_svg_canvas_get_canvas(svg_canvas: BorrowedPtr<SvgCanvas>) -> *mut ReferenceBox<Canvas> {
+pub extern "C" fn skia_svg_canvas_get_canvas(
+    svg_canvas: BorrowedPtr<SvgCanvas>,
+) -> BorrowedPtr<Canvas> {
     svg_canvas
-        .with_ref_ok(|svg_canvas| {
-            let canvas = svg_canvas.deref();
-            ReferenceBox::new(canvas).into_raw()
-        })
-        .or_log(std::ptr::null_mut())
+        .with_ref_ok(|svg_canvas| BorrowedPtr::from_ref(svg_canvas.deref()))
+        .or_log(BorrowedPtr::null())
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_svg_canvas_end(svg_canvas: OwnedPtr<SvgCanvas>, mut data: BorrowedPtr<StringBox>) {
+pub extern "C" fn skia_svg_canvas_end(
+    svg_canvas: OwnedPtr<SvgCanvas>,
+    mut data: BorrowedPtr<StringBox>,
+) {
     svg_canvas
         .with_value_ok(|svg_canvas| {
             data.with_mut_ok(|data| {

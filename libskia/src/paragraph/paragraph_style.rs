@@ -55,7 +55,9 @@ pub extern "C" fn skia_paragraph_style_set_text_style(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paragraph_style_get_height(paragraph_ptr: BorrowedPtr<ParagraphStyle>) -> scalar {
+pub extern "C" fn skia_paragraph_style_get_height(
+    paragraph_ptr: BorrowedPtr<ParagraphStyle>,
+) -> scalar {
     paragraph_ptr
         .with_ref_ok(|style| style.height())
         .or_log(0.0)
@@ -90,7 +92,9 @@ pub extern "C" fn skia_paragraph_style_set_max_lines(
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn skia_paragraph_style_get_max_lines(paragraph_ptr: BorrowedPtr<ParagraphStyle>) -> usize {
+pub extern "C" fn skia_paragraph_style_get_max_lines(
+    paragraph_ptr: BorrowedPtr<ParagraphStyle>,
+) -> usize {
     paragraph_ptr
         .with_ref_ok(|style| style.max_lines().unwrap_or(usize::MAX))
         .or_log(0)
