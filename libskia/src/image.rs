@@ -5,7 +5,10 @@ use std::io::Write;
 use array_box::ArrayBox;
 use skia_safe::gpu::{BackendTexture, SurfaceOrigin};
 use skia_safe::image::CachingHint;
-use skia_safe::{gpu, images, surfaces, AlphaType, ColorSpace, ColorType, Data, EncodedImageFormat, IPoint, ISize, Image, ImageInfo, Paint, M44};
+use skia_safe::{
+    gpu, images, surfaces, AlphaType, ColorSpace, ColorType, Data, EncodedImageFormat, IPoint,
+    ISize, Image, ImageInfo, Paint, M44,
+};
 use string_box::StringBox;
 use value_box::{BorrowedPtr, OwnedPtr, ReturnBoxerResult};
 
@@ -225,20 +228,24 @@ pub fn skia_image_is_texture_backend(image: BorrowedPtr<Image>) -> bool {
 #[no_mangle]
 pub fn skia_image_get_backend_texture(image_ptr: BorrowedPtr<Image>) -> OwnedPtr<BackendTexture> {
     image_ptr
-        .with_ref_ok(|image| match gpu::images::get_backend_texture_from_image(image, true) {
-            None => OwnedPtr::null(),
-            Some(result) => OwnedPtr::new(result.0),
-        })
+        .with_ref_ok(
+            |image| match gpu::images::get_backend_texture_from_image(image, true) {
+                None => OwnedPtr::null(),
+                Some(result) => OwnedPtr::new(result.0),
+            },
+        )
         .or_log(OwnedPtr::null())
 }
 
 #[no_mangle]
 pub fn skia_image_get_backend_texture_origin(image_ptr: BorrowedPtr<Image>) -> SurfaceOrigin {
     image_ptr
-        .with_ref_ok(|image| match gpu::images::get_backend_texture_from_image(image, true) {
-            None => SurfaceOrigin::TopLeft,
-            Some(result) => result.1,
-        })
+        .with_ref_ok(
+            |image| match gpu::images::get_backend_texture_from_image(image, true) {
+                None => SurfaceOrigin::TopLeft,
+                Some(result) => result.1,
+            },
+        )
         .or_log(SurfaceOrigin::BottomLeft)
 }
 

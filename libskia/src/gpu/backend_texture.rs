@@ -75,9 +75,7 @@ pub fn skia_backend_texture_is_protected(texture_ptr: BorrowedPtr<BackendTexture
 
 #[no_mangle]
 pub fn skia_backend_texture_is_valid(texture_ptr: BorrowedPtr<BackendTexture>) -> bool {
-    texture_ptr
-        .with_clone_ok(|_| true)
-        .or_log(false)
+    texture_ptr.with_clone_ok(|_| true).or_log(false)
 }
 
 #[no_mangle]

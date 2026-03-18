@@ -1,28 +1,21 @@
 use crate::gpu::platform_compositor::{PlatformCompositor, PlatformContext};
 
-use cocoa::base::{id as cocoa_id, YES};
-
 use uikit_sys::{
-    id as uikit_id, CALayer, CGPoint as UIPoint, CGRect as UIRect, CGSize as UISize, ICALayer,
-    INSObject, IUIColor, IUIView, NSObject, PCALayerDelegate, UIColor, UIResponder, UIView,
-    UIView_UIViewHierarchy, UIView_UIViewRendering,
+    id as uikit_id, CGPoint as UIPoint, CGRect as UIRect, CGSize as UISize, IUIView, UIView,
+    UIView_UIViewHierarchy,
 };
-
-use objc::declare::ClassDecl;
-use objc::runtime::Class;
-use objc::runtime::Object;
-use objc::runtime::Sel;
-use objc::*;
 
 use core_graphics_types::geometry::CGSize;
 use foreign_types_shared::{ForeignType, ForeignTypeRef};
 use metal::{CommandQueue, Device, MTLPixelFormat, MetalDrawableRef, MetalLayer};
+use objc2::runtime::{AnyClass, AnyObject, ClassBuilder, Sel};
+use objc2::{class, msg_send, sel};
 use skia_safe::gpu::mtl::BackendContext;
 use skia_safe::gpu::{mtl, BackendRenderTarget, DirectContext, SurfaceOrigin};
 use skia_safe::{gpu, scalar, ColorType, ISize, Size, Surface};
 use std::fmt::{Debug, Formatter};
-use std::mem;
 use std::mem::transmute;
+use std::sync::OnceLock;
 use value_box::OwnedPtr;
 
 #[allow(dead_code)]
@@ -37,17 +30,14 @@ pub struct MetalContext {
 }
 
 impl MetalContext {
-    pub fn new(ns_view: cocoa_id, size: Option<CGSize>) -> Self {
+    pub fn new(ns_view: *mut AnyObject, size: Option<CGSize>) -> Self {
         let device = Device::system_default().expect("no device found");
         let ui_view = UIView(ns_view as uikit_id);
 
-        create_metal_view_class();
+        let metal_view_class = metal_view_class();
         let metal_view = unsafe {
-            let sub_view = unsafe {
-                let cls = class!(MetalView);
-                let obj: *mut Object = msg_send![cls, alloc];
-                UIView(obj)
-            };
+            let obj: *mut AnyObject = msg_send![metal_view_class, alloc];
+            let sub_view = UIView(obj as uikit_id);
             if let Some(size) = size {
                 let frame = UIRect {
                     origin: UIPoint { x: 0.0, y: 0.0 },
@@ -152,27 +142,31 @@ impl Debug for MetalContext {
     }
 }
 
-fn create_metal_view_class() {
-    let superclass = class!(UIView);
-    let mut decl = ClassDecl::new("MetalView", superclass).unwrap();
+fn metal_view_class() -> &'static AnyClass {
+    static METAL_VIEW_CLASS: OnceLock<&'static AnyClass> = OnceLock::new();
 
-    // Add an ObjC method for getting the number
-    extern "C" fn layerClass(this: &Class, _cmd: Sel) -> *const Class {
-        class!(CAMetalLayer)
-    }
-    unsafe {
-        decl.add_class_method(
-            sel!(layerClass),
-            layerClass as extern "C" fn(&Class, Sel) -> *const Class,
-        );
-    }
+    METAL_VIEW_CLASS.get_or_init(|| {
+        let mut builder = ClassBuilder::new(c"MetalView", class!(UIView))
+            .expect("MetalView class should only be registered once");
 
-    decl.register();
+        extern "C-unwind" fn layer_class(_this: &AnyClass, _cmd: Sel) -> *const AnyClass {
+            class!(CAMetalLayer)
+        }
+
+        unsafe {
+            builder.add_class_method(
+                sel!(layerClass),
+                layer_class as extern "C-unwind" fn(&AnyClass, Sel) -> *const AnyClass,
+            );
+        }
+
+        builder.register()
+    })
 }
 
 #[no_mangle]
 pub fn skia_metal_compositor_new_size(
-    ns_view: cocoa_id,
+    ns_view: *mut AnyObject,
     width: u32,
     height: u32,
 ) -> OwnedPtr<PlatformCompositor> {

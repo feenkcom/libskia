@@ -33,7 +33,8 @@ pub fn skia_backend_render_target_new_metal(
 ) -> OwnedPtr<BackendRenderTarget> {
     let texture_info = unsafe { skia_safe::gpu::mtl::TextureInfo::new(std::ptr::null_mut()) };
 
-    let render_target = skia_safe::gpu::backend_render_targets::make_mtl((width, height), &texture_info);
+    let render_target =
+        skia_safe::gpu::backend_render_targets::make_mtl((width, height), &texture_info);
 
     OwnedPtr::new(render_target)
 }
