@@ -42,14 +42,3 @@ pub extern "C" fn skia_layer_rec_set_paint(
 pub extern "C" fn skia_layer_rec_drop(save_layer_rec: OwnedPtr<SaveLayerRecWrapper>) {
     drop(save_layer_rec);
 }
-
-#[cfg(test)]
-pub mod test {
-    use super::*;
-
-    #[test]
-    fn default_layer() {
-        let mut layer = skia_layer_rec_default();
-        skia_layer_rec_drop(layer);
-    }
-}

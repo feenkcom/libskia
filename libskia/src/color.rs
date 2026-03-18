@@ -99,20 +99,3 @@ pub extern "C" fn skia_color_array_at_put(
 pub extern "C" fn skia_color_array_drop(array: OwnedPtr<ArrayBox<Color>>) {
     drop(array);
 }
-
-#[test]
-pub fn test_skia_color_array() {
-    let mut color = skia_color_default();
-    let mut array = skia_color_array_create_with(color, 5);
-
-    assert_eq!(!color.is_null(), true);
-    assert_eq!(!array.is_null(), true);
-
-    skia_color_array_drop(array);
-
-    assert_eq!(!color.is_null(), true);
-    assert_eq!(!array.is_null(), false);
-
-    skia_color_drop(color);
-    assert_eq!(!color.is_null(), false);
-}

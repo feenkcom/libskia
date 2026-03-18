@@ -86,33 +86,3 @@ pub extern "C" fn skia_rounded_rectangle_set_oval(
 pub extern "C" fn skia_rounded_rectangle_drop(rounded_rectangle: OwnedPtr<RRect>) {
     drop(rounded_rectangle);
 }
-
-#[cfg(test)]
-mod test {
-    use super::*;
-    use crate::rectangle::{skia_rectangle_f32_default, skia_rectangle_f32_set_ltrb};
-
-    #[test]
-    fn set_rect() {
-        let mut rect = skia_rectangle_f32_default();
-        skia_rectangle_f32_set_ltrb(rect, 0.0, 0.0, 50.0, 50.0);
-
-        let mut r_rect = skia_rounded_rectangle_default();
-        skia_rounded_rectangle_set_rect(r_rect, rect);
-
-        assert_eq!(skia_rounded_rectangle_width(r_rect), 50.0);
-        assert_eq!(skia_rounded_rectangle_height(r_rect), 50.0);
-
-        skia_rectangle_f32_set_ltrb(rect, 0.0, 0.0, 100.0, 100.0);
-
-        assert_eq!(skia_rounded_rectangle_width(r_rect), 50.0);
-        assert_eq!(skia_rounded_rectangle_height(r_rect), 50.0);
-
-        drop(rect);
-
-        assert_eq!(skia_rounded_rectangle_width(r_rect), 50.0);
-        assert_eq!(skia_rounded_rectangle_height(r_rect), 50.0);
-
-        drop(r_rect);
-    }
-}

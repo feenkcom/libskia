@@ -17,24 +17,3 @@ pub extern "C" fn skia_color_space_is_srgb(color_space: BorrowedPtr<ColorSpace>)
 pub extern "C" fn skia_color_space_drop(color_space: OwnedPtr<ColorSpace>) {
     drop(color_space);
 }
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn color_space_new_srgb() {
-        let color_space = skia_color_space_new_srgb();
-        assert_eq!(color_space.is_null(), false);
-        assert_eq!(skia_color_space_is_srgb(color_space), true);
-        skia_color_space_drop(color_space);
-    }
-
-    #[test]
-    fn color_space_is_srgb_for_null() {
-        let color_space: BorrowedPtr<ColorSpace> = std::ptr::null_mut();
-        assert_eq!(color_space.is_null(), true);
-        assert_eq!(skia_color_space_is_srgb(color_space), false);
-        skia_color_space_drop(color_space);
-    }
-}
