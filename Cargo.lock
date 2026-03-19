@@ -75,12 +75,6 @@ checksum = "7f202df86484c868dbad7eaa557ef785d5c66295e41b460ef922eca0723b842c"
 
 [[package]]
 name = "array-box"
-version = "1.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be2a725ca901ef49bb56bd31373dbc809641a8347cf7784200e3c6d6da4d957a"
-
-[[package]]
-name = "array-box"
 version = "4.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ef5e984eeeb4d5a1e71c1b831f38e1e8a2412fb8d34f9873aff8d67eed0232b6"
@@ -285,8 +279,8 @@ checksum = "1d07550c9036bf2ae0c684c4297d503f838287c83c53686d05370d0e139ae570"
 
 [[package]]
 name = "compositor"
-version = "2.3.0"
-source = "git+https://github.com/feenkcom/compositor-rs#a999cb65d232e4b9dceffb1b2a061131a5f1a56e"
+version = "3.0.0"
+source = "git+https://github.com/feenkcom/compositor-rs#14a5803f7256112fb0a54bcd8b51c0a73fa0fba7"
 dependencies = [
  "cfg-if",
  "cocoa",
@@ -303,22 +297,21 @@ dependencies = [
 
 [[package]]
 name = "compositor-ffi"
-version = "2.3.0"
-source = "git+https://github.com/feenkcom/compositor-rs#a999cb65d232e4b9dceffb1b2a061131a5f1a56e"
+version = "3.0.0"
+source = "git+https://github.com/feenkcom/compositor-rs#14a5803f7256112fb0a54bcd8b51c0a73fa0fba7"
 dependencies = [
- "array-box 1.0.2",
+ "array-box",
  "cfg-if",
  "compositor",
  "compositor-texture",
- "reference-box",
- "string-box 1.1.1",
- "value-box 2.3.3",
+ "string-box",
+ "value-box",
 ]
 
 [[package]]
 name = "compositor-skia"
-version = "2.3.0"
-source = "git+https://github.com/feenkcom/compositor-rs#a999cb65d232e4b9dceffb1b2a061131a5f1a56e"
+version = "3.0.0"
+source = "git+https://github.com/feenkcom/compositor-rs#14a5803f7256112fb0a54bcd8b51c0a73fa0fba7"
 dependencies = [
  "anyhow",
  "cfg-if",
@@ -334,19 +327,18 @@ dependencies = [
 
 [[package]]
 name = "compositor-skia-ffi"
-version = "2.2.0"
-source = "git+https://github.com/feenkcom/compositor-rs#a999cb65d232e4b9dceffb1b2a061131a5f1a56e"
+version = "3.0.0"
+source = "git+https://github.com/feenkcom/compositor-rs#14a5803f7256112fb0a54bcd8b51c0a73fa0fba7"
 dependencies = [
  "compositor",
  "compositor-skia",
- "reference-box",
- "value-box 2.3.3",
+ "value-box",
 ]
 
 [[package]]
 name = "compositor-skia-platform"
-version = "0.1.0"
-source = "git+https://github.com/feenkcom/compositor-rs#a999cb65d232e4b9dceffb1b2a061131a5f1a56e"
+version = "3.0.0"
+source = "git+https://github.com/feenkcom/compositor-rs#14a5803f7256112fb0a54bcd8b51c0a73fa0fba7"
 dependencies = [
  "anyhow",
  "cocoa",
@@ -360,15 +352,15 @@ dependencies = [
  "num_enum",
  "objc",
  "skia-safe",
- "thiserror 2.0.18",
+ "thiserror",
  "uikit-sys",
  "windows",
 ]
 
 [[package]]
 name = "compositor-texture"
-version = "0.1.0"
-source = "git+https://github.com/feenkcom/compositor-rs#a999cb65d232e4b9dceffb1b2a061131a5f1a56e"
+version = "3.0.0"
+source = "git+https://github.com/feenkcom/compositor-rs#14a5803f7256112fb0a54bcd8b51c0a73fa0fba7"
 
 [[package]]
 name = "core-foundation"
@@ -553,9 +545,9 @@ dependencies = [
 
 [[package]]
 name = "euclid"
-version = "0.22.13"
+version = "0.22.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "df61bf483e837f88d5c2291dcf55c67be7e676b3a51acc48db3a7b163b91ed63"
+checksum = "f1a05365e3b1c6d1650318537c7460c6923f1abdd272ad6842baa2b509957a06"
 dependencies = [
  "num-traits",
 ]
@@ -1036,7 +1028,7 @@ dependencies = [
 name = "libskia"
 version = "0.6.0"
 dependencies = [
- "array-box 4.1.0",
+ "array-box",
  "compositor",
  "compositor-ffi",
  "compositor-skia",
@@ -1056,10 +1048,10 @@ dependencies = [
  "mozangle",
  "objc2",
  "skia-safe",
- "string-box 4.1.0",
+ "string-box",
  "typename",
  "uikit-sys",
- "value-box 4.1.0",
+ "value-box",
  "value-box-ffi",
  "wayland-sys",
  "windows",
@@ -1484,12 +1476,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "reference-box"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e92eca715ea4abff1a95adea1e590d42ab28911a9f968e4196ada43680727faa"
-
-[[package]]
 name = "regex"
 version = "1.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1752,15 +1738,6 @@ checksum = "6ce2be8dc25455e1f91df71bfa12ad37d7af1092ae736f3a6cd0e37bc7810596"
 
 [[package]]
 name = "string-box"
-version = "1.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c7521baf48cac0e8cf1a74a6b4cb3b59916d3d3ae98bda7c8582ef12b5c4bf7"
-dependencies = [
- "widestring",
-]
-
-[[package]]
-name = "string-box"
 version = "4.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "79726d389757b99ca6ce385124dc83b5625796d74b2618ddd968c00818d8dc86"
@@ -1857,31 +1834,11 @@ checksum = "c13547615a44dc9c452a8a534638acdf07120d4b6847c8178705da06306a3057"
 
 [[package]]
 name = "thiserror"
-version = "1.0.69"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b6aaf5339b578ea85b50e080feb250a3e8ae8cfcdff9a461c9ec2904bc923f52"
-dependencies = [
- "thiserror-impl 1.0.69",
-]
-
-[[package]]
-name = "thiserror"
 version = "2.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4288b5bcbc7920c07a1149a35cf9590a2aa808e0bc1eafaade0b80947865fbc4"
 dependencies = [
- "thiserror-impl 2.0.18",
-]
-
-[[package]]
-name = "thiserror-impl"
-version = "1.0.69"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4fee6c4efc90059e10f81e6d42c60a18f76588c3d74cb83a0b242a2b6c7504c1"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.117",
+ "thiserror-impl",
 ]
 
 [[package]]
@@ -2109,24 +2066,13 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 
 [[package]]
 name = "value-box"
-version = "2.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7a46766ed9f0a78b82f789cab9b0287b7573ce6a8d2d249c29265e75217d80dc"
-dependencies = [
- "log",
- "thiserror 1.0.69",
- "user-error",
-]
-
-[[package]]
-name = "value-box"
 version = "4.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4e736fa2f6312bd82fd889543f917003a2e9b60ca435f0b61a9704405669c1e"
 dependencies = [
  "anyhow",
  "log",
- "thiserror 2.0.18",
+ "thiserror",
  "user-error",
 ]
 
@@ -2136,12 +2082,12 @@ version = "4.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "acb7c24afcf81b56b02b4baebcace622389eede38c3ee8dd10fe289b6ee469d9"
 dependencies = [
- "array-box 4.1.0",
+ "array-box",
  "crossbeam",
  "geometry-box",
  "paste",
- "string-box 4.1.0",
- "value-box 4.1.0",
+ "string-box",
+ "value-box",
 ]
 
 [[package]]
