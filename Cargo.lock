@@ -280,7 +280,7 @@ checksum = "1d07550c9036bf2ae0c684c4297d503f838287c83c53686d05370d0e139ae570"
 [[package]]
 name = "compositor"
 version = "3.0.0"
-source = "git+https://github.com/feenkcom/compositor-rs#14a5803f7256112fb0a54bcd8b51c0a73fa0fba7"
+source = "git+https://github.com/feenkcom/compositor-rs#a5d09b484b8c1106deb3b6f6f2a6513e432fc2ae"
 dependencies = [
  "cfg-if",
  "cocoa",
@@ -298,7 +298,7 @@ dependencies = [
 [[package]]
 name = "compositor-ffi"
 version = "3.0.0"
-source = "git+https://github.com/feenkcom/compositor-rs#14a5803f7256112fb0a54bcd8b51c0a73fa0fba7"
+source = "git+https://github.com/feenkcom/compositor-rs#a5d09b484b8c1106deb3b6f6f2a6513e432fc2ae"
 dependencies = [
  "array-box",
  "cfg-if",
@@ -311,7 +311,7 @@ dependencies = [
 [[package]]
 name = "compositor-skia"
 version = "3.0.0"
-source = "git+https://github.com/feenkcom/compositor-rs#14a5803f7256112fb0a54bcd8b51c0a73fa0fba7"
+source = "git+https://github.com/feenkcom/compositor-rs#a5d09b484b8c1106deb3b6f6f2a6513e432fc2ae"
 dependencies = [
  "anyhow",
  "cfg-if",
@@ -328,7 +328,7 @@ dependencies = [
 [[package]]
 name = "compositor-skia-ffi"
 version = "3.0.0"
-source = "git+https://github.com/feenkcom/compositor-rs#14a5803f7256112fb0a54bcd8b51c0a73fa0fba7"
+source = "git+https://github.com/feenkcom/compositor-rs#a5d09b484b8c1106deb3b6f6f2a6513e432fc2ae"
 dependencies = [
  "compositor",
  "compositor-skia",
@@ -338,7 +338,7 @@ dependencies = [
 [[package]]
 name = "compositor-skia-platform"
 version = "3.0.0"
-source = "git+https://github.com/feenkcom/compositor-rs#14a5803f7256112fb0a54bcd8b51c0a73fa0fba7"
+source = "git+https://github.com/feenkcom/compositor-rs#a5d09b484b8c1106deb3b6f6f2a6513e432fc2ae"
 dependencies = [
  "anyhow",
  "cocoa",
@@ -360,7 +360,7 @@ dependencies = [
 [[package]]
 name = "compositor-texture"
 version = "3.0.0"
-source = "git+https://github.com/feenkcom/compositor-rs#14a5803f7256112fb0a54bcd8b51c0a73fa0fba7"
+source = "git+https://github.com/feenkcom/compositor-rs#a5d09b484b8c1106deb3b6f6f2a6513e432fc2ae"
 
 [[package]]
 name = "core-foundation"
