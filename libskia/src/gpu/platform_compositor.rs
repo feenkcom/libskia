@@ -72,6 +72,9 @@ impl PlatformCompositor {
             .clone();
 
         if let Some(layer) = current_layer {
+            #[cfg(target_os = "macos")]
+            self.context
+                .set_requires_surface_read(layer.requires_surface_read());
             self.context.with_surface(|surface| {
                 let canvas = surface.canvas();
                 canvas.clear(Color::WHITE);
@@ -102,6 +105,9 @@ impl PlatformCompositor {
             .clone();
 
         if let Some(layer) = current_layer {
+            #[cfg(target_os = "macos")]
+            self.context
+                .set_requires_surface_read(layer.requires_surface_read());
             self.context.with_surface(|surface| {
                 let canvas = surface.canvas();
                 canvas.clear(Color::WHITE);
@@ -140,6 +146,13 @@ pub enum PlatformContext {
 }
 
 impl PlatformContext {
+    #[cfg(target_os = "macos")]
+    pub fn set_requires_surface_read(&mut self, required: bool) {
+        if let Self::Metal(context) = self {
+            context.set_requires_surface_read(required);
+        }
+    }
+
     pub fn platform(&self) -> Option<Platform> {
         match self {
             #[cfg(target_os = "macos")]
